@@ -22,4 +22,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency("faraday", "~> 1.5.1")
   spec.add_dependency("faraday_middleware", "~> 1.0.0")
+  spec.add_dependency("sorbet-runtime", "~> 0.5.6497")
+  spec.add_development_dependency("sorbet", "~> 0.5.6497")
+  spec.add_development_dependency("tapioca", "~> 0.4.23")
 end

@@ -1,9 +1,12 @@
 PATH
   remote: .
   specs:
-    lunchmoney-ruby (0.0.3)
+    lunchmoney-ruby (0.0.6)
       faraday (~> 1.5.1)
       faraday_middleware (~> 1.0.0)
+      sorbet (~> 0.5.6497)
+      sorbet-runtime (~> 0.5.6497)
+      tapioca (~> 0.4.23)
 
 GEM
   remote: https://rubygems.org/
@@ -99,6 +102,8 @@ DEPENDENCIES
   rubocop
   rubocop-shopify
   rubocop-sorbet
+  sorbet
+  sorbet-runtime
   tapioca
 
 BUNDLED WITH

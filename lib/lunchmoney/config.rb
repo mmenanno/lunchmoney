@@ -1,6 +1,8 @@
 # typed: strict
 # frozen_string_literal: true
 
+require "sorbet-runtime"
+
 module LunchMoney
   extend T::Sig
   class Config
@@ -11,7 +13,7 @@ module LunchMoney
 
     sig { returns(T.nilable(String)) }
     def token
-      T.let(@token, T.nilable(String)) || ENV.fetch("LUNCHMONEY_TOKEN")
+      T.let(@token, T.nilable(String)) || ENV.fetch("LUNCHMONEY_TOKEN", nil)
     end
   end
 

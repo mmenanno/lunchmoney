@@ -4,8 +4,9 @@ source "https://rubygems.org"
 
 gemspec
 
-gem "faraday"
-gem "faraday_middleware"
+gem("faraday")
+gem("faraday_middleware")
+gem("sorbet-runtime")
 
 group(:development, :test) do
   gem("minitest", require: false)
@@ -13,5 +14,6 @@ group(:development, :test) do
   gem("rubocop", require: false)
   gem("rubocop-shopify", require: false)
   gem("rubocop-sorbet", require: false)
-  gem("tapioca", require: false)
+  gem("tapioca")
+  gem("sorbet")
 end

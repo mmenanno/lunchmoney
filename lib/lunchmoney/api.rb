@@ -229,7 +229,7 @@ module LunchMoney
       body = response.body
       if body.is_a?(Hash)
         parse_and_raise_error(body) if body[:error]
-        raise(LunchMoney::ValidateError, body[:message]) if body[:name].includes?("ValidateError")
+        raise(LunchMoney::ValidateError, body[:message]) if body[:name]&.includes?("ValidateError")
       end
     end
 
