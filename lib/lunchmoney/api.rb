@@ -129,7 +129,7 @@ module LunchMoney
 
     sig { params(transaction_id: Integer, body: T.untyped).returns(T.untyped) }
     def update_transaction(transaction_id, body)
-      response = put("transaction/#{transaction_id}", body)
+      response = put("transactions/#{transaction_id}", body)
       get_errors(response)
       response.body
     end
