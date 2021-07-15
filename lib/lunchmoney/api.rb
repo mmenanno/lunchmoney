@@ -17,13 +17,19 @@ module LunchMoney
       response.body[:categories]
     end
 
-    def create_category(name:, description: nil, is_income: false, exclude_from_budget: false, exclude_from_totals: false)
+    def create_category(
+      name:,
+      description: nil,
+      is_income: false,
+      exclude_from_budget: false,
+      exclude_from_totals: false
+    )
       params = {
         name: name,
         description: description,
         is_income: is_income,
         exclude_from_budget: exclude_from_budget,
-        exclude_from_totals: exclude_from_totals
+        exclude_from_totals: exclude_from_totals,
       }
 
       response = post("categories", params)
@@ -53,7 +59,8 @@ module LunchMoney
       limit: nil,
       start_date: nil,
       end_date: nil,
-      debit_as_negative: nil)
+      debit_as_negative: nil
+    )
 
       params = {}
       params[:tag_id] = tag_id if tag_id
@@ -70,10 +77,10 @@ module LunchMoney
       params[:end_date] = end_date if end_date
       params[:debit_as_negative] = debit_as_negative if debit_as_negative
 
-      if params.empty?
-        response = get("transactions")
+      response = if params.empty?
+        get("transactions")
       else
-        response = get("transactions", query_params: params)
+        get("transactions", query_params: params)
       end
 
       get_errors(response)
@@ -84,10 +91,10 @@ module LunchMoney
       params = {}
       params[:debit_as_negative] = debit_as_negative if debit_as_negative
 
-      if params.empty?
-        response = get("transactions/#{transaction_id}")
+      response = if params.empty?
+        get("transactions/#{transaction_id}")
       else
-        response = get("transactions/#{transaction_id}", query_params: params)
+        get("transactions/#{transaction_id}", query_params: params)
       end
 
       get_errors(response)
@@ -106,7 +113,7 @@ module LunchMoney
       request = Faraday.new do |conn|
         conn.authorization(:Bearer, LUNCHMONEY_TOKEN)
         conn.options.params_encoder = Faraday::FlatParamsEncoder
-        conn.response(:json, content_type: /json$/, :parser_options => { :symbolize_names => true })
+        conn.response(:json, content_type: /json$/, parser_options: { symbolize_names: true })
       end
 
       if query_params
@@ -120,7 +127,7 @@ module LunchMoney
       request = Faraday.new do |conn|
         conn.authorization(:Bearer, LUNCHMONEY_TOKEN)
         conn.request(:json)
-        conn.response(:json, content_type: /json$/, :parser_options => { :symbolize_names => true })
+        conn.response(:json, content_type: /json$/, parser_options: { symbolize_names: true })
       end
 
       request.post(BASE_URL + endpoint, params)
@@ -130,7 +137,7 @@ module LunchMoney
       request = Faraday.new do |conn|
         conn.authorization(:Bearer, LUNCHMONEY_TOKEN)
         conn.request(:json)
-        conn.response(:json, content_type: /json$/, :parser_options => { :symbolize_names => true })
+        conn.response(:json, content_type: /json$/, parser_options: { symbolize_names: true })
       end
 
       request.put(BASE_URL + endpoint) do |req|

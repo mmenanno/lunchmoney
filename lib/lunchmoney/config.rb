@@ -5,7 +5,7 @@ module LunchMoney
     attr_accessor :token
 
     def token
-      @token || ENV.fetch('LUNCHMONEY_TOKEN')
+      @token || ENV.fetch("LUNCHMONEY_TOKEN")
     end
   end
 

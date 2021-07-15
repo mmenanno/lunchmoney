@@ -1,0 +1,21 @@
+# This file strictly follows the rules defined in the Ruby style guide:
+#   http://shopify.github.io/ruby-style-guide/
+inherit_gem:
+  rubocop-shopify: rubocop.yml
+
+AllCops:
+  TargetRubyVersion: 2.6
+  NewCops: enable
+  SuggestExtensions: false
+
+Naming/AccessorMethodName:
+  Exclude:
+    - lib/lunchmoney/api.rb
+
+Naming/FileName:
+  Exclude:
+    - lib/lunchmoney-ruby.rb
+
+Lint/DuplicateMethods:
+  Exclude:
+    - lib/lunchmoney/config.rb
