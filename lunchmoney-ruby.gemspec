@@ -20,6 +20,6 @@ Gem::Specification.new do |spec|
 
   spec.metadata["allowed_push_host"] = "https://rubygems.org"
 
-  spec.add_dependency("faraday")
-  spec.add_dependency("faraday_middleware")
+  spec.add_dependency("faraday", "~> 1.5.1")
+  spec.add_dependency("faraday_middleware", "~> 1.0.0")
 end

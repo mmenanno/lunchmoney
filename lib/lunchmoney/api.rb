@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 require "pry"
@@ -8,15 +9,21 @@ require_relative "config"
 
 module LunchMoney
   class Api
+    extend T::Sig
     BASE_URL = "https://dev.lunchmoney.app/v1/"
-    LUNCHMONEY_TOKEN = LunchMoney.config.token
+    LUNCHMONEY_TOKEN = T.let(LunchMoney.config.token, T.nilable(String))
 
+    sig { returns(T.untyped) }
     def get_all_categories
       response = get("categories")
       get_errors(response)
       response.body[:categories]
     end
 
+    sig do
+      params(name: String, description: T.nilable(String), is_income: T::Boolean, exclude_from_budget: T::Boolean,
+        exclude_from_totals: T::Boolean).returns(T.untyped)
+    end
     def create_category(
       name:,
       description: nil,
@@ -40,12 +47,30 @@ module LunchMoney
       end
     end
 
+    sig { returns(T.untyped) }
     def get_all_tags
       response = get("tags")
       get_errors(response)
       response.body
     end
 
+    sig do
+      params(
+        tag_id: T.nilable(Integer),
+        recurring_id: T.nilable(Integer),
+        plaid_account_id: T.nilable(Integer),
+        category_id: T.nilable(Integer),
+        asset_id: T.nilable(Integer),
+        group_id: T.nilable(Integer),
+        is_group: T.nilable(T::Boolean),
+        status: T.nilable(String),
+        offset: T.nilable(Integer),
+        limit: T.nilable(Integer),
+        start_date: T.nilable(String),
+        end_date: T.nilable(String),
+        debit_as_negative: T.nilable(T::Boolean)
+      ).returns(T.untyped)
+    end
     def get_transactions(
       tag_id: nil,
       recurring_id: nil,
@@ -87,6 +112,7 @@ module LunchMoney
       response.body[:transactions]
     end
 
+    sig { params(transaction_id: Integer, debit_as_negative: T.nilable(T::Boolean)).returns(T.untyped) }
     def get_single_transaction(transaction_id:, debit_as_negative: nil)
       params = {}
       params[:debit_as_negative] = debit_as_negative if debit_as_negative
@@ -101,14 +127,65 @@ module LunchMoney
       response.body[:transactions]
     end
 
+    sig { params(transaction_id: Integer, body: T.untyped).returns(T.untyped) }
     def update_transaction(transaction_id, body)
       response = put("transaction/#{transaction_id}", body)
       get_errors(response)
       response.body
     end
 
+    sig { returns(T.untyped) }
+    def get_budget_summary
+      response = get("budgets")
+      get_errors(response)
+      response.body[:budgets]
+    end
+
+    sig { params(body: T.untyped).returns(T.untyped) }
+    def upsert_budget(body)
+      response = put("budgets", body)
+      get_errors(response)
+      response.body
+    end
+
+    sig { returns(T.untyped) }
+    def get_all_assets
+      response = get("assets")
+      get_errors(response)
+      response.body[:assets]
+    end
+
+    sig { params(asset_id: Integer, body: T.untyped).returns(T.untyped) }
+    def update_asset(asset_id, body)
+      response = put("assets/#{asset_id}", body)
+      get_errors(response)
+      response.body
+    end
+
+    sig { returns(T.untyped) }
+    def get_all_plaid_accounts
+      response = get("plaid_accounts")
+      get_errors(response)
+      response.body[:plaid_accounts]
+    end
+
+    sig { returns(T.untyped) }
+    def get_all_crypto
+      response = get("crypto")
+      get_errors(response)
+      response.body[:crypto]
+    end
+
+    sig { params(crypto_asset_id: Integer, body: T.untyped).returns(T.untyped) }
+    def update_manual_crypto(crypto_asset_id, body)
+      response = put("crypto/manual/#{crypto_asset_id}", body)
+      get_errors(response)
+      response.body
+    end
+
     private
 
+    sig { params(endpoint: String, query_params: T.nilable(T::Hash[String, T.untyped])).returns(Faraday::Response) }
     def get(endpoint, query_params: nil)
       request = Faraday.new do |conn|
         conn.authorization(:Bearer, LUNCHMONEY_TOKEN)
@@ -123,6 +200,7 @@ module LunchMoney
       end
     end
 
+    sig { params(endpoint: String, params: T.nilable(T::Hash[String, T.untyped])).returns(Faraday::Response) }
     def post(endpoint, params)
       request = Faraday.new do |conn|
         conn.authorization(:Bearer, LUNCHMONEY_TOKEN)
@@ -133,6 +211,7 @@ module LunchMoney
       request.post(BASE_URL + endpoint, params)
     end
 
+    sig { params(endpoint: String, body: T::Hash[String, T.untyped]).returns(Faraday::Response) }
     def put(endpoint, body)
       request = Faraday.new do |conn|
         conn.authorization(:Bearer, LUNCHMONEY_TOKEN)
@@ -145,23 +224,35 @@ module LunchMoney
       end
     end
 
+    sig { params(response: T.untyped).void }
     def get_errors(response)
       body = response.body
-      if response.status == 200
-        raise(LunchMoney::GeneralError, body[:error]) if body.class == Hash && body[:error]
-      else
-        body = response.body
-
-        error_class = Object.const_get("LunchMoneyError::#{body[:name]}")
-        raise(error_class, body[:message])
+      if body.is_a?(Hash)
+        parse_and_raise_error(body) if body[:error]
+        raise(LunchMoney::ValidateError, body[:message]) if body[:name].includes?("ValidateError")
       end
-    rescue NameError
-      if body.is_a?(Hash) && body[:error]
-        raise(LunchMoney::GeneralError, body[:error])
-      elsif body[:name] || body[:message]
-        raise(LunchMoney::UnRecognizedError, "#{body[:name]}: #{body[:message]}")
+    end
+
+    sig { params(body: T.untyped).void }
+    def parse_and_raise_error(body)
+      error = body[:error]
+      raise(LunchMoney::MultipleIssuesError, error) if error.is_a?(Array)
+
+      case error
+      when /Missing category name|Category \w+ must be less than /
+        raise(LunchMoney::CategoryError, error)
+      when /Operation error occurred/
+        raise(LunchMoney::OperationError, error)
+      when /Both start_date and end_date must be specified./
+        raise(LunchMoney::MissingDateError, error)
+      when /Transaction ID not found/
+        raise(LunchMoney::UnknownTransactionError, error)
+      when /Must be in format YYYY-MM-DD/
+        raise(LunchMoney::InvalidDateError, error)
+      when /Budget must be greater than or equal/
+        raise(LunchMoney::BudgetAmountError, error)
       else
-        raise(LunchMoney::UnRecognizedError, body)
+        raise(LunchMoney::GeneralError, error)
       end
     end
   end

@@ -3,6 +3,9 @@
 inherit_gem:
   rubocop-shopify: rubocop.yml
 
+require:
+ - rubocop-sorbet
+
 AllCops:
   TargetRubyVersion: 2.6
   NewCops: enable
@@ -19,3 +22,6 @@ Naming/FileName:
 Lint/DuplicateMethods:
   Exclude:
     - lib/lunchmoney/config.rb
+
+Sorbet:
+  Enabled: true
