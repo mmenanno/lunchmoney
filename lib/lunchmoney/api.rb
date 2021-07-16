@@ -1,7 +1,6 @@
 # typed: strict
 # frozen_string_literal: true
 
-require "pry"
 require "faraday"
 require "faraday_middleware"
 require_relative "errors"
