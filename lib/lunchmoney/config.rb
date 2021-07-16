@@ -11,6 +11,14 @@ module LunchMoney
     sig { returns(T.nilable(String)) }
     attr_accessor :token
 
+    sig { returns(T::Boolean) }
+    attr_accessor :response_objects_as_structs
+
+    sig { void }
+    def initialize
+      @response_objects_as_structs = T.let(false, T::Boolean)
+    end
+
     sig { returns(T.nilable(String)) }
     def token
       T.let(@token, T.nilable(String)) || ENV.fetch("LUNCHMONEY_TOKEN", nil)
