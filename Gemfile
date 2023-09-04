@@ -2,18 +2,19 @@
 
 source "https://rubygems.org"
 
+# Specify runtime dependencies in the gemspec
 gemspec
 
-gem("faraday")
-gem("faraday_middleware")
-gem("sorbet-runtime")
-
-group(:development, :test) do
-  gem("minitest", require: false)
-  gem("pry", require: false)
-  gem("rubocop", require: false)
-  gem("rubocop-shopify", require: false)
-  gem("rubocop-sorbet", require: false)
-  gem("tapioca")
-  gem("sorbet")
-end
+# Specify development dependencies here
+gem "rake", "~> 13.0"
+gem "minitest", "~> 5.19", require: false
+gem "mocha", "~> 2.1.0", require: false
+gem "pry-sorbet", "~> 0.2", require: false
+gem "rubocop-shopify", require: false
+gem "rubocop-sorbet", require: false
+gem "rubocop-minitest", require: false
+gem "rubocop-rails", require: false
+gem "rubocop-rake", require: false
+gem "sorbet-static-and-runtime", require: false
+gem "spoom", require: false
+gem "tapioca", require: false
