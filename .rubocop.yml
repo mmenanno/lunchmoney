@@ -1,27 +1,37 @@
-# This file strictly follows the rules defined in the Ruby style guide:
-#   http://shopify.github.io/ruby-style-guide/
 inherit_gem:
   rubocop-shopify: rubocop.yml
 
 require:
- - rubocop-sorbet
+  - rubocop-sorbet
+  - rubocop-minitest
+  - rubocop-rails
+  - rubocop-rake
 
 AllCops:
-  TargetRubyVersion: 2.6
+  TargetRubyVersion: 3.2.2
   NewCops: enable
-  SuggestExtensions: false
-
-Naming/AccessorMethodName:
   Exclude:
-    - lib/lunchmoney/api.rb
-
-Naming/FileName:
-  Exclude:
-    - lib/lunchmoney-ruby.rb
-
-Lint/DuplicateMethods:
-  Exclude:
-    - lib/lunchmoney/config.rb
+    - "sorbet/**/*"
 
 Sorbet:
+  Enabled: true
+
+Sorbet/StrictSigil:
+  Enabled: true
+  Exclude:
+    - "test/*"
+
+Minitest:
+  Enabled: true
+
+Minitest/MultipleAssertions:
+  Max: 6
+
+Rails:
+  Enabled: true
+
+Rails/RefuteMethods:
+  EnforcedStyle: refute
+
+Rake:
   Enabled: true
