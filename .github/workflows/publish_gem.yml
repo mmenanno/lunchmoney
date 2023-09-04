@@ -1,0 +1,21 @@
+name: Publish Gem
+
+on:
+  push:
+    tags:
+      - v*
+jobs:
+  build:
+    name: Release Gem
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Publish to Rubygems
+        if: contains(github.ref, 'refs/tags/v')
+        uses: "cadwallion/publish-rubygems-action@master"
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          RUBYGEMS_API_KEY: ${{secrets.RUBYGEMS_API_KEY}}
+          RELEASE_COMMAND: rake release

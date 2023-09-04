@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - "*"
+    paths-ignore:
+      - ".github/**"
+      - ".gitignore"
+      - "README.md"
+jobs:
+  validate:
+    name: Validate code
+    runs-on: ubuntu-latest
+
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      -
+        name: RuboCop
+        run: bin/rubocop
+      -
+        name: Typecheck
+        run: bin/srb tc
+      -
+        name: Check for Updatable Sigils
+        run: |
+            bin/spoom bump --from false --to true --dry
+            bin/spoom bump --from true --to strict --dry
+      -
+        name: Run Tests
+        run: bin/rake test
