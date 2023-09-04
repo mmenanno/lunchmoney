@@ -5,7 +5,6 @@ require "sorbet-runtime"
 require_relative "struct"
 
 module LunchMoney
-  extend T::Sig
   class Asset < T::Struct
     prop :id, Integer
     prop :type_name, String

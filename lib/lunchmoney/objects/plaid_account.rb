@@ -5,7 +5,6 @@ require "sorbet-runtime"
 require_relative "struct"
 
 module LunchMoney
-  extend T::Sig
   class PlaidAccount < T::Struct
     prop :id, Integer
     prop :date_linked, String

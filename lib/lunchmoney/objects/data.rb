@@ -5,7 +5,6 @@ require "sorbet-runtime"
 require_relative "struct"
 
 module LunchMoney
-  extend T::Sig
   class Data < T::Struct
     prop :budget_month, T.nilable(String)
     prop :budget_amount, T.nilable(Integer)

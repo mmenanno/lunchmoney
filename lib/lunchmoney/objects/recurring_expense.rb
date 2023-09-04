@@ -5,7 +5,6 @@ require "sorbet-runtime"
 require_relative "struct"
 
 module LunchMoney
-  extend T::Sig
   class RecurringExpense < T::Struct
     prop :id, Integer
     prop :start_date, String

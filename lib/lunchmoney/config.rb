@@ -4,10 +4,7 @@
 require "sorbet-runtime"
 
 module LunchMoney
-  extend T::Sig
   class Config
-    extend T::Sig
-
     sig { returns(T.nilable(String)) }
     attr_accessor :token
 

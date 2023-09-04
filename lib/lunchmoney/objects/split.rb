@@ -5,7 +5,6 @@ require "sorbet-runtime"
 require_relative "struct"
 
 module LunchMoney
-  extend T::Sig
   class Split < T::Struct
     prop :date, String
     prop :category_id, Integer

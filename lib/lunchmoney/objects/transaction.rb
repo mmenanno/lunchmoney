@@ -6,7 +6,6 @@ require_relative "struct"
 require_relative "tag"
 
 module LunchMoney
-  extend T::Sig
   class Transaction < T::Struct
     prop :id, T.nilable(Integer)
     prop :date, T.nilable(String)
@@ -22,7 +21,7 @@ module LunchMoney
     prop :tags, T.nilable(T::Array[T.any(
       T.nilable(T.any(Integer, String)),
       T.nilable(T::Hash[Symbol, T.any(String, Integer)]),
-      T.nilable(LunchMoney::Tag)
+      T.nilable(LunchMoney::Tag),
     )])
     prop :plaid_account_id, T.nilable(Integer)
     prop :is_group, T.nilable(T::Boolean)

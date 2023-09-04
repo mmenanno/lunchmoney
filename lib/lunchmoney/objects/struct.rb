@@ -5,7 +5,6 @@ require "sorbet-runtime"
 
 module T
   class Struct
-    extend T::Sig
     sig { returns(T.untyped) }
     def wrap_and_serialize
       { object_name => serialize }

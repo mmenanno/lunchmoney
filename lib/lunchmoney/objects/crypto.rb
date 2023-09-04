@@ -5,7 +5,6 @@ require "sorbet-runtime"
 require_relative "struct"
 
 module LunchMoney
-  extend T::Sig
   class Crypto < T::Struct
     prop :id, T.nilable(Integer)
     prop :zabo_account_id, T.nilable(Integer)

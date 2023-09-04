@@ -18,7 +18,6 @@ require_relative "objects/crypto"
 
 module LunchMoney
   class Api
-    extend T::Sig
     BASE_URL = "https://dev.lunchmoney.app/v1/"
     LUNCHMONEY_TOKEN = T.let(LunchMoney.config.token, T.nilable(String))
 
@@ -29,12 +28,18 @@ module LunchMoney
       get_errors(response)
 
       return response.body[:categories] unless use_structs?
+
       response.body[:categories].map { |category| LunchMoney::Category.new(category) }
     end
 
     sig do
-      params(name: String, description: T.nilable(String), is_income: T::Boolean, exclude_from_budget: T::Boolean,
-        exclude_from_totals: T::Boolean).returns(T.untyped)
+      params(
+        name: String,
+        description: T.nilable(String),
+        is_income: T::Boolean,
+        exclude_from_budget: T::Boolean,
+        exclude_from_totals: T::Boolean,
+      ).returns(T.untyped)
     end
     def create_category(name:, description: nil, is_income: false,
       exclude_from_budget: false, exclude_from_totals: false)
@@ -59,6 +64,7 @@ module LunchMoney
       get_errors(response)
 
       return response.body unless use_structs?
+
       response.body.map { |tag| LunchMoney::Tag.new(tag) }
     end
 
@@ -76,7 +82,7 @@ module LunchMoney
         limit: T.nilable(Integer),
         start_date: T.nilable(String),
         end_date: T.nilable(String),
-        debit_as_negative: T.nilable(T::Boolean)
+        debit_as_negative: T.nilable(T::Boolean),
       ).returns(T.untyped)
     end
     def get_transactions(
@@ -119,6 +125,7 @@ module LunchMoney
       get_errors(response)
 
       return response.body[:transactions] unless use_structs?
+
       response.body[:transactions].map { |transaction| LunchMoney::Transaction.new(transaction) }
     end
 
@@ -136,16 +143,19 @@ module LunchMoney
       get_errors(response)
 
       return response.body unless use_structs?
+
       LunchMoney::Transaction.new(response.body)
     end
 
     sig do
-      params(transactions: T::Array[LunchMoney::Transaction],
+      params(
+        transactions: T::Array[LunchMoney::Transaction],
         apply_rules: T.nilable(T::Boolean),
         skip_duplicates: T.nilable(T::Boolean),
         check_for_recurring: T.nilable(T::Boolean),
         debit_as_negative: T.nilable(T::Boolean),
-        skip_balance_update: T.nilable(T::Boolean)).returns(T.untyped)
+        skip_balance_update: T.nilable(T::Boolean),
+      ).returns(T.untyped)
     end
     def insert_transactions(transactions, apply_rules: nil, skip_duplicates: nil,
       check_for_recurring: nil, debit_as_negative: nil, skip_balance_update: nil)
@@ -168,7 +178,7 @@ module LunchMoney
         transaction: LunchMoney::Transaction,
         split: T.nilable(LunchMoney::Split),
         debit_as_negative: T::Boolean,
-        skip_balance_update: T::Boolean
+        skip_balance_update: T::Boolean,
       ).returns(T.untyped)
     end
     def update_transaction(transaction_id, transaction:, split: nil,
@@ -190,7 +200,7 @@ module LunchMoney
         transactions: T::Array[T.any(Integer, String)],
         category_id: T.nilable(Integer),
         notes: T.nilable(String),
-        tags: T.nilable(T::Array[T.any(Integer, String)])
+        tags: T.nilable(T::Array[T.any(Integer, String)]),
       ).returns(T.untyped)
     end
     def create_transaction_group(date:, payee:, transactions:, category_id: nil, notes: nil, tags: nil)
@@ -218,9 +228,13 @@ module LunchMoney
     end
 
     sig do
-      params(start_date: T.nilable(String),
-        debit_as_negative: T.nilable(T::Boolean)).returns(T::Array[T.any(T::Hash[Symbol, T.untyped],
-          LunchMoney::RecurringExpense)])
+      params(
+        start_date: T.nilable(String),
+        debit_as_negative: T.nilable(T::Boolean),
+      ).returns(T::Array[T.any(
+        T::Hash[Symbol, T.untyped],
+        LunchMoney::RecurringExpense,
+      )])
     end
     def get_recurring_expenses(start_date: nil, debit_as_negative: nil)
       params = {}
@@ -236,6 +250,7 @@ module LunchMoney
       get_errors(response)
 
       return response.body[:recurring_expenses] unless use_structs?
+
       response.body[:recurring_expenses].map { |recurring_expense| LunchMoney::RecurringExpense.new(recurring_expense) }
     end
 
@@ -283,6 +298,7 @@ module LunchMoney
       get_errors(response)
 
       return response.body[:assets] unless use_structs?
+
       response.body[:assets].map { |asset| LunchMoney::Asset.new(asset) }
     end
 
@@ -314,6 +330,7 @@ module LunchMoney
       get_errors(response)
 
       return response.body unless use_structs?
+
       LunchMoney::Asset.new(response.body)
     end
 
@@ -324,6 +341,7 @@ module LunchMoney
       get_errors(response)
 
       return response.body[:plaid_accounts] unless use_structs?
+
       response.body[:plaid_accounts].map { |plaid_account| LunchMoney::PlaidAccount.new(plaid_account) }
     end
 
@@ -334,6 +352,7 @@ module LunchMoney
       get_errors(response)
 
       return response.body[:crypto] unless use_structs?
+
       response.body[:crypto].map { |crypto| LunchMoney::Crypto.new(crypto) }
     end
 
@@ -344,7 +363,7 @@ module LunchMoney
         display_name: T.nilable(String),
         institution_name: T.nilable(String),
         balance: T.nilable(T.any(Integer, String)),
-        currency: T.nilable(String)
+        currency: T.nilable(String),
       ).returns(T.untyped)
     end
     def update_manual_crypto(crypto_asset_id, name: nil, display_name: nil,
@@ -361,6 +380,7 @@ module LunchMoney
       get_errors(response)
 
       return response.body unless use_structs?
+
       LunchMoney::Asset.new(response.body)
     end
 
