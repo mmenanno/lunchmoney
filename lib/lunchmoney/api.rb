@@ -2,7 +2,6 @@
 # frozen_string_literal: true
 
 require "faraday"
-require "faraday_middleware"
 require_relative "errors"
 require_relative "config"
 require_relative "objects/split"
