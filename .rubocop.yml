@@ -13,6 +13,10 @@ AllCops:
   Exclude:
     - "sorbet/**/*"
 
+Naming/FileName:
+  Exclude:
+    - "lib/lunchmoney-ruby.rb" # Due to the gem name this file needs to be kabob case instead of snake case
+
 Sorbet:
   Enabled: true
 

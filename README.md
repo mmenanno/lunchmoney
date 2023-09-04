@@ -27,5 +27,5 @@ or via an environment variable like `ENV['LUNCHMONEY_TOKEN'] = "token"`
 Create an instance of the api, then call the endpoint you need:
 ```Ruby
 api = LunchMoney::Api.new
-api.get_all_categories
+api.all_categories
 ```

@@ -1,7 +1,6 @@
 # typed: strict
 # frozen_string_literal: true
 
-require "faraday"
 require_relative "errors"
 require_relative "config"
 require_relative "objects/split"
@@ -18,15 +17,13 @@ require_relative "objects/crypto"
 module LunchMoney
   class Api
     BASE_URL = "https://dev.lunchmoney.app/v1/"
-    LUNCHMONEY_TOKEN = T.let(LunchMoney.config.token, T.nilable(String))
+    LUNCHMONEY_TOKEN = T.let(LunchMoney::Config.token, T.nilable(String))
 
     sig { returns(T::Array[T.any(T::Hash[Symbol, T.untyped], LunchMoney::Category)]) }
-    def get_all_categories
+    def all_categories
       response = get("categories")
 
-      get_errors(response)
-
-      return response.body[:categories] unless use_structs?
+      errors(response)
 
       response.body[:categories].map { |category| LunchMoney::Category.new(category) }
     end
@@ -51,18 +48,16 @@ module LunchMoney
       }
 
       response = post("categories", params)
-      get_errors(response)
+      errors(response)
 
       response.body
     end
 
     sig { returns(T::Array[T.any(T::Hash[Symbol, T.untyped], LunchMoney::Tag)]) }
-    def get_all_tags
+    def all_tags
       response = get("tags")
 
-      get_errors(response)
-
-      return response.body unless use_structs?
+      errors(response)
 
       response.body.map { |tag| LunchMoney::Tag.new(tag) }
     end
@@ -84,7 +79,7 @@ module LunchMoney
         debit_as_negative: T.nilable(T::Boolean),
       ).returns(T.untyped)
     end
-    def get_transactions(
+    def transactions(
       tag_id: nil,
       recurring_id: nil,
       plaid_account_id: nil,
@@ -121,15 +116,13 @@ module LunchMoney
         get("transactions", query_params: params)
       end
 
-      get_errors(response)
-
-      return response.body[:transactions] unless use_structs?
+      errors(response)
 
       response.body[:transactions].map { |transaction| LunchMoney::Transaction.new(transaction) }
     end
 
     sig { params(transaction_id: Integer, debit_as_negative: T.nilable(T::Boolean)).returns(T.untyped) }
-    def get_single_transaction(transaction_id:, debit_as_negative: nil)
+    def single_transaction(transaction_id:, debit_as_negative: nil)
       params = {}
       params[:debit_as_negative] = debit_as_negative if debit_as_negative
 
@@ -139,9 +132,7 @@ module LunchMoney
         get("transactions/#{transaction_id}", query_params: params)
       end
 
-      get_errors(response)
-
-      return response.body unless use_structs?
+      errors(response)
 
       LunchMoney::Transaction.new(response.body)
     end
@@ -166,7 +157,7 @@ module LunchMoney
       params[:skip_balance_update] = skip_balance_update if skip_balance_update
 
       response = post("transactions", params)
-      get_errors(response)
+      errors(response)
 
       response.body
     end
@@ -188,7 +179,7 @@ module LunchMoney
       body["skip_balance_update"] = skip_balance_update unless skip_balance_update
 
       response = put("transactions/#{transaction_id}", body)
-      get_errors(response)
+      errors(response)
       response.body
     end
 
@@ -213,7 +204,7 @@ module LunchMoney
       params[:tags] = tags if tags
 
       response = post("transactions/group", params)
-      get_errors(response)
+      errors(response)
 
       response.body
     end
@@ -221,7 +212,7 @@ module LunchMoney
     sig { params(transaction_id: T.any(String, Integer)).returns(T.untyped) }
     def delete_transaction_group(transaction_id)
       response = delete("transactions/group/#{transaction_id}")
-      get_errors(response)
+      errors(response)
 
       response.body
     end
@@ -235,7 +226,7 @@ module LunchMoney
         LunchMoney::RecurringExpense,
       )])
     end
-    def get_recurring_expenses(start_date: nil, debit_as_negative: nil)
+    def recurring_expenses(start_date: nil, debit_as_negative: nil)
       params = {}
       params[:start_date] = start_date if start_date
       params[:debit_as_negative] = debit_as_negative if debit_as_negative
@@ -246,21 +237,19 @@ module LunchMoney
         get("recurring_expenses", query_params: params)
       end
 
-      get_errors(response)
-
-      return response.body[:recurring_expenses] unless use_structs?
+      errors(response)
 
       response.body[:recurring_expenses].map { |recurring_expense| LunchMoney::RecurringExpense.new(recurring_expense) }
     end
 
     sig { params(start_date: String, end_date: String).returns(T.untyped) }
-    def get_budget_summary(start_date:, end_date:)
+    def budsummary(start_date:, end_date:)
       params = {
         start_date: start_date,
         end_date: end_date,
       }
       response = get("budgets", query_params: params)
-      get_errors(response)
+      errors(response)
 
       response.body
 
@@ -279,7 +268,7 @@ module LunchMoney
     def upsert_budget(body)
       # TODO
       # response = put("budgets", body)
-      # get_errors(response)
+      # errors(response)
       # response.body
     end
 
@@ -291,12 +280,10 @@ module LunchMoney
     end
 
     sig { returns(T.untyped) }
-    def get_all_assets
+    def all_assets
       response = get("assets")
 
-      get_errors(response)
-
-      return response.body[:assets] unless use_structs?
+      errors(response)
 
       response.body[:assets].map { |asset| LunchMoney::Asset.new(asset) }
     end
@@ -326,31 +313,25 @@ module LunchMoney
 
       response = put("assets/#{asset_id}", params)
 
-      get_errors(response)
-
-      return response.body unless use_structs?
+      errors(response)
 
       LunchMoney::Asset.new(response.body)
     end
 
     sig { returns(T.untyped) }
-    def get_all_plaid_accounts
+    def all_plaid_accounts
       response = get("plaid_accounts")
 
-      get_errors(response)
-
-      return response.body[:plaid_accounts] unless use_structs?
+      errors(response)
 
       response.body[:plaid_accounts].map { |plaid_account| LunchMoney::PlaidAccount.new(plaid_account) }
     end
 
     sig { returns(T.untyped) }
-    def get_all_crypto
+    def all_crypto
       response = get("crypto")
 
-      get_errors(response)
-
-      return response.body[:crypto] unless use_structs?
+      errors(response)
 
       response.body[:crypto].map { |crypto| LunchMoney::Crypto.new(crypto) }
     end
@@ -376,9 +357,7 @@ module LunchMoney
 
       response = put("crypto/manual/#{crypto_asset_id}", params)
 
-      get_errors(response)
-
-      return response.body unless use_structs?
+      errors(response)
 
       LunchMoney::Asset.new(response.body)
     end
@@ -435,7 +414,7 @@ module LunchMoney
     end
 
     sig { params(response: T.untyped).void }
-    def get_errors(response)
+    def errors(response)
       body = response.body
       if body.is_a?(Hash)
         parse_and_raise_error(body) if body[:error]
@@ -464,11 +443,6 @@ module LunchMoney
       else
         raise(LunchMoney::GeneralError, error)
       end
-    end
-
-    sig { returns(T::Boolean) }
-    def use_structs?
-      LunchMoney.config.response_objects_as_structs
     end
   end
 end
