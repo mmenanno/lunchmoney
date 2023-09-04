@@ -6,16 +6,25 @@ on:
       - v*
 jobs:
   build:
-    name: Release Gem
+    name: Build & Release Gem
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Publish to Rubygems
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - uses: fac/ruby-gem-setup-credentials-action@v2
+        with:
+          user: ""
+          key: rubygems
+          token: ${{ secrets.RUBYGEMS_API_KEY }}
+      - name: Build Gem
+        run: bundle exec rake build
+      - name: Release Gem
         if: contains(github.ref, 'refs/tags/v')
-        uses: "cadwallion/publish-rubygems-action@master"
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          RUBYGEMS_API_KEY: ${{secrets.RUBYGEMS_API_KEY}}
-          RELEASE_COMMAND: rake release
+        uses: fac/ruby-gem-push-action@v2
+        with:
+          key: rubygems
