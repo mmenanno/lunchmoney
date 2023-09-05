@@ -6,11 +6,11 @@ require_relative "config"
 
 require_relative "base_api_call"
 require_relative "user/user_calls"
+require_relative "categories/category_calls"
 
 require_relative "objects/split"
 require_relative "objects/transaction"
 require_relative "objects/tag"
-require_relative "objects/category"
 require_relative "objects/recurring_expense"
 require_relative "objects/data"
 require_relative "objects/budget"
@@ -34,45 +34,26 @@ module LunchMoney
     def user_calls
       @user_calls ||= T.let(LunchMoney::UserCalls.new(api_key:), T.nilable(LunchMoney::UserCalls))
     end
+
+    delegate :all_categories,
+      :single_category,
+      :create_category,
+      :create_category_group,
+      :update_category,
+      :add_to_category_group,
+      :delete_category,
+      :force_delete_category,
+      to: :category_calls
+
+    sig { returns(LunchMoney::CategoryCalls) }
+    def category_calls
+      @category_calls ||= T.let(LunchMoney::CategoryCalls.new(api_key:), T.nilable(LunchMoney::CategoryCalls))
+    end
   end
 end
 
 # module LunchMoney
 #   class Api
-#     sig { returns(T::Array[T.any(T::Hash[Symbol, T.untyped], LunchMoney::Category)]) }
-#     def all_categories
-#       response = get("categories")
-
-#       errors(response)
-
-#       response.body[:categories].map { |category| LunchMoney::Category.new(category) }
-#     end
-
-#     sig do
-#       params(
-#         name: String,
-#         description: T.nilable(String),
-#         is_income: T::Boolean,
-#         exclude_from_budget: T::Boolean,
-#         exclude_from_totals: T::Boolean,
-#       ).returns(T.untyped)
-#     end
-#     def create_category(name:, description: nil, is_income: false,
-#       exclude_from_budget: false, exclude_from_totals: false)
-#       params = {
-#         name: name,
-#         description: description,
-#         is_income: is_income,
-#         exclude_from_budget: exclude_from_budget,
-#         exclude_from_totals: exclude_from_totals,
-#       }
-
-#       response = post("categories", params)
-#       errors(response)
-
-#       response.body
-#     end
-
 #     sig { returns(T::Array[T.any(T::Hash[Symbol, T.untyped], LunchMoney::Tag)]) }
 #     def all_tags
 #       response = get("tags")
