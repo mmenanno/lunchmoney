@@ -1,13 +1,11 @@
 # typed: strict
 # frozen_string_literal: true
 
-require "sorbet-runtime"
-require_relative "struct"
-
 module LunchMoney
   class Tag < T::Struct
     prop :id, Integer
     prop :name, String
     prop :description, T.nilable(String)
+    prop :archived, T::Boolean, default: false
   end
 end

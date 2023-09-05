@@ -7,10 +7,10 @@ require_relative "config"
 require_relative "base_api_call"
 require_relative "user/user_calls"
 require_relative "categories/category_calls"
+require_relative "tags/tag_calls"
 
 require_relative "objects/split"
 require_relative "objects/transaction"
-require_relative "objects/tag"
 require_relative "objects/recurring_expense"
 require_relative "objects/data"
 require_relative "objects/budget"
@@ -49,20 +49,18 @@ module LunchMoney
     def category_calls
       @category_calls ||= T.let(LunchMoney::CategoryCalls.new(api_key:), T.nilable(LunchMoney::CategoryCalls))
     end
+
+    delegate :all_tags, to: :tag_calls
+
+    sig { returns(LunchMoney::TagCalls) }
+    def tag_calls
+      @tag_calls ||= T.let(LunchMoney::TagCalls.new(api_key:), T.nilable(LunchMoney::TagCalls))
+    end
   end
 end
 
 # module LunchMoney
 #   class Api
-#     sig { returns(T::Array[T.any(T::Hash[Symbol, T.untyped], LunchMoney::Tag)]) }
-#     def all_tags
-#       response = get("tags")
-
-#       errors(response)
-
-#       response.body.map { |tag| LunchMoney::Tag.new(tag) }
-#     end
-
 #     sig do
 #       params(
 #         tag_id: T.nilable(Integer),
