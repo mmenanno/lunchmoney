@@ -1,9 +1,6 @@
 # typed: strict
 # frozen_string_literal: true
 
-require "sorbet-runtime"
-require_relative "struct"
-
 module LunchMoney
   class Crypto < T::Struct
     prop :id, T.nilable(Integer)

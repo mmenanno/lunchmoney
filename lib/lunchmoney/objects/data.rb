@@ -1,9 +1,6 @@
 # typed: strict
 # frozen_string_literal: true
 
-require "sorbet-runtime"
-require_relative "struct"
-
 module LunchMoney
   class Data < T::Struct
     prop :budget_month, T.nilable(String)

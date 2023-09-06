@@ -8,9 +8,8 @@ require_relative "base_api_call"
 require_relative "user/user_calls"
 require_relative "categories/category_calls"
 require_relative "tags/tag_calls"
+require_relative "transactions/transaction_calls"
 
-require_relative "objects/split"
-require_relative "objects/transaction"
 require_relative "objects/recurring_expense"
 require_relative "objects/data"
 require_relative "objects/budget"
@@ -56,166 +55,25 @@ module LunchMoney
     def tag_calls
       @tag_calls ||= T.let(LunchMoney::TagCalls.new(api_key:), T.nilable(LunchMoney::TagCalls))
     end
+
+    delegate :transactions,
+      :single_transaction,
+      :insert_transactions,
+      :update_transaction,
+      :unsplit_transaction,
+      :create_transaction_group,
+      :delete_transaction_group,
+      to: :transaction_calls
+
+    sig { returns(LunchMoney::TransactionCalls) }
+    def transaction_calls
+      @transaction_calls ||= T.let(LunchMoney::TransactionCalls.new(api_key:), T.nilable(LunchMoney::TransactionCalls))
+    end
   end
 end
 
 # module LunchMoney
 #   class Api
-#     sig do
-#       params(
-#         tag_id: T.nilable(Integer),
-#         recurring_id: T.nilable(Integer),
-#         plaid_account_id: T.nilable(Integer),
-#         category_id: T.nilable(Integer),
-#         asset_id: T.nilable(Integer),
-#         group_id: T.nilable(Integer),
-#         is_group: T.nilable(T::Boolean),
-#         status: T.nilable(String),
-#         offset: T.nilable(Integer),
-#         limit: T.nilable(Integer),
-#         start_date: T.nilable(String),
-#         end_date: T.nilable(String),
-#         debit_as_negative: T.nilable(T::Boolean),
-#       ).returns(T.untyped)
-#     end
-#     def transactions(
-#       tag_id: nil,
-#       recurring_id: nil,
-#       plaid_account_id: nil,
-#       category_id: nil,
-#       asset_id: nil,
-#       group_id: nil,
-#       is_group: nil,
-#       status: nil,
-#       offset: nil,
-#       limit: nil,
-#       start_date: nil,
-#       end_date: nil,
-#       debit_as_negative: nil
-#     )
-
-#       params = {}
-#       params[:tag_id] = tag_id if tag_id
-#       params[:recurring_id] = recurring_id if recurring_id
-#       params[:plaid_account_id] = plaid_account_id if plaid_account_id
-#       params[:category_id] = category_id if category_id
-#       params[:asset_id] = asset_id if asset_id
-#       params[:group_id] = group_id if group_id
-#       params[:is_group] = is_group if is_group
-#       params[:status] = status if status
-#       params[:offset] = offset if offset
-#       params[:limit] = limit if limit
-#       params[:start_date] = start_date if start_date
-#       params[:end_date] = end_date if end_date
-#       params[:debit_as_negative] = debit_as_negative if debit_as_negative
-
-#       response = if params.empty?
-#         get("transactions")
-#       else
-#         get("transactions", query_params: params)
-#       end
-
-#       errors(response)
-
-#       response.body[:transactions].map { |transaction| LunchMoney::Transaction.new(transaction) }
-#     end
-
-#     sig { params(transaction_id: Integer, debit_as_negative: T.nilable(T::Boolean)).returns(T.untyped) }
-#     def single_transaction(transaction_id:, debit_as_negative: nil)
-#       params = {}
-#       params[:debit_as_negative] = debit_as_negative if debit_as_negative
-
-#       response = if params.empty?
-#         get("transactions/#{transaction_id}")
-#       else
-#         get("transactions/#{transaction_id}", query_params: params)
-#       end
-
-#       errors(response)
-
-#       LunchMoney::Transaction.new(response.body)
-#     end
-
-#     sig do
-#       params(
-#         transactions: T::Array[LunchMoney::Transaction],
-#         apply_rules: T.nilable(T::Boolean),
-#         skip_duplicates: T.nilable(T::Boolean),
-#         check_for_recurring: T.nilable(T::Boolean),
-#         debit_as_negative: T.nilable(T::Boolean),
-#         skip_balance_update: T.nilable(T::Boolean),
-#       ).returns(T.untyped)
-#     end
-#     def insert_transactions(transactions, apply_rules: nil, skip_duplicates: nil,
-#       check_for_recurring: nil, debit_as_negative: nil, skip_balance_update: nil)
-#       params = { transactions: transactions.map(&:serialize) }
-#       params[:apply_rules] = apply_rules if apply_rules
-#       params[:skip_duplicates] = skip_duplicates if skip_duplicates
-#       params[:check_for_recurring] = check_for_recurring if check_for_recurring
-#       params[:debit_as_negative] = debit_as_negative if debit_as_negative
-#       params[:skip_balance_update] = skip_balance_update if skip_balance_update
-
-#       response = post("transactions", params)
-#       errors(response)
-
-#       response.body
-#     end
-
-#     sig do
-#       params(
-#         transaction_id: Integer,
-#         transaction: LunchMoney::Transaction,
-#         split: T.nilable(LunchMoney::Split),
-#         debit_as_negative: T::Boolean,
-#         skip_balance_update: T::Boolean,
-#       ).returns(T.untyped)
-#     end
-#     def update_transaction(transaction_id, transaction:, split: nil,
-#       debit_as_negative: false, skip_balance_update: true)
-#       body = transaction.wrap_and_serialize
-#       body.merge!(split) if split
-#       body["debit_as_negative"] = debit_as_negative if debit_as_negative
-#       body["skip_balance_update"] = skip_balance_update unless skip_balance_update
-
-#       response = put("transactions/#{transaction_id}", body)
-#       errors(response)
-#       response.body
-#     end
-
-#     sig do
-#       params(
-#         date: String,
-#         payee: String,
-#         transactions: T::Array[T.any(Integer, String)],
-#         category_id: T.nilable(Integer),
-#         notes: T.nilable(String),
-#         tags: T.nilable(T::Array[T.any(Integer, String)]),
-#       ).returns(T.untyped)
-#     end
-#     def create_transaction_group(date:, payee:, transactions:, category_id: nil, notes: nil, tags: nil)
-#       params = {
-#         date: date,
-#         payee: payee,
-#         transactions: transactions,
-#       }
-#       params[:category_id] = category_id if category_id
-#       params[:notes] = notes if notes
-#       params[:tags] = tags if tags
-
-#       response = post("transactions/group", params)
-#       errors(response)
-
-#       response.body
-#     end
-
-#     sig { params(transaction_id: T.any(String, Integer)).returns(T.untyped) }
-#     def delete_transaction_group(transaction_id)
-#       response = delete("transactions/group/#{transaction_id}")
-#       errors(response)
-
-#       response.body
-#     end
-
 #     sig do
 #       params(
 #         start_date: T.nilable(String),

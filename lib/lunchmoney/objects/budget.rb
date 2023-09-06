@@ -1,8 +1,6 @@
 # typed: strict
 # frozen_string_literal: true
 
-require "sorbet-runtime"
-require_relative "struct"
 require_relative "data"
 
 module LunchMoney
