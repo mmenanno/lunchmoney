@@ -4,7 +4,7 @@
 module LunchMoney
   class RecurringExpense < T::Struct
     prop :id, Integer
-    prop :start_date, String
+    prop :start_date, T.nilable(String)
     prop :end_date, T.nilable(String)
     prop :cadence, String
     prop :payee, String

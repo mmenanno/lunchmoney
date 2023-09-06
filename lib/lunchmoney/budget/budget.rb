@@ -14,6 +14,6 @@ module LunchMoney
     prop :exclude_from_budget, T::Boolean
     prop :exclude_from_totals, T::Boolean
     prop :data, T::Hash[Symbol, LunchMoney::Data]
-    prop :order, Integer
+    prop :config, T::Hash[T.untyped, T.untyped] # TODO: this needs to be better typed
   end
 end

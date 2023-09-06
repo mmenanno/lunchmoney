@@ -9,10 +9,9 @@ require_relative "user/user_calls"
 require_relative "categories/category_calls"
 require_relative "tags/tag_calls"
 require_relative "transactions/transaction_calls"
+require_relative "recurring_expenses/recurring_expense_calls"
+require_relative "budget/budget_calls"
 
-require_relative "objects/recurring_expense"
-require_relative "objects/data"
-require_relative "objects/budget"
 require_relative "objects/asset"
 require_relative "objects/plaid_account"
 require_relative "objects/crypto"
@@ -69,73 +68,28 @@ module LunchMoney
     def transaction_calls
       @transaction_calls ||= T.let(LunchMoney::TransactionCalls.new(api_key:), T.nilable(LunchMoney::TransactionCalls))
     end
+
+    delegate :recurring_expenses, to: :recurring_expense_calls
+
+    sig { returns(LunchMoney::RecurringExpenseCalls) }
+    def recurring_expense_calls
+      @recurring_expense_calls ||= T.let(
+        LunchMoney::RecurringExpenseCalls.new(api_key:),
+        T.nilable(LunchMoney::RecurringExpenseCalls),
+      )
+    end
+
+    delegate :budget_summary, :upsert_budget, :remove_budget, to: :budget_calls
+
+    sig { returns(LunchMoney::BudgetCalls) }
+    def budget_calls
+      @budget_calls ||= T.let(LunchMoney::BudgetCalls.new(api_key:), T.nilable(LunchMoney::BudgetCalls))
+    end
   end
 end
 
 # module LunchMoney
 #   class Api
-#     sig do
-#       params(
-#         start_date: T.nilable(String),
-#         debit_as_negative: T.nilable(T::Boolean),
-#       ).returns(T::Array[T.any(
-#         T::Hash[Symbol, T.untyped],
-#         LunchMoney::RecurringExpense,
-#       )])
-#     end
-#     def recurring_expenses(start_date: nil, debit_as_negative: nil)
-#       params = {}
-#       params[:start_date] = start_date if start_date
-#       params[:debit_as_negative] = debit_as_negative if debit_as_negative
-
-#       response = if params.empty?
-#         get("recurring_expenses")
-#       else
-#         get("recurring_expenses", query_params: params)
-#       end
-
-#       errors(response)
-
-#       response.body[:recurring_expenses].map { |recurring_expense| LunchMoney::RecurringExpense.new(recurring_expense) }
-#     end
-
-#     sig { params(start_date: String, end_date: String).returns(T.untyped) }
-#     def budsummary(start_date:, end_date:)
-#       params = {
-#         start_date: start_date,
-#         end_date: end_date,
-#       }
-#       response = get("budgets", query_params: params)
-#       errors(response)
-
-#       response.body
-
-#       # TODO: below code is for use_structs path, however with changes to the
-#       # endpoint I do not have the documenation yet to finish that version
-#       response.body.map do |budget|
-#         budget[:data].each do |key, value|
-#           budget[:data][key] = LunchMoney::Data.new(value)
-#         end
-
-#         LunchMoney::Budget.new(budget)
-#       end
-#     end
-
-#     sig { params(body: T.untyped).returns(T.untyped) }
-#     def upsert_budget(body)
-#       # TODO
-#       # response = put("budgets", body)
-#       # errors(response)
-#       # response.body
-#     end
-
-#     sig { returns(T.untyped) }
-#     def remove_budget
-#       # TODO
-#       # response = delete("budgets")
-#       # response.body
-#     end
-
 #     sig { returns(T.untyped) }
 #     def all_assets
 #       response = get("assets")
