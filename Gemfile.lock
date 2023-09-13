@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    lunchmoney-ruby (0.1.2)
+    lunchmoney-ruby (0.2.0)
       activesupport (>= 7.0.0)
       faraday (~> 2.7.4)
       sorbet-runtime
