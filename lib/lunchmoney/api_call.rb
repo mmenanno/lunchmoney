@@ -54,36 +54,31 @@ module LunchMoney
       end
     end
 
-    sig { params(response: T.untyped).void }
+    sig { params(response: Faraday::Response).returns(LunchMoney::Errors) }
     def errors(response)
       body = response.body
-      if body.is_a?(Hash)
-        parse_and_raise_error(body) if body[:error]
-        raise(LunchMoney::ValidateError, body[:message]) if body[:name]&.eql?("ValidateError")
-      end
+
+      return parse_errors(body) if body.is_a?(Hash) && body[:error]
+
+      []
     end
 
-    sig { params(body: T.untyped).void }
-    def parse_and_raise_error(body)
-      error = body[:error]
-      raise(LunchMoney::MultipleIssuesError, error) if error.is_a?(Array)
+    sig { params(body: T::Hash[Symbol, T.any(String, T::Array[String])]).returns(LunchMoney::Errors) }
+    def parse_errors(body)
+      errors = body[:error]
+      return [] if errors.blank?
 
-      case error
-      when /Missing category name|Category \w+ must be less than /
-        raise(LunchMoney::CategoryError, error)
-      when /Operation error occurred/
-        raise(LunchMoney::OperationError, error)
-      when /Both start_date and end_date must be specified./
-        raise(LunchMoney::MissingDateError, error)
-      when /Transaction ID not found/
-        raise(LunchMoney::UnknownTransactionError, error)
-      when /Must be in format YYYY-MM-DD/
-        raise(LunchMoney::InvalidDateError, error)
-      when /Budget must be greater than or equal/
-        raise(LunchMoney::BudgetAmountError, error)
-      else
-        raise(LunchMoney::GeneralError, error)
+      api_errors = []
+
+      if errors.class == String
+        api_errors << LunchMoney::Error.new(message: errors)
+      elsif errors.class == Array
+        T.cast(errors, T::Array[String]).each do |error|
+          api_errors << LunchMoney::Error.new(message: error)
+        end
       end
+
+      api_errors
     end
   end
 end

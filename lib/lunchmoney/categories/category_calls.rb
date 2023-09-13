@@ -6,11 +6,12 @@ require "pry"
 
 module LunchMoney
   class CategoryCalls < ApiCall
-    sig { returns(T::Array[LunchMoney::Category]) }
+    sig { returns(T.any(T::Array[LunchMoney::Category], LunchMoney::Errors)) }
     def all_categories
       response = get("categories")
 
-      errors(response)
+      api_errors = errors(response)
+      return api_errors if api_errors.present?
 
       response.body[:categories].map do |category|
         category[:children]&.map! { |child_category| LunchMoney::Category.new(child_category) }
@@ -19,11 +20,12 @@ module LunchMoney
       end
     end
 
-    sig { params(category_id: Integer).returns(LunchMoney::Category) }
+    sig { params(category_id: Integer).returns(T.any(LunchMoney::Category, LunchMoney::Errors)) }
     def single_category(category_id)
       response = get("categories/#{category_id}")
 
-      errors(response)
+      api_errors = errors(response)
+      return api_errors if api_errors.present?
 
       response.body[:children].map! { |child_category| LunchMoney::Category.new(child_category) }
 
@@ -39,7 +41,7 @@ module LunchMoney
         exclude_from_totals: T::Boolean,
         archived: T::Boolean,
         group_id: T.nilable(Integer),
-      ).returns(T::Hash[String, Integer])
+      ).returns(T.any(T::Hash[String, Integer], LunchMoney::Errors))
     end
     def create_category(name:, description: nil, is_income: false, exclude_from_budget: false,
       exclude_from_totals: false, archived: false, group_id: nil)
@@ -56,7 +58,8 @@ module LunchMoney
 
       response = post("categories", params)
 
-      errors(response)
+      api_errors = errors(response)
+      return api_errors if api_errors.present?
 
       response.body
     end
@@ -70,7 +73,7 @@ module LunchMoney
         exclude_from_totals: T::Boolean,
         category_ids: T::Array[Integer],
         new_categories: T::Array[String],
-      ).returns(T::Hash[String, Integer])
+      ).returns(T.any(T::Hash[String, Integer], LunchMoney::Errors))
     end
     def create_category_group(name:, description: nil, is_income: false, exclude_from_budget: false,
       exclude_from_totals: false, category_ids: [], new_categories: [])
@@ -87,7 +90,8 @@ module LunchMoney
 
       response = post("categories/group", params)
 
-      errors(response)
+      api_errors = errors(response)
+      return api_errors if api_errors.present?
 
       response.body
     end
@@ -102,7 +106,7 @@ module LunchMoney
         exclude_from_totals: T.nilable(T::Boolean),
         archived: T.nilable(T::Boolean),
         group_id: T.nilable(Integer),
-      ).returns(T::Boolean)
+      ).returns(T.any(T::Boolean, LunchMoney::Errors))
     end
     def update_category(category_id, name: nil, description: nil, is_income: nil, exclude_from_budget: nil,
       exclude_from_totals: nil, archived: nil, group_id: nil)
@@ -121,7 +125,8 @@ module LunchMoney
 
       response = put("categories/#{category_id}", params)
 
-      errors(response)
+      api_errors = errors(response)
+      return api_errors if api_errors.present?
 
       response.body
     end
@@ -131,7 +136,7 @@ module LunchMoney
         group_id: Integer,
         category_ids: T::Array[Integer],
         new_categories: T::Array[String],
-      ).returns(LunchMoney::Category)
+      ).returns(T.any(LunchMoney::Category, LunchMoney::Errors))
     end
     def add_to_category_group(group_id, category_ids: [], new_categories: [])
       params = {
@@ -141,25 +146,28 @@ module LunchMoney
 
       response = post("categories/group/#{group_id}/add", params)
 
-      errors(response)
+      api_errors = errors(response)
+      return api_errors if api_errors.present?
 
       LunchMoney::Category.new(response.body)
     end
 
-    sig { params(category_id: Integer).returns(T::Boolean) }
+    sig { params(category_id: Integer).returns(T.any(T::Boolean, LunchMoney::Errors)) }
     def delete_category(category_id)
       response = delete("categories/#{category_id}")
 
-      errors(response)
+      api_errors = errors(response)
+      return api_errors if api_errors.present?
 
       response.body
     end
 
-    sig { params(category_id: Integer).returns(T::Boolean) }
+    sig { params(category_id: Integer).returns(T.any(T::Boolean, LunchMoney::Errors)) }
     def force_delete_category(category_id)
       response = delete("categories/#{category_id}/force")
 
-      errors(response)
+      api_errors = errors(response)
+      return api_errors if api_errors.present?
 
       response.body
     end

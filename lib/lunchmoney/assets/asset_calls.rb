@@ -5,11 +5,12 @@ require_relative "asset"
 
 module LunchMoney
   class AssetCalls < ApiCall
-    sig { returns(T::Array[LunchMoney::Asset]) }
+    sig { returns(T.any(T::Array[LunchMoney::Asset], LunchMoney::Errors)) }
     def assets
       response = get("assets")
 
-      errors(response)
+      api_errors = errors(response)
+      return api_errors if api_errors.present?
 
       response.body[:assets].map do |asset|
         LunchMoney::Asset.new(asset)
@@ -28,7 +29,7 @@ module LunchMoney
         institution_name: T.nilable(String),
         closed_on: T.nilable(String),
         exclude_transactions: T.nilable(T::Boolean),
-      ).returns(LunchMoney::Asset)
+      ).returns(T.any(LunchMoney::Asset, LunchMoney::Errors))
     end
     def create_asset(type_name:, name:, balance:, subtype_name: nil, display_name: nil, balance_as_of: nil,
       currency: nil, institution_name: nil, closed_on: nil, exclude_transactions: nil)
@@ -47,7 +48,8 @@ module LunchMoney
 
       response = post("assets", params)
 
-      errors(response)
+      api_errors = errors(response)
+      return api_errors if api_errors.present?
 
       LunchMoney::Asset.new(response.body)
     end
@@ -65,7 +67,7 @@ module LunchMoney
         institution_name: T.nilable(String),
         closed_on: T.nilable(String),
         exclude_transactions: T.nilable(T::Boolean),
-      ).returns(LunchMoney::Asset)
+      ).returns(T.any(LunchMoney::Asset, LunchMoney::Errors))
     end
     def update_asset(asset_id, type_name: nil, name: nil, balance: nil, subtype_name: nil, display_name: nil,
       balance_as_of: nil, currency: nil, institution_name: nil, closed_on: nil, exclude_transactions: nil)
@@ -84,7 +86,8 @@ module LunchMoney
 
       response = put("assets/#{asset_id}", params)
 
-      errors(response)
+      api_errors = errors(response)
+      return api_errors if api_errors.present?
 
       LunchMoney::Asset.new(response.body)
     end

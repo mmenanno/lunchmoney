@@ -23,7 +23,7 @@ module LunchMoney
         end_date: T.nilable(String),
         debit_as_negative: T.nilable(T::Boolean),
         pending: T.nilable(T::Boolean),
-      ).returns(T::Array[LunchMoney::Transaction])
+      ).returns(T.any(T::Array[LunchMoney::Transaction], LunchMoney::Errors))
     end
     def transactions(
       tag_id: nil,
@@ -66,7 +66,8 @@ module LunchMoney
         get("transactions", query_params: params)
       end
 
-      errors(response)
+      api_errors = errors(response)
+      return api_errors if api_errors.present?
 
       response.body[:transactions].map do |transaction|
         transaction[:tags]&.map! { |tag| LunchMoney::Tag.new(tag) }
@@ -75,7 +76,12 @@ module LunchMoney
       end
     end
 
-    sig { params(transaction_id: Integer, debit_as_negative: T.nilable(T::Boolean)).returns(LunchMoney::Transaction) }
+    sig do
+      params(
+        transaction_id: Integer,
+        debit_as_negative: T.nilable(T::Boolean),
+      ).returns(T.any(LunchMoney::Transaction, LunchMoney::Errors))
+    end
     def single_transaction(transaction_id:, debit_as_negative: nil)
       params = {
         debit_as_negative:,
@@ -88,7 +94,8 @@ module LunchMoney
         get("transactions/#{transaction_id}", query_params: params)
       end
 
-      errors(response)
+      api_errors = errors(response)
+      return api_errors if api_errors.present?
 
       LunchMoney::Transaction.new(response.body)
     end
@@ -101,7 +108,7 @@ module LunchMoney
         check_for_recurring: T.nilable(T::Boolean),
         debit_as_negative: T.nilable(T::Boolean),
         skip_balance_update: T.nilable(T::Boolean),
-      ).returns(T::Hash[String, T::Array[Integer]])
+      ).returns(T.any(T::Hash[String, T::Array[Integer]], LunchMoney::Errors))
     end
     def insert_transactions(transactions, apply_rules: nil, skip_duplicates: nil,
       check_for_recurring: nil, debit_as_negative: nil, skip_balance_update: nil)
@@ -117,7 +124,8 @@ module LunchMoney
 
       response = post("transactions", params)
 
-      errors(response)
+      api_errors = errors(response)
+      return api_errors if api_errors.present?
 
       response.body
     end
@@ -129,7 +137,7 @@ module LunchMoney
         split: T.nilable(LunchMoney::Split),
         debit_as_negative: T.nilable(T::Boolean),
         skip_balance_update: T.nilable(T::Boolean),
-      ).returns({ updated: T::Boolean, split: T::Array[Integer] })
+      ).returns(T.any({ updated: T::Boolean, split: T::Array[Integer] }, LunchMoney::Errors))
     end
     def update_transaction(transaction_id, transaction:, split: nil,
       debit_as_negative: nil, skip_balance_update: nil)
@@ -143,12 +151,18 @@ module LunchMoney
 
       response = put("transactions/#{transaction_id}", params)
 
-      errors(response)
+      api_errors = errors(response)
+      return api_errors if api_errors.present?
 
       response.body
     end
 
-    sig { params(parent_ids: T::Array[Integer], remove_parents: T.nilable(T::Boolean)).returns(T::Array[Integer]) }
+    sig do
+      params(
+        parent_ids: T::Array[Integer],
+        remove_parents: T.nilable(T::Boolean),
+      ).returns(T.any(T::Array[Integer], LunchMoney::Errors))
+    end
     def unsplit_transaction(parent_ids, remove_parents:)
       params = {
         parent_ids:,
@@ -158,7 +172,8 @@ module LunchMoney
 
       response = post("transactions/unsplit", params)
 
-      errors(response)
+      api_errors = errors(response)
+      return api_errors if api_errors.present?
 
       response.body
     end
@@ -171,7 +186,7 @@ module LunchMoney
         category_id: T.nilable(Integer),
         notes: T.nilable(String),
         tags: T.nilable(T::Array[T.any(Integer, String)]),
-      ).returns(Integer)
+      ).returns(T.any(Integer, LunchMoney::Errors))
     end
     def create_transaction_group(date:, payee:, transactions:, category_id: nil, notes: nil, tags: nil)
       params = {
@@ -186,16 +201,23 @@ module LunchMoney
 
       response = post("transactions/group", params)
 
-      errors(response)
+      api_errors = errors(response)
+      return api_errors if api_errors.present?
 
       response.body
     end
 
-    sig { params(transaction_id: T.any(String, Integer)).returns(T::Hash[String, T::Array[Integer]]) }
+    sig do
+      params(transaction_id: T.any(
+        String,
+        Integer,
+      )).returns(T.any(T::Hash[String, T::Array[Integer]], LunchMoney::Errors))
+    end
     def delete_transaction_group(transaction_id)
       response = delete("transactions/group/#{transaction_id}")
 
-      errors(response)
+      api_errors = errors(response)
+      return api_errors if api_errors.present?
 
       response.body
     end
