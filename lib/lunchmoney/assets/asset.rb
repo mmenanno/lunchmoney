@@ -13,6 +13,7 @@ module LunchMoney
     prop :closed_on, T.nilable(String)
     prop :currency, String
     prop :institution_name, T.nilable(String)
+    prop :exclude_transactions, T::Boolean
     prop :created_at, String
   end
 end
