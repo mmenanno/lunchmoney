@@ -11,9 +11,9 @@ require_relative "tags/tag_calls"
 require_relative "transactions/transaction_calls"
 require_relative "recurring_expenses/recurring_expense_calls"
 require_relative "budget/budget_calls"
+require_relative "assets/asset_calls"
+require_relative "plaid_accounts/plaid_account_calls"
 
-require_relative "objects/asset"
-require_relative "objects/plaid_account"
 require_relative "objects/crypto"
 
 module LunchMoney
@@ -85,59 +85,28 @@ module LunchMoney
     def budget_calls
       @budget_calls ||= T.let(LunchMoney::BudgetCalls.new(api_key:), T.nilable(LunchMoney::BudgetCalls))
     end
+
+    delegate :assets, :create_asset, :update_asset, to: :asset_calls
+
+    sig { returns(LunchMoney::AssetCalls) }
+    def asset_calls
+      @asset_calls ||= T.let(LunchMoney::AssetCalls.new(api_key:), T.nilable(LunchMoney::AssetCalls))
+    end
+
+    delegate :plaid_accounts, to: :plaid_account_calls
+
+    sig { returns(LunchMoney::PlaidAccountCalls) }
+    def plaid_account_calls
+      @plaid_account_calls ||= T.let(
+        LunchMoney::PlaidAccountCalls.new(api_key:),
+        T.nilable(LunchMoney::PlaidAccountCalls),
+      )
+    end
   end
 end
 
 # module LunchMoney
 #   class Api
-#     sig { returns(T.untyped) }
-#     def all_assets
-#       response = get("assets")
-
-#       errors(response)
-
-#       response.body[:assets].map { |asset| LunchMoney::Asset.new(asset) }
-#     end
-
-#     sig do
-#       params(
-#         asset_id: T.any(Integer, String),
-#         type_name: T.nilable(String),
-#         subtype_name: T.nilable(String),
-#         name: T.nilable(String),
-#         balance: T.nilable(String),
-#         balance_as_of: T.nilable(String),
-#         currency: T.nilable(String),
-#         institution_name: T.nilable(String),
-#       ).returns(T.untyped)
-#     end
-#     def update_asset(asset_id, type_name: nil, subtype_name: nil, name: nil, balance: nil,
-#       balance_as_of: nil, currency: nil, institution_name: nil)
-#       params = {}
-#       params[:type_name] = type_name if type_name
-#       params[:subtype_name] = subtype_name if subtype_name
-#       params[:name] = name if name
-#       params[:balance] = balance if balance
-#       params[:balance_as_of] = balance_as_of if balance_as_of
-#       params[:currency] = currency if currency
-#       params[:institution_name] = institution_name if institution_name
-
-#       response = put("assets/#{asset_id}", params)
-
-#       errors(response)
-
-#       LunchMoney::Asset.new(response.body)
-#     end
-
-#     sig { returns(T.untyped) }
-#     def all_plaid_accounts
-#       response = get("plaid_accounts")
-
-#       errors(response)
-
-#       response.body[:plaid_accounts].map { |plaid_account| LunchMoney::PlaidAccount.new(plaid_account) }
-#     end
-
 #     sig { returns(T.untyped) }
 #     def all_crypto
 #       response = get("crypto")
