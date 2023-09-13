@@ -4,28 +4,48 @@ This gem and readme are very much a work in progress. More to come!
 
 This gem is a library of the [LunchMoney API](https://lunchmoney.dev/) for the wonderful [LunchMoney](http://lunchmoney.app/) web app for personal finance & budgeting.
 
+## Usage
+
 ### Installation
 
 Add this line to your application's `Gemfile`:
+
 ```Ruby
 gem 'lunchmoney-ruby'
 ```
 
 ### Set your lunchmoney token
 
-You can set your LunchMoney token either with a block like:
+There are a few ways you can set your API token. You can set it in an initilizer with:
+
 ```Ruby
-LunchMoney.configure do |config|
-  config.token = "token"
-end
+LunchMoney::Config.token = "your_api_key"
 ```
 
-or via an environment variable like `ENV['LUNCHMONEY_TOKEN'] = "token"`
+The config will also automatically pull in the token if set via environment variable named `LUNCHMONEY_TOKEN`
+
+You can also override the config and set your LunchMoney token via kwarg when you initialize the API:
+
+```Ruby
+LunchMoney::Api.new(api_key: "your_api_key")
+```
 
 ### Using the API
 
 Create an instance of the api, then call the endpoint you need:
+
 ```Ruby
 api = LunchMoney::Api.new
 api.all_categories
 ```
+
+## Contributing to this repo
+Feel free to contribute and submit PRs to improve this gem
+## Releasing a new gem version
+
+1. Bump the `VERSION` constant in `lib/lunchmoney/version.rb`
+2. Run `bundle install`
+3. Commit and push up the change in a PR
+4. Merge the PR
+5. Create a new tag and release with the name version as v0.0.0
+6. A Github action will kick off and publish the new gem version
