@@ -13,8 +13,7 @@ require_relative "recurring_expenses/recurring_expense_calls"
 require_relative "budget/budget_calls"
 require_relative "assets/asset_calls"
 require_relative "plaid_accounts/plaid_account_calls"
-
-require_relative "objects/crypto"
+require_relative "crypto/crypto_calls"
 
 module LunchMoney
   class Api
@@ -102,44 +101,12 @@ module LunchMoney
         T.nilable(LunchMoney::PlaidAccountCalls),
       )
     end
+
+    delegate :crypto, :update_crypto, to: :crypto_calls
+
+    sig { returns(LunchMoney::CryptoCalls) }
+    def crypto_calls
+      @crypto_calls ||= T.let(LunchMoney::CryptoCalls.new(api_key:), T.nilable(LunchMoney::CryptoCalls))
+    end
   end
 end
-
-# module LunchMoney
-#   class Api
-#     sig { returns(T.untyped) }
-#     def all_crypto
-#       response = get("crypto")
-
-#       errors(response)
-
-#       response.body[:crypto].map { |crypto| LunchMoney::Crypto.new(crypto) }
-#     end
-
-#     sig do
-#       params(
-#         crypto_asset_id: T.any(Integer, String),
-#         name: T.nilable(String),
-#         display_name: T.nilable(String),
-#         institution_name: T.nilable(String),
-#         balance: T.nilable(T.any(Integer, String)),
-#         currency: T.nilable(String),
-#       ).returns(T.untyped)
-#     end
-#     def update_manual_crypto(crypto_asset_id, name: nil, display_name: nil,
-#       institution_name: nil, balance: nil, currency: nil)
-#       params = {}
-#       params[:name] = name if name
-#       params[:display_name] = display_name if display_name
-#       params[:institution_name] = institution_name if institution_name
-#       params[:balance] = balance if balance
-#       params[:currency] = currency if currency
-
-#       response = put("crypto/manual/#{crypto_asset_id}", params)
-
-#       errors(response)
-
-#       LunchMoney::Asset.new(response.body)
-#     end
-#   end
-# end
