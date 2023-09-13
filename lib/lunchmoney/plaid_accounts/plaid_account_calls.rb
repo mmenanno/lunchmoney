@@ -4,7 +4,7 @@
 require_relative "plaid_account"
 
 module LunchMoney
-  class PlaidAccountCalls < BaseApiCall
+  class PlaidAccountCalls < ApiCall
     sig { returns(T::Array[LunchMoney::PlaidAccount]) }
     def plaid_accounts
       response = get("plaid_accounts")

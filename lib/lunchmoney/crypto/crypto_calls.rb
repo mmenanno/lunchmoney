@@ -4,7 +4,7 @@
 require_relative "crypto"
 
 module LunchMoney
-  class CryptoCalls < BaseApiCall
+  class CryptoCalls < ApiCall
     sig { returns(T::Array[LunchMoney::Crypto]) }
     def crypto
       response = get("crypto")

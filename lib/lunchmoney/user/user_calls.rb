@@ -4,7 +4,7 @@
 require_relative "user"
 
 module LunchMoney
-  class UserCalls < BaseApiCall
+  class UserCalls < ApiCall
     sig { returns(LunchMoney::User) }
     def user
       response = get("me")

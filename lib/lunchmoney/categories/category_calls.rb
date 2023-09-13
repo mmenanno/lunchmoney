@@ -5,7 +5,7 @@ require_relative "category"
 require "pry"
 
 module LunchMoney
-  class CategoryCalls < BaseApiCall
+  class CategoryCalls < ApiCall
     sig { returns(T::Array[LunchMoney::Category]) }
     def all_categories
       response = get("categories")

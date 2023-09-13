@@ -21,4 +21,6 @@ module LunchMoney
   class BudgetAmountError < Error; end
 
   class GeneralError < Error; end
+
+  class InvalidApiKey < Error; end
 end

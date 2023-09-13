@@ -6,7 +6,7 @@ require_relative "update_transaction"
 require_relative "split"
 
 module LunchMoney
-  class TransactionCalls < BaseApiCall
+  class TransactionCalls < ApiCall
     sig do
       params(
         tag_id: T.nilable(Integer),

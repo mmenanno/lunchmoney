@@ -4,7 +4,7 @@
 require_relative "recurring_expense"
 
 module LunchMoney
-  class RecurringExpenseCalls < BaseApiCall
+  class RecurringExpenseCalls < ApiCall
     sig do
       params(start_date: T.nilable(String), end_date: T.nilable(String)).returns(T::Array[LunchMoney::RecurringExpense])
     end

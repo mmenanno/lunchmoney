@@ -4,7 +4,7 @@
 require_relative "asset"
 
 module LunchMoney
-  class AssetCalls < BaseApiCall
+  class AssetCalls < ApiCall
     sig { returns(T::Array[LunchMoney::Asset]) }
     def assets
       response = get("assets")
