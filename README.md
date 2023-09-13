@@ -40,7 +40,9 @@ api.all_categories
 ```
 
 ## Contributing to this repo
+
 Feel free to contribute and submit PRs to improve this gem
+
 ## Releasing a new gem version
 
 1. Bump the `VERSION` constant in `lib/lunchmoney/version.rb`
