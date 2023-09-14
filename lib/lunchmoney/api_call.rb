@@ -6,14 +6,13 @@ require_relative "error"
 module LunchMoney
   class ApiCall
     BASE_URL = "https://dev.lunchmoney.app/v1/"
-    LUNCHMONEY_TOKEN = T.let(LunchMoney::Config.token, T.nilable(String))
 
     sig { returns(T.nilable(String)) }
     attr_reader :api_key
 
     sig { params(api_key: T.nilable(String)).void }
     def initialize(api_key: nil)
-      @api_key = T.let(api_key || LunchMoney::Config.token, T.nilable(String))
+      @api_key = T.let((api_key || LunchMoney.configuration.api_key), T.nilable(String))
     end
 
     private

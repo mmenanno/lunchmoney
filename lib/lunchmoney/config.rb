@@ -3,6 +3,12 @@
 
 module LunchMoney
   class Config
-    cattr_accessor(:token) { ENV.fetch("LUNCHMONEY_TOKEN", nil) }
+    sig { returns(T.nilable(String)) }
+    attr_accessor :api_key
+
+    sig { void }
+    def initialize
+      @api_key = ENV.fetch("LUNCHMONEY_TOKEN", nil)
+    end
   end
 end

@@ -16,15 +16,17 @@ gem 'lunchmoney-ruby'
 
 ### Set your lunchmoney token
 
-There are a few ways you can set your API token. You can set it in an initilizer with:
+There are a few ways you can set your API token. You can set it manually using a configure block:
 
 ```Ruby
-LunchMoney::Config.token = "your_api_key"
+LunchMoney.configure do |config|
+  config.api_key = "your_api_key"
+end
 ```
 
-The config will also automatically pull in the token if set via environment variable named `LUNCHMONEY_TOKEN`
+The config will also _automatically_ pull in the token if set via environment variable named `LUNCHMONEY_TOKEN`
 
-You can also override the config and set your LunchMoney token via kwarg when you initialize the API:
+You can also override the config and set your LunchMoney token for a specific API instance via kwarg:
 
 ```Ruby
 LunchMoney::Api.new(api_key: "your_api_key")
