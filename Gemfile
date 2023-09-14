@@ -18,3 +18,4 @@ gem "rubocop-rake", require: false
 gem "sorbet-static-and-runtime", require: false
 gem "spoom", require: false
 gem "tapioca", require: false
+gem "dotenv"
