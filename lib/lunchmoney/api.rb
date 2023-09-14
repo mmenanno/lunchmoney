@@ -1,7 +1,7 @@
 # typed: strict
 # frozen_string_literal: true
 
-require_relative "errors"
+require_relative "exceptions"
 require_relative "config"
 
 require_relative "api_call"

@@ -1,6 +1,8 @@
 # typed: strict
 # frozen_string_literal: true
 
+require_relative "error"
+
 module LunchMoney
   class ApiCall
     BASE_URL = "https://dev.lunchmoney.app/v1/"
@@ -70,10 +72,11 @@ module LunchMoney
 
       api_errors = []
 
-      if errors.class == String
+      case errors
+      when String
         api_errors << LunchMoney::Error.new(message: errors)
-      elsif errors.class == Array
-        T.cast(errors, T::Array[String]).each do |error|
+      when Array
+        errors.each do |error|
           api_errors << LunchMoney::Error.new(message: error)
         end
       end

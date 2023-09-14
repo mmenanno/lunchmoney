@@ -9,3 +9,5 @@ require "minitest/autorun"
 require "active_support"
 require "mocha/minitest"
 require "pry"
+
+require_relative "helpers/mocha_typed"
