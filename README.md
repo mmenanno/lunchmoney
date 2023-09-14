@@ -11,7 +11,7 @@ This gem is a library of the [LunchMoney API](https://lunchmoney.dev/) for the w
 Add this line to your application's `Gemfile`:
 
 ```Ruby
-gem 'lunchmoney-ruby'
+gem "lunchmoney-ruby"
 ```
 
 ### Set your lunchmoney token
