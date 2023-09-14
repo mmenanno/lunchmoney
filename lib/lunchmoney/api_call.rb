@@ -67,7 +67,7 @@ module LunchMoney
 
     sig { params(body: T::Hash[Symbol, T.any(String, T::Array[String])]).returns(LunchMoney::Errors) }
     def parse_errors(body)
-      errors = body[:error]
+      errors = body[:error] || body[:errors]
       return [] if errors.blank?
 
       api_errors = []

@@ -11,3 +11,4 @@ require "mocha/minitest"
 require "pry"
 
 require_relative "helpers/mocha_typed"
+require_relative "helpers/mock_response_helper"

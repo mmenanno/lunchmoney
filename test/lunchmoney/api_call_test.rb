@@ -5,6 +5,7 @@ require "test_helper"
 
 class ApiCallTest < ActiveSupport::TestCase
   include Mocha::Typed
+  include MockResponseHelper
 
   test "errors returns and empty array if no errors are present" do
     response = mock_faraday_response({})
@@ -36,14 +37,5 @@ class ApiCallTest < ActiveSupport::TestCase
     errors.each do |error|
       assert_includes(error_messages, error.message)
     end
-  end
-
-  private
-
-  sig { params(body: T::Hash[Symbol, T.untyped]).returns(Faraday::Response) }
-  def mock_faraday_response(body)
-    mock = instance_double(Faraday::Response)
-    mock.stubs(:body).returns(body)
-    mock
   end
 end
