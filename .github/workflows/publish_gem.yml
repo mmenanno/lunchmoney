@@ -15,16 +15,17 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
+          ruby-version: 3.2.2
           bundler-cache: true
-      - uses: fac/ruby-gem-setup-credentials-action@v2
-        with:
-          user: ""
-          key: rubygems
-          token: ${{ secrets.RUBYGEMS_API_KEY }}
-      - name: Build Gem
-        run: bundle exec rake build
       - name: Release Gem
         if: contains(github.ref, 'refs/tags/v')
-        uses: fac/ruby-gem-push-action@v2
-        with:
-          key: rubygems
+        run: |
+          mkdir -p $HOME/.gem
+          touch $HOME/.gem/credentials
+          chmod 0600 $HOME/.gem/credentials
+          printf -- "---\n:rubygems_api_key: ${RUBYGEMS_API_KEY}\n" > $HOME/.gem/credentials
+          gem build *.gemspec
+          gem push *.gem
+        env:
+          RUBYGEMS_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
+
