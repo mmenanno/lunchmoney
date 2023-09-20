@@ -5385,6 +5385,9 @@ class RuboCop::Cop::Rails::RedundantActiveRecordAllMethod < ::RuboCop::Cop::Base
   extend ::RuboCop::Cop::AutoCorrector
 
   # source://rubocop-rails//lib/rubocop/cop/rails/redundant_active_record_all_method.rb#129
+  def followed_by_query_method?(param0 = T.unsafe(nil)); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_active_record_all_method.rb#133
   def on_send(node); end
 end
 
@@ -5394,7 +5397,7 @@ RuboCop::Cop::Rails::RedundantActiveRecordAllMethod::MSG = T.let(T.unsafe(nil), 
 # Defined methods in `ActiveRecord::Querying::QUERYING_METHODS` on activerecord 7.0.5.
 #
 # source://rubocop-rails//lib/rubocop/cop/rails/redundant_active_record_all_method.rb#32
-RuboCop::Cop::Rails::RedundantActiveRecordAllMethod::QUERYING_METHODS = T.let(T.unsafe(nil), Array)
+RuboCop::Cop::Rails::RedundantActiveRecordAllMethod::QUERYING_METHODS = T.let(T.unsafe(nil), Set)
 
 # source://rubocop-rails//lib/rubocop/cop/rails/redundant_active_record_all_method.rb#29
 RuboCop::Cop::Rails::RedundantActiveRecordAllMethod::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
