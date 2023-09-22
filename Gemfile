@@ -6,7 +6,7 @@ source "https://rubygems.org"
 gemspec
 
 # Specify development dependencies here
-gem "rake", "~> 13.0"
+gem "toys"
 gem "minitest", "~> 5.20", require: false
 gem "mocha", "~> 2.1.0", require: false
 gem "pry-sorbet", "~> 0.2", require: false

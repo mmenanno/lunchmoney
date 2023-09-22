@@ -47,7 +47,6 @@ GEM
     racc (1.7.1)
     rack (3.0.8)
     rainbow (3.1.1)
-    rake (13.0.6)
     rbi (0.1.1)
       sorbet-runtime (>= 0.5.9204)
       yarp (>= 0.11.0)
@@ -106,6 +105,9 @@ GEM
       thor (>= 1.2.0)
       yard-sorbet
     thor (1.2.2)
+    toys (0.14.7)
+      toys-core (= 0.14.7)
+    toys-core (0.14.7)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.4.2)
@@ -126,7 +128,6 @@ DEPENDENCIES
   minitest (~> 5.20)
   mocha (~> 2.1.0)
   pry-sorbet (~> 0.2)
-  rake (~> 13.0)
   rubocop-minitest
   rubocop-rails
   rubocop-rake
@@ -135,6 +136,7 @@ DEPENDENCIES
   sorbet-static-and-runtime
   spoom
   tapioca
+  toys
 
 BUNDLED WITH
    2.4.19

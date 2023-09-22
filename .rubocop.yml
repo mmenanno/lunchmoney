@@ -20,10 +20,15 @@ Naming/FileName:
 Sorbet:
   Enabled: true
 
+Sorbet/FalseSigil:
+  Exclude:
+    - ".toys/**/*"
+
 Sorbet/StrictSigil:
   Enabled: true
   Exclude:
     - "test/*"
+    - ".toys/**/*"
 
 Minitest:
   Enabled: true

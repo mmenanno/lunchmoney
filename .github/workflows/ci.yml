@@ -38,4 +38,4 @@ jobs:
         run: bin/tapioca dsl --verify
       -
         name: Run Tests
-        run: bin/rake test
+        run: bin/toys test
