@@ -5321,24 +5321,24 @@ RuboCop::Cop::EndKeywordAlignment::MSG = T.let(T.unsafe(nil), String)
 module RuboCop::Cop::EnforceSuperclass
   # @api private
   #
-  # source://rubocop-rails/2.21.0/lib/rubocop/cop/mixin/enforce_superclass.rb#19
+  # source://rubocop-rails/2.21.1/lib/rubocop/cop/mixin/enforce_superclass.rb#19
   def on_class(node); end
 
   # @api private
   #
-  # source://rubocop-rails/2.21.0/lib/rubocop/cop/mixin/enforce_superclass.rb#25
+  # source://rubocop-rails/2.21.1/lib/rubocop/cop/mixin/enforce_superclass.rb#25
   def on_send(node); end
 
   private
 
-  # source://rubocop-rails/2.21.0/lib/rubocop/cop/mixin/enforce_superclass.rb#33
+  # source://rubocop-rails/2.21.1/lib/rubocop/cop/mixin/enforce_superclass.rb#33
   def register_offense(offense_node); end
 
   class << self
     # @api private
     # @private
     #
-    # source://rubocop-rails/2.21.0/lib/rubocop/cop/mixin/enforce_superclass.rb#7
+    # source://rubocop-rails/2.21.1/lib/rubocop/cop/mixin/enforce_superclass.rb#7
     def included(base); end
   end
 end
@@ -38399,7 +38399,7 @@ class RuboCop::Cop::Style::InverseMethods < ::RuboCop::Cop::Base
   def remove_end_parenthesis(corrector, node, method, method_call); end
 
   class << self
-    # source://rubocop-rails/2.21.0/lib/rubocop-rails.rb#22
+    # source://rubocop-rails/2.21.1/lib/rubocop-rails.rb#22
     def autocorrect_incompatible_with; end
   end
 end
@@ -39423,7 +39423,7 @@ class RuboCop::Cop::Style::MethodCallWithArgsParentheses < ::RuboCop::Cop::Base
   def args_parenthesized?(node); end
 
   class << self
-    # source://rubocop-rails/2.21.0/lib/rubocop-rails.rb#30
+    # source://rubocop-rails/2.21.1/lib/rubocop-rails.rb#30
     def autocorrect_incompatible_with; end
   end
 end
@@ -45858,7 +45858,7 @@ class RuboCop::Cop::Style::RedundantSelf < ::RuboCop::Cop::Base
   def regular_method_call?(node); end
 
   class << self
-    # source://rubocop-rails/2.21.0/lib/rubocop-rails.rb#38
+    # source://rubocop-rails/2.21.1/lib/rubocop-rails.rb#38
     def autocorrect_incompatible_with; end
   end
 end
@@ -55512,123 +55512,6 @@ end
 
 # source://rubocop//lib/rubocop/ast_aliases.rb#6
 RuboCop::ProcessedSource = RuboCop::AST::ProcessedSource
-
-# Provides a custom rake task.
-#
-# require 'rubocop/rake_task'
-# RuboCop::RakeTask.new
-#
-# Use global Rake namespace here to avoid namespace issues with custom
-# rubocop-rake tasks
-#
-# source://rubocop//lib/rubocop/rake_task.rb#14
-class RuboCop::RakeTask < ::Rake::TaskLib
-  # @return [RakeTask] a new instance of RakeTask
-  #
-  # source://rubocop//lib/rubocop/rake_task.rb#17
-  def initialize(name = T.unsafe(nil), *args, &task_block); end
-
-  # Returns the value of attribute fail_on_error.
-  #
-  # source://rubocop//lib/rubocop/rake_task.rb#15
-  def fail_on_error; end
-
-  # Sets the attribute fail_on_error
-  #
-  # @param value the value to set the attribute fail_on_error to.
-  #
-  # source://rubocop//lib/rubocop/rake_task.rb#15
-  def fail_on_error=(_arg0); end
-
-  # Returns the value of attribute formatters.
-  #
-  # source://rubocop//lib/rubocop/rake_task.rb#15
-  def formatters; end
-
-  # Sets the attribute formatters
-  #
-  # @param value the value to set the attribute formatters to.
-  #
-  # source://rubocop//lib/rubocop/rake_task.rb#15
-  def formatters=(_arg0); end
-
-  # Returns the value of attribute name.
-  #
-  # source://rubocop//lib/rubocop/rake_task.rb#15
-  def name; end
-
-  # Sets the attribute name
-  #
-  # @param value the value to set the attribute name to.
-  #
-  # source://rubocop//lib/rubocop/rake_task.rb#15
-  def name=(_arg0); end
-
-  # Returns the value of attribute options.
-  #
-  # source://rubocop//lib/rubocop/rake_task.rb#15
-  def options; end
-
-  # Sets the attribute options
-  #
-  # @param value the value to set the attribute options to.
-  #
-  # source://rubocop//lib/rubocop/rake_task.rb#15
-  def options=(_arg0); end
-
-  # Returns the value of attribute patterns.
-  #
-  # source://rubocop//lib/rubocop/rake_task.rb#15
-  def patterns; end
-
-  # Sets the attribute patterns
-  #
-  # @param value the value to set the attribute patterns to.
-  #
-  # source://rubocop//lib/rubocop/rake_task.rb#15
-  def patterns=(_arg0); end
-
-  # Returns the value of attribute requires.
-  #
-  # source://rubocop//lib/rubocop/rake_task.rb#15
-  def requires; end
-
-  # Sets the attribute requires
-  #
-  # @param value the value to set the attribute requires to.
-  #
-  # source://rubocop//lib/rubocop/rake_task.rb#15
-  def requires=(_arg0); end
-
-  # Returns the value of attribute verbose.
-  #
-  # source://rubocop//lib/rubocop/rake_task.rb#15
-  def verbose; end
-
-  # Sets the attribute verbose
-  #
-  # @param value the value to set the attribute verbose to.
-  #
-  # source://rubocop//lib/rubocop/rake_task.rb#15
-  def verbose=(_arg0); end
-
-  private
-
-  # source://rubocop//lib/rubocop/rake_task.rb#55
-  def full_options; end
-
-  # source://rubocop//lib/rubocop/rake_task.rb#35
-  def perform(option); end
-
-  # source://rubocop//lib/rubocop/rake_task.rb#44
-  def run_cli(verbose, options); end
-
-  # source://rubocop//lib/rubocop/rake_task.rb#62
-  def setup_ivars(name); end
-
-  # source://rubocop//lib/rubocop/rake_task.rb#72
-  def setup_subtasks(name, *args, &task_block); end
-end
 
 # Common methods and behaviors for dealing with remote config files.
 #

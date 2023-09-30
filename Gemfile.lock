@@ -72,8 +72,6 @@ GEM
       activesupport (>= 4.2.0)
       rack (>= 1.1)
       rubocop (>= 1.33.0, < 2.0)
-    rubocop-rake (0.6.0)
-      rubocop (~> 1.0)
     rubocop-shopify (2.14.0)
       rubocop (~> 1.51)
     rubocop-sorbet (0.7.3)
@@ -130,7 +128,6 @@ DEPENDENCIES
   pry-sorbet (~> 0.2)
   rubocop-minitest
   rubocop-rails
-  rubocop-rake
   rubocop-shopify
   rubocop-sorbet
   sorbet-static-and-runtime

@@ -32,7 +32,7 @@ end
 # @return [nil] if the Toys executable is not running.
 #
 # source://toys//lib/toys.rb#40
-Toys::EXECUTABLE_PATH = T.let(T.unsafe(nil), T.untyped)
+Toys::EXECUTABLE_PATH = T.let(T.unsafe(nil), String)
 
 # @private
 #
