@@ -12,7 +12,7 @@ module LunchMoney
       api_errors = errors(response)
       return api_errors if api_errors.present?
 
-      response.body.map { |tag| LunchMoney::Tag.new(tag) }
+      response.body.map { |tag| LunchMoney::Tag.new(**tag) }
     end
   end
 end

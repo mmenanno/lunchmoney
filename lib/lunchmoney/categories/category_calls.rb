@@ -14,9 +14,9 @@ module LunchMoney
       return api_errors if api_errors.present?
 
       response.body[:categories].map do |category|
-        category[:children]&.map! { |child_category| LunchMoney::Category.new(child_category) }
+        category[:children]&.map! { |child_category| LunchMoney::Category.new(**child_category) }
 
-        LunchMoney::Category.new(category)
+        LunchMoney::Category.new(**category)
       end
     end
 
@@ -27,9 +27,9 @@ module LunchMoney
       api_errors = errors(response)
       return api_errors if api_errors.present?
 
-      response.body[:children].map! { |child_category| LunchMoney::Category.new(child_category) }
+      response.body[:children].map! { |child_category| LunchMoney::Category.new(**child_category) }
 
-      LunchMoney::Category.new(response.body)
+      LunchMoney::Category.new(**response.body)
     end
 
     sig do
@@ -149,7 +149,7 @@ module LunchMoney
       api_errors = errors(response)
       return api_errors if api_errors.present?
 
-      LunchMoney::Category.new(response.body)
+      LunchMoney::Category.new(**response.body)
     end
 
     sig { params(category_id: Integer).returns(T.any(T::Boolean, LunchMoney::Errors)) }

@@ -28,7 +28,7 @@ module LunchMoney
       response.body.map do |budget|
         # budget[:data] TODO: Add mapping to data object
 
-        LunchMoney::Budget.new(budget)
+        LunchMoney::Budget.new(**budget)
       end
     end
 

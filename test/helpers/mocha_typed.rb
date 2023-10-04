@@ -5,7 +5,6 @@ module Mocha
   # Extension for Mocha Mocks to make them play well with sorbet.
   module Typed
     include(Kernel)
-    extend(T::Sig)
     extend(T::Helpers)
 
     requires_ancestor { Mocha::API }

@@ -27,7 +27,9 @@ module LunchMoney
       api_errors = errors(response)
       return api_errors if api_errors.present?
 
-      response.body[:recurring_expenses].map { |recurring_expense| LunchMoney::RecurringExpense.new(recurring_expense) }
+      response.body[:recurring_expenses].map do |recurring_expense|
+        LunchMoney::RecurringExpense.new(**recurring_expense)
+      end
     end
   end
 end

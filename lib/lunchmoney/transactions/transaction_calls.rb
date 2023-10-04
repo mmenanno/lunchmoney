@@ -72,7 +72,7 @@ module LunchMoney
       response.body[:transactions].map do |transaction|
         transaction[:tags]&.map! { |tag| LunchMoney::Tag.new(tag) }
 
-        LunchMoney::Transaction.new(transaction)
+        LunchMoney::Transaction.new(**transaction)
       end
     end
 
@@ -97,7 +97,7 @@ module LunchMoney
       api_errors = errors(response)
       return api_errors if api_errors.present?
 
-      LunchMoney::Transaction.new(response.body)
+      LunchMoney::Transaction.new(**response.body)
     end
 
     sig do

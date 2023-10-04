@@ -12,7 +12,7 @@ module LunchMoney
       api_errors = errors(response)
       return api_errors if api_errors.present?
 
-      LunchMoney::User.new(response.body)
+      LunchMoney::User.new(**response.body)
     end
   end
 end

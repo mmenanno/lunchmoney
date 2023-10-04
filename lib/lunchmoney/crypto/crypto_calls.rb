@@ -13,7 +13,7 @@ module LunchMoney
       return api_errors if api_errors.present?
 
       response.body[:crypto].map do |crypto|
-        LunchMoney::Crypto.new(crypto)
+        LunchMoney::Crypto.new(**crypto)
       end
     end
 
@@ -41,7 +41,7 @@ module LunchMoney
       api_errors = errors(response)
       return api_errors if api_errors.present?
 
-      LunchMoney::Crypto.new(response.body)
+      LunchMoney::Crypto.new(**response.body)
     end
   end
 end
