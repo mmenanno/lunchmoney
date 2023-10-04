@@ -13,7 +13,7 @@ module LunchMoney
       return api_errors if api_errors.present?
 
       response.body[:assets].map do |asset|
-        LunchMoney::Asset.new(asset)
+        LunchMoney::Asset.new(**asset)
       end
     end
 
@@ -51,7 +51,7 @@ module LunchMoney
       api_errors = errors(response)
       return api_errors if api_errors.present?
 
-      LunchMoney::Asset.new(response.body)
+      LunchMoney::Asset.new(**response.body)
     end
 
     sig do
@@ -89,7 +89,7 @@ module LunchMoney
       api_errors = errors(response)
       return api_errors if api_errors.present?
 
-      LunchMoney::Asset.new(response.body)
+      LunchMoney::Asset.new(**response.body)
     end
   end
 end

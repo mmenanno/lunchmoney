@@ -13,7 +13,7 @@ module LunchMoney
       return api_errors if api_errors.present?
 
       response.body[:plaid_accounts].map do |plaid_account|
-        LunchMoney::PlaidAccount.new(plaid_account)
+        LunchMoney::PlaidAccount.new(**plaid_account)
       end
     end
   end
