@@ -449,17 +449,20 @@ RuboCop::Cop::Minitest::AssertNil::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array
 class RuboCop::Cop::Minitest::AssertOperator < ::RuboCop::Cop::Base
   extend ::RuboCop::Cop::AutoCorrector
 
-  # source://rubocop-minitest//lib/rubocop/cop/minitest/assert_operator.rb#22
+  # source://rubocop-minitest//lib/rubocop/cop/minitest/assert_operator.rb#23
   def on_send(node); end
 
   private
 
-  # source://rubocop-minitest//lib/rubocop/cop/minitest/assert_operator.rb#37
+  # source://rubocop-minitest//lib/rubocop/cop/minitest/assert_operator.rb#41
   def build_new_arguments(node); end
 
-  # source://rubocop-minitest//lib/rubocop/cop/minitest/assert_operator.rb#48
+  # source://rubocop-minitest//lib/rubocop/cop/minitest/assert_operator.rb#52
   def range_of_arguments(node); end
 end
+
+# source://rubocop-minitest//lib/rubocop/cop/minitest/assert_operator.rb#21
+RuboCop::Cop::Minitest::AssertOperator::ALLOWED_OPERATORS = T.let(T.unsafe(nil), Array)
 
 # source://rubocop-minitest//lib/rubocop/cop/minitest/assert_operator.rb#19
 RuboCop::Cop::Minitest::AssertOperator::MSG = T.let(T.unsafe(nil), String)
@@ -1892,17 +1895,20 @@ RuboCop::Cop::Minitest::RefuteNil::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array
 class RuboCop::Cop::Minitest::RefuteOperator < ::RuboCop::Cop::Base
   extend ::RuboCop::Cop::AutoCorrector
 
-  # source://rubocop-minitest//lib/rubocop/cop/minitest/refute_operator.rb#22
+  # source://rubocop-minitest//lib/rubocop/cop/minitest/refute_operator.rb#23
   def on_send(node); end
 
   private
 
-  # source://rubocop-minitest//lib/rubocop/cop/minitest/refute_operator.rb#37
+  # source://rubocop-minitest//lib/rubocop/cop/minitest/refute_operator.rb#41
   def build_new_arguments(node); end
 
-  # source://rubocop-minitest//lib/rubocop/cop/minitest/refute_operator.rb#48
+  # source://rubocop-minitest//lib/rubocop/cop/minitest/refute_operator.rb#52
   def range_of_arguments(node); end
 end
+
+# source://rubocop-minitest//lib/rubocop/cop/minitest/refute_operator.rb#21
+RuboCop::Cop::Minitest::RefuteOperator::ALLOWED_OPERATORS = T.let(T.unsafe(nil), Array)
 
 # source://rubocop-minitest//lib/rubocop/cop/minitest/refute_operator.rb#19
 RuboCop::Cop::Minitest::RefuteOperator::MSG = T.let(T.unsafe(nil), String)
