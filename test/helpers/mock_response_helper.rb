@@ -8,7 +8,9 @@ module MockResponseHelper
 
   private
 
-  sig { params(body: T::Hash[Symbol, T.untyped]).returns(Faraday::Response) }
+  sig do
+    params(body: T.untyped).returns(Faraday::Response)
+  end
   def mock_faraday_response(body)
     mock = instance_double(Faraday::Response)
     mock.stubs(:body).returns(body)

@@ -13,3 +13,4 @@ require "pry"
 
 require_relative "helpers/mocha_typed"
 require_relative "helpers/mock_response_helper"
+require_relative "helpers/fake_response_data_helper"
