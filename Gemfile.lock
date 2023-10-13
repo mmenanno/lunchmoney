@@ -113,9 +113,9 @@ GEM
       thor (>= 1.2.0)
       yard-sorbet
     thor (1.2.2)
-    toys (0.14.7)
-      toys-core (= 0.14.7)
-    toys-core (0.14.7)
+    toys (0.15.0)
+      toys-core (= 0.15.0)
+    toys-core (0.15.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.5.0)
