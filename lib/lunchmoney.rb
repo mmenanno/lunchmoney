@@ -3,6 +3,7 @@
 
 require "active_support"
 require "active_support/core_ext/module/delegation.rb"
+require "active_support/core_ext/object/blank.rb"
 require "faraday"
 require "sorbet-runtime"
 
