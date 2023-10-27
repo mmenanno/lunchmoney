@@ -465,20 +465,40 @@ end
 #   broadcast = BroadcastLogger.new
 #   broadcast.info("Hello world") # The log message will appear nowhere.
 #
-# source://activesupport//lib/active_support/broadcast_logger.rb#54
+# If you are adding a custom logger with custom methods to the broadcast,
+# the `BroadcastLogger` will proxy them and return the raw value, or an array
+# of raw values, depending on how many loggers in the broadcasts responded to
+# the method:
+#
+#   class MyLogger < ::Logger
+#     def loggable?
+#       true
+#     end
+#   end
+#
+#   logger = BroadcastLogger.new
+#   logger.loggable? # => A NoMethodError exception is raised because no loggers in the broadcasts could respond.
+#
+#   logger.broadcast_to(MyLogger.new(STDOUT))
+#   logger.loggable? # => true
+#   logger.broadcast_to(MyLogger.new(STDOUT))
+#   puts logger.broadcasts # => [MyLogger, MyLogger]
+#   logger.loggable? # [true, true]
+#
+# source://activesupport//lib/active_support/broadcast_logger.rb#74
 class ActiveSupport::BroadcastLogger
   include ::ActiveSupport::LoggerSilence
   include ::ActiveSupport::LoggerThreadSafeLevel
 
   # @return [BroadcastLogger] a new instance of BroadcastLogger
   #
-  # source://activesupport//lib/active_support/broadcast_logger.rb#62
+  # source://activesupport//lib/active_support/broadcast_logger.rb#82
   def initialize(*loggers); end
 
-  # source://activesupport//lib/active_support/broadcast_logger.rb#92
+  # source://activesupport//lib/active_support/broadcast_logger.rb#112
   def <<(message); end
 
-  # source://activesupport//lib/active_support/broadcast_logger.rb#96
+  # source://activesupport//lib/active_support/broadcast_logger.rb#116
   def add(*args, &block); end
 
   # Add logger(s) to the broadcast.
@@ -486,23 +506,23 @@ class ActiveSupport::BroadcastLogger
   #   broadcast_logger = ActiveSupport::BroadcastLogger.new
   #   broadcast_logger.broadcast_to(Logger.new(STDOUT), Logger.new(STDERR))
   #
-  # source://activesupport//lib/active_support/broadcast_logger.rb#73
+  # source://activesupport//lib/active_support/broadcast_logger.rb#93
   def broadcast_to(*loggers); end
 
   # Returns all the logger that are part of this broadcast.
   #
-  # source://activesupport//lib/active_support/broadcast_logger.rb#58
+  # source://activesupport//lib/active_support/broadcast_logger.rb#78
   def broadcasts; end
 
-  # source://activesupport//lib/active_support/broadcast_logger.rb#142
+  # source://activesupport//lib/active_support/broadcast_logger.rb#162
   def close; end
 
-  # source://activesupport//lib/active_support/broadcast_logger.rb#101
+  # source://activesupport//lib/active_support/broadcast_logger.rb#121
   def debug(*args, &block); end
 
   # Sets the log level to Logger::DEBUG for the whole broadcast.
   #
-  # source://activesupport//lib/active_support/broadcast_logger.rb#153
+  # source://activesupport//lib/active_support/broadcast_logger.rb#173
   def debug!; end
 
   # +True+ if the log level allows entries with severity Logger::DEBUG to be written
@@ -510,15 +530,15 @@ class ActiveSupport::BroadcastLogger
   #
   # @return [Boolean]
   #
-  # source://activesupport//lib/active_support/broadcast_logger.rb#148
+  # source://activesupport//lib/active_support/broadcast_logger.rb#168
   def debug?; end
 
-  # source://activesupport//lib/active_support/broadcast_logger.rb#113
+  # source://activesupport//lib/active_support/broadcast_logger.rb#133
   def error(*args, &block); end
 
   # Sets the log level to Logger::ERROR for the whole broadcast.
   #
-  # source://activesupport//lib/active_support/broadcast_logger.rb#186
+  # source://activesupport//lib/active_support/broadcast_logger.rb#206
   def error!; end
 
   # +True+ if the log level allows entries with severity Logger::ERROR to be written
@@ -526,15 +546,15 @@ class ActiveSupport::BroadcastLogger
   #
   # @return [Boolean]
   #
-  # source://activesupport//lib/active_support/broadcast_logger.rb#181
+  # source://activesupport//lib/active_support/broadcast_logger.rb#201
   def error?; end
 
-  # source://activesupport//lib/active_support/broadcast_logger.rb#117
+  # source://activesupport//lib/active_support/broadcast_logger.rb#137
   def fatal(*args, &block); end
 
   # Sets the log level to Logger::FATAL for the whole broadcast.
   #
-  # source://activesupport//lib/active_support/broadcast_logger.rb#197
+  # source://activesupport//lib/active_support/broadcast_logger.rb#217
   def fatal!; end
 
   # +True+ if the log level allows entries with severity Logger::FATAL to be written
@@ -542,23 +562,23 @@ class ActiveSupport::BroadcastLogger
   #
   # @return [Boolean]
   #
-  # source://activesupport//lib/active_support/broadcast_logger.rb#192
+  # source://activesupport//lib/active_support/broadcast_logger.rb#212
   def fatal?; end
 
   # Returns the value of attribute formatter.
   #
-  # source://activesupport//lib/active_support/broadcast_logger.rb#59
+  # source://activesupport//lib/active_support/broadcast_logger.rb#79
   def formatter; end
 
-  # source://activesupport//lib/active_support/broadcast_logger.rb#125
+  # source://activesupport//lib/active_support/broadcast_logger.rb#145
   def formatter=(formatter); end
 
-  # source://activesupport//lib/active_support/broadcast_logger.rb#105
+  # source://activesupport//lib/active_support/broadcast_logger.rb#125
   def info(*args, &block); end
 
   # Sets the log level to Logger::INFO for the whole broadcast.
   #
-  # source://activesupport//lib/active_support/broadcast_logger.rb#164
+  # source://activesupport//lib/active_support/broadcast_logger.rb#184
   def info!; end
 
   # +True+ if the log level allows entries with severity Logger::INFO to be written
@@ -566,34 +586,34 @@ class ActiveSupport::BroadcastLogger
   #
   # @return [Boolean]
   #
-  # source://activesupport//lib/active_support/broadcast_logger.rb#159
+  # source://activesupport//lib/active_support/broadcast_logger.rb#179
   def info?; end
 
-  # source://activesupport//lib/active_support/broadcast_logger.rb#88
+  # source://activesupport//lib/active_support/broadcast_logger.rb#108
   def level; end
 
-  # source://activesupport//lib/active_support/broadcast_logger.rb#131
+  # source://activesupport//lib/active_support/broadcast_logger.rb#151
   def level=(level); end
 
-  # source://activesupport//lib/active_support/broadcast_logger.rb#136
+  # source://activesupport//lib/active_support/broadcast_logger.rb#156
   def local_level=(level); end
 
-  # source://activesupport//lib/active_support/broadcast_logger.rb#96
+  # source://activesupport//lib/active_support/broadcast_logger.rb#116
   def log(*args, &block); end
 
   # Returns the value of attribute progname.
   #
-  # source://activesupport//lib/active_support/broadcast_logger.rb#60
+  # source://activesupport//lib/active_support/broadcast_logger.rb#80
   def progname; end
 
   # Sets the attribute progname
   #
   # @param value the value to set the attribute progname to.
   #
-  # source://activesupport//lib/active_support/broadcast_logger.rb#60
+  # source://activesupport//lib/active_support/broadcast_logger.rb#80
   def progname=(_arg0); end
 
-  # source://activesupport//lib/active_support/broadcast_logger.rb#131
+  # source://activesupport//lib/active_support/broadcast_logger.rb#151
   def sev_threshold=(level); end
 
   # source://activesupport//lib/active_support/logger_silence.rb#12
@@ -610,18 +630,18 @@ class ActiveSupport::BroadcastLogger
   #
   #   broadcast_logger.stop_broadcasting_to(sink)
   #
-  # source://activesupport//lib/active_support/broadcast_logger.rb#84
+  # source://activesupport//lib/active_support/broadcast_logger.rb#104
   def stop_broadcasting_to(logger); end
 
-  # source://activesupport//lib/active_support/broadcast_logger.rb#121
+  # source://activesupport//lib/active_support/broadcast_logger.rb#141
   def unknown(*args, &block); end
 
-  # source://activesupport//lib/active_support/broadcast_logger.rb#109
+  # source://activesupport//lib/active_support/broadcast_logger.rb#129
   def warn(*args, &block); end
 
   # Sets the log level to Logger::WARN for the whole broadcast.
   #
-  # source://activesupport//lib/active_support/broadcast_logger.rb#175
+  # source://activesupport//lib/active_support/broadcast_logger.rb#195
   def warn!; end
 
   # +True+ if the log level allows entries with severity Logger::WARN to be written
@@ -629,20 +649,20 @@ class ActiveSupport::BroadcastLogger
   #
   # @return [Boolean]
   #
-  # source://activesupport//lib/active_support/broadcast_logger.rb#170
+  # source://activesupport//lib/active_support/broadcast_logger.rb#190
   def warn?; end
 
   private
 
-  # source://activesupport//lib/active_support/broadcast_logger.rb#202
+  # source://activesupport//lib/active_support/broadcast_logger.rb#222
   def dispatch(&block); end
 
-  # source://activesupport//lib/active_support/broadcast_logger.rb#206
-  def method_missing(name, *args, &block); end
+  # source://activesupport//lib/active_support/broadcast_logger.rb#226
+  def method_missing(name, *args, **kwargs, &block); end
 
   # @return [Boolean]
   #
-  # source://activesupport//lib/active_support/broadcast_logger.rb#218
+  # source://activesupport//lib/active_support/broadcast_logger.rb#238
   def respond_to_missing?(method, include_all); end
 
   class << self
@@ -1541,7 +1561,7 @@ class ActiveSupport::Cache::Store
   #
   # @raise [NotImplementedError]
   #
-  # source://activesupport//lib/active_support/cache.rb#738
+  # source://activesupport//lib/active_support/cache.rb#732
   def cleanup(options = T.unsafe(nil)); end
 
   # Clears the entire cache. Be careful with this method since it could
@@ -1553,7 +1573,7 @@ class ActiveSupport::Cache::Store
   #
   # @raise [NotImplementedError]
   #
-  # source://activesupport//lib/active_support/cache.rb#748
+  # source://activesupport//lib/active_support/cache.rb#742
   def clear(options = T.unsafe(nil)); end
 
   # Decrements an integer value in the cache.
@@ -1564,7 +1584,7 @@ class ActiveSupport::Cache::Store
   #
   # @raise [NotImplementedError]
   #
-  # source://activesupport//lib/active_support/cache.rb#729
+  # source://activesupport//lib/active_support/cache.rb#723
   def decrement(name, amount = T.unsafe(nil), options = T.unsafe(nil)); end
 
   # Deletes an entry in the cache. Returns +true+ if an entry is deleted
@@ -1572,7 +1592,7 @@ class ActiveSupport::Cache::Store
   #
   # Options are passed to the underlying cache implementation.
   #
-  # source://activesupport//lib/active_support/cache.rb#667
+  # source://activesupport//lib/active_support/cache.rb#661
   def delete(name, options = T.unsafe(nil)); end
 
   # Deletes all entries with keys matching the pattern.
@@ -1583,7 +1603,7 @@ class ActiveSupport::Cache::Store
   #
   # @raise [NotImplementedError]
   #
-  # source://activesupport//lib/active_support/cache.rb#711
+  # source://activesupport//lib/active_support/cache.rb#705
   def delete_matched(matcher, options = T.unsafe(nil)); end
 
   # Deletes multiple entries in the cache. Returns the number of deleted
@@ -1591,7 +1611,7 @@ class ActiveSupport::Cache::Store
   #
   # Options are passed to the underlying cache implementation.
   #
-  # source://activesupport//lib/active_support/cache.rb#679
+  # source://activesupport//lib/active_support/cache.rb#673
   def delete_multi(names, options = T.unsafe(nil)); end
 
   # Returns +true+ if the cache contains an entry for the given key.
@@ -1600,7 +1620,7 @@ class ActiveSupport::Cache::Store
   #
   # @return [Boolean]
   #
-  # source://activesupport//lib/active_support/cache.rb#693
+  # source://activesupport//lib/active_support/cache.rb#687
   def exist?(name, options = T.unsafe(nil)); end
 
   # Fetches data from the cache, using the given key. If there is data in
@@ -1692,9 +1712,9 @@ class ActiveSupport::Cache::Store
   #
   # ==== Dynamic Options
   #
-  # In some cases it may be necessary to to dynamically compute options based
-  # on the cached value. For this purpose, a ActiveSupport::Cache::WriteOptions
-  # instance is passed as a second argument to the block
+  # In some cases it may be necessary to dynamically compute options based
+  # on the cached value. To support this, an ActiveSupport::Cache::WriteOptions
+  # instance is passed as the second argument to the block. For example:
   #
   #     cache.fetch("authentication-token:#{user.id}") do |key, options|
   #       token = authenticate_to_service
@@ -1702,13 +1722,7 @@ class ActiveSupport::Cache::Store
   #       token
   #     end
   #
-  # Only some options can be set dynamically:
-  #
-  #   - +:expires_in+
-  #   - +:expires_at+
-  #   - +:version+
-  #
-  # source://activesupport//lib/active_support/cache.rb#458
+  # source://activesupport//lib/active_support/cache.rb#452
   def fetch(name, options = T.unsafe(nil), &block); end
 
   # Fetches data from the cache, using the given keys. If there is data in
@@ -1743,7 +1757,7 @@ class ActiveSupport::Cache::Store
   #
   # @raise [ArgumentError]
   #
-  # source://activesupport//lib/active_support/cache.rb#592
+  # source://activesupport//lib/active_support/cache.rb#586
   def fetch_multi(*names); end
 
   # Increments an integer value in the cache.
@@ -1754,7 +1768,7 @@ class ActiveSupport::Cache::Store
   #
   # @raise [NotImplementedError]
   #
-  # source://activesupport//lib/active_support/cache.rb#720
+  # source://activesupport//lib/active_support/cache.rb#714
   def increment(name, amount = T.unsafe(nil), options = T.unsafe(nil)); end
 
   # source://activesupport//lib/active_support/cache.rb#195
@@ -1768,7 +1782,7 @@ class ActiveSupport::Cache::Store
   # source://activesupport//lib/active_support/cache.rb#346
   def mute; end
 
-  # source://activesupport//lib/active_support/cache.rb#702
+  # source://activesupport//lib/active_support/cache.rb#696
   def new_entry(value, options = T.unsafe(nil)); end
 
   # Returns the value of attribute options.
@@ -1799,7 +1813,7 @@ class ActiveSupport::Cache::Store
   #
   # Other options will be handled by the specific cache store implementation.
   #
-  # source://activesupport//lib/active_support/cache.rb#502
+  # source://activesupport//lib/active_support/cache.rb#496
   def read(name, options = T.unsafe(nil)); end
 
   # Reads multiple values at once from the cache. Options can be passed
@@ -1809,7 +1823,7 @@ class ActiveSupport::Cache::Store
   #
   # Returns a hash mapping the names provided to the values found.
   #
-  # source://activesupport//lib/active_support/cache.rb#535
+  # source://activesupport//lib/active_support/cache.rb#529
   def read_multi(*names); end
 
   # Returns the value of attribute silence.
@@ -1861,20 +1875,20 @@ class ActiveSupport::Cache::Store
   #
   # Other options will be handled by the specific cache store implementation.
   #
-  # source://activesupport//lib/active_support/cache.rb#654
+  # source://activesupport//lib/active_support/cache.rb#648
   def write(name, value, options = T.unsafe(nil)); end
 
   # Cache Storage API to write multiple values at once.
   #
-  # source://activesupport//lib/active_support/cache.rb#549
+  # source://activesupport//lib/active_support/cache.rb#543
   def write_multi(hash, options = T.unsafe(nil)); end
 
   private
 
-  # source://activesupport//lib/active_support/cache.rb#1004
+  # source://activesupport//lib/active_support/cache.rb#998
   def _instrument(operation, multi: T.unsafe(nil), options: T.unsafe(nil), **payload, &block); end
 
-  # source://activesupport//lib/active_support/cache.rb#753
+  # source://activesupport//lib/active_support/cache.rb#747
   def default_serializer; end
 
   # Deletes an entry from the cache implementation. Subclasses must
@@ -1882,41 +1896,41 @@ class ActiveSupport::Cache::Store
   #
   # @raise [NotImplementedError]
   #
-  # source://activesupport//lib/active_support/cache.rb#847
+  # source://activesupport//lib/active_support/cache.rb#841
   def delete_entry(key, **options); end
 
   # Deletes multiples entries in the cache implementation. Subclasses MAY
   # implement this method.
   #
-  # source://activesupport//lib/active_support/cache.rb#853
+  # source://activesupport//lib/active_support/cache.rb#847
   def delete_multi_entries(entries, **options); end
 
-  # source://activesupport//lib/active_support/cache.rb#812
+  # source://activesupport//lib/active_support/cache.rb#806
   def deserialize_entry(payload); end
 
   # Expands key to be a consistent string value. Invokes +cache_key+ if
   # object responds to +cache_key+. Otherwise, +to_param+ method will be
   # called. If the key is a Hash, then keys will be sorted alphabetically.
   #
-  # source://activesupport//lib/active_support/cache.rb#967
+  # source://activesupport//lib/active_support/cache.rb#961
   def expanded_key(key); end
 
-  # source://activesupport//lib/active_support/cache.rb#988
+  # source://activesupport//lib/active_support/cache.rb#982
   def expanded_version(key); end
 
-  # source://activesupport//lib/active_support/cache.rb#1041
+  # source://activesupport//lib/active_support/cache.rb#1035
   def get_entry_value(entry, name, options); end
 
-  # source://activesupport//lib/active_support/cache.rb#1025
+  # source://activesupport//lib/active_support/cache.rb#1019
   def handle_expired_entry(entry, key, options); end
 
-  # source://activesupport//lib/active_support/cache.rb#887
+  # source://activesupport//lib/active_support/cache.rb#881
   def handle_invalid_expires_in(message); end
 
-  # source://activesupport//lib/active_support/cache.rb#996
+  # source://activesupport//lib/active_support/cache.rb#990
   def instrument(operation, key, options = T.unsafe(nil), &block); end
 
-  # source://activesupport//lib/active_support/cache.rb#1000
+  # source://activesupport//lib/active_support/cache.rb#994
   def instrument_multi(operation, keys, options = T.unsafe(nil), &block); end
 
   # Adds the namespace defined in the options to a pattern designed to
@@ -1924,12 +1938,12 @@ class ActiveSupport::Cache::Store
   # this method to translate a pattern that matches names into one that
   # matches namespaced keys.
   #
-  # source://activesupport//lib/active_support/cache.rb#776
+  # source://activesupport//lib/active_support/cache.rb#770
   def key_matcher(pattern, options); end
 
   # Merges the default options with ones specific to a method call.
   #
-  # source://activesupport//lib/active_support/cache.rb#858
+  # source://activesupport//lib/active_support/cache.rb#852
   def merged_options(call_options); end
 
   # Prefix the key with a namespace string:
@@ -1942,7 +1956,7 @@ class ActiveSupport::Cache::Store
   #   namespace_key 'foo', namespace: -> { 'cache' }
   #   # => 'cache:foo'
   #
-  # source://activesupport//lib/active_support/cache.rb#945
+  # source://activesupport//lib/active_support/cache.rb#939
   def namespace_key(key, options = T.unsafe(nil)); end
 
   # Expands and namespaces the cache key.
@@ -1951,15 +1965,15 @@ class ActiveSupport::Cache::Store
   #
   # @raise [ArgumentError]
   #
-  # source://activesupport//lib/active_support/cache.rb#929
+  # source://activesupport//lib/active_support/cache.rb#923
   def normalize_key(key, options = T.unsafe(nil)); end
 
   # Normalize aliased options to their canonical form
   #
-  # source://activesupport//lib/active_support/cache.rb#898
+  # source://activesupport//lib/active_support/cache.rb#892
   def normalize_options(options); end
 
-  # source://activesupport//lib/active_support/cache.rb#984
+  # source://activesupport//lib/active_support/cache.rb#978
   def normalize_version(key, options = T.unsafe(nil)); end
 
   # Reads an entry from the cache implementation. Subclasses must implement
@@ -1967,22 +1981,22 @@ class ActiveSupport::Cache::Store
   #
   # @raise [NotImplementedError]
   #
-  # source://activesupport//lib/active_support/cache.rb#793
+  # source://activesupport//lib/active_support/cache.rb#787
   def read_entry(key, **options); end
 
   # Reads multiple entries from the cache implementation. Subclasses MAY
   # implement this method.
   #
-  # source://activesupport//lib/active_support/cache.rb#820
+  # source://activesupport//lib/active_support/cache.rb#814
   def read_multi_entries(names, **options); end
 
-  # source://activesupport//lib/active_support/cache.rb#1046
+  # source://activesupport//lib/active_support/cache.rb#1040
   def save_block_result_to_cache(name, options); end
 
-  # source://activesupport//lib/active_support/cache.rb#803
+  # source://activesupport//lib/active_support/cache.rb#797
   def serialize_entry(entry, **options); end
 
-  # source://activesupport//lib/active_support/cache.rb#909
+  # source://activesupport//lib/active_support/cache.rb#903
   def validate_options(options); end
 
   # Writes an entry to the cache implementation. Subclasses must implement
@@ -1990,13 +2004,13 @@ class ActiveSupport::Cache::Store
   #
   # @raise [NotImplementedError]
   #
-  # source://activesupport//lib/active_support/cache.rb#799
+  # source://activesupport//lib/active_support/cache.rb#793
   def write_entry(key, entry, **options); end
 
   # Writes multiple entries to the cache implementation. Subclasses MAY
   # implement this method.
   #
-  # source://activesupport//lib/active_support/cache.rb#839
+  # source://activesupport//lib/active_support/cache.rb#833
   def write_multi_entries(hash, **options); end
 
   class << self
@@ -2160,29 +2174,29 @@ end
 # source://activesupport//lib/active_support/cache.rb#26
 ActiveSupport::Cache::UNIVERSAL_OPTIONS = T.let(T.unsafe(nil), Array)
 
-# source://activesupport//lib/active_support/cache.rb#1056
+# source://activesupport//lib/active_support/cache.rb#1050
 class ActiveSupport::Cache::WriteOptions
   # @return [WriteOptions] a new instance of WriteOptions
   #
-  # source://activesupport//lib/active_support/cache.rb#1057
+  # source://activesupport//lib/active_support/cache.rb#1051
   def initialize(options); end
 
-  # source://activesupport//lib/active_support/cache.rb#1078
+  # source://activesupport//lib/active_support/cache.rb#1072
   def expires_at; end
 
-  # source://activesupport//lib/active_support/cache.rb#1082
+  # source://activesupport//lib/active_support/cache.rb#1076
   def expires_at=(expires_at); end
 
-  # source://activesupport//lib/active_support/cache.rb#1069
+  # source://activesupport//lib/active_support/cache.rb#1063
   def expires_in; end
 
-  # source://activesupport//lib/active_support/cache.rb#1073
+  # source://activesupport//lib/active_support/cache.rb#1067
   def expires_in=(expires_in); end
 
-  # source://activesupport//lib/active_support/cache.rb#1061
+  # source://activesupport//lib/active_support/cache.rb#1055
   def version; end
 
-  # source://activesupport//lib/active_support/cache.rb#1065
+  # source://activesupport//lib/active_support/cache.rb#1059
   def version=(version); end
 end
 
@@ -4000,8 +4014,8 @@ end
 # [+raise+]   Raise ActiveSupport::DeprecationException.
 # [+stderr+]  Log all deprecation warnings to <tt>$stderr</tt>.
 # [+log+]     Log all deprecation warnings to +Rails.logger+.
-# [+notify+]  Use +ActiveSupport::Notifications+ to notify +deprecation.rails+.
-# [+report+]  Use +ActiveSupport::ErrorReporter+ to report deprecations.
+# [+notify+]  Use ActiveSupport::Notifications to notify +deprecation.rails+.
+# [+report+]  Use ActiveSupport::ErrorReporter to report deprecations.
 # [+silence+] Do nothing. On \Rails, set <tt>config.active_support.report_deprecations = false</tt> to disable all behaviors.
 #
 # Setting behaviors only affects deprecations that happen after boot time.
@@ -4022,8 +4036,8 @@ module ActiveSupport::Deprecation::Behavior
   # [+raise+]   Raise ActiveSupport::DeprecationException.
   # [+stderr+]  Log all deprecation warnings to <tt>$stderr</tt>.
   # [+log+]     Log all deprecation warnings to +Rails.logger+.
-  # [+notify+]  Use +ActiveSupport::Notifications+ to notify +deprecation.rails+.
-  # [+report+]  Use +ActiveSupport::ErrorReporter+ to report deprecations.
+  # [+notify+]  Use ActiveSupport::Notifications to notify +deprecation.rails+.
+  # [+report+]  Use ActiveSupport::ErrorReporter to report deprecations.
   # [+silence+] Do nothing.
   #
   # Setting behaviors only affects deprecations that happen after boot time.
@@ -7431,7 +7445,7 @@ ActiveSupport::MessageEncryptor::SEPARATOR = T.let(T.unsafe(nil), String)
 class ActiveSupport::MessageEncryptors < ::ActiveSupport::Messages::RotationCoordinator
   private
 
-  # source://activesupport//lib/active_support/message_encryptors.rb#134
+  # source://activesupport//lib/active_support/message_encryptors.rb#135
   def build(salt, secret_generator:, secret_generator_options:, **options); end
 end
 
@@ -7755,7 +7769,7 @@ ActiveSupport::MessageVerifier::SEPARATOR_LENGTH = T.let(T.unsafe(nil), Integer)
 class ActiveSupport::MessageVerifiers < ::ActiveSupport::Messages::RotationCoordinator
   private
 
-  # source://activesupport//lib/active_support/message_verifiers.rb#130
+  # source://activesupport//lib/active_support/message_verifiers.rb#131
   def build(salt, secret_generator:, secret_generator_options:, **options); end
 end
 
@@ -8616,8 +8630,8 @@ class ActiveSupport::Notifications::Event
   # source://activesupport//lib/active_support/notifications/instrumenter.rb#110
   def initialize(name, start, ending, transaction_id, payload); end
 
-  # Returns the number of allocations made since the call to +start!+ and
-  # the call to +finish!+
+  # Returns the number of allocations made between the call to #start! and
+  # the call to #finish!.
   #
   # source://activesupport//lib/active_support/notifications/instrumenter.rb#164
   def allocations; end
@@ -8625,8 +8639,8 @@ class ActiveSupport::Notifications::Event
   # source://activesupport//lib/active_support/notifications/instrumenter.rb#168
   def children; end
 
-  # Returns the CPU time (in milliseconds) passed since the call to
-  # +start!+ and the call to +finish!+
+  # Returns the CPU time (in milliseconds) passed between the call to
+  # #start! and the call to #finish!.
   #
   # source://activesupport//lib/active_support/notifications/instrumenter.rb#151
   def cpu_time; end
@@ -8657,8 +8671,8 @@ class ActiveSupport::Notifications::Event
   # source://activesupport//lib/active_support/notifications/instrumenter.rb#143
   def finish!; end
 
-  # Returns the idle time time (in milliseconds) passed since the call to
-  # +start!+ and the call to +finish!+
+  # Returns the idle time time (in milliseconds) passed between the call to
+  # #start! and the call to #finish!.
   #
   # source://activesupport//lib/active_support/notifications/instrumenter.rb#157
   def idle_time; end
@@ -9035,16 +9049,16 @@ class ActiveSupport::Notifications::Instrumenter
   # source://activesupport//lib/active_support/notifications/instrumenter.rb#12
   def initialize(notifier); end
 
-  # Returns a "handle" for an event with the given +name+ and +payload+
+  # Returns a "handle" for an event with the given +name+ and +payload+.
   #
-  # +#start+ and +#finish+ must each be called exactly once on the returned object.
+  # #start and #finish must each be called exactly once on the returned object.
   #
-  # Where possible, it's best to use +#instrument+, which will record the
+  # Where possible, it's best to use #instrument, which will record the
   # start and finish of the event and correctly handle any exceptions.
   # +build_handle+ is a low-level API intended for cases where using
-  # +#instrument+ isn't possible.
+  # +instrument+ isn't possible.
   #
-  # See ActiveSupport::Notifications::Fanout::Handle
+  # See ActiveSupport::Notifications::Fanout::Handle.
   #
   # source://activesupport//lib/active_support/notifications/instrumenter.rb#78
   def build_handle(name, payload); end
@@ -16721,7 +16735,7 @@ end
 #
 #   'ScaleScore'.tableize # => "scale_scores"
 #
-# source://activesupport//lib/active_support/core_ext/string/multibyte.rb#5
+# source://activesupport//lib/active_support/core_ext/object/blank.rb#103
 class String
   include ::Comparable
 

@@ -1095,7 +1095,7 @@ end
 #       end
 #     end
 #
-# source://toys-core//lib/toys/cli.rb#45
+# source://toys-core//lib/toys/cli.rb#41
 class Toys::CLI
   # Create a CLI.
   #
@@ -1227,7 +1227,7 @@ class Toys::CLI
   #   Note: the standard toys executable sets this to `".lib"`.
   # @return [CLI] a new instance of CLI
   #
-  # source://toys-core//lib/toys/cli.rb#179
+  # source://toys-core//lib/toys/cli.rb#175
   def initialize(executable_name: T.unsafe(nil), middleware_stack: T.unsafe(nil), extra_delimiters: T.unsafe(nil), config_dir_name: T.unsafe(nil), config_file_name: T.unsafe(nil), index_file_name: T.unsafe(nil), preload_file_name: T.unsafe(nil), preload_dir_name: T.unsafe(nil), data_dir_name: T.unsafe(nil), lib_dir_name: T.unsafe(nil), mixin_lookup: T.unsafe(nil), middleware_lookup: T.unsafe(nil), template_lookup: T.unsafe(nil), logger_factory: T.unsafe(nil), logger: T.unsafe(nil), base_level: T.unsafe(nil), error_handler: T.unsafe(nil), completion: T.unsafe(nil)); end
 
   # Add a configuration block to the loader.
@@ -1247,7 +1247,7 @@ class Toys::CLI
   #   `nil` to denote no context. Defaults to `nil`.
   # @return [self]
   #
-  # source://toys-core//lib/toys/cli.rb#360
+  # source://toys-core//lib/toys/cli.rb#356
   def add_config_block(high_priority: T.unsafe(nil), source_name: T.unsafe(nil), context_directory: T.unsafe(nil), &block); end
 
   # Add a specific configuration file or directory to the loader.
@@ -1270,7 +1270,7 @@ class Toys::CLI
   #   Defaults to `:parent`.
   # @return [self]
   #
-  # source://toys-core//lib/toys/cli.rb#331
+  # source://toys-core//lib/toys/cli.rb#327
   def add_config_path(path, high_priority: T.unsafe(nil), source_name: T.unsafe(nil), context_directory: T.unsafe(nil)); end
 
   # Checks the given directory path. If it contains a config file and/or
@@ -1289,7 +1289,7 @@ class Toys::CLI
   #   Defaults to `:path`.
   # @return [self]
   #
-  # source://toys-core//lib/toys/cli.rb#388
+  # source://toys-core//lib/toys/cli.rb#384
   def add_search_path(search_path, high_priority: T.unsafe(nil), context_directory: T.unsafe(nil)); end
 
   # Walk up the directory hierarchy from the given start location, and add to
@@ -1308,7 +1308,7 @@ class Toys::CLI
   #   priority list rather than the tail.
   # @return [self]
   #
-  # source://toys-core//lib/toys/cli.rb#423
+  # source://toys-core//lib/toys/cli.rb#419
   def add_search_path_hierarchy(start: T.unsafe(nil), terminate: T.unsafe(nil), high_priority: T.unsafe(nil)); end
 
   # The initial logger level in this CLI, used as the level for verbosity 0.
@@ -1316,7 +1316,7 @@ class Toys::CLI
   #
   # @return [Integer, nil]
   #
-  # source://toys-core//lib/toys/cli.rb#302
+  # source://toys-core//lib/toys/cli.rb#298
   def base_level; end
 
   # Make a clone with the same settings but no config blocks and no paths in
@@ -1330,28 +1330,28 @@ class Toys::CLI
   # @yieldparam cli [Toys::CLI] If you pass a block, the new CLI is yielded
   #   to it so you can add paths and make other modifications.
   #
-  # source://toys-core//lib/toys/cli.rb#241
+  # source://toys-core//lib/toys/cli.rb#237
   def child(**opts); end
 
   # The overall completion strategy for this CLI.
   #
   # @return [Toys::Completion::Base, Proc]
   #
-  # source://toys-core//lib/toys/cli.rb#308
+  # source://toys-core//lib/toys/cli.rb#304
   def completion; end
 
   # The effective executable name used for usage text in this CLI.
   #
   # @return [String]
   #
-  # source://toys-core//lib/toys/cli.rb#277
+  # source://toys-core//lib/toys/cli.rb#273
   def executable_name; end
 
   # The string of tool name delimiter characters (besides space).
   #
   # @return [String]
   #
-  # source://toys-core//lib/toys/cli.rb#283
+  # source://toys-core//lib/toys/cli.rb#279
   def extra_delimiters; end
 
   # Prepare a tool to be run, but just execute the given block rather than
@@ -1364,28 +1364,28 @@ class Toys::CLI
   # @return [Object] The value returned from the block.
   # @yieldparam context [Toys::Context] Yields the tool context.
   #
-  # source://toys-core//lib/toys/cli.rb#484
+  # source://toys-core//lib/toys/cli.rb#480
   def load_tool(*args); end
 
   # The current loader for this CLI.
   #
   # @return [Toys::Loader]
   #
-  # source://toys-core//lib/toys/cli.rb#271
+  # source://toys-core//lib/toys/cli.rb#267
   def loader; end
 
   # The global logger, if any.
   #
   # @return [Logger, nil]
   #
-  # source://toys-core//lib/toys/cli.rb#289
+  # source://toys-core//lib/toys/cli.rb#285
   def logger; end
 
   # The logger factory.
   #
   # @return [Proc]
   #
-  # source://toys-core//lib/toys/cli.rb#295
+  # source://toys-core//lib/toys/cli.rb#291
   def logger_factory; end
 
   # Run the CLI with the given command line arguments.
@@ -1400,41 +1400,41 @@ class Toys::CLI
   #   delegated execution.
   # @return [Integer] The resulting process status code (i.e. 0 for success).
   #
-  # source://toys-core//lib/toys/cli.rb#454
+  # source://toys-core//lib/toys/cli.rb#450
   def run(*args, verbosity: T.unsafe(nil), delegated_from: T.unsafe(nil)); end
 
   private
 
-  # source://toys-core//lib/toys/cli.rb#588
+  # source://toys-core//lib/toys/cli.rb#585
   def build_context(tool, args, verbosity: T.unsafe(nil), delegated_from: T.unsafe(nil)); end
 
-  # source://toys-core//lib/toys/cli.rb#632
+  # source://toys-core//lib/toys/cli.rb#629
   def build_executor(tool, context); end
 
-  # source://toys-core//lib/toys/cli.rb#668
+  # source://toys-core//lib/toys/cli.rb#665
   def call_handler(context, handler, argument); end
 
-  # source://toys-core//lib/toys/cli.rb#613
+  # source://toys-core//lib/toys/cli.rb#610
   def execute_tool(tool, context, &block); end
 
-  # source://toys-core//lib/toys/cli.rb#659
+  # source://toys-core//lib/toys/cli.rb#656
   def handle_signal_by_tool(context, tool, exception); end
 
   # @raise [ArgParsingError]
   #
-  # source://toys-core//lib/toys/cli.rb#652
+  # source://toys-core//lib/toys/cli.rb#649
   def handle_usage_errors(context, tool); end
 
-  # source://toys-core//lib/toys/cli.rb#677
+  # source://toys-core//lib/toys/cli.rb#674
   def make_executor(middleware, context, next_executor); end
 
-  # source://toys-core//lib/toys/cli.rb#600
+  # source://toys-core//lib/toys/cli.rb#597
   def make_run_handler(tool); end
 
   class << self
     # Returns a default Completion that simply uses the tool's completion.
     #
-    # source://toys-core//lib/toys/cli.rb#579
+    # source://toys-core//lib/toys/cli.rb#576
     def default_completion; end
 
     # Returns a bare-bones error handler that takes simply reraises the
@@ -1446,7 +1446,7 @@ class Toys::CLI
     #
     # @return [Proc]
     #
-    # source://toys-core//lib/toys/cli.rb#555
+    # source://toys-core//lib/toys/cli.rb#551
     def default_error_handler; end
 
     # Returns a default logger factory that generates simple loggers that
@@ -1454,7 +1454,7 @@ class Toys::CLI
     #
     # @return [Proc]
     #
-    # source://toys-core//lib/toys/cli.rb#568
+    # source://toys-core//lib/toys/cli.rb#564
     def default_logger_factory; end
 
     # Returns a default ModuleLookup for middleware that points at the
@@ -1462,7 +1462,7 @@ class Toys::CLI
     #
     # @return [Toys::ModuleLookup]
     #
-    # source://toys-core//lib/toys/cli.rb#532
+    # source://toys-core//lib/toys/cli.rb#528
     def default_middleware_lookup; end
 
     # Returns a default set of middleware that may be used as a starting
@@ -1478,7 +1478,7 @@ class Toys::CLI
     #
     # @return [Array<Toys::Middleware::Spec>]
     #
-    # source://toys-core//lib/toys/cli.rb#507
+    # source://toys-core//lib/toys/cli.rb#503
     def default_middleware_stack; end
 
     # Returns a default ModuleLookup for mixins that points at the
@@ -1486,14 +1486,14 @@ class Toys::CLI
     #
     # @return [Toys::ModuleLookup]
     #
-    # source://toys-core//lib/toys/cli.rb#522
+    # source://toys-core//lib/toys/cli.rb#518
     def default_mixin_lookup; end
 
     # Returns a default empty ModuleLookup for templates.
     #
     # @return [Toys::ModuleLookup]
     #
-    # source://toys-core//lib/toys/cli.rb#541
+    # source://toys-core//lib/toys/cli.rb#537
     def default_template_lookup; end
   end
 end
@@ -6095,7 +6095,7 @@ end
 # The Loader service loads tools from configuration files, and finds the
 # appropriate tool given a set of command line arguments.
 #
-# source://toys-core//lib/toys/loader.rb#10
+# source://toys-core//lib/toys/loader.rb#8
 class Toys::Loader
   # Create a Loader
   #
@@ -6130,7 +6130,7 @@ class Toys::Loader
   #   well-known template classes. Defaults to an empty lookup.
   # @return [Loader] a new instance of Loader
   #
-  # source://toys-core//lib/toys/loader.rb#44
+  # source://toys-core//lib/toys/loader.rb#42
   def initialize(index_file_name: T.unsafe(nil), preload_dir_name: T.unsafe(nil), preload_file_name: T.unsafe(nil), data_dir_name: T.unsafe(nil), lib_dir_name: T.unsafe(nil), middleware_stack: T.unsafe(nil), extra_delimiters: T.unsafe(nil), mixin_lookup: T.unsafe(nil), middleware_lookup: T.unsafe(nil), template_lookup: T.unsafe(nil), git_cache: T.unsafe(nil)); end
 
   # Returns the active tool specified by the given words, with the given
@@ -6141,7 +6141,7 @@ class Toys::Loader
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/loader.rb#351
+  # source://toys-core//lib/toys/loader.rb#350
   def activate_tool(words, priority); end
 
   # Add a configuration block to the loader.
@@ -6159,7 +6159,7 @@ class Toys::Loader
   #   `nil` to denote no context. Defaults to `nil`.
   # @return [self]
   #
-  # source://toys-core//lib/toys/loader.rb#168
+  # source://toys-core//lib/toys/loader.rb#167
   def add_block(high_priority: T.unsafe(nil), source_name: T.unsafe(nil), context_directory: T.unsafe(nil), &block); end
 
   # Add a configuration git source to the loader.
@@ -6179,7 +6179,7 @@ class Toys::Loader
   #   or `nil` to denote no context. Defaults to `nil`.
   # @return [self]
   #
-  # source://toys-core//lib/toys/loader.rb#204
+  # source://toys-core//lib/toys/loader.rb#203
   def add_git(git_remote, git_path, git_commit, high_priority: T.unsafe(nil), update: T.unsafe(nil), context_directory: T.unsafe(nil)); end
 
   # Add a configuration file/directory to the loader.
@@ -6196,7 +6196,7 @@ class Toys::Loader
   #   Defaults to `:parent`.
   # @return [self]
   #
-  # source://toys-core//lib/toys/loader.rb#95
+  # source://toys-core//lib/toys/loader.rb#94
   def add_path(path, high_priority: T.unsafe(nil), source_name: T.unsafe(nil), context_directory: T.unsafe(nil)); end
 
   # Add a set of configuration files/directories from a common directory to
@@ -6217,7 +6217,7 @@ class Toys::Loader
   #   Defaults to `:path`.
   # @return [self]
   #
-  # source://toys-core//lib/toys/loader.rb#132
+  # source://toys-core//lib/toys/loader.rb#131
   def add_path_set(root_path, relative_paths, high_priority: T.unsafe(nil), context_directory: T.unsafe(nil)); end
 
   # Build a new tool.
@@ -6225,14 +6225,14 @@ class Toys::Loader
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/loader.rb#373
+  # source://toys-core//lib/toys/loader.rb#372
   def build_tool(words, priority, tool_class = T.unsafe(nil)); end
 
   # Get or create the tool definition for the given name and priority.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/loader.rb#336
+  # source://toys-core//lib/toys/loader.rb#335
   def get_tool(words, priority, tool_class = T.unsafe(nil)); end
 
   # Returns true if the given path has at least one subtool, even if they are
@@ -6241,7 +6241,7 @@ class Toys::Loader
   # @param words [Array<String>] The name of the parent tool
   # @return [Boolean]
   #
-  # source://toys-core//lib/toys/loader.rb#307
+  # source://toys-core//lib/toys/loader.rb#306
   def has_subtools?(words); end
 
   # Returns a list of subtools for the given path, loading from the
@@ -6259,21 +6259,21 @@ class Toys::Loader
   #   no children and are not runnable. Defaults to false.
   # @return [Array<Toys::ToolDefinition>] An array of subtools.
   #
-  # source://toys-core//lib/toys/loader.rb#282
+  # source://toys-core//lib/toys/loader.rb#281
   def list_subtools(words, recursive: T.unsafe(nil), include_hidden: T.unsafe(nil), include_namespaces: T.unsafe(nil), include_non_runnable: T.unsafe(nil)); end
 
   # Load a subtool block. Called from the `tool` directive in the DSL.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/loader.rb#473
+  # source://toys-core//lib/toys/loader.rb#472
   def load_block(parent_source, block, words, remaining_words, priority); end
 
   # Loads the subtree under the given prefix.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/loader.rb#399
+  # source://toys-core//lib/toys/loader.rb#398
   def load_for_prefix(prefix); end
 
   # Load configuration from the given git remote. This is called from the
@@ -6281,7 +6281,7 @@ class Toys::Loader
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/loader.rb#458
+  # source://toys-core//lib/toys/loader.rb#457
   def load_git(parent_source, git_remote, git_path, git_commit, words, remaining_words, priority, update: T.unsafe(nil)); end
 
   # Load configuration from the given path. This is called from the `load`
@@ -6289,7 +6289,7 @@ class Toys::Loader
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/loader.rb#441
+  # source://toys-core//lib/toys/loader.rb#440
   def load_path(parent_source, path, words, remaining_words, priority); end
 
   # Given a list of command line arguments, find the appropriate tool to
@@ -6304,7 +6304,7 @@ class Toys::Loader
   # @param args [Array<String>] Command line arguments
   # @return [Array(Toys::ToolDefinition,Array<String>)]
   #
-  # source://toys-core//lib/toys/loader.rb#236
+  # source://toys-core//lib/toys/loader.rb#235
   def lookup(args); end
 
   # Given a tool name, looks up the specific tool, loading it from the
@@ -6318,21 +6318,21 @@ class Toys::Loader
   # @return [Toys::ToolDefinition] if the tool was found
   # @return [nil] if no such tool exists
   #
-  # source://toys-core//lib/toys/loader.rb#258
+  # source://toys-core//lib/toys/loader.rb#257
   def lookup_specific(words); end
 
   # Attempt to get a well-known mixin module for the given symbolic name.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/loader.rb#422
+  # source://toys-core//lib/toys/loader.rb#421
   def resolve_standard_mixin(name); end
 
   # Attempt to get a well-known template class for the given symbolic name.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/loader.rb#431
+  # source://toys-core//lib/toys/loader.rb#430
   def resolve_standard_template(name); end
 
   # Splits the given path using the delimiters configured in this Loader.
@@ -6342,7 +6342,7 @@ class Toys::Loader
   # @param str [String, Symbol, Array<String,Symbol>] The path to split.
   # @return [Array<String>]
   #
-  # source://toys-core//lib/toys/loader.rb#324
+  # source://toys-core//lib/toys/loader.rb#323
   def split_path(str); end
 
   # Stop search at the given priority. Returns true if successful.
@@ -6350,7 +6350,7 @@ class Toys::Loader
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/loader.rb#386
+  # source://toys-core//lib/toys/loader.rb#385
   def stop_loading_at_priority(priority); end
 
   # Returns true if the given tool name currently exists in the loader.
@@ -6359,7 +6359,7 @@ class Toys::Loader
   # @private This interface is internal and subject to change without warning.
   # @return [Boolean]
   #
-  # source://toys-core//lib/toys/loader.rb#363
+  # source://toys-core//lib/toys/loader.rb#362
   def tool_defined?(words); end
 
   private
@@ -6368,75 +6368,75 @@ class Toys::Loader
   # loaded. No additional loading is done. The returned array is not in any
   # particular order.
   #
-  # source://toys-core//lib/toys/loader.rb#649
+  # source://toys-core//lib/toys/loader.rb#648
   def all_cur_definitions; end
 
-  # source://toys-core//lib/toys/loader.rb#795
+  # source://toys-core//lib/toys/loader.rb#794
   def calc_remaining_words(words1, words2); end
 
   # Look for and require any preloads.
   #
-  # source://toys-core//lib/toys/loader.rb#768
+  # source://toys-core//lib/toys/loader.rb#767
   def do_preload(path); end
 
   # Given a sorted list of tools, filter out non-runnable tools, subject to
   # the given settings.
   #
-  # source://toys-core//lib/toys/loader.rb#809
+  # source://toys-core//lib/toys/loader.rb#808
   def filter_non_runnable_tools(tools, include_namespaces, include_non_runnable); end
 
   # Finishes all tool definitions under the given path. This generally means
   # installing middleware.
   #
-  # source://toys-core//lib/toys/loader.rb#672
+  # source://toys-core//lib/toys/loader.rb#671
   def finish_definitions_in_tree(words); end
 
   # Get or create the ToolData for the given name.
   # Caller must own the mutex.
   #
-  # source://toys-core//lib/toys/loader.rb#664
+  # source://toys-core//lib/toys/loader.rb#663
   def get_tool_data(words, create); end
 
   # Load non-index file in a directory source.
   # Caller must own the mutex.
   #
-  # source://toys-core//lib/toys/loader.rb#745
+  # source://toys-core//lib/toys/loader.rb#744
   def load_child_in(source, child, words, remaining_words, priority); end
 
   # Load an index file in a directory source.
   # Caller must own the mutex.
   #
-  # source://toys-core//lib/toys/loader.rb#735
+  # source://toys-core//lib/toys/loader.rb#734
   def load_index_in(source, words, remaining_words, priority); end
 
   # Loads from a proc source.
   # Caller must own the mutex.
   #
-  # source://toys-core//lib/toys/loader.rb#686
+  # source://toys-core//lib/toys/loader.rb#685
   def load_proc(source, words, remaining_words, priority); end
 
   # Load from a file path source that is known to exist and is known to be
   # relevant to the current load request.
   # Caller must own the mutex.
   #
-  # source://toys-core//lib/toys/loader.rb#717
+  # source://toys-core//lib/toys/loader.rb#716
   def load_relevant_path(source, words, remaining_words, priority); end
 
   # Load from a file path source that is known to exist.
   # Caller must own the mutex.
   #
-  # source://toys-core//lib/toys/loader.rb#704
+  # source://toys-core//lib/toys/loader.rb#703
   def load_validated_path(source, words, remaining_words, priority); end
 
   # Require the contents of the given directory.
   #
-  # source://toys-core//lib/toys/loader.rb#786
+  # source://toys-core//lib/toys/loader.rb#785
   def require_dir_contents(preload_dir); end
 
   # Update min_loaded_priority to the given value.
   # Caller must own the mutex.
   #
-  # source://toys-core//lib/toys/loader.rb#761
+  # source://toys-core//lib/toys/loader.rb#760
   def update_min_loaded_priority(priority); end
 
   class << self
@@ -6444,14 +6444,14 @@ class Toys::Loader
     #
     # @private This interface is internal and subject to change without warning.
     #
-    # source://toys-core//lib/toys/loader.rb#488
+    # source://toys-core//lib/toys/loader.rb#487
     def default_git_cache; end
 
     # Determine the next setting for remaining_words, given a word.
     #
     # @private This interface is internal and subject to change without warning.
     #
-    # source://toys-core//lib/toys/loader.rb#502
+    # source://toys-core//lib/toys/loader.rb#501
     def next_remaining_words(remaining_words, word); end
   end
 end
@@ -6460,22 +6460,22 @@ end
 #
 # @private
 #
-# source://toys-core//lib/toys/loader.rb#609
+# source://toys-core//lib/toys/loader.rb#608
 class Toys::Loader::DelimiterHandler
   # @private
   # @return [DelimiterHandler] a new instance of DelimiterHandler
   #
-  # source://toys-core//lib/toys/loader.rb#613
+  # source://toys-core//lib/toys/loader.rb#612
   def initialize(extra_delimiters); end
 
   # @private
   #
-  # source://toys-core//lib/toys/loader.rb#631
+  # source://toys-core//lib/toys/loader.rb#630
   def find_orig_prefix(args); end
 
   # @private
   #
-  # source://toys-core//lib/toys/loader.rb#624
+  # source://toys-core//lib/toys/loader.rb#623
   def split_path(str); end
 end
 
@@ -6488,14 +6488,14 @@ end
 #
 # @private
 #
-# source://toys-core//lib/toys/loader.rb#522
+# source://toys-core//lib/toys/loader.rb#521
 class Toys::Loader::ToolData
   # Create an empty tool data with no definitions.
   #
   # @private
   # @return [ToolData] a new instance of ToolData
   #
-  # source://toys-core//lib/toys/loader.rb#528
+  # source://toys-core//lib/toys/loader.rb#527
   def initialize(words); end
 
   # Attempt to activate the tool with the given priority, and return it.
@@ -6507,7 +6507,7 @@ class Toys::Loader::ToolData
   #
   # @private
   #
-  # source://toys-core//lib/toys/loader.rb#578
+  # source://toys-core//lib/toys/loader.rb#577
   def activate_tool(priority, loader); end
 
   # Return the current "best" definition, which is either the active
@@ -6515,13 +6515,13 @@ class Toys::Loader::ToolData
   #
   # @private
   #
-  # source://toys-core//lib/toys/loader.rb#540
+  # source://toys-core//lib/toys/loader.rb#539
   def cur_definition; end
 
   # @private
   # @return [Boolean]
   #
-  # source://toys-core//lib/toys/loader.rb#547
+  # source://toys-core//lib/toys/loader.rb#546
   def empty?; end
 
   # Ensure there is a tool definition of the given priority, creating it if
@@ -6530,18 +6530,18 @@ class Toys::Loader::ToolData
   #
   # @private
   #
-  # source://toys-core//lib/toys/loader.rb#558
+  # source://toys-core//lib/toys/loader.rb#557
   def get_tool(priority, loader, tool_class = T.unsafe(nil)); end
 
   private
 
-  # source://toys-core//lib/toys/loader.rb#599
+  # source://toys-core//lib/toys/loader.rb#598
   def active_definition; end
 
-  # source://toys-core//lib/toys/loader.rb#595
+  # source://toys-core//lib/toys/loader.rb#594
   def top_definition; end
 
-  # source://toys-core//lib/toys/loader.rb#587
+  # source://toys-core//lib/toys/loader.rb#586
   def validate_words(words); end
 end
 
@@ -7005,13 +7005,13 @@ end
 # used to obtain named helpers, middleware, and templates from the
 # respective modules.
 #
-# source://toys-core//lib/toys/module_lookup.rb#11
+# source://toys-core//lib/toys/module_lookup.rb#9
 class Toys::ModuleLookup
   # Create an empty ModuleLookup
   #
   # @return [ModuleLookup] a new instance of ModuleLookup
   #
-  # source://toys-core//lib/toys/module_lookup.rb#58
+  # source://toys-core//lib/toys/module_lookup.rb#56
   def initialize; end
 
   # Add a lookup path for modules.
@@ -7023,7 +7023,7 @@ class Toys::ModuleLookup
   #   path, otherwise add to the end.
   # @return [self]
   #
-  # source://toys-core//lib/toys/module_lookup.rb#74
+  # source://toys-core//lib/toys/module_lookup.rb#73
   def add_path(path_base, module_base: T.unsafe(nil), high_priority: T.unsafe(nil)); end
 
   # Obtain a named module. Returns `nil` if the name is not present.
@@ -7031,7 +7031,7 @@ class Toys::ModuleLookup
   # @param name [String, Symbol] The name of the module to return.
   # @return [Module] The specified module
   #
-  # source://toys-core//lib/toys/module_lookup.rb#93
+  # source://toys-core//lib/toys/module_lookup.rb#92
   def lookup(name); end
 
   class << self
@@ -7040,7 +7040,7 @@ class Toys::ModuleLookup
     # @param path [String] File path, delimited by forward slash
     # @return [Module] The module loaded from that path
     #
-    # source://toys-core//lib/toys/module_lookup.rb#44
+    # source://toys-core//lib/toys/module_lookup.rb#42
     def path_to_module(path); end
 
     # Convert the given string to a module name. Specifically, converts
@@ -7049,7 +7049,7 @@ class Toys::ModuleLookup
     # @param str [String, Symbol] String to convert.
     # @return [Symbol] Converted name
     #
-    # source://toys-core//lib/toys/module_lookup.rb#33
+    # source://toys-core//lib/toys/module_lookup.rb#31
     def to_module_name(str); end
 
     # Convert the given string to a path element. Specifically, converts
@@ -7058,7 +7058,7 @@ class Toys::ModuleLookup
     # @param str [String, Symbol] String to convert.
     # @return [String] Converted string
     #
-    # source://toys-core//lib/toys/module_lookup.rb#20
+    # source://toys-core//lib/toys/module_lookup.rb#18
     def to_path_name(str); end
   end
 end
@@ -7525,21 +7525,21 @@ end
 #     root_settings.str = "value_from_root"
 #     grandchild_settings.str        # => "value_from_root"
 #
-# source://toys-core//lib/toys/settings.rb#301
+# source://toys-core//lib/toys/settings.rb#299
 class Toys::Settings
   # Create a settings instance.
   #
   # @param parent [Settings, nil] Optional parent settings.
   # @return [Settings] a new instance of Settings
   #
-  # source://toys-core//lib/toys/settings.rb#582
+  # source://toys-core//lib/toys/settings.rb#580
   def initialize(parent: T.unsafe(nil)); end
 
   # Internal get field value, with fallback to parents.
   #
   # @private
   #
-  # source://toys-core//lib/toys/settings.rb#681
+  # source://toys-core//lib/toys/settings.rb#679
   def get!(field); end
 
   # Load the given hash of data into this settings object.
@@ -7550,7 +7550,7 @@ class Toys::Settings
   #   array of the errors raised.
   # @return [Array<FieldError>] An array of errors.
   #
-  # source://toys-core//lib/toys/settings.rb#601
+  # source://toys-core//lib/toys/settings.rb#599
   def load_data!(data, raise_on_failure: T.unsafe(nil)); end
 
   # Parse the given JSON string and load the data into this settings object.
@@ -7561,7 +7561,7 @@ class Toys::Settings
   #   array of the errors raised.
   # @return [Array<FieldError>] An array of errors.
   #
-  # source://toys-core//lib/toys/settings.rb#658
+  # source://toys-core//lib/toys/settings.rb#656
   def load_json!(str, raise_on_failure: T.unsafe(nil), **json_opts); end
 
   # Parse the given JSON file and load the data into this settings object.
@@ -7572,7 +7572,7 @@ class Toys::Settings
   #   array of the errors raised.
   # @return [Array<FieldError>] An array of errors.
   #
-  # source://toys-core//lib/toys/settings.rb#672
+  # source://toys-core//lib/toys/settings.rb#670
   def load_json_file!(filename, raise_on_failure: T.unsafe(nil), **json_opts); end
 
   # Parse the given YAML string and load the data into this settings object.
@@ -7583,7 +7583,7 @@ class Toys::Settings
   #   array of the errors raised.
   # @return [Array<FieldError>] An array of errors.
   #
-  # source://toys-core//lib/toys/settings.rb#631
+  # source://toys-core//lib/toys/settings.rb#629
   def load_yaml!(str, raise_on_failure: T.unsafe(nil)); end
 
   # Parse the given YAML file and load the data into this settings object.
@@ -7594,14 +7594,14 @@ class Toys::Settings
   #   array of the errors raised.
   # @return [Array<FieldError>] An array of errors.
   #
-  # source://toys-core//lib/toys/settings.rb#645
+  # source://toys-core//lib/toys/settings.rb#643
   def load_yaml_file!(filename, raise_on_failure: T.unsafe(nil)); end
 
   # Internal set field value, with validation.
   #
   # @private
   #
-  # source://toys-core//lib/toys/settings.rb#709
+  # source://toys-core//lib/toys/settings.rb#707
   def set!(field, value); end
 
   # Internal determine if the field is set locally.
@@ -7609,14 +7609,14 @@ class Toys::Settings
   # @private
   # @return [Boolean]
   #
-  # source://toys-core//lib/toys/settings.rb#721
+  # source://toys-core//lib/toys/settings.rb#719
   def set?(field); end
 
   # Internal unset field value.
   #
   # @private
   #
-  # source://toys-core//lib/toys/settings.rb#732
+  # source://toys-core//lib/toys/settings.rb#730
   def unset!(field); end
 
   class << self
@@ -7625,7 +7625,7 @@ class Toys::Settings
     #
     # @private This interface is internal and subject to change without warning.
     #
-    # source://toys-core//lib/toys/settings.rb#843
+    # source://toys-core//lib/toys/settings.rb#841
     def fields; end
 
     # When this base class is inherited, if its enclosing module is also a
@@ -7633,7 +7633,7 @@ class Toys::Settings
     #
     # @private
     #
-    # source://toys-core//lib/toys/settings.rb#853
+    # source://toys-core//lib/toys/settings.rb#851
     def inherited(subclass); end
 
     # Add an attribute field.
@@ -7645,7 +7645,7 @@ class Toys::Settings
     # @param type [Object] Optional. The type specification. If not provided,
     #   one is inferred from the default value.
     #
-    # source://toys-core//lib/toys/settings.rb#798
+    # source://toys-core//lib/toys/settings.rb#796
     def settings_attr(name, default: T.unsafe(nil), type: T.unsafe(nil), &block); end
 
     # Add a group field.
@@ -7659,129 +7659,129 @@ class Toys::Settings
     #   subclass Settings). If not present, an anonymous subclass will be
     #   created, and you must provide a block to configure it.
     #
-    # source://toys-core//lib/toys/settings.rb#821
+    # source://toys-core//lib/toys/settings.rb#819
     def settings_group(name, klass = T.unsafe(nil), &block); end
 
     private
 
-    # source://toys-core//lib/toys/settings.rb#889
+    # source://toys-core//lib/toys/settings.rb#887
     def create_getter(field); end
 
-    # source://toys-core//lib/toys/settings.rb#901
+    # source://toys-core//lib/toys/settings.rb#899
     def create_set_detect(field); end
 
-    # source://toys-core//lib/toys/settings.rb#895
+    # source://toys-core//lib/toys/settings.rb#893
     def create_setter(field); end
 
-    # source://toys-core//lib/toys/settings.rb#907
+    # source://toys-core//lib/toys/settings.rb#905
     def create_unsetter(field); end
 
-    # source://toys-core//lib/toys/settings.rb#876
+    # source://toys-core//lib/toys/settings.rb#874
     def interpret_name(name); end
 
-    # source://toys-core//lib/toys/settings.rb#872
+    # source://toys-core//lib/toys/settings.rb#870
     def to_class_name(str); end
 
-    # source://toys-core//lib/toys/settings.rb#866
+    # source://toys-core//lib/toys/settings.rb#864
     def to_field_name(str); end
   end
 end
 
 # A special type specification indicating infer from the default value.
 #
-# source://toys-core//lib/toys/settings.rb#306
+# source://toys-core//lib/toys/settings.rb#304
 Toys::Settings::DEFAULT_TYPE = T.let(T.unsafe(nil), Object)
 
 # @private
 #
-# source://toys-core//lib/toys/settings.rb#748
+# source://toys-core//lib/toys/settings.rb#746
 class Toys::Settings::Field
   # @return [Field] a new instance of Field
   #
-  # source://toys-core//lib/toys/settings.rb#749
+  # source://toys-core//lib/toys/settings.rb#747
   def initialize(container, name, type_spec, default_or_group_class); end
 
   # Returns the value of attribute container.
   #
-  # source://toys-core//lib/toys/settings.rb#768
+  # source://toys-core//lib/toys/settings.rb#766
   def container; end
 
   # Returns the value of attribute default.
   #
-  # source://toys-core//lib/toys/settings.rb#771
+  # source://toys-core//lib/toys/settings.rb#769
   def default; end
 
   # @return [Boolean]
   #
-  # source://toys-core//lib/toys/settings.rb#774
+  # source://toys-core//lib/toys/settings.rb#772
   def group?; end
 
   # Returns the value of attribute group_class.
   #
-  # source://toys-core//lib/toys/settings.rb#772
+  # source://toys-core//lib/toys/settings.rb#770
   def group_class; end
 
   # Returns the value of attribute name.
   #
-  # source://toys-core//lib/toys/settings.rb#769
+  # source://toys-core//lib/toys/settings.rb#767
   def name; end
 
   # Returns the value of attribute type.
   #
-  # source://toys-core//lib/toys/settings.rb#770
+  # source://toys-core//lib/toys/settings.rb#768
   def type; end
 
-  # source://toys-core//lib/toys/settings.rb#778
+  # source://toys-core//lib/toys/settings.rb#776
   def validate(value); end
 end
 
 # Error raised when a value does not match the type constraint.
 #
-# source://toys-core//lib/toys/settings.rb#311
+# source://toys-core//lib/toys/settings.rb#309
 class Toys::Settings::FieldError < ::StandardError
   # @private This interface is internal and subject to change without warning.
   # @return [FieldError] a new instance of FieldError
   #
-  # source://toys-core//lib/toys/settings.rb#339
+  # source://toys-core//lib/toys/settings.rb#337
   def initialize(value, settings_class, field_name, type_description); end
 
   # The field that rejected the value
   #
   # @return [Symbol]
   #
-  # source://toys-core//lib/toys/settings.rb#328
+  # source://toys-core//lib/toys/settings.rb#326
   def field_name; end
 
   # The settings class that rejected the value
   #
   # @return [Class]
   #
-  # source://toys-core//lib/toys/settings.rb#322
+  # source://toys-core//lib/toys/settings.rb#320
   def settings_class; end
 
   # A description of the type constraint, or nil if the field didn't exist.
   #
   # @return [String, nil]
   #
-  # source://toys-core//lib/toys/settings.rb#334
+  # source://toys-core//lib/toys/settings.rb#332
   def type_description; end
 
   # The value that did not match
   #
   # @return [Object]
   #
-  # source://toys-core//lib/toys/settings.rb#316
+  # source://toys-core//lib/toys/settings.rb#314
   def value; end
 end
 
 # A special value indicating a type check failure.
 #
-# source://toys-core//lib/toys/settings.rb#303
+# source://toys-core//lib/toys/settings.rb#301
 Toys::Settings::ILLEGAL_VALUE = T.let(T.unsafe(nil), Object)
 
 # @private
 #
-# source://toys-core//lib/toys/settings.rb#741
+# source://toys-core//lib/toys/settings.rb#739
 Toys::Settings::SETTINGS_TYPE = T.let(T.unsafe(nil), Toys::Settings::Type)
 
 # A type object that checks values.
@@ -7791,7 +7791,7 @@ Toys::Settings::SETTINGS_TYPE = T.let(T.unsafe(nil), Toys::Settings::Type)
 # is valid, a converted value if the value can be converted to a valid
 # value, or {ILLEGAL_VALUE} if the type check failed.
 #
-# source://toys-core//lib/toys/settings.rb#363
+# source://toys-core//lib/toys/settings.rb#361
 class Toys::Settings::Type
   # Create a new Type.
   #
@@ -7799,7 +7799,7 @@ class Toys::Settings::Type
   # @param block [Proc] A testing function.
   # @return [Type] a new instance of Type
   #
-  # source://toys-core//lib/toys/settings.rb#370
+  # source://toys-core//lib/toys/settings.rb#368
   def initialize(description, &block); end
 
   # Test a value, possibly converting to a legal value.
@@ -7808,14 +7808,14 @@ class Toys::Settings::Type
   # @return [Object] The validated value, the value converted to a legal
   #   value, or {ILLEGAL_VALUE} if the type check is unsuccessful.
   #
-  # source://toys-core//lib/toys/settings.rb#388
+  # source://toys-core//lib/toys/settings.rb#386
   def call(val); end
 
   # The name of the type.
   #
   # @return [String]
   #
-  # source://toys-core//lib/toys/settings.rb#379
+  # source://toys-core//lib/toys/settings.rb#377
   def description; end
 
   class << self
@@ -7825,7 +7825,7 @@ class Toys::Settings::Type
     # @param value [Object]
     # @return [Type]
     #
-    # source://toys-core//lib/toys/settings.rb#429
+    # source://toys-core//lib/toys/settings.rb#427
     def for_default_value(value); end
 
     # Create and return a Type given a type specification. See the
@@ -7835,34 +7835,34 @@ class Toys::Settings::Type
     # @raise [ArgumentError] if the type specification is invalid.
     # @return [Type]
     #
-    # source://toys-core//lib/toys/settings.rb#401
+    # source://toys-core//lib/toys/settings.rb#399
     def for_type_spec(type_spec); end
 
     private
 
-    # source://toys-core//lib/toys/settings.rb#488
+    # source://toys-core//lib/toys/settings.rb#486
     def convert(val, klass); end
 
-    # source://toys-core//lib/toys/settings.rb#442
+    # source://toys-core//lib/toys/settings.rb#440
     def for_module(klass); end
 
-    # source://toys-core//lib/toys/settings.rb#448
+    # source://toys-core//lib/toys/settings.rb#446
     def for_range(range); end
 
-    # source://toys-core//lib/toys/settings.rb#456
+    # source://toys-core//lib/toys/settings.rb#454
     def for_regexp(regexp); end
 
-    # source://toys-core//lib/toys/settings.rb#482
+    # source://toys-core//lib/toys/settings.rb#480
     def for_scalar(value); end
 
-    # source://toys-core//lib/toys/settings.rb#464
+    # source://toys-core//lib/toys/settings.rb#462
     def for_union(array); end
   end
 end
 
 # @private
 #
-# source://toys-core//lib/toys/settings.rb#566
+# source://toys-core//lib/toys/settings.rb#564
 Toys::Settings::Type::CONVERTERS = T.let(T.unsafe(nil), Hash)
 
 # Information about the source of a tool, such as the file, git repository,
@@ -8260,7 +8260,7 @@ end
 # command line arguments supported, and a block that gets run when the
 # tool is executed.
 #
-# source://toys-core//lib/toys/tool_definition.rb#13
+# source://toys-core//lib/toys/tool_definition.rb#11
 class Toys::ToolDefinition
   # Create a new tool.
   # Should be created only from the DSL via the Loader.
@@ -8268,7 +8268,7 @@ class Toys::ToolDefinition
   # @private This interface is internal and subject to change without warning.
   # @return [ToolDefinition] a new instance of ToolDefinition
   #
-  # source://toys-core//lib/toys/tool_definition.rb#221
+  # source://toys-core//lib/toys/tool_definition.rb#219
   def initialize(parent, full_name, priority, source_root, middleware_stack, middleware_lookup, tool_class = T.unsafe(nil)); end
 
   # Add a named acceptor to the tool. This acceptor may be refereneced by
@@ -8285,7 +8285,7 @@ class Toys::ToolDefinition
   #   {Toys::Acceptor.create}.
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#829
+  # source://toys-core//lib/toys/tool_definition.rb#827
   def add_acceptor(name, acceptor = T.unsafe(nil), type_desc: T.unsafe(nil), &block); end
 
   # Add a named completion proc to this tool. The completion may be
@@ -8302,7 +8302,7 @@ class Toys::ToolDefinition
   #   {Toys::Completion.create}.
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#876
+  # source://toys-core//lib/toys/tool_definition.rb#874
   def add_completion(name, completion = T.unsafe(nil), **options, &block); end
 
   # Add a flag to the current tool. Each flag must specify a key which
@@ -8354,7 +8354,7 @@ class Toys::ToolDefinition
   #   text and error messages.
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1054
+  # source://toys-core//lib/toys/tool_definition.rb#1052
   def add_flag(key, flags = T.unsafe(nil), accept: T.unsafe(nil), default: T.unsafe(nil), handler: T.unsafe(nil), complete_flags: T.unsafe(nil), complete_values: T.unsafe(nil), report_collisions: T.unsafe(nil), group: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), display_name: T.unsafe(nil)); end
 
   # Add a flag group to the group list.
@@ -8382,7 +8382,7 @@ class Toys::ToolDefinition
   #   group to the list. Default is `false`.
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#987
+  # source://toys-core//lib/toys/tool_definition.rb#985
   def add_flag_group(type: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), name: T.unsafe(nil), report_collisions: T.unsafe(nil), prepend: T.unsafe(nil)); end
 
   # Add an initializer.
@@ -8392,7 +8392,7 @@ class Toys::ToolDefinition
   # @param kwargs [keywords] Keyword arguments to pass to the initializer
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1285
+  # source://toys-core//lib/toys/tool_definition.rb#1283
   def add_initializer(proc, *args, **kwargs); end
 
   # Add a named mixin module to this tool.
@@ -8404,7 +8404,7 @@ class Toys::ToolDefinition
   #   not provided directly.
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#850
+  # source://toys-core//lib/toys/tool_definition.rb#848
   def add_mixin(name, mixin_module = T.unsafe(nil), &block); end
 
   # Add an optional positional argument to the current tool. You must specify
@@ -8432,7 +8432,7 @@ class Toys::ToolDefinition
   #   for a description of allowed formats. Defaults to the empty array.
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1157
+  # source://toys-core//lib/toys/tool_definition.rb#1155
   def add_optional_arg(key, default: T.unsafe(nil), accept: T.unsafe(nil), complete: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil)); end
 
   # Add a required positional argument to the current tool. You must specify
@@ -8456,7 +8456,7 @@ class Toys::ToolDefinition
   #   for a description of allowed formats. Defaults to the empty array.
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1119
+  # source://toys-core//lib/toys/tool_definition.rb#1117
   def add_required_arg(key, accept: T.unsafe(nil), complete: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil)); end
 
   # Add a named template class to this tool.
@@ -8468,7 +8468,7 @@ class Toys::ToolDefinition
   #   is not provided directly.
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#897
+  # source://toys-core//lib/toys/tool_definition.rb#895
   def add_template(name, template_class = T.unsafe(nil), &block); end
 
   # Append long description strings.
@@ -8479,21 +8479,21 @@ class Toys::ToolDefinition
   # @param long_desc [Array<Toys::WrappableString,String,Array<String>>]
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#808
+  # source://toys-core//lib/toys/tool_definition.rb#806
   def append_long_desc(long_desc); end
 
   # Returns true if this tool has disabled argument parsing.
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#639
+  # source://toys-core//lib/toys/tool_definition.rb#637
   def argument_parsing_disabled?; end
 
   # The stack of built middleware specs for this tool.
   #
   # @return [Array<Toys::Middleware>]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#420
+  # source://toys-core//lib/toys/tool_definition.rb#418
   def built_middleware; end
 
   # Check that the tool can still be defined. Should be called internally
@@ -8501,7 +8501,7 @@ class Toys::ToolDefinition
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1429
+  # source://toys-core//lib/toys/tool_definition.rb#1427
   def check_definition_state(is_arg: T.unsafe(nil), is_method: T.unsafe(nil)); end
 
   # The completion strategy for this tool.
@@ -8520,7 +8520,7 @@ class Toys::ToolDefinition
   #
   # @return [Toys::Completion::Base, Proc]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#455
+  # source://toys-core//lib/toys/tool_definition.rb#453
   def completion; end
 
   # Set the completion strategy for this ToolDefinition.
@@ -8529,7 +8529,7 @@ class Toys::ToolDefinition
   #
   # @param spec [Object]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1310
+  # source://toys-core//lib/toys/tool_definition.rb#1308
   def completion=(spec); end
 
   # Return the effective context directory.
@@ -8542,7 +8542,7 @@ class Toys::ToolDefinition
   # @return [String] The effective context directory path.
   # @return [nil] if there is no effective context directory.
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1335
+  # source://toys-core//lib/toys/tool_definition.rb#1333
   def context_directory; end
 
   # The custom context directory set for this tool.
@@ -8550,7 +8550,7 @@ class Toys::ToolDefinition
   # @return [String] The directory path
   # @return [nil] if no custom context directory is set.
   #
-  # source://toys-core//lib/toys/tool_definition.rb#436
+  # source://toys-core//lib/toys/tool_definition.rb#434
   def custom_context_directory; end
 
   # Set the custom context directory.
@@ -8559,21 +8559,21 @@ class Toys::ToolDefinition
   #
   # @param dir [String]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1298
+  # source://toys-core//lib/toys/tool_definition.rb#1296
   def custom_context_directory=(dir); end
 
   # The default context data set by arguments.
   #
   # @return [Hash]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#404
+  # source://toys-core//lib/toys/tool_definition.rb#402
   def default_data; end
 
   # Returns true if this tool's definition has been finished and is locked.
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#631
+  # source://toys-core//lib/toys/tool_definition.rb#629
   def definition_finished?; end
 
   # The full name of the delegate target, if any.
@@ -8581,7 +8581,7 @@ class Toys::ToolDefinition
   # @return [Array<String>] if this tool delegates
   # @return [nil] if this tool does not delegate
   #
-  # source://toys-core//lib/toys/tool_definition.rb#495
+  # source://toys-core//lib/toys/tool_definition.rb#493
   def delegate_target; end
 
   # Causes this tool to delegate to another tool.
@@ -8589,7 +8589,7 @@ class Toys::ToolDefinition
   # @param target [Array<String>] The full path to the delegate tool.
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1345
+  # source://toys-core//lib/toys/tool_definition.rb#1343
   def delegate_to(target); end
 
   # The short description string.
@@ -8606,7 +8606,7 @@ class Toys::ToolDefinition
   #
   # @return [Toys::WrappableString]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#335
+  # source://toys-core//lib/toys/tool_definition.rb#333
   def desc; end
 
   # Set the short description string.
@@ -8615,14 +8615,14 @@ class Toys::ToolDefinition
   #
   # @param desc [Toys::WrappableString, String, Array<String>]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#782
+  # source://toys-core//lib/toys/tool_definition.rb#780
   def desc=(desc); end
 
   # Disable argument parsing for this tool.
   #
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#913
+  # source://toys-core//lib/toys/tool_definition.rb#911
   def disable_argument_parsing; end
 
   # Mark one or more flags as disabled, preventing their use by any
@@ -8632,7 +8632,7 @@ class Toys::ToolDefinition
   # @param flags [String...] The flags to disable
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1085
+  # source://toys-core//lib/toys/tool_definition.rb#1083
   def disable_flag(*flags); end
 
   # A displayable name of this tool, generally the full name delimited by
@@ -8640,7 +8640,7 @@ class Toys::ToolDefinition
   #
   # @return [String]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#512
+  # source://toys-core//lib/toys/tool_definition.rb#510
   def display_name; end
 
   # Enforce that flags must come before args for this tool.
@@ -8649,14 +8649,14 @@ class Toys::ToolDefinition
   # @param state [true, false]
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#931
+  # source://toys-core//lib/toys/tool_definition.rb#929
   def enforce_flags_before_args(state = T.unsafe(nil)); end
 
   # Returns true if this tool requires exact flag matches.
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#655
+  # source://toys-core//lib/toys/tool_definition.rb#653
   def exact_flag_match_required?; end
 
   # Complete definition and run middleware configs. Should be called from
@@ -8664,28 +8664,28 @@ class Toys::ToolDefinition
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1395
+  # source://toys-core//lib/toys/tool_definition.rb#1393
   def finish_definition(loader); end
 
   # A list of all defined flag groups, in order.
   #
   # @return [Array<Toys::FlagGroup>]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#361
+  # source://toys-core//lib/toys/tool_definition.rb#359
   def flag_groups; end
 
   # A list of all defined flags.
   #
   # @return [Array<Toys::Flag>]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#368
+  # source://toys-core//lib/toys/tool_definition.rb#366
   def flags; end
 
   # Returns true if this tool enforces flags before args.
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#647
+  # source://toys-core//lib/toys/tool_definition.rb#645
   def flags_before_args_enforced?; end
 
   # The name of the tool as an array of strings.
@@ -8693,7 +8693,7 @@ class Toys::ToolDefinition
   #
   # @return [Array<String>]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#297
+  # source://toys-core//lib/toys/tool_definition.rb#295
   def full_name; end
 
   # Returns true if this tool handles interrupts. This is equivalent to
@@ -8701,7 +8701,7 @@ class Toys::ToolDefinition
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#568
+  # source://toys-core//lib/toys/tool_definition.rb#566
   def handles_interrupts?; end
 
   # Returns true if this tool handles the given signal.
@@ -8709,14 +8709,14 @@ class Toys::ToolDefinition
   # @param signal [Integer, String, Symbol] The signal number or name
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#578
+  # source://toys-core//lib/toys/tool_definition.rb#576
   def handles_signal?(signal); end
 
   # Returns true if this tool handles usage errors.
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#587
+  # source://toys-core//lib/toys/tool_definition.rb#585
   def handles_usage_errors?; end
 
   # Include the given mixin in the tool class.
@@ -8727,7 +8727,7 @@ class Toys::ToolDefinition
   # @param mod [Module] The mixin module
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#740
+  # source://toys-core//lib/toys/tool_definition.rb#738
   def include_mixin(mod, *args, **kwargs); end
 
   # Returns true if at least one flag or positional argument is defined
@@ -8735,28 +8735,28 @@ class Toys::ToolDefinition
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#612
+  # source://toys-core//lib/toys/tool_definition.rb#610
   def includes_arguments?; end
 
   # Returns true if this tool has any definition information.
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#622
+  # source://toys-core//lib/toys/tool_definition.rb#620
   def includes_definition?; end
 
   # Returns true if there is a specific description set for this tool.
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#603
+  # source://toys-core//lib/toys/tool_definition.rb#601
   def includes_description?; end
 
   # Returns true if this tool has at least one included module.
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#595
+  # source://toys-core//lib/toys/tool_definition.rb#593
   def includes_modules?; end
 
   # Return the interrupt handler. This is equivalent to `signal_handler(2)`.
@@ -8765,7 +8765,7 @@ class Toys::ToolDefinition
   # @return [Symbol] if the interrupt signal handler is defined as a method
   # @return [nil] if there is no handler for the interrupt signals
   #
-  # source://toys-core//lib/toys/tool_definition.rb#540
+  # source://toys-core//lib/toys/tool_definition.rb#538
   def interrupt_handler; end
 
   # Set the interrupt handler. This is equivalent to calling
@@ -8773,7 +8773,7 @@ class Toys::ToolDefinition
   #
   # @param handler [Proc, Symbol] The interrupt signal handler
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1234
+  # source://toys-core//lib/toys/tool_definition.rb#1232
   def interrupt_handler=(handler); end
 
   # Sets the path to the file that defines this tool.
@@ -8783,7 +8783,7 @@ class Toys::ToolDefinition
   # @param source [Toys::SourceInfo] Source info
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#770
+  # source://toys-core//lib/toys/tool_definition.rb#768
   def lock_source(source); end
 
   # The long description strings.
@@ -8802,7 +8802,7 @@ class Toys::ToolDefinition
   #
   # @return [Array<Toys::WrappableString>]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#354
+  # source://toys-core//lib/toys/tool_definition.rb#352
   def long_desc; end
 
   # Set the long description strings.
@@ -8811,7 +8811,7 @@ class Toys::ToolDefinition
   #
   # @param long_desc [Array<Toys::WrappableString,String,Array<String>>]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#794
+  # source://toys-core//lib/toys/tool_definition.rb#792
   def long_desc=(long_desc); end
 
   # Get the named acceptor from this tool or its ancestors.
@@ -8820,7 +8820,7 @@ class Toys::ToolDefinition
   # @return [Toys::Acceptor::Base] The acceptor.
   # @return [nil] if no acceptor of the given name is found.
   #
-  # source://toys-core//lib/toys/tool_definition.rb#694
+  # source://toys-core//lib/toys/tool_definition.rb#692
   def lookup_acceptor(name); end
 
   # Get the named completion from this tool or its ancestors.
@@ -8829,14 +8829,14 @@ class Toys::ToolDefinition
   # @return [Toys::Completion::Base, Proc] The completion proc.
   # @return [nil] if no completion of the given name is found.
   #
-  # source://toys-core//lib/toys/tool_definition.rb#727
+  # source://toys-core//lib/toys/tool_definition.rb#725
   def lookup_completion(name); end
 
   # Lookup the custom context directory in this tool and its ancestors.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1374
+  # source://toys-core//lib/toys/tool_definition.rb#1372
   def lookup_custom_context_directory; end
 
   # Get the named mixin from this tool or its ancestors.
@@ -8845,7 +8845,7 @@ class Toys::ToolDefinition
   # @return [Module] The mixin module.
   # @return [nil] if no mixin of the given name is found.
   #
-  # source://toys-core//lib/toys/tool_definition.rb#716
+  # source://toys-core//lib/toys/tool_definition.rb#714
   def lookup_mixin(name); end
 
   # Get the named template from this tool or its ancestors.
@@ -8854,35 +8854,35 @@ class Toys::ToolDefinition
   # @return [Class, nil] The template class.
   # @return [nil] if no template of the given name is found.
   #
-  # source://toys-core//lib/toys/tool_definition.rb#705
+  # source://toys-core//lib/toys/tool_definition.rb#703
   def lookup_template(name); end
 
   # Mark this tool as having at least one module included.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1383
+  # source://toys-core//lib/toys/tool_definition.rb#1381
   def mark_includes_modules; end
 
   # A list of all defined optional positional arguments.
   #
   # @return [Array<Toys::PositionalArg>]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#382
+  # source://toys-core//lib/toys/tool_definition.rb#380
   def optional_args; end
 
   # All arg definitions in order: required, optional, remaining.
   #
   # @return [Array<Toys::PositionalArg>]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#664
+  # source://toys-core//lib/toys/tool_definition.rb#662
   def positional_args; end
 
   # The priority of this tool definition.
   #
   # @return [Integer]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#304
+  # source://toys-core//lib/toys/tool_definition.rb#302
   def priority; end
 
   # The remaining arguments specification.
@@ -8890,7 +8890,7 @@ class Toys::ToolDefinition
   # @return [Toys::PositionalArg] The argument definition
   # @return [nil] if remaining arguments are not supported by this tool.
   #
-  # source://toys-core//lib/toys/tool_definition.rb#390
+  # source://toys-core//lib/toys/tool_definition.rb#388
   def remaining_arg; end
 
   # Require that flags must match exactly. (If false, flags can match an
@@ -8899,14 +8899,14 @@ class Toys::ToolDefinition
   # @param state [true, false]
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#949
+  # source://toys-core//lib/toys/tool_definition.rb#947
   def require_exact_flag_match(state = T.unsafe(nil)); end
 
   # A list of all defined required positional arguments.
   #
   # @return [Array<Toys::PositionalArg>]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#375
+  # source://toys-core//lib/toys/tool_definition.rb#373
   def required_args; end
 
   # Reset the definition of this tool, deleting all definition data but
@@ -8915,7 +8915,7 @@ class Toys::ToolDefinition
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/tool_definition.rb#248
+  # source://toys-core//lib/toys/tool_definition.rb#246
   def reset_definition; end
 
   # Resolve the given flag given the flag string. Returns an object that
@@ -8926,14 +8926,14 @@ class Toys::ToolDefinition
   # @param str [String] Flag string
   # @return [Toys::Flag::Resolution]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#679
+  # source://toys-core//lib/toys/tool_definition.rb#677
   def resolve_flag(str); end
 
   # Returns true if this tool is a root tool.
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#548
+  # source://toys-core//lib/toys/tool_definition.rb#546
   def root?; end
 
   # The run handler.
@@ -8950,7 +8950,7 @@ class Toys::ToolDefinition
   # @return [Symbol] if the run handler is defined as a method
   # @return [nil] if the tool is explicitly made non-runnable
   #
-  # source://toys-core//lib/toys/tool_definition.rb#472
+  # source://toys-core//lib/toys/tool_definition.rb#470
   def run_handler; end
 
   # Set the run handler.
@@ -8965,21 +8965,21 @@ class Toys::ToolDefinition
   #
   # @param handler [Proc, Symbol, nil] the run handler
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1220
+  # source://toys-core//lib/toys/tool_definition.rb#1218
   def run_handler=(handler); end
 
   # Run all initializers against a context. Called from the Runner.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1417
+  # source://toys-core//lib/toys/tool_definition.rb#1415
   def run_initializers(context); end
 
   # Returns true if this tool is marked as runnable.
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#556
+  # source://toys-core//lib/toys/tool_definition.rb#554
   def runnable?; end
 
   # Specify what should be done with unmatched positional arguments. You must
@@ -9006,7 +9006,7 @@ class Toys::ToolDefinition
   #   for a description of allowed formats. Defaults to the empty array.
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1195
+  # source://toys-core//lib/toys/tool_definition.rb#1193
   def set_remaining_args(key, default: T.unsafe(nil), accept: T.unsafe(nil), complete: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil)); end
 
   # Set the handler for the given signal.
@@ -9019,14 +9019,14 @@ class Toys::ToolDefinition
   # @param signal [Integer, String, Symbol] The signal number or name
   # @param handler [Proc, Symbol] The signal handler
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1249
+  # source://toys-core//lib/toys/tool_definition.rb#1247
   def set_signal_handler(signal, handler); end
 
   # Settings for this tool
   #
-  # @return [Toys::Tool::Settings]
+  # @return [Toys::ToolDefinition::Settings]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#289
+  # source://toys-core//lib/toys/tool_definition.rb#287
   def settings; end
 
   # Return the signal handler for the given signal.
@@ -9041,14 +9041,14 @@ class Toys::ToolDefinition
   # @return [Symbol] if the signal handler is defined as a method
   # @return [nil] if there is no handler for the given signal
   #
-  # source://toys-core//lib/toys/tool_definition.rb#529
+  # source://toys-core//lib/toys/tool_definition.rb#527
   def signal_handler(signal); end
 
   # The local name of this tool, i.e. the last element of the full name.
   #
   # @return [String]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#502
+  # source://toys-core//lib/toys/tool_definition.rb#500
   def simple_name; end
 
   # Info on the source of this tool.
@@ -9056,14 +9056,14 @@ class Toys::ToolDefinition
   # @return [Toys::SourceInfo] The source info
   # @return [nil] if the source is not defined.
   #
-  # source://toys-core//lib/toys/tool_definition.rb#428
+  # source://toys-core//lib/toys/tool_definition.rb#426
   def source_info; end
 
   # The root source info defining this tool, or nil if there is no source.
   #
   # @return [Toys::SourceInfo, nil]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#311
+  # source://toys-core//lib/toys/tool_definition.rb#309
   def source_root; end
 
   # The stack of middleware specs used for subtools.
@@ -9072,14 +9072,14 @@ class Toys::ToolDefinition
   #
   # @return [Array<Toys::Middleware::Spec>]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#413
+  # source://toys-core//lib/toys/tool_definition.rb#411
   def subtool_middleware_stack; end
 
   # The tool class.
   #
   # @return [Class]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#318
+  # source://toys-core//lib/toys/tool_definition.rb#316
   def tool_class; end
 
   # The usage error handler.
@@ -9094,7 +9094,7 @@ class Toys::ToolDefinition
   # @return [Symbol] if the user error handler is defined as a method
   # @return [nil] if there is no usage error handler
   #
-  # source://toys-core//lib/toys/tool_definition.rb#487
+  # source://toys-core//lib/toys/tool_definition.rb#485
   def usage_error_handler; end
 
   # Set the usage error handler.
@@ -9107,46 +9107,46 @@ class Toys::ToolDefinition
   #
   # @param handler [Proc, Symbol] The usage error handler
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1269
+  # source://toys-core//lib/toys/tool_definition.rb#1267
   def usage_error_handler=(handler); end
 
   # A list of flags that have been used in the flag definitions.
   #
   # @return [Array<String>]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#397
+  # source://toys-core//lib/toys/tool_definition.rb#395
   def used_flags; end
 
   private
 
   # @raise [::ArgumentError]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1494
+  # source://toys-core//lib/toys/tool_definition.rb#1492
   def canonicalize_signal(signal); end
 
-  # source://toys-core//lib/toys/tool_definition.rb#1447
+  # source://toys-core//lib/toys/tool_definition.rb#1445
   def create_class; end
 
-  # source://toys-core//lib/toys/tool_definition.rb#1451
+  # source://toys-core//lib/toys/tool_definition.rb#1449
   def make_config_proc(middleware, loader, next_config); end
 
-  # source://toys-core//lib/toys/tool_definition.rb#1459
+  # source://toys-core//lib/toys/tool_definition.rb#1457
   def make_delegation_run_handler(target); end
 
   # @raise [ToolDefinitionError]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1480
+  # source://toys-core//lib/toys/tool_definition.rb#1478
   def resolve_acceptor_name(name); end
 
   # @raise [ToolDefinitionError]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1487
+  # source://toys-core//lib/toys/tool_definition.rb#1485
   def resolve_completion_name(name); end
 end
 
 # A Completion that implements the default algorithm for a tool.
 #
-# source://toys-core//lib/toys/tool_definition.rb#17
+# source://toys-core//lib/toys/tool_definition.rb#15
 class Toys::ToolDefinition::DefaultCompletion < ::Toys::Completion::Base
   # Create a completion given configuration options.
   #
@@ -9160,7 +9160,7 @@ class Toys::ToolDefinition::DefaultCompletion < ::Toys::Completion::Base
   #   `nil` if none.
   # @return [DefaultCompletion] a new instance of DefaultCompletion
   #
-  # source://toys-core//lib/toys/tool_definition.rb#30
+  # source://toys-core//lib/toys/tool_definition.rb#28
   def initialize(complete_subtools: T.unsafe(nil), include_hidden_subtools: T.unsafe(nil), complete_args: T.unsafe(nil), complete_flags: T.unsafe(nil), complete_flag_values: T.unsafe(nil), delegation_target: T.unsafe(nil)); end
 
   # Returns candidates for the current completion.
@@ -9169,35 +9169,35 @@ class Toys::ToolDefinition::DefaultCompletion < ::Toys::Completion::Base
   #   context including the string fragment.
   # @return [Array<Toys::Completion::Candidate>] an array of candidates
   #
-  # source://toys-core//lib/toys/tool_definition.rb#96
+  # source://toys-core//lib/toys/tool_definition.rb#94
   def call(context); end
 
   # Whether to complete positional args
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#70
+  # source://toys-core//lib/toys/tool_definition.rb#68
   def complete_args?; end
 
   # Whether to complete flag values
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#78
+  # source://toys-core//lib/toys/tool_definition.rb#76
   def complete_flag_values?; end
 
   # Whether to complete flags
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#62
+  # source://toys-core//lib/toys/tool_definition.rb#60
   def complete_flags?; end
 
   # Whether to complete subtool names
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#46
+  # source://toys-core//lib/toys/tool_definition.rb#44
   def complete_subtools?; end
 
   # Delegation target, or nil for none.
@@ -9205,7 +9205,7 @@ class Toys::ToolDefinition::DefaultCompletion < ::Toys::Completion::Base
   # @return [Array<String>] if there is a delegation target
   # @return [nil] if there is no delegation target
   #
-  # source://toys-core//lib/toys/tool_definition.rb#87
+  # source://toys-core//lib/toys/tool_definition.rb#85
   def delegation_target; end
 
   # Delegation target, or nil for none.
@@ -9213,37 +9213,37 @@ class Toys::ToolDefinition::DefaultCompletion < ::Toys::Completion::Base
   # @return [Array<String>] if there is a delegation target
   # @return [nil] if there is no delegation target
   #
-  # source://toys-core//lib/toys/tool_definition.rb#87
+  # source://toys-core//lib/toys/tool_definition.rb#85
   def delegation_target=(_arg0); end
 
   # Whether to include hidden subtools
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#54
+  # source://toys-core//lib/toys/tool_definition.rb#52
   def include_hidden_subtools?; end
 
   private
 
-  # source://toys-core//lib/toys/tool_definition.rb#151
+  # source://toys-core//lib/toys/tool_definition.rb#149
   def analyze_subtool_fragment(context); end
 
-  # source://toys-core//lib/toys/tool_definition.rb#173
+  # source://toys-core//lib/toys/tool_definition.rb#171
   def arg_candidates(context); end
 
-  # source://toys-core//lib/toys/tool_definition.rb#192
+  # source://toys-core//lib/toys/tool_definition.rb#190
   def flag_value_candidates(context); end
 
-  # source://toys-core//lib/toys/tool_definition.rb#180
+  # source://toys-core//lib/toys/tool_definition.rb#178
   def plain_flag_candidates(context); end
 
-  # source://toys-core//lib/toys/tool_definition.rb#134
+  # source://toys-core//lib/toys/tool_definition.rb#132
   def subtool_candidates(context); end
 
-  # source://toys-core//lib/toys/tool_definition.rb#128
+  # source://toys-core//lib/toys/tool_definition.rb#126
   def subtool_or_arg_candidates(context); end
 
-  # source://toys-core//lib/toys/tool_definition.rb#114
+  # source://toys-core//lib/toys/tool_definition.rb#112
   def valued_flag_candidates(context); end
 end
 
@@ -9254,18 +9254,18 @@ end
 #  *  `propagate_helper_methods` (_boolean_) - Whether subtools should
 #     inherit methods defined by parent tools. Defaults to `false`.
 #
-# source://toys-core//lib/toys/tool_definition.rb#211
+# source://toys-core//lib/toys/tool_definition.rb#209
 class Toys::ToolDefinition::Settings < ::Toys::Settings
-  # source://toys-core//lib/toys/settings.rb#890
+  # source://toys-core//lib/toys/settings.rb#888
   def propagate_helper_methods; end
 
-  # source://toys-core//lib/toys/settings.rb#896
+  # source://toys-core//lib/toys/settings.rb#894
   def propagate_helper_methods=(val); end
 
-  # source://toys-core//lib/toys/settings.rb#902
+  # source://toys-core//lib/toys/settings.rb#900
   def propagate_helper_methods_set?; end
 
-  # source://toys-core//lib/toys/settings.rb#908
+  # source://toys-core//lib/toys/settings.rb#906
   def propagate_helper_methods_unset!; end
 end
 
