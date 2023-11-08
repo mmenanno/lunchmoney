@@ -45,7 +45,7 @@ module LunchMoney
         category_group_name: T.nilable(String),
         group_id: T.nilable(Integer),
         is_group: T.nilable(T::Boolean),
-        config: T.nilable(LunchMoney::Config),
+        config: T.nilable(T::Hash[Symbol, LunchMoney::Config]),
       ).void
     end
     def initialize(is_income:, exclude_from_budget:, exclude_from_totals:, data:,
