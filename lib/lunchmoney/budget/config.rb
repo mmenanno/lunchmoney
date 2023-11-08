@@ -3,6 +3,8 @@
 
 module LunchMoney
   class Config < LunchMoney::DataObject
+    # API object reference documentation: https://lunchmoney.dev/#config-object
+
     sig { returns(Integer) }
     attr_accessor :config_id, :amount, :to_base
 

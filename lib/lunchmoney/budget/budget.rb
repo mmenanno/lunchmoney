@@ -6,6 +6,8 @@ require_relative "config"
 
 module LunchMoney
   class Budget < LunchMoney::DataObject
+    # API object reference documentation: https://lunchmoney.dev/#budget-object
+
     sig { returns(String) }
     attr_accessor :category_name
 

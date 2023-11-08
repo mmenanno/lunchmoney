@@ -3,6 +3,8 @@
 
 module LunchMoney
   class Data < LunchMoney::DataObject
+    # API object reference documentation: https://lunchmoney.dev/#data-object
+
     sig { returns(T.nilable(Integer)) }
     attr_accessor :budget_amount, :budget_to_base, :spending_to_base, :num_transactions
 
