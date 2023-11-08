@@ -26,7 +26,7 @@ module LunchMoney
       return api_errors if api_errors.present?
 
       response.body.map do |budget|
-        # budget[:data] TODO: Add mapping to data object
+        # budget[:data] TODO: Add mapping to data and config objects
 
         LunchMoney::Budget.new(**budget)
       end
@@ -39,7 +39,7 @@ module LunchMoney
         amount: Integer,
         currency: T.nilable(String),
       ).returns(T.any(
-        T::Hash[String, { category_id: Integer, amount: Integer, currency: String, start_date: String }],
+        T::Hash[Symbol, { category_id: Integer, amount: Integer, currency: String, start_date: String }],
         LunchMoney::Errors,
       ))
     end

@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 module LunchMoney
-  class Config
+  class Configuration
     sig { returns(T.nilable(String)) }
     attr_accessor :api_key
 

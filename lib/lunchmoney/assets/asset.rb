@@ -3,6 +3,8 @@
 
 module LunchMoney
   class Asset < LunchMoney::DataObject
+    # API object reference documentation: https://lunchmoney.dev/#assets-object
+
     sig { returns(Integer) }
     attr_accessor :id
 

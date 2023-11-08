@@ -5,7 +5,7 @@ require "test_helper"
 
 class ApiTest < ActiveSupport::TestCase
   test "api_key can be overwritten via kwarg" do
-    LunchMoney::Config.any_instance.stubs(:api_key).returns("test_token")
+    LunchMoney::Configuration.any_instance.stubs(:api_key).returns("test_token")
 
     api = LunchMoney::Api.new(api_key: "new_test_token")
 
@@ -14,7 +14,7 @@ class ApiTest < ActiveSupport::TestCase
   end
 
   test "api_key defaults to config value when no kwarg is passed" do
-    LunchMoney::Config.any_instance.stubs(:api_key).returns("test_token")
+    LunchMoney::Configuration.any_instance.stubs(:api_key).returns("test_token")
 
     assert_equal("test_token", LunchMoney.configuration.api_key)
   end
@@ -86,7 +86,7 @@ class ApiTest < ActiveSupport::TestCase
   ].each do |call|
     test "error is raised if api_key is nil for #{call}" do
       T.bind(self, ApiTest)
-      LunchMoney::Config.any_instance.stubs(:api_key).returns(nil)
+      LunchMoney::Configuration.any_instance.stubs(:api_key).returns(nil)
 
       error = assert_raises(LunchMoney::InvalidApiKey) do
         LunchMoney::Api.new.send(call)
@@ -97,7 +97,7 @@ class ApiTest < ActiveSupport::TestCase
 
     test "error is raised if api_key is empty string for #{call}" do
       T.bind(self, ApiTest)
-      LunchMoney::Config.any_instance.stubs(:api_key).returns("")
+      LunchMoney::Configuration.any_instance.stubs(:api_key).returns("")
 
       error = assert_raises(LunchMoney::InvalidApiKey) do
         LunchMoney::Api.new.send(call)
@@ -108,7 +108,7 @@ class ApiTest < ActiveSupport::TestCase
 
     test "error is not raised if api_key is not empty or nil for #{call}" do
       T.bind(self, ApiTest)
-      LunchMoney::Config.any_instance.stubs(:api_key).returns("this_could_maybe_be_a_token")
+      LunchMoney::Configuration.any_instance.stubs(:api_key).returns("this_could_maybe_be_a_token")
 
       assert_nothing_raised do
         LunchMoney::Api.new.send(call)

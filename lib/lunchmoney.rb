@@ -18,16 +18,16 @@ module LunchMoney
 
   class << self
     sig do
-      params(block: T.proc.params(arg0: LunchMoney::Config).void).void
+      params(block: T.proc.params(arg0: LunchMoney::Configuration).void).void
     end
     def configure(&block)
       yield(configuration)
     end
 
-    sig { returns(LunchMoney::Config) }
+    sig { returns(LunchMoney::Configuration) }
     def configuration
-      @configuration = T.let(nil, T.nilable(LunchMoney::Config)) unless defined?(@configuration)
-      @configuration || LOCK.synchronize { @configuration = LunchMoney::Config.new }
+      @configuration = T.let(nil, T.nilable(LunchMoney::Configuration)) unless defined?(@configuration)
+      @configuration || LOCK.synchronize { @configuration = LunchMoney::Configuration.new }
     end
   end
 end
