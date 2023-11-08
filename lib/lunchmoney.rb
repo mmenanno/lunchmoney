@@ -11,6 +11,7 @@ require "sorbet-runtime"
 Module.include(T::Sig)
 
 require_relative "lunchmoney/version"
+require_relative "lunchmoney/validators"
 require_relative "lunchmoney/api"
 
 module LunchMoney
@@ -28,6 +29,11 @@ module LunchMoney
     def configuration
       @configuration = T.let(nil, T.nilable(LunchMoney::Configuration)) unless defined?(@configuration)
       @configuration || LOCK.synchronize { @configuration = LunchMoney::Configuration.new }
+    end
+
+    sig { returns(T::Boolean) }
+    def validate_object_attributes?
+      configuration.validate_object_attributes
     end
   end
 end
