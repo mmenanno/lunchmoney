@@ -24,8 +24,8 @@ module LunchMoney
         is_automated: T.nilable(T::Boolean),
       ).void
     end
-    def initialize(spending_to_base: nil, num_transactions: nil, budget_amount: nil, budget_currency: nil, budget_to_base: nil,
-      is_automated: nil)
+    def initialize(spending_to_base: nil, num_transactions: nil, budget_amount: nil, budget_currency: nil,
+      budget_to_base: nil, is_automated: nil)
       super()
       @budget_amount = budget_amount
       @budget_currency = budget_currency
