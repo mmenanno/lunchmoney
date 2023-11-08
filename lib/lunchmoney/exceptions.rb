@@ -5,4 +5,6 @@ module LunchMoney
   class Exception < StandardError; end
 
   class InvalidApiKey < Exception; end
+
+  class InvalidObjectAttribute < Exception; end
 end
