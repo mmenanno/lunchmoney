@@ -13,7 +13,7 @@ module FakeResponseDataHelper
       assets: [{
         "id": 72,
         "type_name": "cash",
-        "subtype_name": "physical cash",
+        "subtype_name": "retirement",
         "name": "Test Asset 1",
         "balance": "1201.0100",
         "balance_as_of": "2020-01-26T12:27:22.000Z",

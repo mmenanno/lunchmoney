@@ -12,13 +12,13 @@ module LunchMoney
     attr_accessor :category_name
 
     sig { returns(Integer) }
-    attr_accessor :category_id, :order
+    attr_accessor :order
 
     sig { returns(T.nilable(String)) }
     attr_accessor :category_group_name
 
     sig { returns(T.nilable(Integer)) }
-    attr_accessor :group_id
+    attr_accessor :category_id, :group_id
 
     sig { returns(T.nilable(T::Boolean)) }
     attr_accessor :is_group
@@ -45,7 +45,7 @@ module LunchMoney
         category_group_name: T.nilable(String),
         group_id: T.nilable(Integer),
         is_group: T.nilable(T::Boolean),
-        config: T.nilable(T::Hash[T.untyped, T.untyped]),
+        config: T.nilable(LunchMoney::Config),
       ).void
     end
     def initialize(is_income:, exclude_from_budget:, exclude_from_totals:, data:,
