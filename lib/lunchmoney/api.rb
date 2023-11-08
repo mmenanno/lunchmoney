@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 require_relative "exceptions"
-require_relative "config"
+require_relative "configuration"
 
 require_relative "api_call"
 require_relative "data_object"
