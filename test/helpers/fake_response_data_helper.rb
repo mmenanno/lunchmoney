@@ -2,6 +2,8 @@
 # frozen_string_literal: true
 
 module FakeResponseDataHelper
+  private
+
   sig { returns(T::Hash[Symbol, String]) }
   def fake_general_error
     { error: "This is an error" }
@@ -9,20 +11,31 @@ module FakeResponseDataHelper
 
   sig { returns(T::Hash[Symbol, T::Array[T::Hash[String, T.any(Integer, String, T::Boolean)]]]) }
   def fake_assets_response
-    {
-      assets: [{
-        "id": 72,
-        "type_name": "cash",
-        "subtype_name": "retirement",
-        "name": "Test Asset 1",
-        "balance": "1201.0100",
-        "balance_as_of": "2020-01-26T12:27:22.000Z",
-        "currency": "cad",
-        "institution_name": "Bank of Me",
-        "created_at": "2020-01-26T12:27:22.726Z",
-        "exclude_transactions": false,
-      }],
-    }
+    { assets: [create_asset.serialize(symbolize_keys: true)] }
+  end
+
+  sig do
+    params(
+      type_name: String,
+      subtype_name: String,
+      balance_as_of: String,
+      created_at: String,
+    ).returns(LunchMoney::Asset)
+  end
+  def create_asset(type_name: "cash", subtype_name: "retirement", balance_as_of: "2023-01-01T01:01:01.000Z",
+    created_at: "2023-01-01T01:01:01.000Z")
+    LunchMoney::Asset.new(
+      "id": 1,
+      "type_name": type_name,
+      "subtype_name": subtype_name,
+      "name": "Test Asset 1",
+      "balance": "1201.0100",
+      "balance_as_of": balance_as_of,
+      "currency": "cad",
+      "institution_name": "Bank of Me",
+      "exclude_transactions": false,
+      "created_at": created_at,
+    )
   end
 
   sig { returns(T::Array[T::Hash[String, T.nilable(T.any(String, Integer, Float, T::Boolean))]]) }

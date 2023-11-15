@@ -4,6 +4,8 @@
 require "test_helper"
 
 class AssetTest < ActiveSupport::TestCase
+  include FakeResponseDataHelper
+
   test "type_name can be set to known valid types" do
     LunchMoney::Asset::VALID_TYPE_NAMES.each do |type_name|
       assert_nothing_raised do
@@ -62,29 +64,5 @@ class AssetTest < ActiveSupport::TestCase
     end
 
     assert_match(/is not a valid ISO 8601 string/, error.message)
-  end
-
-  sig do
-    params(
-      type_name: String,
-      subtype_name: String,
-      balance_as_of: String,
-      created_at: String,
-    ).returns(LunchMoney::Asset)
-  end
-  def create_asset(type_name: "cash", subtype_name: "retirement", balance_as_of: "2023-01-01T01:01:01.000Z",
-    created_at: "2023-01-01T01:01:01.000Z")
-    LunchMoney::Asset.new(
-      "id": 1,
-      "type_name": type_name,
-      "subtype_name": subtype_name,
-      "name": "Test Asset 1",
-      "balance": "1201.0100",
-      "balance_as_of": balance_as_of,
-      "currency": "cad",
-      "institution_name": "Bank of Me",
-      "exclude_transactions": false,
-      "created_at": created_at,
-    )
   end
 end
