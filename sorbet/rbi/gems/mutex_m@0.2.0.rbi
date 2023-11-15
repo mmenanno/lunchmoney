@@ -31,61 +31,63 @@
 #   end
 #   obj = Foo.new
 #   # this obj can be handled like Mutex
+#
+# source://mutex_m//lib/mutex_m.rb#41
 module Mutex_m
-  # source://mutex_m//mutex_m.rb#113
+  # source://mutex_m//lib/mutex_m.rb#111
   def initialize(*args, **_arg1); end
 
-  # source://mutex_m//mutex_m.rb#66
+  # source://mutex_m//lib/mutex_m.rb#64
   def mu_extended; end
 
   # See Thread::Mutex#lock
   #
-  # source://mutex_m//mutex_m.rb#93
+  # source://mutex_m//lib/mutex_m.rb#91
   def mu_lock; end
 
   # See Thread::Mutex#locked?
   #
   # @return [Boolean]
   #
-  # source://mutex_m//mutex_m.rb#83
+  # source://mutex_m//lib/mutex_m.rb#81
   def mu_locked?; end
 
   # See Thread::Mutex#synchronize
   #
-  # source://mutex_m//mutex_m.rb#78
+  # source://mutex_m//lib/mutex_m.rb#76
   def mu_synchronize(&block); end
 
   # See Thread::Mutex#try_lock
   #
-  # source://mutex_m//mutex_m.rb#88
+  # source://mutex_m//lib/mutex_m.rb#86
   def mu_try_lock; end
 
   # See Thread::Mutex#unlock
   #
-  # source://mutex_m//mutex_m.rb#98
+  # source://mutex_m//lib/mutex_m.rb#96
   def mu_unlock; end
 
   # See Thread::Mutex#sleep
   #
-  # source://mutex_m//mutex_m.rb#103
+  # source://mutex_m//lib/mutex_m.rb#101
   def sleep(timeout = T.unsafe(nil)); end
 
   private
 
-  # source://mutex_m//mutex_m.rb#109
+  # source://mutex_m//lib/mutex_m.rb#107
   def mu_initialize; end
 
   class << self
-    # source://mutex_m//mutex_m.rb#56
+    # source://mutex_m//lib/mutex_m.rb#54
     def append_features(cl); end
 
-    # source://mutex_m//mutex_m.rb#46
+    # source://mutex_m//lib/mutex_m.rb#46
     def define_aliases(cl); end
 
-    # source://mutex_m//mutex_m.rb#61
+    # source://mutex_m//lib/mutex_m.rb#59
     def extend_object(obj); end
   end
 end
 
-# source://mutex_m//mutex_m.rb#43
+# source://mutex_m//lib/mutex_m.rb#43
 Mutex_m::VERSION = T.let(T.unsafe(nil), String)
