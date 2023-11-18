@@ -1,0 +1,40 @@
+name: Dependabot RBI Updater
+on:
+  pull_request:
+    paths:
+      - 'Gemfile.lock'
+      - 'Gemfile'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-rbis:
+    runs-on: ubuntu-latest
+    if: ${{ github.triggering_actor == 'dependabot[bot]' }}
+
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      -
+        name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      -
+        name: Update RBIs
+        run: bin/toys rbi all_types
+      -
+        name: Commit RBIs
+        run: |
+          git checkout ${{ github.head_ref }}
+          git config user.name "Dependabot RBI Updater"
+          git config user.email action@github.com
+          git add sorbet/rbi/*/*.rbi
+          git diff-index --quiet HEAD || git commit -m "[dependabot skip] Update RBIs"
+          git push

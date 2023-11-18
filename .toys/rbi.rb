@@ -30,6 +30,29 @@ tool :dsl do
   end
 end
 
+tool :all_types do
+  include :exec
+  include :terminal
+
+  def run_stage(name, tool)
+    puts("** #{name} started **", :blue, :bold)
+
+    if exec_tool(tool).success?
+      puts("** #{name} succeeded **", :green, :bold)
+      puts
+    else
+      puts("** CI terminated: #{name} failed!", :red, :bold)
+      exit(1)
+    end
+  end
+
+  def run
+    run_stage("Update Gem RBIs", ["rbi", "gems"])
+    run_stage("Update DSL RBIs", ["rbi", "dsl"])
+    run_stage("Update Annotations RBIs", ["rbi", "annotations"])
+  end
+end
+
 remaining_args :commands
 
 def run
