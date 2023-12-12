@@ -35,6 +35,6 @@ jobs:
           git checkout ${{ github.head_ref }}
           git config user.name "Dependabot RBI Updater"
           git config user.email action@github.com
-          git add sorbet/rbi/*/*.rbi
+          git add sorbet/*
           git diff-index --quiet HEAD || git commit -m "[dependabot skip] Update RBIs"
           git push
