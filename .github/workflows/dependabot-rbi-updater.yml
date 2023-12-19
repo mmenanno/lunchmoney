@@ -21,9 +21,7 @@ jobs:
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
-          token: ${{ env.RUBYGEMS_API_KEY }}
-        env:
-          RUBYGEMS_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
+          token: ${{ secrets.LUNCHMONEY_PAT_TOKEN }}
       -
         name: Setup Ruby
         uses: ruby/setup-ruby@v1
