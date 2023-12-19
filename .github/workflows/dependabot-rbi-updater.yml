@@ -5,10 +5,6 @@ on:
       - 'Gemfile.lock'
       - 'Gemfile'
 
-permissions:
-  contents: write
-  pull-requests: write
-
 jobs:
   update-rbis:
     runs-on: ubuntu-latest
@@ -20,6 +16,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+          token: ${{ secrets.LUNCHMONEY_PAT_TOKEN }}
           fetch-depth: 0
       -
         name: Setup Ruby
@@ -33,8 +30,8 @@ jobs:
         name: Commit RBIs
         run: |
           git checkout ${{ github.head_ref }}
-          git config user.name "Dependabot RBI Updater"
-          git config user.email action@github.com
-          git add sorbet/*
-          git diff-index --quiet HEAD || git commit -m "[dependabot skip] Update RBIs"
+          git config --local user.name "Dependabot RBI Updater"
+          git config --local user.email action@github.com
+          git commit -a -m "[dependabot skip] Update RBIs"
           git push
+
