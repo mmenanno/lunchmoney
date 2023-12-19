@@ -31,7 +31,8 @@ jobs:
         run: |
           git config --local user.name "Dependabot RBI Updater"
           git config --local user.email action@github.com
-          git commit -a -m "[dependabot skip] Update RBIs"
+          git add sorbet/*
+          git commit -m "[dependabot skip] Update RBIs"
       -
         name: Push changes
         uses: ad-m/github-push-action@v0.8.0
