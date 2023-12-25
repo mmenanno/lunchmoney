@@ -92,12 +92,12 @@ module Faraday
     # @example With an URL argument
     #   Faraday.new 'http://faraday.com'
     #   # => Faraday::Connection to http://faraday.com
+    # @example With an URL argument and an options hash
+    #   Faraday.new 'http://faraday.com', params: { page: 1 }
+    #   # => Faraday::Connection to http://faraday.com?page=1
     # @example With everything in an options hash
     #   Faraday.new url: 'http://faraday.com',
     #   params: { page: 1 }
-    #   # => Faraday::Connection to http://faraday.com?page=1
-    # @example With an URL argument and an options hash
-    #   Faraday.new 'http://faraday.com', params: { page: 1 }
     #   # => Faraday::Connection to http://faraday.com?page=1
     # @option options
     # @option options
@@ -2171,7 +2171,7 @@ class Faraday::Request::Json < ::Faraday::Middleware
 
   # @return [Boolean]
   #
-  # source://faraday//lib/faraday/request/json.rb#42
+  # source://faraday//lib/faraday/request/json.rb#48
   def body?(env); end
 
   # source://faraday//lib/faraday/request/json.rb#26
@@ -2179,15 +2179,15 @@ class Faraday::Request::Json < ::Faraday::Middleware
 
   # @yield []
   #
-  # source://faraday//lib/faraday/request/json.rb#30
+  # source://faraday//lib/faraday/request/json.rb#36
   def match_content_type(env); end
 
   # @return [Boolean]
   #
-  # source://faraday//lib/faraday/request/json.rb#37
+  # source://faraday//lib/faraday/request/json.rb#43
   def process_request?(env); end
 
-  # source://faraday//lib/faraday/request/json.rb#55
+  # source://faraday//lib/faraday/request/json.rb#61
   def request_type(env); end
 end
 
@@ -2374,28 +2374,31 @@ class Faraday::Response::Json < ::Faraday::Middleware
   # source://faraday//lib/faraday/response/json.rb#9
   def initialize(app = T.unsafe(nil), parser_options: T.unsafe(nil), content_type: T.unsafe(nil), preserve_raw: T.unsafe(nil)); end
 
-  # source://faraday//lib/faraday/response/json.rb#16
+  # source://faraday//lib/faraday/response/json.rb#18
   def on_complete(env); end
 
   private
 
-  # source://faraday//lib/faraday/response/json.rb#29
+  # source://faraday//lib/faraday/response/json.rb#31
   def parse(body); end
 
   # @return [Boolean]
   #
-  # source://faraday//lib/faraday/response/json.rb#33
+  # source://faraday//lib/faraday/response/json.rb#39
   def parse_response?(env); end
 
-  # source://faraday//lib/faraday/response/json.rb#22
+  # source://faraday//lib/faraday/response/json.rb#57
+  def process_parser_options; end
+
+  # source://faraday//lib/faraday/response/json.rb#24
   def process_response(env); end
 
   # @return [Boolean]
   #
-  # source://faraday//lib/faraday/response/json.rb#38
+  # source://faraday//lib/faraday/response/json.rb#44
   def process_response_type?(env); end
 
-  # source://faraday//lib/faraday/response/json.rb#45
+  # source://faraday//lib/faraday/response/json.rb#51
   def response_type(env); end
 end
 
