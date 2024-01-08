@@ -4478,7 +4478,7 @@ module Toys::DSL::Tool
   #     tool "foo" do
   #       to_run :foo
   #       def foo
-  #         puts "The fool tool ran!"
+  #         puts "The foo tool ran!"
   #       end
   #     end
   #
@@ -5162,7 +5162,7 @@ module Toys::DSL::Tool
   #     tool "foo" do
   #       to_run :foo
   #       def foo
-  #         puts "The fool tool ran!"
+  #         puts "The foo tool ran!"
   #       end
   #     end
   #
@@ -5530,7 +5530,8 @@ class Toys::Flag
   class << self
     # Create a flag definition.
     #
-    # @param used_flags [Array<String>] An array of flags already in use.
+    # @param key [String, Symbol] The key to use to retrieve the value from
+    #   the execution context.
     # @param flags [Array<String>] The flags in OptionParser format. If empty,
     #   a flag will be inferred from the key.
     # @param accept [Object] An acceptor that validates and/or converts the
@@ -5569,8 +5570,7 @@ class Toys::Flag
     #   for a description of allowed formats. Defaults to the empty array.
     # @param display_name [String] A display name for this flag, used in help
     #   text and error messages.
-    # @param key [String, Symbol] The key to use to retrieve the value from
-    #   the execution context.
+    # @param used_flags [Array<String>] An array of flags already in use.
     #
     # source://toys-core//lib/toys/flag.rb#437
     def create(key, flags = T.unsafe(nil), used_flags: T.unsafe(nil), report_collisions: T.unsafe(nil), accept: T.unsafe(nil), handler: T.unsafe(nil), default: T.unsafe(nil), complete_flags: T.unsafe(nil), complete_values: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), group: T.unsafe(nil)); end
@@ -6069,25 +6069,28 @@ class Toys::FlagGroup::Required < ::Toys::FlagGroup::Base
   def validation_errors(seen); end
 end
 
-# This module is a namespace for constant scopes. Whenever a configuration file
-# is parsed, a module is created under this parent for that file's constants.
+# This module is the root namespace for tool definitions loaded from files.
+# Whenever a toys configuration file is parsed, a module is created under this
+# parent for that file's contents. Tool classes defined in that file, along
+# with mixins and templates, and any other classes, modules, and constants
+# defined, are located within that file's module.
 #
-# source://toys-core//lib/toys/input_file.rb#7
+# source://toys-core//lib/toys/input_file.rb#10
 module Toys::InputFile
   class << self
     # @private
     #
-    # source://toys-core//lib/toys/input_file.rb#36
+    # source://toys-core//lib/toys/input_file.rb#39
     def __binding; end
 
     # @private
     #
-    # source://toys-core//lib/toys/input_file.rb#43
+    # source://toys-core//lib/toys/input_file.rb#46
     def build_eval_string(module_name, string); end
 
     # @private This interface is internal and subject to change without warning.
     #
-    # source://toys-core//lib/toys/input_file.rb#11
+    # source://toys-core//lib/toys/input_file.rb#14
     def evaluate(tool_class, words, priority, remaining_words, source, loader); end
   end
 end
@@ -7868,38 +7871,71 @@ Toys::Settings::Type::CONVERTERS = T.let(T.unsafe(nil), Hash)
 # Information about the source of a tool, such as the file, git repository,
 # or block that defined it.
 #
-# source://toys-core//lib/toys/source_info.rb#8
+# This object represents a source of tool information and definitions. Such a
+# source could include:
+#
+# * A toys directory
+# * A single toys file
+# * A file or directory loaded from git
+# * A config block passed directly to the CLI
+# * A tool block within a toys file
+#
+# The SourceInfo provides information such as the tool's context directory,
+# and locates data and lib directories appropriate to the tool. It also
+# locates the tool's source code so it can be reported when an error occurs.
+#
+# Each tool has a unique SourceInfo with all the information specific to that
+# tool. Additionally, SourceInfo objects are arranged in a containment
+# hierarchy. For example, a SourceInfo object representing a toys files could
+# have a parent representing a toys directory, and an object representing a
+# tool block could have a parent representing an enclosing block or a file.
+#
+# Child SourceInfo objects generally inherit some attributes of their parent.
+# For example, the `.toys` directory in a project directory defines the
+# context directory as that project directory. Then all tools defined under
+# that directory will share that context directory, so all SourceInfo objects
+# descending from that root will inherit that value (unless it's changed
+# explicitly).
+#
+# SourceInfo objects can be obtained in the DSL from
+# {Toys::DSL::Tool#source_info} or at runtime by getting the
+# {Toys::Context::Key::TOOL_SOURCE} key. However, they are created internally
+# by the Loader and should not be created manually.
+#
+# source://toys-core//lib/toys/source_info.rb#39
 class Toys::SourceInfo
   # Create a SourceInfo.
   #
   # @private This interface is internal and subject to change without warning.
   # @return [SourceInfo] a new instance of SourceInfo
   #
-  # source://toys-core//lib/toys/source_info.rb#145
+  # source://toys-core//lib/toys/source_info.rb#194
   def initialize(parent, priority, context_directory, source_type, source_path, source_proc, git_remote, git_path, git_commit, source_name, data_dir_name, lib_dir_name); end
 
   # Create a child SourceInfo with an absolute path.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/source_info.rb#194
+  # source://toys-core//lib/toys/source_info.rb#243
   def absolute_child(child_path, source_name: T.unsafe(nil)); end
 
   # Apply all lib paths in order from high to low priority
   #
   # @return [self]
   #
-  # source://toys-core//lib/toys/source_info.rb#134
+  # source://toys-core//lib/toys/source_info.rb#183
   def apply_lib_paths; end
 
   # The context directory path (normally the directory containing the
   # toplevel toys file or directory).
   #
-  # @return [String] The context directory path.
-  # @return [nil] if there is no context directory (perhaps because the tool
-  #   is being defined from a block)
+  # This is not affected by setting a custom context directory for a tool.
   #
-  # source://toys-core//lib/toys/source_info.rb#40
+  # @return [String] The context directory path.
+  # @return [nil] if there is no context directory (perhaps because the root
+  #   source was a block)
+  #
+  # source://toys-core//lib/toys/source_info.rb#74
   def context_directory; end
 
   # Locate the given data file or directory and return an absolute path.
@@ -7910,46 +7946,49 @@ class Toys::SourceInfo
   # @return [String] Absolute path of the resulting data.
   # @return [nil] if the data was not found.
   #
-  # source://toys-core//lib/toys/source_info.rb#114
+  # source://toys-core//lib/toys/source_info.rb#163
   def find_data(path, type: T.unsafe(nil)); end
 
   # Create a child SourceInfo with a git source.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/source_info.rb#206
+  # source://toys-core//lib/toys/source_info.rb#255
   def git_child(child_git_remote, child_git_path, child_git_commit, child_path, source_name: T.unsafe(nil)); end
 
-  # The git commit.
+  # The git commit. This is set if the source, or one of its ancestors, comes
+  # from git.
   #
   # @return [String] The git commit.
   # @return [nil] if this source is not fron git.
   #
-  # source://toys-core//lib/toys/source_info.rb#95
+  # source://toys-core//lib/toys/source_info.rb#144
   def git_commit; end
 
-  # The git path.
+  # The git path. This is set if the source, or one of its ancestors, comes
+  # from git.
   #
   # @return [String] The git path. This could be the empty string.
   # @return [nil] if this source is not fron git.
   #
-  # source://toys-core//lib/toys/source_info.rb#87
+  # source://toys-core//lib/toys/source_info.rb#135
   def git_path; end
 
-  # The git remote.
+  # The git remote. This is set if the source, or one of its ancestors, comes
+  # from git.
   #
   # @return [String] The git remote
   # @return [nil] if this source is not fron git.
   #
-  # source://toys-core//lib/toys/source_info.rb#79
+  # source://toys-core//lib/toys/source_info.rb#126
   def git_remote; end
 
   # The parent of this SourceInfo.
   #
   # @return [Toys::SourceInfo] The parent.
-  # @return [nil] if this SourceInfo is the root.
+  # @return [nil] if this SourceInfo is a root.
   #
-  # source://toys-core//lib/toys/source_info.rb#15
+  # source://toys-core//lib/toys/source_info.rb#46
   def parent; end
 
   # The priority of tools defined by this source. Higher values indicate a
@@ -7957,78 +7996,91 @@ class Toys::SourceInfo
   #
   # @return [Integer] The priority.
   #
-  # source://toys-core//lib/toys/source_info.rb#30
+  # source://toys-core//lib/toys/source_info.rb#62
   def priority; end
 
   # Create a proc child SourceInfo
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/source_info.rb#221
+  # source://toys-core//lib/toys/source_info.rb#270
   def proc_child(child_proc, source_name: T.unsafe(nil)); end
 
   # Create a child SourceInfo relative to the parent path.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/source_info.rb#170
+  # source://toys-core//lib/toys/source_info.rb#219
   def relative_child(filename, source_name: T.unsafe(nil)); end
 
-  # The root ancestor of this SourceInfo.
+  # The root ancestor of this SourceInfo. This generally represents a source
+  # that was added directly to a CLI in code.
   #
   # @return [Toys::SourceInfo] The root ancestor.
   #
-  # source://toys-core//lib/toys/source_info.rb#22
+  # source://toys-core//lib/toys/source_info.rb#54
   def root; end
 
-  # The source, which may be a path or a proc.
+  # The source, which may be a path or a proc depending on the {#source_type}.
   #
   # @return [String] Path to the source file or directory.
   # @return [Proc] The block serving as the source.
   #
-  # source://toys-core//lib/toys/source_info.rb#48
+  # source://toys-core//lib/toys/source_info.rb#82
   def source; end
 
-  # The user-visible name of this source.
+  # A user-visible name of this source.
   #
   # @return [String]
   #
-  # source://toys-core//lib/toys/source_info.rb#102
+  # source://toys-core//lib/toys/source_info.rb#151
   def source_name; end
 
   # The path of the current source file or directory.
   #
+  # This could be set even if {#source_type} is `:proc`, if that proc is
+  # defined within a toys file. The only time this is not set is if the
+  # source is added directly to a CLI in a code block.
+  #
   # @return [String] The source path
   # @return [nil] if this source has no file system path.
   #
-  # source://toys-core//lib/toys/source_info.rb#63
+  # source://toys-core//lib/toys/source_info.rb#109
   def source_path; end
 
-  # The source proc.
+  # The source proc. This is set if {#source_type} is `:proc`.
   #
   # @return [Proc] The source proc
   # @return [nil] if this source has no proc.
   #
-  # source://toys-core//lib/toys/source_info.rb#71
+  # source://toys-core//lib/toys/source_info.rb#117
   def source_proc; end
 
-  # Return the type of source.
+  # The type of source. This could be:
+  #
+  # * `:file`, representing a single toys file. The {#source} will be the
+  #   filesystem path to that file.
+  # * `:directory`, representing a toys directory. The {#source} will be the
+  #   filesystem path to that directory.
+  # * `:proc`, representing a proc, which could be a toplevel block added
+  #   directly to a CLI, a `tool` block within a toys file, or a block within
+  #   another block. The {#source} will be the proc itself.
   #
   # @return [:file, :directory, :proc]
   #
-  # source://toys-core//lib/toys/source_info.rb#55
+  # source://toys-core//lib/toys/source_info.rb#97
   def source_type; end
 
-  # The user-visible name of this source.
+  # A user-visible name of this source.
   #
   # @return [String]
   #
-  # source://toys-core//lib/toys/source_info.rb#102
+  # source://toys-core//lib/toys/source_info.rb#151
   def to_s; end
 
   private
 
-  # source://toys-core//lib/toys/source_info.rb#308
+  # source://toys-core//lib/toys/source_info.rb#357
   def find_special_dir(dir_name); end
 
   class << self
@@ -8036,28 +8088,28 @@ class Toys::SourceInfo
     #
     # @private This interface is internal and subject to change without warning.
     #
-    # source://toys-core//lib/toys/source_info.rb#286
+    # source://toys-core//lib/toys/source_info.rb#335
     def check_path(path, lenient); end
 
     # Create a root source info for a cached git repo.
     #
     # @private This interface is internal and subject to change without warning.
     #
-    # source://toys-core//lib/toys/source_info.rb#255
+    # source://toys-core//lib/toys/source_info.rb#304
     def create_git_root(git_remote, git_path, git_commit, source_path, priority, context_directory: T.unsafe(nil), data_dir_name: T.unsafe(nil), lib_dir_name: T.unsafe(nil), source_name: T.unsafe(nil)); end
 
     # Create a root source info for a file path.
     #
     # @private This interface is internal and subject to change without warning.
     #
-    # source://toys-core//lib/toys/source_info.rb#233
+    # source://toys-core//lib/toys/source_info.rb#282
     def create_path_root(source_path, priority, context_directory: T.unsafe(nil), data_dir_name: T.unsafe(nil), lib_dir_name: T.unsafe(nil), source_name: T.unsafe(nil)); end
 
     # Create a root source info for a proc.
     #
     # @private This interface is internal and subject to change without warning.
     #
-    # source://toys-core//lib/toys/source_info.rb#271
+    # source://toys-core//lib/toys/source_info.rb#320
     def create_proc_root(source_proc, priority, context_directory: T.unsafe(nil), data_dir_name: T.unsafe(nil), lib_dir_name: T.unsafe(nil), source_name: T.unsafe(nil)); end
   end
 end
