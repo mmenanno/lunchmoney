@@ -39,7 +39,7 @@ GEM
     json (2.7.1)
     language_server-protocol (3.17.0.3)
     method_source (1.0.0)
-    minitest (5.20.0)
+    minitest (5.21.1)
     mocha (2.1.0)
       ruby2_keywords (>= 0.0.5)
     mutex_m (0.2.0)
@@ -135,7 +135,7 @@ PLATFORMS
 DEPENDENCIES
   dotenv
   lunchmoney-ruby!
-  minitest (~> 5.20)
+  minitest (~> 5.21)
   mocha (~> 2.1.0)
   pry-sorbet (~> 0.2)
   rubocop-minitest
