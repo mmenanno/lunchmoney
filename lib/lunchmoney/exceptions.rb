@@ -7,4 +7,6 @@ module LunchMoney
   class InvalidApiKey < Exception; end
 
   class InvalidObjectAttribute < Exception; end
+
+  class InvalidQueryParameter < Exception; end
 end
