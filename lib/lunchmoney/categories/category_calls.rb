@@ -2,13 +2,24 @@
 # frozen_string_literal: true
 
 require_relative "category"
-require "pry"
 
 module LunchMoney
   class CategoryCalls < ApiCall
-    sig { returns(T.any(T::Array[LunchMoney::Category], LunchMoney::Errors)) }
-    def all_categories
-      response = get("categories")
+    VALID_FORMATS = T.let(
+      [
+        "flattened",
+        "nested",
+      ],
+      T::Array[String],
+    )
+
+    sig do
+      params(
+        format: T.nilable(T.any(String, Symbol)),
+      ).returns(T.any(T::Array[LunchMoney::Category], LunchMoney::Errors))
+    end
+    def all_categories(format: nil)
+      response = get("categories", query_params: all_categories_params(format:))
 
       api_errors = errors(response)
       return api_errors if api_errors.present?
@@ -170,6 +181,17 @@ module LunchMoney
       return api_errors if api_errors.present?
 
       response.body
+    end
+
+    private
+
+    sig { params(format: T.nilable(T.any(String, Symbol))).returns(T.nilable(T::Hash[String, String])) }
+    def all_categories_params(format:)
+      return unless format
+
+      raise(InvalidQueryParameter, "format must be either flattened or nested") if VALID_FORMATS.exclude?(format.to_s)
+
+      { format: format.to_s }
     end
   end
 end

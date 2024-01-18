@@ -3,8 +3,6 @@
 
 module LunchMoney
   class DataObject
-    require "pry"
-
     sig { params(symbolize_keys: T::Boolean).returns(T::Hash[String, T.untyped]) }
     def serialize(symbolize_keys: false)
       ivars = instance_variables
