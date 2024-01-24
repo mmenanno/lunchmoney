@@ -32,7 +32,7 @@ jobs:
         run: gem install yard yard-sorbet
 
       - name: Generate docs
-        run: yard docs -o doc
+        run: yard doc -o doc
 
       - name: Setup Github Pages
         uses: actions/configure-pages@v4
