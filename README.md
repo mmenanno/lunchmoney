@@ -4,6 +4,8 @@ This gem and readme are very much a work in progress. More to come!
 
 This gem is a library of the [LunchMoney API](https://lunchmoney.dev/) for the wonderful [LunchMoney](http://lunchmoney.app/) web app for personal finance & budgeting.
 
+You can find the yard docs for this gem [here](https://halorrr.github.io/lunchmoney-ruby/)
+
 ## Usage
 
 ### Installation
