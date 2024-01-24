@@ -4,6 +4,7 @@
 require_relative "crypto"
 
 module LunchMoney
+  # https://lunchmoney.dev/#crypto
   class CryptoCalls < ApiCall
     sig { returns(T.any(T::Array[LunchMoney::Crypto], LunchMoney::Errors)) }
     def crypto

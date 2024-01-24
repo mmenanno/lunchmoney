@@ -17,6 +17,9 @@ require_relative "plaid_accounts/plaid_account_calls"
 require_relative "crypto/crypto_calls"
 
 module LunchMoney
+  # The main API class that a user should interface through the method of any individual call is delegated through here
+  # so that it is never necessary to go through things like `LunchMoney::UserCalls.new.user` instead you can directly
+  # call the endpoint with LunchMoney::Api.new.user and it will be delegated to the correct call.
   class Api
     sig { returns(T.nilable(String)) }
     attr_reader :api_key

@@ -4,6 +4,7 @@
 require "time"
 
 module LunchMoney
+  # module containing reusable methods for validating data objects
   module Validators
     include Kernel
 

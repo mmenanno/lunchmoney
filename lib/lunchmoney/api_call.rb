@@ -4,7 +4,9 @@
 require_relative "error"
 
 module LunchMoney
+  # Base class for all API call types
   class ApiCall
+    # Base URL used for API calls
     BASE_URL = "https://dev.lunchmoney.app/v1/"
 
     sig { returns(T.nilable(String)) }

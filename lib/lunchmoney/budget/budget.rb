@@ -5,6 +5,7 @@ require_relative "data"
 require_relative "config"
 
 module LunchMoney
+  # https://lunchmoney.dev/#budget-object
   class Budget < LunchMoney::DataObject
     # API object reference documentation: https://lunchmoney.dev/#budget-object
 

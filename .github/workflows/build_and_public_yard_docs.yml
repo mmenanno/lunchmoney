@@ -1,0 +1,47 @@
+name: Build and Publish Yard Docs
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+    contents: read
+    pages: write
+    id-token: write
+
+concurrency:
+    group: "pages"
+    cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and Publish Yard Docs
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1.165.1
+        with:
+          ruby-version: 3.3.0
+          bundler-cache: true
+
+      - name: Install YARD
+        run: gem install yard
+
+      - name: Generate docs
+        run: yard docs
+
+      - name: Setup Github Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "doc"
+
+      - name: Publish to Github Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -148,6 +148,8 @@ DEPENDENCIES
   spoom
   tapioca
   toys
+  yard
+  yard-sorbet
 
 BUNDLED WITH
    2.5.3

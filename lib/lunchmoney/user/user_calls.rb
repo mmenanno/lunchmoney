@@ -4,6 +4,7 @@
 require_relative "user"
 
 module LunchMoney
+  # https://lunchmoney.dev/#user
   class UserCalls < ApiCall
     sig { returns(T.any(LunchMoney::User, LunchMoney::Errors)) }
     def user

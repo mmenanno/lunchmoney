@@ -2,6 +2,14 @@
 # frozen_string_literal: true
 
 module LunchMoney
+  # Holds global configuration options for this gem
+  # @example api_key
+  #   LunchMoney::Configuration.api_key
+  #   => "your_api_key"
+  #
+  # @example validate_object_attributes
+  #   LunchMoney::Configuration.validate_object_attributes
+  #   => true
   class Configuration
     sig { returns(T.nilable(String)) }
     attr_accessor :api_key

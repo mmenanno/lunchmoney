@@ -8,16 +8,28 @@ require "faraday"
 require "sorbet-runtime"
 
 # Include T::Sig directly in the module class so that it doesn't need to be extended everywhere.
-Module.include(T::Sig)
+class Module
+  include T::Sig
+end
 
 require_relative "lunchmoney/version"
 require_relative "lunchmoney/validators"
 require_relative "lunchmoney/api"
 
 module LunchMoney
+  # Lock used to avoid config conflicts
   LOCK = T.let(Mutex.new, Mutex)
 
   class << self
+    # @example Set your API key
+    #   LunchMoney.configure do |config|
+    #     config.api_key = "your_api_key"
+    #   end
+    #
+    # @example Turn off object validation
+    #   LunchMoney.configure do |config|
+    #     config.validate_object_attributes = false
+    #   end
     sig do
       params(block: T.proc.params(arg0: LunchMoney::Configuration).void).void
     end

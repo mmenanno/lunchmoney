@@ -6,6 +6,7 @@ require_relative "update_transaction"
 require_relative "split"
 
 module LunchMoney
+  # https://lunchmoney.dev/#transactions
   class TransactionCalls < ApiCall
     sig do
       params(

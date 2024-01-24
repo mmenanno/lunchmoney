@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 module LunchMoney
+  # Base data object for the objects returned and used when calling the LunchMoney API
   class DataObject
     sig { params(symbolize_keys: T::Boolean).returns(T::Hash[String, T.untyped]) }
     def serialize(symbolize_keys: false)

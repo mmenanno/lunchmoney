@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 module LunchMoney
+  # https://lunchmoney.dev/#crypto-object
   class Crypto < LunchMoney::DataObject
     sig { returns(T.nilable(Integer)) }
     attr_accessor :id, :zabo_account_id

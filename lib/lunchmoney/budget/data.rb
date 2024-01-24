@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 module LunchMoney
+  # https://lunchmoney.dev/#data-object
   class Data < LunchMoney::DataObject
     # API object reference documentation: https://lunchmoney.dev/#data-object
 

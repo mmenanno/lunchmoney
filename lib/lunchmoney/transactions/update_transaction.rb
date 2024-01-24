@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 module LunchMoney
+  # object used when updating a transaction https://lunchmoney.dev/#update-transaction
   class UpdateTransaction < LunchMoney::DataObject
     sig { returns(T.nilable(String)) }
     attr_accessor :date, :payee, :amount, :currency, :notes, :status, :external_id

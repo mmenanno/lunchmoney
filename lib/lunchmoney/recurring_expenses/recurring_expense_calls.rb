@@ -4,6 +4,7 @@
 require_relative "recurring_expense"
 
 module LunchMoney
+  # https://lunchmoney.dev/#recurring-expenses
   class RecurringExpenseCalls < ApiCall
     sig do
       params(

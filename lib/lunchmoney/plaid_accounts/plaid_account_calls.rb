@@ -4,6 +4,7 @@
 require_relative "plaid_account"
 
 module LunchMoney
+  # https://lunchmoney.dev/#plaid-accounts
   class PlaidAccountCalls < ApiCall
     sig { returns(T.any(T::Array[LunchMoney::PlaidAccount], LunchMoney::Errors)) }
     def plaid_accounts
