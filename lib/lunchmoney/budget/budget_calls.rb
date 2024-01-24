@@ -4,6 +4,7 @@
 require_relative "budget"
 
 module LunchMoney
+  # https://lunchmoney.dev/#budget
   class BudgetCalls < ApiCall
     sig do
       params(

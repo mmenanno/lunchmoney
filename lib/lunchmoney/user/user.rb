@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 module LunchMoney
+  # https://lunchmoney.dev/#user-object
   class User < LunchMoney::DataObject
     sig { returns(Integer) }
     attr_accessor :user_id, :account_id

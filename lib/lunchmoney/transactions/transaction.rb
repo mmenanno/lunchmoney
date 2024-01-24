@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 module LunchMoney
+  # https://lunchmoney.dev/#transaction-object
   class Transaction < LunchMoney::DataObject
     sig { returns(T.nilable(Integer)) }
     attr_accessor :id, :to_base, :category_id, :recurring_id, :asset_id, :plaid_account_id, :parent_id, :group_id

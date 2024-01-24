@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 module LunchMoney
+  # https://lunchmoney.dev/#tags-object
   class Tag < LunchMoney::DataObject
     sig { returns(Integer) }
     attr_accessor :id

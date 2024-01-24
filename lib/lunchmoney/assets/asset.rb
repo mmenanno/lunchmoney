@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 module LunchMoney
+  # https://lunchmoney.dev/#assets-object
   class Asset < LunchMoney::DataObject
     # API object reference documentation: https://lunchmoney.dev/#assets-object
 
@@ -25,6 +26,7 @@ module LunchMoney
     sig { returns(T::Boolean) }
     attr_accessor :exclude_transactions
 
+    # Valid asset type names
     VALID_TYPE_NAMES = T.let(
       [
         "cash",
@@ -41,6 +43,7 @@ module LunchMoney
       T::Array[String],
     )
 
+    # Valid asset subtype names
     VALID_SUBTYPE_NAMES = T.let(
       [
         "retirement",

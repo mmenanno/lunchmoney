@@ -4,6 +4,7 @@
 require_relative "asset"
 
 module LunchMoney
+  # https://lunchmoney.dev/#assets
   class AssetCalls < ApiCall
     sig { returns(T.any(T::Array[LunchMoney::Asset], LunchMoney::Errors)) }
     def assets

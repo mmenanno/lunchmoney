@@ -4,6 +4,7 @@
 require_relative "tag"
 
 module LunchMoney
+  # https://lunchmoney.dev/#tags
   class TagCalls < ApiCall
     sig { returns(T.any(T::Array[LunchMoney::Tag], LunchMoney::Errors)) }
     def all_tags

@@ -4,7 +4,9 @@
 require_relative "category"
 
 module LunchMoney
+  # https://lunchmoney.dev/#categories
   class CategoryCalls < ApiCall
+    # Valid query parameter formets for categories
     VALID_FORMATS = T.let(
       [
         "flattened",

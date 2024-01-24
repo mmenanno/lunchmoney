@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 module LunchMoney
+  # Object used to split a transaction when updating https://lunchmoney.dev/#update-transaction
   class Split < LunchMoney::DataObject
     sig { returns(T.nilable(String)) }
     attr_accessor :payee, :date, :notes
