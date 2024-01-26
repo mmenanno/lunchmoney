@@ -44,6 +44,6 @@ class PlaidAccountCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::PlaidAccountCalls.new.plaid_accounts_fetch
 
-    assert_kind_of(LunchMoney::Error, api_call.first)
+    assert_kind_of(LunchMoney::Error, T.unsafe(api_call).first)
   end
 end
