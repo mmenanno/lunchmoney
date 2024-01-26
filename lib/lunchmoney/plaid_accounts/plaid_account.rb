@@ -52,24 +52,23 @@ module LunchMoney
       balance_last_update:, display_name:, id:, plaid_last_successful_update:, limit: nil, subtype: nil,
       import_start_date: nil, last_fetch: nil)
       super()
+      @id = id
       @date_linked = date_linked
       @name = name
       @display_name = display_name
       @type = type
+      @subtype = subtype
       @mask = mask
       @institution_name = institution_name
       @status = status
-      @last_import = last_import
+      @limit = limit
       @balance = balance
       @currency = currency
       @balance_last_update = balance_last_update
-      @id = id
-      @plaid_last_successful_update = plaid_last_successful_update
-      @limit = limit
-      @subtype = subtype
-      @balance_last_update = balance_last_update
       @import_start_date = import_start_date
+      @last_import = last_import
       @last_fetch = last_fetch
+      @plaid_last_successful_update = plaid_last_successful_update
     end
   end
 end
