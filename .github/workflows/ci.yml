@@ -37,3 +37,7 @@ jobs:
       -
         name: Run Tests
         run: bin/toys test
+        env:
+          REMOTE_TESTS_ENABLED: ${{ vars.REMOTE_TESTS_ENABLED }}
+          LUNCHMONEY_TOKEN: ${{ secrets.LUNCHMONEY_TOKEN }}
+
