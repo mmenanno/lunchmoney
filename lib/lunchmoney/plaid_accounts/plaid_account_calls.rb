@@ -34,7 +34,7 @@ module LunchMoney
       params.reject! { |_key, value| value.nil? }
 
       response = post("plaid_accounts/fetch", params)
-      # binding.pry
+
       api_errors = errors(response)
       return api_errors if api_errors.present?
 
