@@ -17,5 +17,28 @@ module LunchMoney
         LunchMoney::PlaidAccount.new(**plaid_account)
       end
     end
+
+    sig do
+      params(
+        start_date: T.nilable(String),
+        end_date: T.nilable(String),
+        plaid_account_id: T.nilable(Integer),
+      ).returns(T.any(T::Boolean, LunchMoney::Errors))
+    end
+    def plaid_accounts_fetch(start_date: nil, end_date: nil, plaid_account_id: nil)
+      params = {
+        start_date:,
+        end_date:,
+        plaid_account_id:,
+      }
+      params.reject! { |_key, value| value.nil? }
+
+      response = post("plaid_accounts/fetch", params)
+      # binding.pry
+      api_errors = errors(response)
+      return api_errors if api_errors.present?
+
+      response.body
+    end
   end
 end
