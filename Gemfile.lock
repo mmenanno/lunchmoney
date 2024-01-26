@@ -19,12 +19,16 @@ GEM
       minitest (>= 5.1)
       mutex_m
       tzinfo (~> 2.0)
+    addressable (2.8.6)
+      public_suffix (>= 2.0.2, < 6.0)
     ast (2.4.2)
     base64 (0.2.0)
     bigdecimal (3.1.6)
     coderay (1.1.3)
     concurrent-ruby (1.2.3)
     connection_pool (2.4.1)
+    crack (0.4.5)
+      rexml
     dotenv (2.8.1)
     drb (2.2.0)
       ruby2_keywords
@@ -33,6 +37,7 @@ GEM
       faraday-net_http (>= 2.0, < 3.2)
     faraday-net_http (3.1.0)
       net-http
+    hashdiff (1.1.0)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     json (2.7.1)
@@ -56,6 +61,7 @@ GEM
       method_source (~> 1.0)
     pry-sorbet (0.2.1)
       pry
+    public_suffix (5.0.4)
     racc (1.7.3)
     rack (3.0.8)
     rainbow (3.1.1)
@@ -123,6 +129,11 @@ GEM
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.5.0)
     uri (0.13.0)
+    vcr (6.2.0)
+    webmock (3.19.1)
+      addressable (>= 2.8.0)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
     yard (0.9.34)
     yard-sorbet (0.8.1)
       sorbet-runtime (>= 0.5)
@@ -148,6 +159,8 @@ DEPENDENCIES
   spoom
   tapioca
   toys
+  vcr
+  webmock
   yard
   yard-sorbet
 
