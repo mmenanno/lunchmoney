@@ -113,7 +113,7 @@ module LunchMoney
       end
     end
 
-    delegate :plaid_accounts, to: :plaid_account_calls
+    delegate :plaid_accounts, :plaid_accounts_fetch, to: :plaid_account_calls
 
     sig { returns(LunchMoney::ApiCall) }
     def plaid_account_calls
