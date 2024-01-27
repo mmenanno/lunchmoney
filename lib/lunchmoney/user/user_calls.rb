@@ -7,7 +7,7 @@ module LunchMoney
   # https://lunchmoney.dev/#user
   class UserCalls < ApiCall
     sig { returns(T.any(LunchMoney::User, LunchMoney::Errors)) }
-    def user
+    def me
       response = get("me")
 
       api_errors = errors(response)

@@ -29,7 +29,7 @@ module LunchMoney
       @api_key = T.let((api_key || LunchMoney.configuration.api_key), T.nilable(String))
     end
 
-    delegate :user, to: :user_calls
+    delegate :me, to: :user_calls
 
     sig { returns(LunchMoney::ApiCall) }
     def user_calls
