@@ -65,4 +65,30 @@ class AssetTest < ActiveSupport::TestCase
 
     assert_match(/is not a valid ISO 8601 string/, error.message)
   end
+
+  private
+
+  sig do
+    params(
+      type_name: String,
+      subtype_name: String,
+      balance_as_of: String,
+      created_at: String,
+    ).returns(LunchMoney::Asset)
+  end
+  def create_asset(type_name: "cash", subtype_name: "physical cash", balance_as_of: "2023-01-01T01:01:01.000Z",
+    created_at: "2023-01-01T01:01:01.000Z")
+    LunchMoney::Asset.new(
+      "id": 1,
+      "type_name": type_name,
+      "subtype_name": subtype_name,
+      "name": "Test Asset 1",
+      "balance": "1201.0100",
+      "balance_as_of": balance_as_of,
+      "currency": "cad",
+      "institution_name": "Bank of Me",
+      "exclude_transactions": false,
+      "created_at": created_at,
+    )
+  end
 end

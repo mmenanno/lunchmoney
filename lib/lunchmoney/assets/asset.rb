@@ -44,10 +44,12 @@ module LunchMoney
     # Valid asset subtype names
     VALID_SUBTYPE_NAMES = T.let(
       [
-        "retirement",
         "checking",
         "savings",
-        "prepaid credit card",
+        "digital wallet (paypal, venmo)",
+        "physical cash",
+        "gift card",
+        "store credit",
       ],
       T::Array[String],
     )
