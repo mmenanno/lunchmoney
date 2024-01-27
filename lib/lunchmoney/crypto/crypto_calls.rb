@@ -24,7 +24,7 @@ module LunchMoney
         name: T.nilable(String),
         display_name: T.nilable(String),
         institution_name: T.nilable(String),
-        balance: T.nilable(Integer),
+        balance: T.nilable(String),
         currency: T.nilable(String),
       ).returns(T.any(LunchMoney::Crypto, LunchMoney::Errors))
     end
@@ -37,7 +37,9 @@ module LunchMoney
         currency:,
       }
 
-      response = put("assets/manual/#{crypto_id}", params)
+      params.reject! { |_key, value| value.nil? }
+
+      response = put("crypto/manual/#{crypto_id}", params)
 
       api_errors = errors(response)
       return api_errors if api_errors.present?

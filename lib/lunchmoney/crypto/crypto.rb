@@ -8,10 +8,10 @@ module LunchMoney
     attr_accessor :id, :zabo_account_id
 
     sig { returns(String) }
-    attr_accessor :source, :name, :balance, :balance_as_of, :currency, :status, :institution_name, :created_at
+    attr_accessor :source, :name, :balance, :balance_as_of, :currency, :status, :created_at
 
     sig { returns(T.nilable(String)) }
-    attr_accessor :display_name
+    attr_accessor :display_name, :institution_name
 
     sig do
       params(
@@ -22,14 +22,14 @@ module LunchMoney
         balance_as_of: String,
         currency: String,
         status: String,
-        institution_name: String,
+        institution_name: T.nilable(String),
         id: T.nilable(Integer),
         zabo_account_id: T.nilable(Integer),
         display_name: T.nilable(String),
       ).void
     end
     def initialize(created_at:, source:, name:, balance:, balance_as_of:, currency:,
-      status:, institution_name:, id: nil, zabo_account_id: nil, display_name: nil)
+      status:, institution_name: nil, id: nil, zabo_account_id: nil, display_name: nil)
       super()
       @created_at = created_at
       @source = source
