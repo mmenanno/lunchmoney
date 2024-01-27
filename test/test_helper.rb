@@ -32,6 +32,20 @@ VCR.configure do |config|
     end
   end
 
+  config.filter_sensitive_data("<USER_NAME>") do |interaction|
+    if interaction.request.uri == "https://dev.lunchmoney.app/v1/me"
+      response = JSON.parse(interaction.response.body)
+      response["user_name"]
+    end
+  end
+
+  config.filter_sensitive_data("<USER_EMAIL>") do |interaction|
+    if interaction.request.uri == "https://dev.lunchmoney.app/v1/me"
+      response = JSON.parse(interaction.response.body)
+      response["user_email"]
+    end
+  end
+
   config.allow_http_connections_when_no_cassette = true if ENV.fetch("VCR_RECORD", nil)
 end
 
