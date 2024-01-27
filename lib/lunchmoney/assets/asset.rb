@@ -4,8 +4,6 @@
 module LunchMoney
   # https://lunchmoney.dev/#assets-object
   class Asset < LunchMoney::DataObject
-    # API object reference documentation: https://lunchmoney.dev/#assets-object
-
     include LunchMoney::Validators
 
     sig { returns(Integer) }
