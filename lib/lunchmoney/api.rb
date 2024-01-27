@@ -55,7 +55,7 @@ module LunchMoney
       end
     end
 
-    delegate :all_tags, to: :tag_calls
+    delegate :tags, to: :tag_calls
 
     sig { returns(LunchMoney::ApiCall) }
     def tag_calls
