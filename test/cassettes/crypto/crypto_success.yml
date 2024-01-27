@@ -1,0 +1,53 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://dev.lunchmoney.app/v1/crypto
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v2.9.0
+      Authorization:
+      - Bearer <BEARER_TOKEN>
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - Cowboy
+      Report-To:
+      - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1706328556&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=34C6iXlWykeKldb26g6PZZFBNMWIDy0JOxgvICSbWrQ%3D"}]}'
+      Reporting-Endpoints:
+      - heroku-nel=https://nel.heroku.com/reports?ts=1706328556&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=34C6iXlWykeKldb26g6PZZFBNMWIDy0JOxgvICSbWrQ%3D
+      Nel:
+      - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
+      Connection:
+      - keep-alive
+      X-Powered-By:
+      - Express
+      Vary:
+      - Origin, Accept-Encoding
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Content-Type:
+      - application/json; charset=utf-8
+      Content-Length:
+      - '254'
+      Etag:
+      - W/"fe-VyxYqtWHqNckX0s0a0rVtu6ZGt0"
+      Date:
+      - Sat, 27 Jan 2024 04:09:16 GMT
+      Via:
+      - 1.1 vegur
+    body:
+      encoding: UTF-8
+      string: '{"crypto":[{"id":7638,"source":"manual","created_at":"2024-01-27T01:45:52.493Z","name":"Bitcoin","display_name":null,"balance":"1.000000000000000000","balance_as_of":"2024-01-27T04:05:02.937Z","currency":"BTC","status":"active","institution_name":null}]}'
+  recorded_at: Sat, 27 Jan 2024 04:09:16 GMT
+recorded_with: VCR 6.2.0
