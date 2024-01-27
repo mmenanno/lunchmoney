@@ -13,7 +13,9 @@ class PlaidAccountCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::PlaidAccountCalls.new.plaid_accounts
 
-    assert_kind_of(LunchMoney::PlaidAccount, api_call.first)
+    api_call.each do |plaid_account|
+      assert_kind_of(LunchMoney::PlaidAccount, plaid_account)
+    end
   end
 
   test "plaid_accounts returns an array of Error objects on error response" do
@@ -22,7 +24,9 @@ class PlaidAccountCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::PlaidAccountCalls.new.plaid_accounts
 
-    assert_kind_of(LunchMoney::Error, api_call.first)
+    api_call.each do |error|
+      assert_kind_of(LunchMoney::Error, error)
+    end
   end
 
   test "plaid_accounts_fetch returns a boolean response on success" do
@@ -40,6 +44,8 @@ class PlaidAccountCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::PlaidAccountCalls.new.plaid_accounts_fetch
 
-    assert_kind_of(LunchMoney::Error, T.unsafe(api_call).first)
+    T.unsafe(api_call).each do |error|
+      assert_kind_of(LunchMoney::Error, error)
+    end
   end
 end
