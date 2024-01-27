@@ -12,14 +12,11 @@ module LunchMoney
     sig { returns(String) }
     attr_reader :type_name, :balance_as_of, :created_at
 
-    sig { returns(T.nilable(String)) }
-    attr_reader :subtype_name
-
     sig { returns(String) }
     attr_accessor :name, :balance, :currency
 
     sig { returns(T.nilable(String)) }
-    attr_accessor :display_name, :closed_on, :institution_name
+    attr_accessor :display_name, :closed_on, :institution_name, :subtype_name
 
     sig { returns(T::Boolean) }
     attr_accessor :exclude_transactions
@@ -37,19 +34,6 @@ module LunchMoney
         "employee compensation",
         "other liability",
         "other asset",
-      ],
-      T::Array[String],
-    )
-
-    # Valid asset subtype names
-    VALID_SUBTYPE_NAMES = T.let(
-      [
-        "checking",
-        "savings",
-        "digital wallet (paypal, venmo)",
-        "physical cash",
-        "gift card",
-        "store credit",
       ],
       T::Array[String],
     )
@@ -81,10 +65,7 @@ module LunchMoney
       @currency = currency
       @exclude_transactions = exclude_transactions
       @id = id
-      @subtype_name = T.let(
-        subtype_name.nil? ? subtype_name : validate_one_of!(subtype_name, VALID_SUBTYPE_NAMES),
-        T.nilable(String),
-      )
+      @subtype_name = subtype_name
       @display_name = display_name
       @closed_on = closed_on
       @institution_name = institution_name
@@ -93,13 +74,6 @@ module LunchMoney
     sig { params(name: String).void }
     def type_name=(name)
       @type_name = validate_one_of!(name, VALID_TYPE_NAMES)
-    end
-
-    sig { params(name: T.nilable(String)).void }
-    def subtype_name=(name)
-      return unless name
-
-      @subtype_name = validate_one_of!(name, VALID_TYPE_NAMES)
     end
 
     sig { params(time: String).void }
