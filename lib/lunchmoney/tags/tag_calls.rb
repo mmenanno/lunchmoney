@@ -7,7 +7,7 @@ module LunchMoney
   # https://lunchmoney.dev/#tags
   class TagCalls < ApiCall
     sig { returns(T.any(T::Array[LunchMoney::Tag], LunchMoney::Errors)) }
-    def all_tags
+    def tags
       response = get("tags")
 
       api_errors = errors(response)
