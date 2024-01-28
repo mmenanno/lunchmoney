@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require_relative "tag"
+require_relative "transaction_tag"
 
 module LunchMoney
   # https://lunchmoney.dev/#tags
