@@ -1,8 +1,8 @@
 # typed: strict
 # frozen_string_literal: true
 
-require_relative "tag"
-require_relative "transaction_tag"
+require_relative "tag/tag_base"
+require_relative "tag/tag"
 
 module LunchMoney
   # https://lunchmoney.dev/#tags

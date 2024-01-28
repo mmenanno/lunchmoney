@@ -3,13 +3,7 @@
 
 module LunchMoney
   # https://lunchmoney.dev/#tags-object
-  class Tag < LunchMoney::DataObject
-    sig { returns(Integer) }
-    attr_accessor :id
-
-    sig { returns(String) }
-    attr_accessor :name
-
+  class Tag < TagBase
     sig { returns(T.nilable(String)) }
     attr_accessor :description
 
@@ -18,9 +12,7 @@ module LunchMoney
 
     sig { params(id: Integer, name: String, archived: T::Boolean, description: T.nilable(String)).void }
     def initialize(id:, name:, archived:, description: nil)
-      super()
-      @id = id
-      @name = name
+      super(id:, name:)
       @archived = archived
       @description = description
     end

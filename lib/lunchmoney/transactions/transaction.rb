@@ -57,7 +57,7 @@ module LunchMoney
     sig { returns(T::Boolean) }
     attr_accessor :is_income, :exclude_from_budget, :exclude_from_totals, :is_pending, :has_children, :is_group
 
-    sig { returns(T::Array[LunchMoney::Tag]) }
+    sig { returns(T::Array[LunchMoney::TagBase]) }
     attr_accessor :tags
 
     sig { returns(T.nilable(T::Array[LunchMoney::ChildTransaction])) }
@@ -83,7 +83,7 @@ module LunchMoney
         source: String,
         display_name: String,
         account_display_name: String,
-        tags: T::Array[LunchMoney::Tag],
+        tags: T::Array[LunchMoney::TagBase],
         category_id: T.nilable(Integer),
         category_name: T.nilable(String),
         category_group_id: T.nilable(Integer),
