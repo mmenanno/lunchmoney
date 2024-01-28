@@ -14,7 +14,7 @@ class BudgetCallsTest < ActiveSupport::TestCase
     end
   end
 
-  test "assets returns an array of Error objects on error response" do
+  test "budgets returns an array of Error objects on error response" do
     response = mock_faraday_lunchmoney_error_response
     LunchMoney::BudgetCalls.any_instance.stubs(:get).returns(response)
 
