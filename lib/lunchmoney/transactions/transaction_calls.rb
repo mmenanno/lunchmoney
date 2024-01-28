@@ -181,6 +181,16 @@ module LunchMoney
       response.body
     end
 
+    sig { params(transaction_id: Integer).returns(T.any(LunchMoney::Transaction, LunchMoney::Errors)) }
+    def transaction_group(transaction_id)
+      response = get("transactions/group", query_params: { transaction_id: })
+
+      api_errors = errors(response)
+      return api_errors if api_errors.present?
+
+      LunchMoney::Transaction.new(**response.body)
+    end
+
     sig do
       params(
         date: String,
