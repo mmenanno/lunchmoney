@@ -48,10 +48,11 @@ module LunchMoney
         group_id: T.nilable(Integer),
         is_group: T.nilable(T::Boolean),
         config: T.nilable(T::Hash[Symbol, LunchMoney::Config]),
+        recurring: T.untyped, # TODO: Better type this field
       ).void
     end
     def initialize(is_income:, exclude_from_budget:, exclude_from_totals:, data:, category_name:, order:, archived:,
-      category_id: nil, category_group_name: nil, group_id: nil, is_group: nil, config: nil)
+      category_id: nil, category_group_name: nil, group_id: nil, is_group: nil, config: nil, recurring: nil)
       super()
       @category_id = category_id
       @is_income = is_income
@@ -65,6 +66,7 @@ module LunchMoney
       @is_group = is_group
       @config = config
       @archived = archived
+      @recurring = recurring
     end
   end
 end
