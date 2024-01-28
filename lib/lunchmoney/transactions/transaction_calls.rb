@@ -85,7 +85,7 @@ module LunchMoney
         debit_as_negative: T.nilable(T::Boolean),
       ).returns(T.any(LunchMoney::Transaction, LunchMoney::Errors))
     end
-    def single_transaction(transaction_id:, debit_as_negative: nil)
+    def transaction(transaction_id, debit_as_negative: nil)
       params = {
         debit_as_negative:,
       }

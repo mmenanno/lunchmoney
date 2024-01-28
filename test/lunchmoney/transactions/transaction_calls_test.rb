@@ -26,4 +26,23 @@ class TransactionCallsTest < ActiveSupport::TestCase
       assert_kind_of(LunchMoney::Error, error)
     end
   end
+
+  test "transaction returns an array of Transaction objects on success response" do
+    VCR.use_cassette("transactions/transaction_success") do
+      api_call = LunchMoney::TransactionCalls.new.transaction(893631800)
+
+      assert_kind_of(LunchMoney::Transaction, api_call)
+    end
+  end
+
+  test "transaction returns an array of Error objects on error response" do
+    response = mock_faraday_lunchmoney_error_response
+    LunchMoney::TransactionCalls.any_instance.stubs(:get).returns(response)
+
+    api_call = LunchMoney::TransactionCalls.new.transaction(893631800)
+
+    T.unsafe(api_call).each do |error|
+      assert_kind_of(LunchMoney::Error, error)
+    end
+  end
 end
