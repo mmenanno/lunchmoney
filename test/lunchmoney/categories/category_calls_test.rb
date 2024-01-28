@@ -10,7 +10,9 @@ class CategoryCallsTest < ActiveSupport::TestCase
     VCR.use_cassette("categories/categories_success") do
       api_call = LunchMoney::CategoryCalls.new.categories
 
-      assert_kind_of(LunchMoney::Category, api_call.first)
+      api_call.each do |category|
+        assert_kind_of(LunchMoney::Category, category)
+      end
     end
   end
 
@@ -20,7 +22,9 @@ class CategoryCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::CategoryCalls.new.categories(format: "flattened")
 
-    assert_kind_of(LunchMoney::Error, api_call.first)
+    api_call.each do |error|
+      assert_kind_of(LunchMoney::Error, error)
+    end
   end
 
   test "categories does not raise an error when called with flattened format" do
@@ -51,5 +55,31 @@ class CategoryCallsTest < ActiveSupport::TestCase
     end
 
     assert_equal("format must be either flattened or nested", error.message)
+  end
+
+  test "category returns a Category object on success response with regular category" do
+    VCR.use_cassette("categories/category_category_success") do
+      api_call = LunchMoney::CategoryCalls.new.category(777052)
+
+      assert_kind_of(LunchMoney::Category, api_call)
+    end
+  end
+
+  test "category returns a Category object on success response with category group" do
+    VCR.use_cassette("categories/category_category_group_success") do
+      api_call = LunchMoney::CategoryCalls.new.category(777021)
+
+      assert_kind_of(LunchMoney::Category, api_call)
+    end
+  end
+
+  test "category returns an array of Error objects on error response" do
+    VCR.use_cassette("categories/category_does_not_exist_failure") do
+      api_call = LunchMoney::CategoryCalls.new.category(1)
+
+      T.unsafe(api_call).each do |error|
+        assert_kind_of(LunchMoney::Error, error)
+      end
+    end
   end
 end

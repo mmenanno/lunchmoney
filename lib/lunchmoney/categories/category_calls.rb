@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require_relative "category"
+require_relative "child_category"
 
 module LunchMoney
   # https://lunchmoney.dev/#categories
@@ -34,13 +35,13 @@ module LunchMoney
     end
 
     sig { params(category_id: Integer).returns(T.any(LunchMoney::Category, LunchMoney::Errors)) }
-    def single_category(category_id)
+    def category(category_id)
       response = get("categories/#{category_id}")
 
       api_errors = errors(response)
       return api_errors if api_errors.present?
 
-      response.body[:children].map! { |child_category| LunchMoney::Category.new(**child_category) }
+      response.body[:children]&.map! { |child_category| LunchMoney::ChildCategory.new(**child_category) }
 
       LunchMoney::Category.new(**response.body)
     end
