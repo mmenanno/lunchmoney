@@ -95,7 +95,7 @@ module LunchMoney
       end
     end
 
-    delegate :budget_summary, :upsert_budget, :remove_budget, to: :budget_calls
+    delegate :budgets, :upsert_budget, :remove_budget, to: :budget_calls
 
     sig { returns(LunchMoney::ApiCall) }
     def budget_calls

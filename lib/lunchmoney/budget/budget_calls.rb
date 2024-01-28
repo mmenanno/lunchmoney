@@ -13,7 +13,7 @@ module LunchMoney
         currency: T.nilable(String),
       ).returns(T.any(T::Array[LunchMoney::Budget], LunchMoney::Errors))
     end
-    def budget_summary(start_date:, end_date:, currency: nil)
+    def budgets(start_date:, end_date:, currency: nil)
       params = {
         start_date:,
         end_date:,

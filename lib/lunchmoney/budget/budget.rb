@@ -25,7 +25,7 @@ module LunchMoney
     attr_accessor :is_group
 
     sig { returns(T::Boolean) }
-    attr_accessor :is_income, :exclude_from_budget, :exclude_from_totals
+    attr_accessor :is_income, :exclude_from_budget, :exclude_from_totals, :archived
 
     sig { returns(T::Hash[Symbol, LunchMoney::Data]) }
     attr_accessor :data
@@ -42,6 +42,7 @@ module LunchMoney
         data: T::Hash[Symbol, LunchMoney::Data],
         category_name: String,
         order: Integer,
+        archived: T::Boolean,
         category_id: T.nilable(Integer),
         category_group_name: T.nilable(String),
         group_id: T.nilable(Integer),
@@ -49,8 +50,8 @@ module LunchMoney
         config: T.nilable(T::Hash[Symbol, LunchMoney::Config]),
       ).void
     end
-    def initialize(is_income:, exclude_from_budget:, exclude_from_totals:, data:,
-      category_name:, order:, category_id: nil, category_group_name: nil, group_id: nil, is_group: nil, config: nil)
+    def initialize(is_income:, exclude_from_budget:, exclude_from_totals:, data:, category_name:, order:, archived:,
+      category_id: nil, category_group_name: nil, group_id: nil, is_group: nil, config: nil)
       super()
       @category_id = category_id
       @is_income = is_income
@@ -63,6 +64,7 @@ module LunchMoney
       @group_id = group_id
       @is_group = is_group
       @config = config
+      @archived = archived
     end
   end
 end

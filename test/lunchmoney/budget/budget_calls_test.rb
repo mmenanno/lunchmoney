@@ -7,22 +7,19 @@ class BudgetCallsTest < ActiveSupport::TestCase
   include MockResponseHelper
   include FakeResponseDataHelper
 
-  test "assets returns an array of Asset objects on success response" do
-    response = mock_faraday_response(fake_budget_summary_response)
+  test "budgets returns an array of Budget objects on success response" do
+    VCR.use_cassette("budget/budgets_success") do
+      api_call = LunchMoney::BudgetCalls.new.budgets(start_date: "2023-01-01", end_date: "2024-01-01")
 
-    LunchMoney::BudgetCalls.any_instance.stubs(:get).returns(response)
-
-    api_call = LunchMoney::BudgetCalls.new.budget_summary(start_date: "", end_date: "")
-
-    assert_kind_of(LunchMoney::Budget, api_call.first)
+      assert_kind_of(LunchMoney::Budget, api_call.first)
+    end
   end
 
   test "assets returns an array of Error objects on error response" do
     response = mock_faraday_response(fake_general_error)
-
     LunchMoney::BudgetCalls.any_instance.stubs(:get).returns(response)
 
-    api_call = LunchMoney::BudgetCalls.new.budget_summary(start_date: "", end_date: "")
+    api_call = LunchMoney::BudgetCalls.new.budgets(start_date: "2023-01-01", end_date: "2024-01-01")
 
     assert_kind_of(LunchMoney::Error, api_call.first)
   end
