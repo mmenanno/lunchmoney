@@ -5,6 +5,8 @@ on:
     paths-ignore:
       - ".gitignore"
       - "README.md"
+  workflow_dispatch:
+
 jobs:
   validate:
     name: Validate code
