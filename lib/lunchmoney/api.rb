@@ -65,7 +65,7 @@ module LunchMoney
     end
 
     delegate :transactions,
-      :single_transaction,
+      :transaction,
       :insert_transactions,
       :update_transaction,
       :unsplit_transaction,
