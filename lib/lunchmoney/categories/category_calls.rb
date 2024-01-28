@@ -20,8 +20,8 @@ module LunchMoney
         format: T.nilable(T.any(String, Symbol)),
       ).returns(T.any(T::Array[LunchMoney::Category], LunchMoney::Errors))
     end
-    def all_categories(format: nil)
-      response = get("categories", query_params: all_categories_params(format:))
+    def categories(format: nil)
+      response = get("categories", query_params: categories_params(format:))
 
       api_errors = errors(response)
       return api_errors if api_errors.present?
@@ -188,7 +188,7 @@ module LunchMoney
     private
 
     sig { params(format: T.nilable(T.any(String, Symbol))).returns(T.nilable(T::Hash[String, String])) }
-    def all_categories_params(format:)
+    def categories_params(format:)
       return unless format
 
       raise(InvalidQueryParameter, "format must be either flattened or nested") if VALID_FORMATS.exclude?(format.to_s)

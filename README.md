@@ -40,7 +40,7 @@ Create an instance of the api, then call the endpoint you need:
 
 ```Ruby
 api = LunchMoney::Api.new
-api.all_categories
+api.categories
 ```
 
 ## Contributing to this repo
