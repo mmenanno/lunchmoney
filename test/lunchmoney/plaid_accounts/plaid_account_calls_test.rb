@@ -31,7 +31,7 @@ class PlaidAccountCallsTest < ActiveSupport::TestCase
     VCR.use_cassette("plaid_accounts/plaid_accounts_fetch_success") do
       api_call = LunchMoney::PlaidAccountCalls.new.plaid_accounts_fetch
 
-      assert_kind_of(FalseClass, api_call)
+      assert_kind_of(TrueClass, api_call)
     end
   end
 
