@@ -1,10 +1,11 @@
 # typed: strict
 # frozen_string_literal: true
 
-require_relative "transaction"
-require_relative "child_transaction"
-require_relative "update_transaction"
-require_relative "split"
+require_relative "transaction/transaction_base"
+require_relative "transaction/child_transaction"
+require_relative "transaction/transaction"
+require_relative "transaction/split"
+require_relative "transaction/update_transaction"
 
 module LunchMoney
   # https://lunchmoney.dev/#transactions
