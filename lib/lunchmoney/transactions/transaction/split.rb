@@ -3,13 +3,7 @@
 
 module LunchMoney
   # Object used to split a transaction when updating https://lunchmoney.dev/#update-transaction
-  class Split < LunchMoney::DataObject
-    sig { returns(T.nilable(String)) }
-    attr_accessor :payee, :date, :notes
-
-    sig { returns(T.nilable(Integer)) }
-    attr_accessor :category_id
-
+  class Split < TransactionModificationBase
     sig { returns(T.any(Integer, String)) }
     attr_accessor :amount
 
@@ -23,12 +17,8 @@ module LunchMoney
       ).void
     end
     def initialize(amount:, payee: nil, date: nil, category_id: nil, notes: nil)
-      super()
+      super(payee:, date:, category_id:, notes:)
       @amount = amount
-      @payee = payee
-      @date = date
-      @category_id = category_id
-      @notes = notes
     end
   end
 end

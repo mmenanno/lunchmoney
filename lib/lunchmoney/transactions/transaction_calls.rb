@@ -4,6 +4,7 @@
 require_relative "transaction/transaction_base"
 require_relative "transaction/child_transaction"
 require_relative "transaction/transaction"
+require_relative "transaction/transaction_modification_base"
 require_relative "transaction/split"
 require_relative "transaction/update_transaction"
 
