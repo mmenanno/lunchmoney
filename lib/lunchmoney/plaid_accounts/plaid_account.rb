@@ -14,7 +14,6 @@ module LunchMoney
       :mask,
       :institution_name,
       :status,
-      :last_import,
       :balance,
       :currency,
       :balance_last_update,
@@ -22,7 +21,7 @@ module LunchMoney
       :plaid_last_successful_update
 
     sig { returns(T.nilable(String)) }
-    attr_accessor :subtype, :import_start_date, :last_fetch
+    attr_accessor :subtype, :import_start_date, :last_fetch, :last_import
 
     sig { returns(T.nilable(Integer)) }
     attr_accessor :limit
@@ -35,22 +34,22 @@ module LunchMoney
         mask: String,
         institution_name: String,
         status: String,
-        last_import: String,
         balance: String,
         currency: String,
         balance_last_update: String,
         display_name: String,
         id: Integer,
         plaid_last_successful_update: String,
+        last_import: T.nilable(String),
         limit: T.nilable(Integer),
         subtype: T.nilable(String),
         import_start_date: T.nilable(String),
         last_fetch: T.nilable(String),
       ).void
     end
-    def initialize(date_linked:, name:, type:, mask:, institution_name:, status:, last_import:, balance:, currency:,
-      balance_last_update:, display_name:, id:, plaid_last_successful_update:, limit: nil, subtype: nil,
-      import_start_date: nil, last_fetch: nil)
+    def initialize(date_linked:, name:, type:, mask:, institution_name:, status:, balance:, currency:,
+      balance_last_update:, display_name:, id:, plaid_last_successful_update:, last_import: nil, limit: nil,
+      subtype: nil, import_start_date: nil, last_fetch: nil)
       super()
       @id = id
       @date_linked = date_linked
