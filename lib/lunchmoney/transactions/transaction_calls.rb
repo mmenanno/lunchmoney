@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require_relative "transaction"
+require_relative "child_transaction"
 require_relative "update_transaction"
 require_relative "split"
 
@@ -15,15 +16,14 @@ module LunchMoney
         plaid_account_id: T.nilable(Integer),
         category_id: T.nilable(Integer),
         asset_id: T.nilable(Integer),
-        group_id: T.nilable(Integer),
         is_group: T.nilable(T::Boolean),
         status: T.nilable(String),
-        offset: T.nilable(Integer),
-        limit: T.nilable(Integer),
         start_date: T.nilable(String),
         end_date: T.nilable(String),
         debit_as_negative: T.nilable(T::Boolean),
         pending: T.nilable(T::Boolean),
+        offset: T.nilable(Integer),
+        limit: T.nilable(Integer),
       ).returns(T.any(T::Array[LunchMoney::Transaction], LunchMoney::Errors))
     end
     def transactions(
@@ -32,15 +32,14 @@ module LunchMoney
       plaid_account_id: nil,
       category_id: nil,
       asset_id: nil,
-      group_id: nil,
       is_group: nil,
       status: nil,
-      offset: nil,
-      limit: nil,
       start_date: nil,
       end_date: nil,
       debit_as_negative: nil,
-      pending: nil
+      pending: nil,
+      offset: nil,
+      limit: nil
     )
 
       params = {
@@ -49,15 +48,14 @@ module LunchMoney
         plaid_account_id:,
         category_id:,
         asset_id:,
-        group_id:,
         is_group:,
         status:,
-        offset:,
-        limit:,
         start_date:,
         end_date:,
         debit_as_negative:,
         pending:,
+        offset:,
+        limit:,
       }
       params.reject! { |_key, value| value.nil? }
 
@@ -71,7 +69,9 @@ module LunchMoney
       return api_errors if api_errors.present?
 
       response.body[:transactions].map do |transaction|
-        transaction[:tags]&.map! { |tag| LunchMoney::Tag.new(tag) }
+        transaction[:tags].map! { |tag| LunchMoney::TransactionTag.new(**tag) }
+
+        transaction[:children]&.map! { |child_transaction| LunchMoney::ChildTransaction.new(**child_transaction) }
 
         LunchMoney::Transaction.new(**transaction)
       end
