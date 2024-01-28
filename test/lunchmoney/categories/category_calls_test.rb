@@ -5,7 +5,6 @@ require "test_helper"
 
 class CategoryCallsTest < ActiveSupport::TestCase
   include MockResponseHelper
-  include FakeResponseDataHelper
 
   test "categories returns an array of Category objects on success response" do
     VCR.use_cassette("categories/categories_success") do
@@ -16,7 +15,7 @@ class CategoryCallsTest < ActiveSupport::TestCase
   end
 
   test "categories returns an array of Error objects on error response" do
-    response = mock_faraday_response(fake_general_error)
+    response = mock_faraday_lunchmoney_error_response
     LunchMoney::CategoryCalls.any_instance.stubs(:get).returns(response)
 
     api_call = LunchMoney::CategoryCalls.new.categories(format: "flattened")

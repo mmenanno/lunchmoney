@@ -4,8 +4,6 @@
 require "test_helper"
 
 class AssetTest < ActiveSupport::TestCase
-  include FakeResponseDataHelper
-
   test "type_name can be set to known valid types" do
     LunchMoney::Asset::VALID_TYPE_NAMES.each do |type_name|
       assert_nothing_raised do
