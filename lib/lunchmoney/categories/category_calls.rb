@@ -1,8 +1,8 @@
 # typed: strict
 # frozen_string_literal: true
 
-require_relative "category"
-require_relative "child_category"
+require_relative "category/child_category"
+require_relative "category/category"
 
 module LunchMoney
   # https://lunchmoney.dev/#categories
