@@ -39,7 +39,7 @@ module LunchMoney
     end
 
     delegate :categories,
-      :single_category,
+      :category,
       :create_category,
       :create_category_group,
       :update_category,

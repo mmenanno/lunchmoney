@@ -11,7 +11,7 @@ module LunchMoney
     attr_accessor :name
 
     sig { returns(T.nilable(String)) }
-    attr_accessor :description, :archived_on, :updated_at, :created_at
+    attr_accessor :description, :archived_on, :updated_at, :created_at, :group_category_name
 
     sig { returns(T.nilable(T::Boolean)) }
     attr_accessor :archived
@@ -22,7 +22,7 @@ module LunchMoney
     sig { returns(T.nilable(Integer)) }
     attr_accessor :group_id, :order
 
-    sig { returns(T.nilable(T::Array[LunchMoney::Category])) }
+    sig { returns(T.nilable(T::Array[T.any(LunchMoney::Category, LunchMoney::ChildCategory)])) }
     attr_accessor :children
 
     sig do
@@ -40,11 +40,13 @@ module LunchMoney
         group_id: T.nilable(Integer),
         order: T.nilable(Integer),
         description: T.nilable(String),
-        children: T.nilable(T::Array[LunchMoney::Category]),
+        children: T.nilable(T::Array[T.any(LunchMoney::Category, LunchMoney::ChildCategory)]),
+        group_category_name: T.nilable(String),
       ).void
     end
     def initialize(id:, name:, is_income:, exclude_from_budget:, exclude_from_totals:, is_group:, archived: nil,
-      archived_on: nil, updated_at: nil, created_at: nil, group_id: nil, order: nil, description: nil, children: nil)
+      archived_on: nil, updated_at: nil, created_at: nil, group_id: nil, order: nil, description: nil, children: nil,
+      group_category_name: nil)
       super()
       @id = id
       @name = name
@@ -60,6 +62,7 @@ module LunchMoney
       @order = order
       @description = description
       @children = children
+      @group_category_name = group_category_name
     end
   end
 end
