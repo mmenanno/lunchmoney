@@ -2,8 +2,9 @@
 # frozen_string_literal: true
 
 module LunchMoney
-  # https://lunchmoney.dev/#tags-object without some fields. This is used for the returns from transactions calls
-  class TransactionTag < LunchMoney::DataObject
+  # https://lunchmoney.dev/#tags-object without some fields. This is used within field returns of other objects like
+  # field returns of other objects like transactions
+  class TagBase < LunchMoney::DataObject
     sig { returns(Integer) }
     attr_accessor :id
 

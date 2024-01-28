@@ -3,29 +3,17 @@
 
 module LunchMoney
   # https://lunchmoney.dev/#transaction-object
-  class Transaction < LunchMoney::DataObject
-    sig { returns(Integer) }
-    attr_accessor :id
-
-    sig { returns(T.any(Integer, Float)) }
-    attr_accessor :to_base
-
+  class Transaction < TransactionBase
     sig { returns(T.nilable(Integer)) }
     attr_accessor :category_id,
       :category_group_id,
       :recurring_id,
       :parent_id,
       :group_id,
-      :asset_id,
-      :plaid_account_id,
       :external_id
 
     sig { returns(String) }
-    attr_accessor :date,
-      :amount,
-      :currency,
-      :payee,
-      :created_at,
+    attr_accessor :created_at,
       :updated_at,
       :status,
       :source,
@@ -35,7 +23,6 @@ module LunchMoney
     sig { returns(T.nilable(String)) }
     attr_accessor :category_name,
       :category_group_name,
-      :notes,
       :original_name,
       :recurring_payee,
       :recurring_description,
@@ -57,7 +44,7 @@ module LunchMoney
     sig { returns(T::Boolean) }
     attr_accessor :is_income, :exclude_from_budget, :exclude_from_totals, :is_pending, :has_children, :is_group
 
-    sig { returns(T::Array[LunchMoney::Tag]) }
+    sig { returns(T::Array[LunchMoney::TagBase]) }
     attr_accessor :tags
 
     sig { returns(T.nilable(T::Array[LunchMoney::ChildTransaction])) }
@@ -83,7 +70,7 @@ module LunchMoney
         source: String,
         display_name: String,
         account_display_name: String,
-        tags: T::Array[LunchMoney::Tag],
+        tags: T::Array[LunchMoney::TagBase],
         category_id: T.nilable(Integer),
         category_name: T.nilable(String),
         category_group_id: T.nilable(Integer),
@@ -124,13 +111,7 @@ module LunchMoney
       asset_name: nil, asset_display_name: nil, asset_status: nil, plaid_account_id: nil, plaid_account_name: nil,
       plaid_account_mask: nil, institution_name: nil, plaid_account_display_name: nil, plaid_metadata: nil,
       display_notes: nil, external_id: nil, children: nil)
-      super()
-      @id = id
-      @date = date
-      @amount = amount
-      @currency = currency
-      @to_base = to_base
-      @payee = payee
+      super(id:, date:, amount:, currency:, to_base:, payee:, notes:, asset_id:, plaid_account_id:)
       @is_income = is_income
       @exclude_from_budget = exclude_from_budget
       @exclude_from_totals = exclude_from_totals
@@ -148,7 +129,6 @@ module LunchMoney
       @category_name = category_name
       @category_group_id = category_group_id
       @category_group_name = category_group_name
-      @notes = notes
       @original_name = original_name
       @recurring_id = recurring_id
       @recurring_payee = recurring_payee
@@ -159,12 +139,10 @@ module LunchMoney
       @recurring_currency = recurring_currency
       @parent_id = parent_id
       @group_id = group_id
-      @asset_id = asset_id
       @asset_institution_name = asset_institution_name
       @asset_name = asset_name
       @asset_display_name = asset_display_name
       @asset_status = asset_status
-      @plaid_account_id = plaid_account_id
       @plaid_account_name = plaid_account_name
       @plaid_account_mask = plaid_account_mask
       @institution_name = institution_name

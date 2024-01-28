@@ -3,18 +3,9 @@
 
 module LunchMoney
   # https://lunchmoney.dev/#categories-object
-  class Category < LunchMoney::DataObject
-    sig { returns(Integer) }
-    attr_accessor :id
-
-    sig { returns(String) }
-    attr_accessor :name
-
+  class Category < ChildCategory
     sig { returns(T.nilable(String)) }
-    attr_accessor :description, :archived_on, :updated_at, :created_at, :group_category_name
-
-    sig { returns(T.nilable(T::Boolean)) }
-    attr_accessor :archived
+    attr_accessor :group_category_name
 
     sig { returns(T::Boolean) }
     attr_accessor :is_income, :exclude_from_budget, :exclude_from_totals, :is_group
@@ -47,20 +38,13 @@ module LunchMoney
     def initialize(id:, name:, is_income:, exclude_from_budget:, exclude_from_totals:, is_group:, archived: nil,
       archived_on: nil, updated_at: nil, created_at: nil, group_id: nil, order: nil, description: nil, children: nil,
       group_category_name: nil)
-      super()
-      @id = id
-      @name = name
+      super(id:, name:, archived:, archived_on:, updated_at:, created_at:, description:)
       @is_income = is_income
       @exclude_from_budget = exclude_from_budget
       @exclude_from_totals = exclude_from_totals
       @is_group = is_group
-      @archived = archived
-      @archived_on = archived_on
-      @updated_at = updated_at
-      @created_at = created_at
       @group_id = group_id
       @order = order
-      @description = description
       @children = children
       @group_category_name = group_category_name
     end

@@ -1,10 +1,12 @@
 # typed: strict
 # frozen_string_literal: true
 
-require_relative "transaction"
-require_relative "child_transaction"
-require_relative "update_transaction"
-require_relative "split"
+require_relative "transaction/transaction_base"
+require_relative "transaction/child_transaction"
+require_relative "transaction/transaction"
+require_relative "transaction/transaction_modification_base"
+require_relative "transaction/split"
+require_relative "transaction/update_transaction"
 
 module LunchMoney
   # https://lunchmoney.dev/#transactions
@@ -69,7 +71,7 @@ module LunchMoney
       return api_errors if api_errors.present?
 
       response.body[:transactions].map do |transaction|
-        transaction[:tags].map! { |tag| LunchMoney::TransactionTag.new(**tag) }
+        transaction[:tags].map! { |tag| LunchMoney::TagBase.new(**tag) }
 
         transaction[:children]&.map! { |child_transaction| LunchMoney::ChildTransaction.new(**child_transaction) }
 
