@@ -30,7 +30,6 @@ module LunchMoney
     sig { returns(T::Hash[Symbol, LunchMoney::Data]) }
     attr_accessor :data
 
-    # TODO: this needs to be better typed
     sig { returns(T.nilable(T::Hash[Symbol, LunchMoney::Config])) }
     attr_accessor :config
 
