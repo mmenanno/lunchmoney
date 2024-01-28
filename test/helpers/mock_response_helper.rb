@@ -16,4 +16,9 @@ module MockResponseHelper
     mock.stubs(:body).returns(body)
     mock
   end
+
+  sig { returns(Faraday::Response) }
+  def mock_faraday_lunchmoney_error_response
+    mock_faraday_response({ error: "This is an error" })
+  end
 end

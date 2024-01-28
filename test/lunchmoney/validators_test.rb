@@ -4,7 +4,7 @@
 require "test_helper"
 
 class ValidatorsTest < ActiveSupport::TestCase
-  include ConfigurationStubs
+  include ConfigurationHelper
   include LunchMoney::Validators
 
   setup do

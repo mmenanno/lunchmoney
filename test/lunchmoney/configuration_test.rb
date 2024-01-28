@@ -4,7 +4,7 @@
 require "test_helper"
 
 class ConfigurationTest < ActiveSupport::TestCase
-  include EnvironmentHelper
+  include ConfigurationHelper
 
   test "token defaults to LUNCHMONEY_TOKEN variable when set" do
     with_environment({ "LUNCHMONEY_TOKEN" => "test_token" }) do

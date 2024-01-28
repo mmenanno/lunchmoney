@@ -5,11 +5,9 @@ require "test_helper"
 
 class TagCallsTest < ActiveSupport::TestCase
   include MockResponseHelper
-  include FakeResponseDataHelper
 
   test "tags returns an array of Tag objects on success response" do
     VCR.use_cassette("tags/tags_success") do
-      ensure_correct_api_key
       api_call = LunchMoney::TagCalls.new.tags
 
       api_call.each do |tag|
@@ -19,7 +17,7 @@ class TagCallsTest < ActiveSupport::TestCase
   end
 
   test "tags returns an array of Error objects on error response" do
-    response = mock_faraday_response(fake_general_error)
+    response = mock_faraday_lunchmoney_error_response
     LunchMoney::TagCalls.any_instance.stubs(:get).returns(response)
 
     api_call = LunchMoney::TagCalls.new.tags
