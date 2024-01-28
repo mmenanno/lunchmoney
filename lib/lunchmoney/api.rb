@@ -69,6 +69,7 @@ module LunchMoney
       :insert_transactions,
       :update_transaction,
       :unsplit_transaction,
+      :transaction_group,
       :create_transaction_group,
       :delete_transaction_group,
       to: :transaction_calls
