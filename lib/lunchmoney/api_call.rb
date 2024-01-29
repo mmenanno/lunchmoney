@@ -19,7 +19,7 @@ module LunchMoney
 
     private
 
-    sig { params(endpoint: String, query_params: T.nilable(T::Hash[String, T.untyped])).returns(Faraday::Response) }
+    sig { params(endpoint: String, query_params: T.nilable(T::Hash[Symbol, T.untyped])).returns(Faraday::Response) }
     def get(endpoint, query_params: nil)
       connection = request(flat_params: true)
 
@@ -30,12 +30,12 @@ module LunchMoney
       end
     end
 
-    sig { params(endpoint: String, params: T.nilable(T::Hash[String, T.untyped])).returns(Faraday::Response) }
+    sig { params(endpoint: String, params: T.nilable(T::Hash[Symbol, T.untyped])).returns(Faraday::Response) }
     def post(endpoint, params)
       request(json_request: true).post(BASE_URL + endpoint, params)
     end
 
-    sig { params(endpoint: String, body: T::Hash[String, T.untyped]).returns(Faraday::Response) }
+    sig { params(endpoint: String, body: T::Hash[Symbol, T.untyped]).returns(Faraday::Response) }
     def put(endpoint, body)
       request(json_request: true).put(BASE_URL + endpoint) do |req|
         req.body = body
@@ -96,6 +96,11 @@ module LunchMoney
       elsif body[:name] == "Error"
         body[:message]
       end
+    end
+
+    sig { params(params: T::Hash[Symbol, T.untyped]).returns(T::Hash[Symbol, T.untyped]) }
+    def clean_params(params)
+      params.reject! { |_key, value| value.nil? }
     end
   end
 end

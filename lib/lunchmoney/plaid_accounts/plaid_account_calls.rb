@@ -26,12 +26,11 @@ module LunchMoney
       ).returns(T.any(T::Boolean, LunchMoney::Errors))
     end
     def plaid_accounts_fetch(start_date: nil, end_date: nil, plaid_account_id: nil)
-      params = {
+      params = clean_params({
         start_date:,
         end_date:,
         plaid_account_id:,
-      }
-      params.reject! { |_key, value| value.nil? }
+      })
 
       response = post("plaid_accounts/fetch", params)
 

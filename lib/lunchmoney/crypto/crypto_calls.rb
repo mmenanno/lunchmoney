@@ -29,15 +29,13 @@ module LunchMoney
       ).returns(T.any(LunchMoney::Crypto, LunchMoney::Errors))
     end
     def update_crypto(crypto_id, name: nil, display_name: nil, institution_name: nil, balance: nil, currency: nil)
-      params = {
+      params = clean_params({
         name:,
         display_name:,
         institution_name:,
         balance:,
         currency:,
-      }
-
-      params.reject! { |_key, value| value.nil? }
+      })
 
       response = put("crypto/manual/#{crypto_id}", params)
 

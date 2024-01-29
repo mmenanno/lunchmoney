@@ -38,4 +38,17 @@ class ApiCallTest < ActiveSupport::TestCase
       assert_includes(error_messages, error.message)
     end
   end
+
+  test "clean_params removes params with nil values from hash" do
+    test_params = {
+      param_with_value: "param_with_value",
+      other_param_with_value: "other_param_with_value",
+      param_without_value: nil,
+      other_param_without_value: nil,
+    }
+
+    cleaned_params = LunchMoney::ApiCall.new.send(:clean_params, test_params)
+
+    assert_equal(2, cleaned_params.keys.count)
+  end
 end
