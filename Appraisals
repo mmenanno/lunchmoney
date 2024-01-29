@@ -8,9 +8,9 @@ appraise "activesupport-7-0" do
   gem "activesupport", "~> 7.0"
 end
 
-appraise "sorbet-runtime-5-5175" do
-  gem "activesupport", "0.5.5175" # oldest 0.5 version
-end
+# appraise "sorbet-runtime-5-5175" do
+#   gem "sorbet-runtime", "0.5.5175" # oldest 0.5 version
+# end
 
 appraise "faraday-1-0" do
   gem "faraday", "~> 1.0"
