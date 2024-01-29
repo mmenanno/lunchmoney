@@ -134,7 +134,6 @@ module LunchMoney
         archived:,
         group_id:,
       })
-
       response = put("categories/#{category_id}", params)
 
       api_errors = errors(response)

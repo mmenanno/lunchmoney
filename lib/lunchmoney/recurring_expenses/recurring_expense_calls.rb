@@ -13,16 +13,8 @@ module LunchMoney
       ).returns(T.any(T::Array[LunchMoney::RecurringExpense], LunchMoney::Errors))
     end
     def recurring_expenses(start_date: nil, end_date: nil)
-      params = clean_params({
-        start_date:,
-        end_date:,
-      })
-
-      response = if params.empty?
-        get("recurring_expenses")
-      else
-        get("recurring_expenses", query_params: params)
-      end
+      params = clean_params({ start_date:, end_date: })
+      response = get("recurring_expenses", query_params: params)
 
       api_errors = errors(response)
       return api_errors if api_errors.present?

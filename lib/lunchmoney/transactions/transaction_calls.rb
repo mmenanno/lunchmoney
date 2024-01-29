@@ -59,12 +59,7 @@ module LunchMoney
         offset:,
         limit:,
       })
-
-      response = if params.empty?
-        get("transactions")
-      else
-        get("transactions", query_params: params)
-      end
+      response = get("transactions", query_params: params)
 
       api_errors = errors(response)
       return api_errors if api_errors.present?
@@ -85,15 +80,8 @@ module LunchMoney
       ).returns(T.any(LunchMoney::Transaction, LunchMoney::Errors))
     end
     def transaction(transaction_id, debit_as_negative: nil)
-      params = clean_params({
-        debit_as_negative:,
-      })
-
-      response = if params.empty?
-        get("transactions/#{transaction_id}")
-      else
-        get("transactions/#{transaction_id}", query_params: params)
-      end
+      params = clean_params({ debit_as_negative: })
+      response = get("transactions/#{transaction_id}", query_params: params)
 
       api_errors = errors(response)
       return api_errors if api_errors.present?
@@ -121,7 +109,6 @@ module LunchMoney
         debit_as_negative:,
         skip_balance_update:,
       })
-
       response = post("transactions", params)
 
       api_errors = errors(response)
@@ -147,7 +134,6 @@ module LunchMoney
         debit_as_negative:,
         skip_balance_update:,
       })
-
       response = put("transactions/#{transaction_id}", params)
 
       api_errors = errors(response)
@@ -163,11 +149,7 @@ module LunchMoney
       ).returns(T.any(T::Array[Integer], LunchMoney::Errors))
     end
     def unsplit_transaction(parent_ids, remove_parents:)
-      params = clean_params({
-        parent_ids:,
-        remove_parents:,
-      })
-
+      params = clean_params({ parent_ids:, remove_parents: })
       response = post("transactions/unsplit", params)
 
       api_errors = errors(response)
@@ -205,7 +187,6 @@ module LunchMoney
         notes:,
         tags:,
       })
-
       response = post("transactions/group", params)
 
       api_errors = errors(response)

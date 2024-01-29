@@ -23,7 +23,7 @@ module LunchMoney
     def get(endpoint, query_params: nil)
       connection = request(flat_params: true)
 
-      if query_params
+      if query_params.present?
         connection.get(BASE_URL + endpoint, query_params)
       else
         connection.get(BASE_URL + endpoint)
