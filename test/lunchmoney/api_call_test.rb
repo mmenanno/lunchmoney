@@ -51,4 +51,14 @@ class ApiCallTest < ActiveSupport::TestCase
 
     assert_equal(2, cleaned_params.keys.count)
   end
+
+  test "get does not send query params when empty" do
+    response = mock_faraday_response({})
+    endpoint = LunchMoney::ApiCall::BASE_URL + "me"
+
+    Faraday::Connection.any_instance.expects(:get).with(endpoint).returns(response).once
+    Faraday::Connection.any_instance.expects(:get).with(endpoint, {}).returns(response).never
+
+    LunchMoney::ApiCall.new.send(:get, "me", query_params: {})
+  end
 end
