@@ -125,7 +125,7 @@ module LunchMoney
     def update_category(category_id, name: nil, description: nil, is_income: nil, exclude_from_budget: nil,
       exclude_from_totals: nil, archived: nil, group_id: nil)
 
-      params = {
+      params = clean_params({
         name:,
         description:,
         is_income:,
@@ -133,9 +133,7 @@ module LunchMoney
         exclude_from_totals:,
         archived:,
         group_id:,
-      }
-
-      params.reject! { |_key, value| value.nil? }
+      })
 
       response = put("categories/#{category_id}", params)
 
@@ -188,7 +186,7 @@ module LunchMoney
 
     private
 
-    sig { params(format: T.nilable(T.any(String, Symbol))).returns(T.nilable(T::Hash[String, String])) }
+    sig { params(format: T.nilable(T.any(String, Symbol))).returns(T.nilable(T::Hash[Symbol, String])) }
     def categories_params(format:)
       return unless format
 

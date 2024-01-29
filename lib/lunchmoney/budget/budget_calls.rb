@@ -14,12 +14,11 @@ module LunchMoney
       ).returns(T.any(T::Array[LunchMoney::Budget], LunchMoney::Errors))
     end
     def budgets(start_date:, end_date:, currency: nil)
-      params = {
+      params = clean_params({
         start_date:,
         end_date:,
         currency:,
-      }
-      params.reject! { |_key, value| value.nil? }
+      })
 
       response = get("budgets", query_params: params)
 
@@ -45,13 +44,12 @@ module LunchMoney
       ))
     end
     def upsert_budget(start_date:, category_id:, amount:, currency: nil)
-      params = {
+      params = clean_params({
         start_date:,
         category_id:,
         amount:,
         currency:,
-      }
-      params.reject! { |_key, value| value.nil? }
+      })
 
       response = put("budgets", params)
 

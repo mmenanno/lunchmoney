@@ -44,7 +44,7 @@ module LunchMoney
       limit: nil
     )
 
-      params = {
+      params = clean_params({
         tag_id:,
         recurring_id:,
         plaid_account_id:,
@@ -58,8 +58,7 @@ module LunchMoney
         pending:,
         offset:,
         limit:,
-      }
-      params.reject! { |_key, value| value.nil? }
+      })
 
       response = if params.empty?
         get("transactions")
@@ -86,10 +85,9 @@ module LunchMoney
       ).returns(T.any(LunchMoney::Transaction, LunchMoney::Errors))
     end
     def transaction(transaction_id, debit_as_negative: nil)
-      params = {
+      params = clean_params({
         debit_as_negative:,
-      }
-      params.reject! { |_key, value| value.nil? }
+      })
 
       response = if params.empty?
         get("transactions/#{transaction_id}")
@@ -115,15 +113,14 @@ module LunchMoney
     end
     def insert_transactions(transactions, apply_rules: nil, skip_duplicates: nil,
       check_for_recurring: nil, debit_as_negative: nil, skip_balance_update: nil)
-      params = {
+      params = clean_params({
         transactions: transactions.map(&:serialize),
         apply_rules:,
         skip_duplicates:,
         check_for_recurring:,
         debit_as_negative:,
         skip_balance_update:,
-      }
-      params.reject! { |_key, value| value.nil? }
+      })
 
       response = post("transactions", params)
 
@@ -144,13 +141,12 @@ module LunchMoney
     end
     def update_transaction(transaction_id, transaction:, split: nil,
       debit_as_negative: nil, skip_balance_update: nil)
-      params = {
+      params = clean_params({
         transaction: transaction.serialize,
         split: split&.serialize,
         debit_as_negative:,
         skip_balance_update:,
-      }
-      params.reject! { |_key, value| value.nil? }
+      })
 
       response = put("transactions/#{transaction_id}", params)
 
@@ -167,11 +163,10 @@ module LunchMoney
       ).returns(T.any(T::Array[Integer], LunchMoney::Errors))
     end
     def unsplit_transaction(parent_ids, remove_parents:)
-      params = {
+      params = clean_params({
         parent_ids:,
         remove_parents:,
-      }
-      params.reject! { |_key, value| value.nil? }
+      })
 
       response = post("transactions/unsplit", params)
 
@@ -202,15 +197,14 @@ module LunchMoney
       ).returns(T.any(Integer, LunchMoney::Errors))
     end
     def create_transaction_group(date:, payee:, transactions:, category_id: nil, notes: nil, tags: nil)
-      params = {
+      params = clean_params({
         date:,
         payee:,
         transactions:,
         category_id:,
         notes:,
         tags:,
-      }
-      params.reject! { |_key, value| value.nil? }
+      })
 
       response = post("transactions/group", params)
 
