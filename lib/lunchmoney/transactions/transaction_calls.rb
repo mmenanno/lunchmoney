@@ -91,13 +91,13 @@ module LunchMoney
 
     sig do
       params(
-        transactions: T::Array[LunchMoney::Transaction],
+        transactions: T::Array[LunchMoney::UpdateTransaction],
         apply_rules: T.nilable(T::Boolean),
         skip_duplicates: T.nilable(T::Boolean),
         check_for_recurring: T.nilable(T::Boolean),
         debit_as_negative: T.nilable(T::Boolean),
         skip_balance_update: T.nilable(T::Boolean),
-      ).returns(T.any(T::Hash[String, T::Array[Integer]], LunchMoney::Errors))
+      ).returns(T.any(T::Hash[Symbol, T::Array[Integer]], LunchMoney::Errors))
     end
     def insert_transactions(transactions, apply_rules: nil, skip_duplicates: nil,
       check_for_recurring: nil, debit_as_negative: nil, skip_balance_update: nil)
