@@ -42,7 +42,11 @@ jobs:
         name: Check for DSL rbi updates
         run: bin/tapioca dsl --verify
       -
-        name: Run Tests
+        name: Run Tests (Using Cassettes)
+        run: bin/toys test
+      -
+        name: Run Tests (With Remote Calls)
+        if: ${{ endsWith(matrix.ruby-version, '3.3') }}
         run: bin/toys test
         env:
           REMOTE_TESTS_ENABLED: ${{ vars.REMOTE_TESTS_ENABLED }}
