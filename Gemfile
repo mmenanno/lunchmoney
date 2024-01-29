@@ -22,3 +22,4 @@ gem "tapioca", require: false
 gem "dotenv"
 gem "yard", require: false
 gem "yard-sorbet", require: false
+gem "appraisal", require: false
