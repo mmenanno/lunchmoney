@@ -21,7 +21,19 @@ module LunchMoney
       return api_errors if api_errors.present?
 
       response.body.map do |budget|
-        # budget[:data] TODO: Add mapping to data and config objects
+        if budget[:data]
+          data_keys = budget[:data].keys
+          data_keys.each do |data_key|
+            budget[:data][data_key] = LunchMoney::Data.new(**budget[:data][data_key])
+          end
+        end
+
+        if budget[:config]
+          config_keys = budget[:config].keys
+          config_keys.each do |config_key|
+            budget[:config][config_key] = LunchMoney::Data.new(**budget[:config][config_key])
+          end
+        end
 
         LunchMoney::Budget.new(**budget)
       end
