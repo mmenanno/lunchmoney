@@ -43,6 +43,7 @@ jobs:
         run: bin/tapioca dsl --verify
       -
         name: Run Tests (Using Cassettes)
+        if: ${{ ! endsWith(matrix.ruby-version, '3.3') }}
         run: bin/toys test
       -
         name: Run Tests (With Remote Calls)
