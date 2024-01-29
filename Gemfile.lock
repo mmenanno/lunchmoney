@@ -1,10 +1,10 @@
 PATH
   remote: .
   specs:
-    lunchmoney-ruby (0.7.0)
-      activesupport (~> 7.0)
+    lunchmoney-ruby (0.7.1)
+      activesupport (>= 6.1)
       faraday (>= 2.7.4, < 2.10.0)
-      sorbet-runtime (>= 0.5.10187)
+      sorbet-runtime (>= 0.5)
 
 GEM
   remote: https://rubygems.org/
