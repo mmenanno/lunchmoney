@@ -25,4 +25,31 @@ class BudgetCallsTest < ActiveSupport::TestCase
 
     assert_kind_of(LunchMoney::Error, api_call.first)
   end
+
+  test "upsert_budget does not return an error on success response" do
+    VCR.use_cassette("budget/upsert_budget_success") do
+      api_call = LunchMoney::BudgetCalls.new.upsert_budget(
+        start_date: "2023-01-01",
+        category_id: 777052,
+        amount: 400.99,
+      )
+
+      api_call.each do |group|
+        refute_kind_of(LunchMoney::Error, group)
+      end
+    end
+  end
+
+  test "upsert_budget returns an array of Error objects on error response" do
+    response = mock_faraday_lunchmoney_error_response
+    LunchMoney::BudgetCalls.any_instance.stubs(:put).returns(response)
+
+    api_call = LunchMoney::BudgetCalls.new.upsert_budget(
+      start_date: "2023-01-01",
+      category_id: 777052,
+      amount: 400.99,
+    )
+
+    assert_kind_of(LunchMoney::Error, api_call.first)
+  end
 end
