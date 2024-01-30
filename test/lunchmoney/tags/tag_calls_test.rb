@@ -5,13 +5,16 @@ require "test_helper"
 
 class TagCallsTest < ActiveSupport::TestCase
   include MockResponseHelper
+  include VcrHelper
 
   test "tags returns an array of Tag objects on success response" do
-    VCR.use_cassette("tags/tags_success") do
-      api_call = LunchMoney::TagCalls.new.tags
+    with_real_ci_connections do
+      VCR.use_cassette("tags/tags_success") do
+        api_call = LunchMoney::TagCalls.new.tags
 
-      api_call.each do |tag|
-        assert_kind_of(LunchMoney::Tag, tag)
+        api_call.each do |tag|
+          assert_kind_of(LunchMoney::Tag, tag)
+        end
       end
     end
   end

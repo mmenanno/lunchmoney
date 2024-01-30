@@ -5,13 +5,16 @@ require "test_helper"
 
 class PlaidAccountCallsTest < ActiveSupport::TestCase
   include MockResponseHelper
+  include VcrHelper
 
   test "plaid_accounts returns an array of PlaidAccount objects on success response" do
-    VCR.use_cassette("plaid_accounts/plaid_accounts_success") do
-      api_call = LunchMoney::PlaidAccountCalls.new.plaid_accounts
+    with_real_ci_connections do
+      VCR.use_cassette("plaid_accounts/plaid_accounts_success") do
+        api_call = LunchMoney::PlaidAccountCalls.new.plaid_accounts
 
-      api_call.each do |plaid_account|
-        assert_kind_of(LunchMoney::PlaidAccount, plaid_account)
+        api_call.each do |plaid_account|
+          assert_kind_of(LunchMoney::PlaidAccount, plaid_account)
+        end
       end
     end
   end
@@ -28,10 +31,12 @@ class PlaidAccountCallsTest < ActiveSupport::TestCase
   end
 
   test "plaid_accounts_fetch returns a boolean response on success" do
-    VCR.use_cassette("plaid_accounts/plaid_accounts_fetch_success") do
-      api_call = LunchMoney::PlaidAccountCalls.new.plaid_accounts_fetch
+    with_real_ci_connections do
+      VCR.use_cassette("plaid_accounts/plaid_accounts_fetch_success") do
+        api_call = LunchMoney::PlaidAccountCalls.new.plaid_accounts_fetch
 
-      assert_includes([TrueClass, FalseClass], api_call.class)
+        assert_includes([TrueClass, FalseClass], api_call.class)
+      end
     end
   end
 

@@ -5,13 +5,16 @@ require "test_helper"
 
 class AssetCallsTest < ActiveSupport::TestCase
   include MockResponseHelper
+  include VcrHelper
 
   test "assets returns an array of Asset objects on success response" do
-    VCR.use_cassette("assets/assets_success") do
-      api_call = LunchMoney::AssetCalls.new.assets
+    with_real_ci_connections do
+      VCR.use_cassette("assets/assets_success") do
+        api_call = LunchMoney::AssetCalls.new.assets
 
-      api_call.each do |asset|
-        assert_kind_of(LunchMoney::Asset, asset)
+        api_call.each do |asset|
+          assert_kind_of(LunchMoney::Asset, asset)
+        end
       end
     end
   end
