@@ -25,9 +25,9 @@ http_interactions:
       Server:
       - Cowboy
       Report-To:
-      - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1706329651&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=fv862SfyeEqkJRxWGU2Xn5Wa4o%2BNmdebYOkTQVl%2F9V8%3D"}]}'
+      - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1706641812&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=wNacQrM4%2FTZ47EL5Y1iLQg7RoWsVoe8FfvLTSavKYZE%3D"}]}'
       Reporting-Endpoints:
-      - heroku-nel=https://nel.heroku.com/reports?ts=1706329651&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=fv862SfyeEqkJRxWGU2Xn5Wa4o%2BNmdebYOkTQVl%2F9V8%3D
+      - heroku-nel=https://nel.heroku.com/reports?ts=1706641812&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=wNacQrM4%2FTZ47EL5Y1iLQg7RoWsVoe8FfvLTSavKYZE%3D
       Nel:
       - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
       Connection:
@@ -45,11 +45,11 @@ http_interactions:
       Etag:
       - W/"a3-HBvhFcJX1nIVRLhW7eU2gRmIojM"
       Date:
-      - Sat, 27 Jan 2024 04:27:31 GMT
+      - Tue, 30 Jan 2024 19:10:12 GMT
       Via:
       - 1.1 vegur
     body:
       encoding: UTF-8
-      string: '{"id":7638,"source":"manual","created_at":"2024-01-27T01:45:52.493Z","name":"Bitcoin","display_name":null,"balance":"2.000000000000000000","balance_as_of":"2024-01-27T04:05:02.937Z","currency":"BTC","status":"active","institution_name":null}'
-  recorded_at: Sat, 27 Jan 2024 04:27:31 GMT
+      string: '{"id":7638,"source":"manual","created_at":"2024-01-27T01:45:52.493Z","name":"Bitcoin","display_name":null,"balance":"2.000000000000000000","institution_name":null}'
+  recorded_at: Tue, 30 Jan 2024 19:10:12 GMT
 recorded_with: VCR 6.2.0

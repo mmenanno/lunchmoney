@@ -1,7 +1,8 @@
 # typed: strict
 # frozen_string_literal: true
 
-require_relative "crypto"
+require_relative "crypto/crypto_base"
+require_relative "crypto/crypto"
 
 module LunchMoney
   # https://lunchmoney.dev/#crypto
@@ -26,7 +27,7 @@ module LunchMoney
         institution_name: T.nilable(String),
         balance: T.nilable(String),
         currency: T.nilable(String),
-      ).returns(T.any(LunchMoney::Crypto, LunchMoney::Errors))
+      ).returns(T.any(LunchMoney::CryptoBase, LunchMoney::Errors))
     end
     def update_crypto(crypto_id, name: nil, display_name: nil, institution_name: nil, balance: nil, currency: nil)
       params = clean_params({
@@ -42,7 +43,7 @@ module LunchMoney
       api_errors = errors(response)
       return api_errors if api_errors.present?
 
-      LunchMoney::Crypto.new(**response.body)
+      LunchMoney::CryptoBase.new(**response.body)
     end
   end
 end

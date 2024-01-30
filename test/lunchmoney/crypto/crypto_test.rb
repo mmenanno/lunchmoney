@@ -5,7 +5,7 @@ require "test_helper"
 
 class CryptoTest < ActiveSupport::TestCase
   test "source can be set to known valid types" do
-    LunchMoney::Crypto::VALID_SOURCES.each do |source|
+    LunchMoney::CryptoBase::VALID_SOURCES.each do |source|
       assert_nothing_raised do
         create_crypto(source:)
       end

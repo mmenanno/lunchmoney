@@ -32,17 +32,14 @@ class CryptoCallsTest < ActiveSupport::TestCase
 
   test "update_crypto returns a Crypto objects on success response" do
     VCR.use_cassette("crypto/update_crypto_success") do
-      # TODO: Current cassette has balance_as_of, currency, and status fields manually added in as they were
-      # not returned in the response as expected. Once I know if this is a bug or not we can adjust accordingly.
-      ensure_correct_api_key
       api_call = LunchMoney::CryptoCalls.new.update_crypto(7638, balance: "2.000000000000000000")
 
-      assert_kind_of(LunchMoney::Crypto, api_call)
+      assert_kind_of(LunchMoney::CryptoBase, api_call)
     end
   end
 
   test "update_crypto returns an array of Error objects on error response" do
-    response = mock_faraday_response(fake_general_error)
+    response = mock_faraday_lunchmoney_error_response
     LunchMoney::CryptoCalls.any_instance.stubs(:put).returns(response)
 
     api_call = LunchMoney::CryptoCalls.new.update_crypto(7638, balance: "1.000000000000000000")
