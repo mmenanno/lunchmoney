@@ -42,9 +42,15 @@ module LunchMoney
       end
     end
 
-    sig { params(endpoint: String).returns(Faraday::Response) }
-    def delete(endpoint)
-      request.delete(BASE_URL + endpoint)
+    sig { params(endpoint: String, query_params: T.nilable(T::Hash[Symbol, T.untyped])).returns(Faraday::Response) }
+    def delete(endpoint, query_params: nil)
+      connection = request(flat_params: true)
+
+      if query_params.present?
+        connection.delete(BASE_URL + endpoint, query_params)
+      else
+        connection.delete(BASE_URL + endpoint)
+      end
     end
 
     sig { params(json_request: T::Boolean, flat_params: T::Boolean).returns(Faraday::Connection) }

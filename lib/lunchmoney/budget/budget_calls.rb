@@ -62,13 +62,12 @@ module LunchMoney
 
     sig { params(start_date: String, category_id: Integer).returns(T.any(T::Boolean, LunchMoney::Errors)) }
     def remove_budget(start_date:, category_id:)
-      # params = {
-      #   start_date:,
-      #   category_id:,
-      # }
+      params = {
+        start_date:,
+        category_id:,
+      }
 
-      # TODO: Add params to delete call
-      response = delete("budgets")
+      response = delete("budgets", query_params: params)
 
       api_errors = errors(response)
       return api_errors if api_errors.present?
