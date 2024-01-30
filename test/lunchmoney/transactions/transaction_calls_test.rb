@@ -170,6 +170,57 @@ class TransactionCallsTest < ActiveSupport::TestCase
     end
   end
 
+  test "create_transaction_group returns a transaction id of the created group on success response" do
+    VCR.use_cassette("transactions/create_transaction_group_success") do
+      arguments = {
+        date: "2024-01-30",
+        payee: "Group Transaction",
+        transactions: [898357857, 898359936],
+      }
+      api_call = LunchMoney::TransactionCalls.new.create_transaction_group(**arguments)
+
+      assert_kind_of(Integer, api_call)
+    end
+  end
+
+  test "create_transaction_group returns an array of Error objects on error response" do
+    response = mock_faraday_lunchmoney_error_response
+    LunchMoney::TransactionCalls.any_instance.stubs(:post).returns(response)
+    arguments = {
+      date: "2024-01-30",
+      payee: "Group Transaction",
+      transactions: [898357857, 898359936],
+    }
+
+    api_call = LunchMoney::TransactionCalls.new.create_transaction_group(**arguments)
+
+    T.unsafe(api_call).each do |error|
+      assert_kind_of(LunchMoney::Error, error)
+    end
+  end
+
+  test "delete_transaction_group returns an array of transaction ids from the deleted group on success response" do
+    VCR.use_cassette("transactions/delete_transaction_group_success") do
+      api_call = LunchMoney::TransactionCalls.new.delete_transaction_group(905483362)
+      api_call = T.cast(api_call, T::Hash[Symbol, T::Array[Integer]])
+
+      T.must(api_call[:transactions]).each do |transaction_id|
+        assert_kind_of(Integer, transaction_id)
+      end
+    end
+  end
+
+  test "delete_transaction_group returns an array of Error objects on error response" do
+    response = mock_faraday_lunchmoney_error_response
+    LunchMoney::TransactionCalls.any_instance.stubs(:delete).returns(response)
+
+    api_call = LunchMoney::TransactionCalls.new.delete_transaction_group(905483362)
+
+    T.unsafe(api_call).each do |error|
+      assert_kind_of(LunchMoney::Error, error)
+    end
+  end
+
   private
 
   sig { params(status: String).returns(LunchMoney::UpdateTransaction) }
