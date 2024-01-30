@@ -43,10 +43,10 @@ module LunchMoney
       params(
         start_date: String,
         category_id: Integer,
-        amount: Integer,
+        amount: T.any(Integer, Float),
         currency: T.nilable(String),
       ).returns(T.any(
-        T::Hash[Symbol, { category_id: Integer, amount: Integer, currency: String, start_date: String }],
+        T::Hash[Symbol, { category_id: Integer, amount: T.any(Integer, Float), currency: String, start_date: String }],
         LunchMoney::Errors,
       ))
     end

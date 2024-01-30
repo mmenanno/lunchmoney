@@ -7,10 +7,10 @@ module LunchMoney
     # API object reference documentation: https://lunchmoney.dev/#data-object
 
     sig { returns(T.nilable(Integer)) }
-    attr_accessor :budget_amount, :budget_to_base, :num_transactions
+    attr_accessor :num_transactions
 
     sig { returns(T.nilable(T.any(Integer, Float))) }
-    attr_accessor :spending_to_base
+    attr_accessor :budget_amount, :budget_to_base, :spending_to_base
 
     sig { returns(T.nilable(String)) }
     attr_accessor :budget_currency
@@ -22,9 +22,9 @@ module LunchMoney
       params(
         spending_to_base: T.nilable(T.any(Integer, Float)),
         num_transactions: T.nilable(Integer),
-        budget_amount: T.nilable(Integer),
+        budget_amount: T.nilable(T.any(Integer, Float)),
         budget_currency: T.nilable(String),
-        budget_to_base: T.nilable(Integer),
+        budget_to_base: T.nilable(T.any(Integer, Float)),
         is_automated: T.nilable(T::Boolean),
       ).void
     end
