@@ -116,9 +116,9 @@ class TransactionCallsTest < ActiveSupport::TestCase
     VCR.use_cassette("transactions/update_transactions_split_success") do
       split = [
         LunchMoney::Split.new(amount: "10.00"),
-        LunchMoney::Split.new(amount: "43.05"),
+        LunchMoney::Split.new(amount: "47.54"),
       ]
-      api_call = LunchMoney::TransactionCalls.new.update_transaction(897349559, split:)
+      api_call = LunchMoney::TransactionCalls.new.update_transaction(904778058, split:)
       api_call = T.cast(api_call, { updated: T::Boolean, split: T.nilable(T::Array[Integer]) })
 
       assert(api_call[:updated])
@@ -143,6 +143,27 @@ class TransactionCallsTest < ActiveSupport::TestCase
       897349559,
       transaction: random_update_transaction(status: "cleared"),
     )
+
+    T.unsafe(api_call).each do |error|
+      assert_kind_of(LunchMoney::Error, error)
+    end
+  end
+
+  test "unsplit_transaction returns an array of unsplit transaction ids on success response" do
+    VCR.use_cassette("transactions/unsplit_transaction_success") do
+      api_call = LunchMoney::TransactionCalls.new.unsplit_transaction([904778058])
+
+      api_call.each do |transaction_id|
+        assert_kind_of(Integer, transaction_id)
+      end
+    end
+  end
+
+  test "unsplit_transaction returns an array of Error objects on error response" do
+    response = mock_faraday_lunchmoney_error_response
+    LunchMoney::TransactionCalls.any_instance.stubs(:post).returns(response)
+
+    api_call = LunchMoney::TransactionCalls.new.unsplit_transaction([904778058])
 
     T.unsafe(api_call).each do |error|
       assert_kind_of(LunchMoney::Error, error)
