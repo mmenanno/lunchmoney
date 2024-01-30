@@ -1,11 +1,11 @@
 ---
 http_interactions:
 - request:
-    method: put
-    uri: https://dev.lunchmoney.app/v1/transactions/904778058
+    method: post
+    uri: https://dev.lunchmoney.app/v1/transactions/unsplit
     body:
       encoding: UTF-8
-      string: '{"split":[{"payee":null,"date":null,"category_id":null,"notes":null,"amount":"10.00"},{"payee":null,"date":null,"category_id":null,"notes":null,"amount":"47.54"}]}'
+      string: '{"parent_ids":[904778058],"remove_parents":false}'
     headers:
       User-Agent:
       - Faraday v2.9.0
@@ -25,9 +25,9 @@ http_interactions:
       Server:
       - Cowboy
       Report-To:
-      - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1706585033&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=HzUiZDM6bFouSpTJROYzEFcNk0NLtrY7pPVEi%2BWz%2B54%3D"}]}'
+      - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1706585170&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=3C7dznjF2meU4Jg%2Fim8lojToFOESpyzYXTUm%2Fuzik2Q%3D"}]}'
       Reporting-Endpoints:
-      - heroku-nel=https://nel.heroku.com/reports?ts=1706585033&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=HzUiZDM6bFouSpTJROYzEFcNk0NLtrY7pPVEi%2BWz%2B54%3D
+      - heroku-nel=https://nel.heroku.com/reports?ts=1706585170&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=3C7dznjF2meU4Jg%2Fim8lojToFOESpyzYXTUm%2Fuzik2Q%3D
       Nel:
       - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
       Connection:
@@ -41,15 +41,15 @@ http_interactions:
       Content-Type:
       - application/json; charset=utf-8
       Content-Length:
-      - '46'
+      - '21'
       Etag:
-      - W/"2e-5GGYvbfxyRs4efc2pKEVw1vSmoI"
+      - W/"15-c+BO1FqVWxR4XMxcBbh1EjAByX0"
       Date:
-      - Tue, 30 Jan 2024 03:23:53 GMT
+      - Tue, 30 Jan 2024 03:26:10 GMT
       Via:
       - 1.1 vegur
     body:
       encoding: UTF-8
-      string: '{"updated":true,"split":[905400521,905400522]}'
-  recorded_at: Tue, 30 Jan 2024 03:23:53 GMT
+      string: "[905400521,905400522]"
+  recorded_at: Tue, 30 Jan 2024 03:26:10 GMT
 recorded_with: VCR 6.2.0

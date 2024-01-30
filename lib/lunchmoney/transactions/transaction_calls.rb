@@ -153,8 +153,8 @@ module LunchMoney
         remove_parents: T.nilable(T::Boolean),
       ).returns(T.any(T::Array[Integer], LunchMoney::Errors))
     end
-    def unsplit_transaction(parent_ids, remove_parents:)
-      params = clean_params({ parent_ids:, remove_parents: })
+    def unsplit_transaction(parent_ids, remove_parents: false)
+      params = { parent_ids:, remove_parents: }
       response = post("transactions/unsplit", params)
 
       api_errors = errors(response)
