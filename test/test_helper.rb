@@ -18,3 +18,5 @@ require_relative "helpers/configuration_helper"
 require_relative "helpers/mocha_typed"
 require_relative "helpers/mock_response_helper"
 require_relative "helpers/vcr_helper"
+
+include VcrHelper

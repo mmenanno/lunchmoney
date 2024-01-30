@@ -7,11 +7,13 @@ class RecurringExpenseCallsTest < ActiveSupport::TestCase
   include MockResponseHelper
 
   test "recurring_expenses returns an array of Tag objects on success response" do
-    VCR.use_cassette("recurring_expenses/recurring_expenses_success") do
-      api_call = LunchMoney::RecurringExpenseCalls.new.recurring_expenses
+    with_real_ci_connections do
+      VCR.use_cassette("recurring_expenses/recurring_expenses_success") do
+        api_call = LunchMoney::RecurringExpenseCalls.new.recurring_expenses
 
-      api_call.each do |recurring_expense|
-        assert_kind_of(LunchMoney::RecurringExpense, recurring_expense)
+        api_call.each do |recurring_expense|
+          assert_kind_of(LunchMoney::RecurringExpense, recurring_expense)
+        end
       end
     end
   end

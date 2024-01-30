@@ -7,11 +7,13 @@ class CryptoCallsTest < ActiveSupport::TestCase
   include MockResponseHelper
 
   test "crypto returns an array of Crypto objects on success response" do
-    VCR.use_cassette("crypto/crypto_success") do
-      api_call = LunchMoney::CryptoCalls.new.crypto
+    with_real_ci_connections do
+      VCR.use_cassette("crypto/crypto_success") do
+        api_call = LunchMoney::CryptoCalls.new.crypto
 
-      api_call.each do |crypto|
-        assert_kind_of(LunchMoney::Crypto, crypto)
+        api_call.each do |crypto|
+          assert_kind_of(LunchMoney::Crypto, crypto)
+        end
       end
     end
   end

@@ -7,10 +7,12 @@ class UserCallsTest < ActiveSupport::TestCase
   include MockResponseHelper
 
   test "me returns a User objects on success response" do
-    VCR.use_cassette("user/me_success") do
-      api_call = LunchMoney::UserCalls.new.me
+    with_real_ci_connections do
+      VCR.use_cassette("user/me_success") do
+        api_call = LunchMoney::UserCalls.new.me
 
-      assert_kind_of(LunchMoney::User, api_call)
+        assert_kind_of(LunchMoney::User, api_call)
+      end
     end
   end
 
