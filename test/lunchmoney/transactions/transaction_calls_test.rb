@@ -73,16 +73,14 @@ class TransactionCallsTest < ActiveSupport::TestCase
   end
 
   test "insert_transactions returns a hash containing an array of ids on success response" do
-    with_real_ci_connections do
-      VCR.use_cassette("transactions/insert_transactions_success") do
-        api_call = LunchMoney::TransactionCalls.new.insert_transactions([random_update_transaction])
-        ids = T.cast(api_call, T::Hash[Symbol, T::Array[Integer]])[:ids]
+    VCR.use_cassette("transactions/insert_transactions_success") do
+      api_call = LunchMoney::TransactionCalls.new.insert_transactions([random_update_transaction])
+      ids = T.cast(api_call, T::Hash[Symbol, T::Array[Integer]])[:ids]
 
-        refute_nil(ids)
+      refute_nil(ids)
 
-        T.unsafe(ids).each do |id|
-          assert_kind_of(Integer, id)
-        end
+      T.unsafe(ids).each do |id|
+        assert_kind_of(Integer, id)
       end
     end
   end
