@@ -3,17 +3,17 @@
 
 module LunchMoney
   # https://lunchmoney.dev/#crypto-object
-  class Crypto < LunchMoney::DataObject
+  class CryptoBase < LunchMoney::DataObject
     include LunchMoney::Validators
 
     sig { returns(T.nilable(Integer)) }
     attr_accessor :id, :zabo_account_id
 
     sig { returns(String) }
-    attr_reader :source, :balance_as_of, :created_at
+    attr_reader :source, :created_at
 
     sig { returns(String) }
-    attr_accessor :name, :balance, :currency, :status
+    attr_accessor :name, :balance
 
     sig { returns(T.nilable(String)) }
     attr_accessor :display_name, :institution_name
@@ -33,25 +33,19 @@ module LunchMoney
         source: String,
         name: String,
         balance: String,
-        balance_as_of: String,
-        currency: String,
-        status: String,
         institution_name: T.nilable(String),
         id: T.nilable(Integer),
         zabo_account_id: T.nilable(Integer),
         display_name: T.nilable(String),
       ).void
     end
-    def initialize(created_at:, source:, name:, balance:, balance_as_of:, currency:,
-      status:, institution_name: nil, id: nil, zabo_account_id: nil, display_name: nil)
+    def initialize(created_at:, source:, name:, balance:, institution_name: nil, id: nil, zabo_account_id: nil,
+      display_name: nil)
       super()
       @created_at = T.let(validate_iso8601!(created_at), String)
       @source = T.let(validate_one_of!(source, VALID_SOURCES), String)
       @name = name
       @balance = balance
-      @balance_as_of = T.let(validate_iso8601!(balance_as_of), String)
-      @currency = currency
-      @status = status
       @institution_name = institution_name
       @id = id
       @zabo_account_id = zabo_account_id
@@ -61,11 +55,6 @@ module LunchMoney
     sig { params(name: String).void }
     def source=(name)
       @source = validate_one_of!(name, VALID_SOURCES)
-    end
-
-    sig { params(time: String).void }
-    def balance_as_of=(time)
-      @balance_as_of = validate_iso8601!(time)
     end
 
     sig { params(time: String).void }
