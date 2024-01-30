@@ -98,14 +98,66 @@ class TransactionCallsTest < ActiveSupport::TestCase
     end
   end
 
+  test "update_transaction returns a hash containing an updated boolean on success response" do
+    with_real_ci_connections do
+      VCR.use_cassette("transactions/update_transactions_success") do
+        api_call = LunchMoney::TransactionCalls.new.update_transaction(
+          897349559,
+          transaction: random_update_transaction(status: "cleared"),
+        )
+        updated = T.cast(api_call, T::Hash[Symbol, T::Boolean])[:updated]
+
+        assert(updated)
+      end
+    end
+  end
+
+  test "update_transaction returns a hash containing an updated boolean and split ids on success split response" do
+    VCR.use_cassette("transactions/update_transactions_split_success") do
+      split = [
+        LunchMoney::Split.new(amount: "10.00"),
+        LunchMoney::Split.new(amount: "43.05"),
+      ]
+      api_call = LunchMoney::TransactionCalls.new.update_transaction(897349559, split:)
+      api_call = T.cast(api_call, { updated: T::Boolean, split: T.nilable(T::Array[Integer]) })
+
+      assert(api_call[:updated])
+
+      api_call[:split].each do |split_id|
+        assert_kind_of(Integer, split_id)
+      end
+    end
+  end
+
+  test "update_transaction raises an exception if neither a transaction or split were provided" do
+    assert_raises(LunchMoney::MissingArgument) do
+      LunchMoney::TransactionCalls.new.update_transaction(897349559)
+    end
+  end
+
+  test "update_transaction returns an array of Error objects on error response" do
+    response = mock_faraday_lunchmoney_error_response
+    LunchMoney::TransactionCalls.any_instance.stubs(:put).returns(response)
+
+    api_call = LunchMoney::TransactionCalls.new.update_transaction(
+      897349559,
+      transaction: random_update_transaction(status: "cleared"),
+    )
+
+    T.unsafe(api_call).each do |error|
+      assert_kind_of(LunchMoney::Error, error)
+    end
+  end
+
   private
 
-  sig { returns(LunchMoney::UpdateTransaction) }
-  def random_update_transaction
+  sig { params(status: String).returns(LunchMoney::UpdateTransaction) }
+  def random_update_transaction(status: "uncleared")
     date = Time.now.utc.strftime("%F")
     amount = rand(0.1..99.9).to_s
     payee = "Gem Remote Testing"
     notes = "Remote test at #{Time.now.utc}"
-    LunchMoney::UpdateTransaction.new(date:, amount:, payee:, notes:)
+    currency = "cad"
+    LunchMoney::UpdateTransaction.new(date:, amount:, payee:, notes:, currency:, status:)
   end
 end

@@ -13,4 +13,7 @@ module LunchMoney
 
   # Exception raised when a query parameter is invalid
   class InvalidQueryParameter < Exception; end
+
+  # Exception raised when an essential argument is missing
+  class MissingArgument < Exception; end
 end
