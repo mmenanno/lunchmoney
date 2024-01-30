@@ -120,17 +120,22 @@ module LunchMoney
     sig do
       params(
         transaction_id: Integer,
-        transaction: LunchMoney::UpdateTransaction,
-        split: T.nilable(LunchMoney::Split),
+        transaction: T.nilable(LunchMoney::UpdateTransaction),
+        split: T.nilable(T::Array[LunchMoney::Split]),
         debit_as_negative: T.nilable(T::Boolean),
         skip_balance_update: T.nilable(T::Boolean),
-      ).returns(T.any({ updated: T::Boolean, split: T::Array[Integer] }, LunchMoney::Errors))
+      ).returns(T.any({ updated: T::Boolean, split: T.nilable(T::Array[Integer]) }, LunchMoney::Errors))
     end
-    def update_transaction(transaction_id, transaction:, split: nil,
+    def update_transaction(transaction_id, transaction: nil, split: nil,
       debit_as_negative: nil, skip_balance_update: nil)
+      raise(
+        LunchMoney::MissingArgument,
+        "Either a transaction or split must be provided",
+      ) if transaction.nil? && split.nil?
+
       params = clean_params({
-        transaction: transaction.serialize,
-        split: split&.serialize,
+        transaction: transaction&.serialize,
+        split: split&.map!(&:serialize),
         debit_as_negative:,
         skip_balance_update:,
       })
