@@ -5,6 +5,7 @@ require "test_helper"
 
 class AssetCallsTest < ActiveSupport::TestCase
   include MockResponseHelper
+  include VcrHelper
 
   test "assets returns an array of Asset objects on success response" do
     with_real_ci_connections do

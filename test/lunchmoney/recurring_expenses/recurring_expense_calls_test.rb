@@ -5,6 +5,7 @@ require "test_helper"
 
 class RecurringExpenseCallsTest < ActiveSupport::TestCase
   include MockResponseHelper
+  include VcrHelper
 
   test "recurring_expenses returns an array of Tag objects on success response" do
     with_real_ci_connections do

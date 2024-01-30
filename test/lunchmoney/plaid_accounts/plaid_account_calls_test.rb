@@ -5,6 +5,7 @@ require "test_helper"
 
 class PlaidAccountCallsTest < ActiveSupport::TestCase
   include MockResponseHelper
+  include VcrHelper
 
   test "plaid_accounts returns an array of PlaidAccount objects on success response" do
     with_real_ci_connections do

@@ -5,6 +5,7 @@ require "test_helper"
 
 class TagCallsTest < ActiveSupport::TestCase
   include MockResponseHelper
+  include VcrHelper
 
   test "tags returns an array of Tag objects on success response" do
     with_real_ci_connections do

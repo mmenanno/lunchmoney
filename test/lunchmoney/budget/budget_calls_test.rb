@@ -5,6 +5,7 @@ require "test_helper"
 
 class BudgetCallsTest < ActiveSupport::TestCase
   include MockResponseHelper
+  include VcrHelper
 
   test "budgets returns an array of Budget objects on success response" do
     with_real_ci_connections do

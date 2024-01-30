@@ -5,6 +5,7 @@ require "test_helper"
 
 class CategoryCallsTest < ActiveSupport::TestCase
   include MockResponseHelper
+  include VcrHelper
 
   test "categories returns an array of Category objects on success response" do
     with_real_ci_connections do

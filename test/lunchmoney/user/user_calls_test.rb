@@ -5,6 +5,7 @@ require "test_helper"
 
 class UserCallsTest < ActiveSupport::TestCase
   include MockResponseHelper
+  include VcrHelper
 
   test "me returns a User objects on success response" do
     with_real_ci_connections do

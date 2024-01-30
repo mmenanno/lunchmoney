@@ -5,6 +5,7 @@ require "test_helper"
 
 class TransactionCallsTest < ActiveSupport::TestCase
   include MockResponseHelper
+  include VcrHelper
 
   test "transactions returns an array of Transaction objects on success response" do
     with_real_ci_connections do

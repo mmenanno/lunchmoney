@@ -5,6 +5,7 @@ require "test_helper"
 
 class CryptoCallsTest < ActiveSupport::TestCase
   include MockResponseHelper
+  include VcrHelper
 
   test "crypto returns an array of Crypto objects on success response" do
     with_real_ci_connections do
