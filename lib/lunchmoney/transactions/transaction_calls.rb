@@ -204,7 +204,7 @@ module LunchMoney
       params(transaction_id: T.any(
         String,
         Integer,
-      )).returns(T.any(T::Hash[String, T::Array[Integer]], LunchMoney::Errors))
+      )).returns(T.any(T::Hash[Symbol, T::Array[Integer]], LunchMoney::Errors))
     end
     def delete_transaction_group(transaction_id)
       response = delete("transactions/group/#{transaction_id}")
