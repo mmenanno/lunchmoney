@@ -33,6 +33,9 @@ module LunchMoney
     sig { returns(T.nilable(T::Hash[Symbol, LunchMoney::Config])) }
     attr_accessor :config
 
+    sig { returns(T.nilable({ list: T::Array[LunchMoney::RecurringExpense] })) }
+    attr_accessor :recurring
+
     sig do
       params(
         is_income: T::Boolean,
@@ -47,7 +50,7 @@ module LunchMoney
         group_id: T.nilable(Integer),
         is_group: T.nilable(T::Boolean),
         config: T.nilable(T::Hash[Symbol, LunchMoney::Config]),
-        recurring: T.untyped, # TODO: Better type this field
+        recurring: T.nilable({ list: T::Array[LunchMoney::RecurringExpense] }),
       ).void
     end
     def initialize(is_income:, exclude_from_budget:, exclude_from_totals:, data:, category_name:, order:, archived:,

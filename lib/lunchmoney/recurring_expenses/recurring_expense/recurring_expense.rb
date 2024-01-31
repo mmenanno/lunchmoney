@@ -3,7 +3,7 @@
 
 module LunchMoney
   # https://lunchmoney.dev/#recurring-expenses-object
-  class RecurringExpense < LunchMoney::DataObject
+  class RecurringExpense < RecurringExpenseBase
     sig { returns(Integer) }
     attr_accessor :id
 
@@ -11,7 +11,7 @@ module LunchMoney
     attr_accessor :start_date, :end_date, :description, :original_name
 
     sig { returns(String) }
-    attr_accessor :cadence, :payee, :currency, :billing_date, :type, :source, :amount, :created_at
+    attr_accessor :cadence, :billing_date, :type, :source, :created_at
 
     sig { returns(T.nilable(Integer)) }
     attr_accessor :plaid_account_id, :asset_id, :transaction_id, :category_id
@@ -35,12 +35,13 @@ module LunchMoney
         plaid_account_id: T.nilable(Integer),
         asset_id: T.nilable(Integer),
         transaction_id: T.nilable(Integer),
+        to_base: T.nilable(Integer),
       ).void
     end
     def initialize(cadence:, payee:, amount:, currency:, billing_date:, type:, source:, id:, created_at:,
       category_id: nil, start_date: nil, end_date: nil, description: nil, original_name: nil, plaid_account_id: nil,
-      asset_id: nil, transaction_id: nil)
-      super()
+      asset_id: nil, transaction_id: nil, to_base: nil)
+      super(payee:, amount:, currency:, to_base:)
       @cadence = cadence
       @payee = payee
       @amount = amount
@@ -58,6 +59,7 @@ module LunchMoney
       @plaid_account_id = plaid_account_id
       @asset_id = asset_id
       @transaction_id = transaction_id
+      @to_base = to_base
     end
   end
 end
