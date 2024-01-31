@@ -25,9 +25,7 @@ class CryptoCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::CryptoCalls.new.crypto
 
-    api_call.each do |error|
-      assert_kind_of(LunchMoney::Error, error)
-    end
+    assert_kind_of(LunchMoney::Errors, api_call)
   end
 
   test "update_crypto returns a Crypto objects on success response" do
@@ -44,8 +42,6 @@ class CryptoCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::CryptoCalls.new.update_crypto(7638, balance: "1.000000000000000000")
 
-    T.unsafe(api_call).each do |error|
-      assert_kind_of(LunchMoney::Error, error)
-    end
+    assert_kind_of(LunchMoney::Errors, api_call)
   end
 end

@@ -25,9 +25,7 @@ class CategoryCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::CategoryCalls.new.categories(format: "flattened")
 
-    api_call.each do |error|
-      assert_kind_of(LunchMoney::Error, error)
-    end
+    assert_kind_of(LunchMoney::Errors, api_call)
   end
 
   test "categories does not raise an error when called with flattened format" do
@@ -89,9 +87,7 @@ class CategoryCallsTest < ActiveSupport::TestCase
       VCR.use_cassette("categories/category_does_not_exist_failure") do
         api_call = LunchMoney::CategoryCalls.new.category(1)
 
-        T.unsafe(api_call).each do |error|
-          assert_kind_of(LunchMoney::Error, error)
-        end
+        assert_kind_of(LunchMoney::Errors, api_call)
       end
     end
   end
@@ -111,9 +107,7 @@ class CategoryCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::CategoryCalls.new.create_category(name: "Create Category Test")
 
-    api_call.each do |error|
-      assert_kind_of(LunchMoney::Error, error)
-    end
+    assert_kind_of(LunchMoney::Errors, api_call)
   end
 
   test "create_category_group returns anid of created category group on success response" do
@@ -131,9 +125,7 @@ class CategoryCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::CategoryCalls.new.create_category_group(name: "Create Category Group Test")
 
-    api_call.each do |error|
-      assert_kind_of(LunchMoney::Error, error)
-    end
+    assert_kind_of(LunchMoney::Errors, api_call)
   end
 
   test "update_category returns a boolean on success response" do
@@ -150,9 +142,7 @@ class CategoryCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::CategoryCalls.new.update_category(784587, name: "Update Category Test")
 
-    T.unsafe(api_call).each do |error|
-      assert_kind_of(LunchMoney::Error, error)
-    end
+    assert_kind_of(LunchMoney::Errors, api_call)
   end
 
   test "add_to_category_group returns a Category object on success response" do
@@ -169,9 +159,7 @@ class CategoryCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::CategoryCalls.new.add_to_category_group(784588, new_categories: ["New Category Test"])
 
-    T.unsafe(api_call).each do |error|
-      assert_kind_of(LunchMoney::Error, error)
-    end
+    assert_kind_of(LunchMoney::Errors, api_call)
   end
 
   test "delete_category returns a boolean on success response" do
@@ -188,9 +176,7 @@ class CategoryCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::CategoryCalls.new.delete_category(784587)
 
-    T.unsafe(api_call).each do |error|
-      assert_kind_of(LunchMoney::Error, error)
-    end
+    assert_kind_of(LunchMoney::Errors, api_call)
   end
 
   test "force_delete_category returns a boolean on success response" do
@@ -207,8 +193,6 @@ class CategoryCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::CategoryCalls.new.force_delete_category(784588)
 
-    T.unsafe(api_call).each do |error|
-      assert_kind_of(LunchMoney::Error, error)
-    end
+    assert_kind_of(LunchMoney::Errors, api_call)
   end
 end

@@ -23,7 +23,7 @@ class ApiCallTest < ActiveSupport::TestCase
 
     refute_empty(errors)
 
-    assert_equal(error_message, errors.first.message)
+    assert_equal(error_message, errors.first)
   end
 
   test "errors returns errors when multiple errors are returned" do
@@ -35,7 +35,7 @@ class ApiCallTest < ActiveSupport::TestCase
     refute_empty(errors)
 
     errors.each do |error|
-      assert_includes(error_messages, error.message)
+      assert_includes(error_messages, error)
     end
   end
 
