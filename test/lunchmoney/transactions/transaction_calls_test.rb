@@ -69,11 +69,10 @@ class TransactionCallsTest < ActiveSupport::TestCase
   test "insert_transactions returns a hash containing an array of ids on success response" do
     VCR.use_cassette("transactions/insert_transactions_success") do
       api_call = LunchMoney::TransactionCalls.new.insert_transactions([random_update_transaction])
-      ids = T.cast(api_call, T::Hash[Symbol, T::Array[Integer]])[:ids]
 
-      refute_nil(ids)
+      refute_nil(api_call[:ids])
 
-      T.unsafe(ids).each do |id|
+      api_call[:ids].each do |id|
         assert_kind_of(Integer, id)
       end
     end
@@ -95,9 +94,8 @@ class TransactionCallsTest < ActiveSupport::TestCase
           897349559,
           transaction: random_update_transaction(status: "cleared"),
         )
-        updated = T.cast(api_call, T::Hash[Symbol, T::Boolean])[:updated]
 
-        assert(updated)
+        assert(api_call[:updated])
       end
     end
   end
@@ -109,7 +107,6 @@ class TransactionCallsTest < ActiveSupport::TestCase
         LunchMoney::Split.new(amount: "47.54"),
       ]
       api_call = LunchMoney::TransactionCalls.new.update_transaction(904778058, split:)
-      api_call = T.cast(api_call, { updated: T::Boolean, split: T.nilable(T::Array[Integer]) })
 
       assert(api_call[:updated])
 
@@ -186,9 +183,8 @@ class TransactionCallsTest < ActiveSupport::TestCase
   test "delete_transaction_group returns an array of transaction ids from the deleted group on success response" do
     VCR.use_cassette("transactions/delete_transaction_group_success") do
       api_call = LunchMoney::TransactionCalls.new.delete_transaction_group(905483362)
-      api_call = T.cast(api_call, T::Hash[Symbol, T::Array[Integer]])
 
-      T.must(api_call[:transactions]).each do |transaction_id|
+      api_call[:transactions].each do |transaction_id|
         assert_kind_of(Integer, transaction_id)
       end
     end
