@@ -25,9 +25,7 @@ class PlaidAccountCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::PlaidAccountCalls.new.plaid_accounts
 
-    api_call.each do |error|
-      assert_kind_of(LunchMoney::Error, error)
-    end
+    assert_kind_of(LunchMoney::Errors, api_call)
   end
 
   test "plaid_accounts_fetch returns a boolean response on success" do
@@ -46,8 +44,6 @@ class PlaidAccountCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::PlaidAccountCalls.new.plaid_accounts_fetch
 
-    T.unsafe(api_call).each do |error|
-      assert_kind_of(LunchMoney::Error, error)
-    end
+    assert_kind_of(LunchMoney::Errors, api_call)
   end
 end

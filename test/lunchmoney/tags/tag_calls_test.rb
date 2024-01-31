@@ -25,8 +25,6 @@ class TagCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::TagCalls.new.tags
 
-    api_call.each do |error|
-      assert_kind_of(LunchMoney::Error, error)
-    end
+    assert_kind_of(LunchMoney::Errors, api_call)
   end
 end

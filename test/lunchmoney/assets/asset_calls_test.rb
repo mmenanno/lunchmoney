@@ -25,6 +25,6 @@ class AssetCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::AssetCalls.new.assets
 
-    assert_kind_of(LunchMoney::Error, api_call.first)
+    assert_kind_of(LunchMoney::Errors, api_call)
   end
 end

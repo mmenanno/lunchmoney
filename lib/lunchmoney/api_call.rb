@@ -1,7 +1,7 @@
 # typed: strict
 # frozen_string_literal: true
 
-require_relative "error"
+require_relative "errors"
 
 module LunchMoney
   # Base class for all API call types
@@ -69,23 +69,20 @@ module LunchMoney
 
       return parse_errors(body) unless error_hash(body).nil?
 
-      []
+      LunchMoney::Errors.new
     end
 
     sig { params(body: T::Hash[Symbol, T.any(String, T::Array[String])]).returns(LunchMoney::Errors) }
     def parse_errors(body)
       errors = error_hash(body)
-      return [] if errors.blank?
-
-      api_errors = []
+      api_errors = LunchMoney::Errors.new
+      return api_errors if errors.blank?
 
       case errors
       when String
-        api_errors << LunchMoney::Error.new(message: errors)
+        api_errors << errors
       when Array
-        errors.each do |error|
-          api_errors << LunchMoney::Error.new(message: error)
-        end
+        errors.each { |error| api_errors << error }
       end
 
       api_errors

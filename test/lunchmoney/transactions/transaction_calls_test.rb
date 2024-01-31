@@ -25,9 +25,7 @@ class TransactionCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::TransactionCalls.new.transactions(start_date: "2019-01-01", end_date: "2025-01-01")
 
-    api_call.each do |error|
-      assert_kind_of(LunchMoney::Error, error)
-    end
+    assert_kind_of(LunchMoney::Errors, api_call)
   end
 
   test "transaction returns a Transaction objects on success response" do
@@ -46,9 +44,7 @@ class TransactionCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::TransactionCalls.new.transaction(893631800)
 
-    T.unsafe(api_call).each do |error|
-      assert_kind_of(LunchMoney::Error, error)
-    end
+    assert_kind_of(LunchMoney::Errors, api_call)
   end
 
   test "transaction_group returns a Transaction objects on success response" do
@@ -67,9 +63,7 @@ class TransactionCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::TransactionCalls.new.transaction(893631800)
 
-    T.unsafe(api_call).each do |error|
-      assert_kind_of(LunchMoney::Error, error)
-    end
+    assert_kind_of(LunchMoney::Errors, api_call)
   end
 
   test "insert_transactions returns a hash containing an array of ids on success response" do
@@ -91,9 +85,7 @@ class TransactionCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::TransactionCalls.new.insert_transactions([random_update_transaction])
 
-    T.unsafe(api_call).each do |error|
-      assert_kind_of(LunchMoney::Error, error)
-    end
+    assert_kind_of(LunchMoney::Errors, api_call)
   end
 
   test "update_transaction returns a hash containing an updated boolean on success response" do
@@ -142,9 +134,7 @@ class TransactionCallsTest < ActiveSupport::TestCase
       transaction: random_update_transaction(status: "cleared"),
     )
 
-    T.unsafe(api_call).each do |error|
-      assert_kind_of(LunchMoney::Error, error)
-    end
+    assert_kind_of(LunchMoney::Errors, api_call)
   end
 
   test "unsplit_transaction returns an array of unsplit transaction ids on success response" do
@@ -163,9 +153,7 @@ class TransactionCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::TransactionCalls.new.unsplit_transaction([904778058])
 
-    T.unsafe(api_call).each do |error|
-      assert_kind_of(LunchMoney::Error, error)
-    end
+    assert_kind_of(LunchMoney::Errors, api_call)
   end
 
   test "create_transaction_group returns a transaction id of the created group on success response" do
@@ -192,9 +180,7 @@ class TransactionCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::TransactionCalls.new.create_transaction_group(**arguments)
 
-    T.unsafe(api_call).each do |error|
-      assert_kind_of(LunchMoney::Error, error)
-    end
+    assert_kind_of(LunchMoney::Errors, api_call)
   end
 
   test "delete_transaction_group returns an array of transaction ids from the deleted group on success response" do
@@ -214,9 +200,7 @@ class TransactionCallsTest < ActiveSupport::TestCase
 
     api_call = LunchMoney::TransactionCalls.new.delete_transaction_group(905483362)
 
-    T.unsafe(api_call).each do |error|
-      assert_kind_of(LunchMoney::Error, error)
-    end
+    assert_kind_of(LunchMoney::Errors, api_call)
   end
 
   private
