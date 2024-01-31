@@ -35,6 +35,10 @@ module LunchMoney
           end
         end
 
+        if budget[:recurring]
+          budget[:recurring][:list]&.map! { |recurring| LunchMoney::RecurringExpenseBase.new(**recurring) }
+        end
+
         LunchMoney::Budget.new(**budget)
       end
     end

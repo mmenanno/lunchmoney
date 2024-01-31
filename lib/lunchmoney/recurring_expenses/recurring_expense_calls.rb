@@ -1,7 +1,8 @@
 # typed: strict
 # frozen_string_literal: true
 
-require_relative "recurring_expense"
+require_relative "recurring_expense/recurring_expense_base"
+require_relative "recurring_expense/recurring_expense"
 
 module LunchMoney
   # https://lunchmoney.dev/#recurring-expenses
