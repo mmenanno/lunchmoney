@@ -95,7 +95,6 @@ class CategoryCallsTest < ActiveSupport::TestCase
   test "create_category returns an id of created category success response" do
     VCR.use_cassette("categories/create_category_success") do
       api_call = LunchMoney::CategoryCalls.new.create_category(name: "Create Category Test")
-      api_call = T.cast(api_call, T::Hash[Symbol, Integer])
 
       assert_kind_of(Integer, api_call[:category_id])
     end
@@ -113,7 +112,6 @@ class CategoryCallsTest < ActiveSupport::TestCase
   test "create_category_group returns anid of created category group on success response" do
     VCR.use_cassette("categories/create_category_group_success") do
       api_call = LunchMoney::CategoryCalls.new.create_category_group(name: "Create Category Group Test")
-      api_call = T.cast(api_call, T::Hash[Symbol, Integer])
 
       assert_kind_of(Integer, api_call[:category_id])
     end
