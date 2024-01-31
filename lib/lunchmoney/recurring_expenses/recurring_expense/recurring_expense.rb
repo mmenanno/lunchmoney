@@ -35,7 +35,7 @@ module LunchMoney
         plaid_account_id: T.nilable(Integer),
         asset_id: T.nilable(Integer),
         transaction_id: T.nilable(Integer),
-        to_base: T.nilable(Integer),
+        to_base: T.nilable(Number),
       ).void
     end
     def initialize(cadence:, payee:, amount:, currency:, billing_date:, type:, source:, id:, created_at:,

@@ -12,6 +12,7 @@ class Module
   include T::Sig
 end
 
+# Add type alias for when Integer and Float can both be used
 Number = T.type_alias { T.any(Integer, Float) }
 
 require_relative "lunchmoney/version"

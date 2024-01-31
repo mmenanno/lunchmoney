@@ -7,7 +7,10 @@ module LunchMoney
     # API object reference documentation: https://lunchmoney.dev/#config-object
 
     sig { returns(Integer) }
-    attr_accessor :config_id, :amount, :to_base
+    attr_accessor :config_id
+
+    sig { returns(Number) }
+    attr_accessor :amount, :to_base
 
     sig { returns(String) }
     attr_accessor :cadence, :currency, :auto_suggest
@@ -16,9 +19,9 @@ module LunchMoney
       params(
         config_id: Integer,
         cadence: String,
-        amount: Integer,
+        amount: Number,
         currency: String,
-        to_base: Integer,
+        to_base: Number,
         auto_suggest: String,
       ).void
     end
