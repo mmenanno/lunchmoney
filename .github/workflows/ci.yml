@@ -6,6 +6,9 @@ on:
       - ".gitignore"
       - "README.md"
   workflow_dispatch:
+  schedule:
+    # Every day at 9pm
+    - cron: '0 21 * * *'
 
 jobs:
   validate:
