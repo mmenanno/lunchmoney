@@ -56,7 +56,7 @@ module LunchMoney
         date: String,
         amount: String,
         currency: String,
-        to_base: T.any(Integer, Float),
+        to_base: Number,
         payee: String,
         is_income: T::Boolean,
         exclude_from_budget: T::Boolean,

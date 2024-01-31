@@ -4,12 +4,12 @@
 module LunchMoney
   # Object used to split a transaction when updating https://lunchmoney.dev/#update-transaction
   class Split < TransactionModificationBase
-    sig { returns(T.any(Integer, String)) }
+    sig { returns(T.any(Number, String)) }
     attr_accessor :amount
 
     sig do
       params(
-        amount: T.any(Integer, String),
+        amount: T.any(Number, String),
         payee: T.nilable(String),
         date: T.nilable(String),
         category_id: T.nilable(Integer),

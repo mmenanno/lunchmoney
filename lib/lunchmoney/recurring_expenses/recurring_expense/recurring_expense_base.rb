@@ -7,7 +7,7 @@ module LunchMoney
     sig { returns(String) }
     attr_accessor :payee, :currency, :amount
 
-    sig { returns(T.nilable(Integer)) }
+    sig { returns(T.nilable(Number)) }
     attr_accessor :to_base
 
     sig do
@@ -15,7 +15,7 @@ module LunchMoney
         payee: String,
         amount: String,
         currency: String,
-        to_base: T.nilable(Integer),
+        to_base: T.nilable(Number),
       ).void
     end
     def initialize(payee:, amount:, currency:, to_base:)

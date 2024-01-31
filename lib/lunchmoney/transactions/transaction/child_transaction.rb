@@ -14,7 +14,7 @@ module LunchMoney
         date: String,
         amount: String,
         currency: String,
-        to_base: T.any(Integer, Float),
+        to_base: Number,
         payee: String,
         formatted_date: String,
         notes: T.nilable(String),
