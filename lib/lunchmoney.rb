@@ -12,6 +12,8 @@ class Module
   include T::Sig
 end
 
+Number = T.type_alias { T.any(Integer, Float) }
+
 require_relative "lunchmoney/version"
 require_relative "lunchmoney/validators"
 require_relative "lunchmoney/api"

@@ -9,7 +9,7 @@ module LunchMoney
     sig { returns(T.nilable(Integer)) }
     attr_accessor :num_transactions
 
-    sig { returns(T.nilable(T.any(Integer, Float))) }
+    sig { returns(T.nilable(Number)) }
     attr_accessor :budget_amount, :budget_to_base, :spending_to_base
 
     sig { returns(T.nilable(String)) }
@@ -20,11 +20,11 @@ module LunchMoney
 
     sig do
       params(
-        spending_to_base: T.nilable(T.any(Integer, Float)),
+        spending_to_base: T.nilable(Number),
         num_transactions: T.nilable(Integer),
-        budget_amount: T.nilable(T.any(Integer, Float)),
+        budget_amount: T.nilable(Number),
         budget_currency: T.nilable(String),
-        budget_to_base: T.nilable(T.any(Integer, Float)),
+        budget_to_base: T.nilable(Number),
         is_automated: T.nilable(T::Boolean),
       ).void
     end

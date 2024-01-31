@@ -7,7 +7,7 @@ module LunchMoney
     sig { returns(Integer) }
     attr_accessor :id
 
-    sig { returns(T.any(Integer, Float)) }
+    sig { returns(Number) }
     attr_accessor :to_base
 
     sig { returns(T.nilable(Integer)) }
@@ -28,7 +28,7 @@ module LunchMoney
         date: String,
         amount: String,
         currency: String,
-        to_base: T.any(Integer, Float),
+        to_base: Number,
         payee: String,
         notes: T.nilable(String),
         asset_id: T.nilable(Integer),
