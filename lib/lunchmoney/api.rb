@@ -4,21 +4,21 @@
 require_relative "exceptions"
 require_relative "configuration"
 
-require_relative "api_call"
-require_relative "data_object"
-require_relative "user/user_calls"
-require_relative "categories/category_calls"
-require_relative "tags/tag_calls"
-require_relative "transactions/transaction_calls"
-require_relative "recurring_expenses/recurring_expense_calls"
-require_relative "budget/budget_calls"
-require_relative "assets/asset_calls"
-require_relative "plaid_accounts/plaid_account_calls"
-require_relative "crypto/crypto_calls"
+require_relative "calls/base"
+require_relative "objects/object"
+require_relative "calls/users"
+require_relative "calls/categories"
+require_relative "calls/tags"
+require_relative "calls/transactions"
+require_relative "calls/recurring_expenses"
+require_relative "calls/budgets"
+require_relative "calls/assets"
+require_relative "calls/plaid_accounts"
+require_relative "calls/crypto"
 
 module LunchMoney
   # The main API class that a user should interface through the method of any individual call is delegated through here
-  # so that it is never necessary to go through things like `LunchMoney::UserCalls.new.user` instead you can directly
+  # so that it is never necessary to go through things like `LunchMoney::Calls::Users.new.user` instead you can directly
   # call the endpoint with LunchMoney::Api.new.user and it will be delegated to the correct call.
   class Api
     sig { returns(T.nilable(String)) }
@@ -31,10 +31,10 @@ module LunchMoney
 
     delegate :me, to: :user_calls
 
-    sig { returns(LunchMoney::ApiCall) }
+    sig { returns(LunchMoney::Calls::Base) }
     def user_calls
       with_valid_api_key do
-        @user_calls ||= T.let(LunchMoney::UserCalls.new(api_key:), T.nilable(LunchMoney::UserCalls))
+        @user_calls ||= T.let(LunchMoney::Calls::Users.new(api_key:), T.nilable(LunchMoney::Calls::Users))
       end
     end
 
@@ -48,19 +48,19 @@ module LunchMoney
       :force_delete_category,
       to: :category_calls
 
-    sig { returns(LunchMoney::ApiCall) }
+    sig { returns(LunchMoney::Calls::Base) }
     def category_calls
       with_valid_api_key do
-        @category_calls ||= T.let(LunchMoney::CategoryCalls.new(api_key:), T.nilable(LunchMoney::CategoryCalls))
+        @category_calls ||= T.let(LunchMoney::Calls::Categories.new(api_key:), T.nilable(LunchMoney::Calls::Categories))
       end
     end
 
     delegate :tags, to: :tag_calls
 
-    sig { returns(LunchMoney::ApiCall) }
+    sig { returns(LunchMoney::Calls::Base) }
     def tag_calls
       with_valid_api_key do
-        @tag_calls ||= T.let(LunchMoney::TagCalls.new(api_key:), T.nilable(LunchMoney::TagCalls))
+        @tag_calls ||= T.let(LunchMoney::Calls::Tags.new(api_key:), T.nilable(LunchMoney::Calls::Tags))
       end
     end
 
@@ -74,70 +74,70 @@ module LunchMoney
       :delete_transaction_group,
       to: :transaction_calls
 
-    sig { returns(LunchMoney::ApiCall) }
+    sig { returns(LunchMoney::Calls::Base) }
     def transaction_calls
       with_valid_api_key do
         @transaction_calls ||= T.let(
-          LunchMoney::TransactionCalls.new(api_key:),
-          T.nilable(LunchMoney::TransactionCalls),
+          LunchMoney::Calls::Transactions.new(api_key:),
+          T.nilable(LunchMoney::Calls::Transactions),
         )
       end
     end
 
     delegate :recurring_expenses, to: :recurring_expense_calls
 
-    sig { returns(LunchMoney::ApiCall) }
+    sig { returns(LunchMoney::Calls::Base) }
     def recurring_expense_calls
       with_valid_api_key do
         @recurring_expense_calls ||= T.let(
-          LunchMoney::RecurringExpenseCalls.new(api_key:),
-          T.nilable(LunchMoney::RecurringExpenseCalls),
+          LunchMoney::Calls::RecurringExpenses.new(api_key:),
+          T.nilable(LunchMoney::Calls::RecurringExpenses),
         )
       end
     end
 
     delegate :budgets, :upsert_budget, :remove_budget, to: :budget_calls
 
-    sig { returns(LunchMoney::ApiCall) }
+    sig { returns(LunchMoney::Calls::Base) }
     def budget_calls
       with_valid_api_key do
-        @budget_calls ||= T.let(LunchMoney::BudgetCalls.new(api_key:), T.nilable(LunchMoney::BudgetCalls))
+        @budget_calls ||= T.let(LunchMoney::Calls::Budgets.new(api_key:), T.nilable(LunchMoney::Calls::Budgets))
       end
     end
 
     delegate :assets, :create_asset, :update_asset, to: :asset_calls
 
-    sig { returns(LunchMoney::ApiCall) }
+    sig { returns(LunchMoney::Calls::Base) }
     def asset_calls
       with_valid_api_key do
-        @asset_calls ||= T.let(LunchMoney::AssetCalls.new(api_key:), T.nilable(LunchMoney::AssetCalls))
+        @asset_calls ||= T.let(LunchMoney::Calls::Assets.new(api_key:), T.nilable(LunchMoney::Calls::Assets))
       end
     end
 
     delegate :plaid_accounts, :plaid_accounts_fetch, to: :plaid_account_calls
 
-    sig { returns(LunchMoney::ApiCall) }
+    sig { returns(LunchMoney::Calls::Base) }
     def plaid_account_calls
       with_valid_api_key do
         @plaid_account_calls ||= T.let(
-          LunchMoney::PlaidAccountCalls.new(api_key:),
-          T.nilable(LunchMoney::PlaidAccountCalls),
+          LunchMoney::Calls::PlaidAccounts.new(api_key:),
+          T.nilable(LunchMoney::Calls::PlaidAccounts),
         )
       end
     end
 
     delegate :crypto, :update_crypto, to: :crypto_calls
 
-    sig { returns(LunchMoney::ApiCall) }
+    sig { returns(LunchMoney::Calls::Base) }
     def crypto_calls
       with_valid_api_key do
-        @crypto_calls ||= T.let(LunchMoney::CryptoCalls.new(api_key:), T.nilable(LunchMoney::CryptoCalls))
+        @crypto_calls ||= T.let(LunchMoney::Calls::Crypto.new(api_key:), T.nilable(LunchMoney::Calls::Crypto))
       end
     end
 
     private
 
-    sig { params(block: T.proc.returns(LunchMoney::ApiCall)).returns(LunchMoney::ApiCall) }
+    sig { params(block: T.proc.returns(LunchMoney::Calls::Base)).returns(LunchMoney::Calls::Base) }
     def with_valid_api_key(&block)
       raise(InvalidApiKey, "API key is missing or invalid") if api_key.blank?
 
