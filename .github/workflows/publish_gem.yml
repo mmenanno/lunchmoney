@@ -8,6 +8,7 @@ jobs:
   build:
     name: Build & Release Gem
     runs-on: ubuntu-latest
+    environment: rubygems
 
     steps:
       - uses: actions/checkout@v4
