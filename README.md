@@ -4,11 +4,9 @@
 [![CI](https://github.com/halorrr/lunchmoney/actions/workflows/ci.yml/badge.svg)](https://github.com/halorrr/lunchmoney/actions/workflows/ci.yml)
 [![Yard Docs](https://github.com/halorrr/lunchmoney/actions/workflows/build_and_publish_yard_docs.yml/badge.svg)](https://github.com/halorrr/lunchmoney/actions/workflows/build_and_publish_yard_docs.yml)
 
-This gem and readme are very much a work in progress. More to come!
+This gem is a API client library of the [LunchMoney API](https://lunchmoney.dev/) for the wonderful [LunchMoney](http://lunchmoney.app/) web app for personal finance & budgeting.
 
-This gem is a library of the [LunchMoney API](https://lunchmoney.dev/) for the wonderful [LunchMoney](http://lunchmoney.app/) web app for personal finance & budgeting.
-
-You can find the yard docs for this gem [here](https://halorrr.github.io/lunchmoney/)
+Documentation is still a work in process, but you can find the yard docs for this gem [here](https://halorrr.github.io/lunchmoney/) as well as some write ups of the basics below.
 
 ## Usage
 
@@ -40,11 +38,46 @@ LunchMoney::Api.new(api_key: "your_api_key")
 
 ### Using the API
 
-Create an instance of the api, then call the endpoint you need:
+It is intended that all calls typically go through a `LunchMoney::Api` instannce. This class delegates methods to their
+relvant classes behind the scenes. Create an instance of the api, then call the endpoint you need:
 
 ```Ruby
 api = LunchMoney::Api.new
 api.categories
+```
+
+When the api returns an error a `LunchMoney::Errors` object will be returned. You can check the errors that occured via
+`.messages` on the instance. This will return an array of errors.
+
+```Ruby
+api = LunchMoney::Api.new
+response = api.categories
+
+response.class
+=> LunchMoney::Errors
+
+response.messages
+=> ["Some error returned by the API"]
+```
+
+The instance itself has been set up to act like an array, delegating a lot of common array getter methods directly to
+messages for you. This enables things like:
+
+```Ruby
+api = LunchMoney::Api.new
+response = api.categories
+
+response.class
+=> LunchMoney::Errors
+
+response.first
+=> "Some error returned by the API"
+
+response.empty?
+=> false
+
+response[0]
+=> "Some error returned by the API"
 ```
 
 ## Contributing to this repo
