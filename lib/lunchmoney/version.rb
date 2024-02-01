@@ -3,5 +3,5 @@
 
 module LunchMoney
   # Current version of the gem
-  VERSION = "0.9.1"
+  VERSION = "0.10.0"
 end
