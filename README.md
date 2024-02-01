@@ -6,7 +6,7 @@
 
 This gem is a API client library of the [LunchMoney API](https://lunchmoney.dev/) for the wonderful [LunchMoney](http://lunchmoney.app/) web app for personal finance & budgeting.
 
-Documentation is still a work in process, but you can find the yard docs for this gem [here](https://halorrr.github.io/lunchmoney/) as well as some write ups of the basics below.
+Documentation is still a work in process, but you can find the yard docs for this gem [here](https://halorrr.github.io/lunchmoney/) as well as some write ups of the basics below. An example of every call is listed on the [Api class in the yard docs](https://halorrr.github.io/lunchmoney/LunchMoney/Api.html).
 
 ## Usage
 
