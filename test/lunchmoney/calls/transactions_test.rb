@@ -55,7 +55,7 @@ module LunchMoney
       test "transaction_group returns a Transaction objects on success response" do
         with_real_ci_connections do
           VCR.use_cassette("transactions/transaction_group_success") do
-            api_call = LunchMoney::Calls::Transactions.new.transaction(894063595)
+            api_call = LunchMoney::Calls::Transactions.new.transaction_group(894063595)
 
             assert_kind_of(LunchMoney::Objects::Transaction, api_call)
           end
@@ -66,7 +66,7 @@ module LunchMoney
         response = mock_faraday_lunchmoney_error_response
         LunchMoney::Calls::Transactions.any_instance.stubs(:get).returns(response)
 
-        api_call = LunchMoney::Calls::Transactions.new.transaction(893631800)
+        api_call = LunchMoney::Calls::Transactions.new.transaction_group(893631800)
 
         assert_kind_of(LunchMoney::Errors, api_call)
       end
