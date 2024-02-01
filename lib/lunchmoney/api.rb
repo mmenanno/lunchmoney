@@ -208,6 +208,16 @@ module LunchMoney
     # @example [Get All Assets](https://lunchmoney.dev/#get-all-assets)
     #   api = LunchMoney::Api.new
     #   api.assets
+    # @example [Create Asset](https://lunchmoney.dev/#create-asset)
+    #   api = LunchMoney::Api.new
+    #   api.create_asset(
+    #     type_name: "cash",
+    #     name: "Create Asset Test",
+    #     balance: "10.00",
+    #   )
+    # @example [Update Asset](https://lunchmoney.dev/#update-asset)
+    #   api = LunchMoney::Api.new
+    #   api.update_asset(93746, balance: "99.99")
     sig { returns(LunchMoney::Calls::Base) }
     def asset_calls
       with_valid_api_key do
