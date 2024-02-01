@@ -1,6 +1,8 @@
 # typed: strict
 # frozen_string_literal: true
 
+require_relative "transaction_modification_base"
+
 module LunchMoney
   # Object used to split a transaction when updating https://lunchmoney.dev/#update-transaction
   class Split < TransactionModificationBase

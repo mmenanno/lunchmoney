@@ -1,6 +1,8 @@
 # typed: strict
 # frozen_string_literal: true
 
+require_relative "transaction_base"
+
 module LunchMoney
   # Slimmed down version of https://lunchmoney.dev/#transaction-object used in the
   # `children` field of a transaction object with an additional `formatted_date`` field

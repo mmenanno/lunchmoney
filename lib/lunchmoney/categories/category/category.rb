@@ -1,6 +1,7 @@
 # typed: strict
 # frozen_string_literal: true
 
+require_relative "child_category"
 module LunchMoney
   # https://lunchmoney.dev/#categories-object
   class Category < ChildCategory

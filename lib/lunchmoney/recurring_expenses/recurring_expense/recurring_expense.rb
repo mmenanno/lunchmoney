@@ -1,6 +1,7 @@
 # typed: strict
 # frozen_string_literal: true
 
+require_relative "recurring_expense_base"
 module LunchMoney
   # https://lunchmoney.dev/#recurring-expenses-object
   class RecurringExpense < RecurringExpenseBase

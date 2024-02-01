@@ -1,6 +1,8 @@
 # typed: strict
 # frozen_string_literal: true
 
+require_relative "transaction_modification_base"
+
 module LunchMoney
   # object used when updating a transaction https://lunchmoney.dev/#update-transaction
   class UpdateTransaction < TransactionModificationBase

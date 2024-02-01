@@ -1,6 +1,8 @@
 # typed: strict
 # frozen_string_literal: true
 
+require_relative "transaction_base"
+
 module LunchMoney
   # https://lunchmoney.dev/#transaction-object
   class Transaction < TransactionBase

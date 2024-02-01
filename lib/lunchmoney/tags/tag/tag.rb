@@ -1,6 +1,8 @@
 # typed: strict
 # frozen_string_literal: true
 
+require_relative "tag_base"
+
 module LunchMoney
   # https://lunchmoney.dev/#tags-object
   class Tag < TagBase

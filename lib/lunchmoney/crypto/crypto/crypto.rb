@@ -1,6 +1,7 @@
 # typed: strict
 # frozen_string_literal: true
 
+require_relative "crypto_base"
 module LunchMoney
   # https://lunchmoney.dev/#crypto-object
   class Crypto < CryptoBase
