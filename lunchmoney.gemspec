@@ -3,13 +3,13 @@
 require_relative "lib/lunchmoney/version"
 
 Gem::Specification.new do |spec|
-  spec.name                   = "lunchmoney-ruby"
+  spec.name                   = "lunchmoney"
   spec.version                = LunchMoney::VERSION
   spec.author                 = "@halorrr"
   spec.email                  = "halorrr@gmail.com"
 
   spec.summary                = "LunchMoney API client library."
-  spec.homepage               = "https://github.com/halorrr/lunchmoney-ruby"
+  spec.homepage               = "https://github.com/halorrr/lunchmoney"
   spec.required_ruby_version  = ">= 3.1"
   spec.license = "MIT"
 
