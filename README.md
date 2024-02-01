@@ -1,8 +1,8 @@
+# lunchmoney
+
 [![Gem Version](https://badge.fury.io/rb/lunchmoney.svg)](https://badge.fury.io/rb/lunchmoney)
 [![CI](https://github.com/halorrr/lunchmoney/actions/workflows/ci.yml/badge.svg)](https://github.com/halorrr/lunchmoney/actions/workflows/ci.yml)
 [![Yard Docs](https://github.com/halorrr/lunchmoney/actions/workflows/build_and_publish_yard_docs.yml/badge.svg)](https://github.com/halorrr/lunchmoney/actions/workflows/build_and_publish_yard_docs.yml)
-
-# lunchmoney
 
 This gem and readme are very much a work in progress. More to come!
 
