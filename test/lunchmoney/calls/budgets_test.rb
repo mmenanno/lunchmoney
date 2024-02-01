@@ -15,7 +15,7 @@ module LunchMoney
             api_call = LunchMoney::Calls::Budgets.new.budgets(start_date: "2023-01-01", end_date: "2024-01-01")
 
             api_call.each do |budget|
-              assert_kind_of(LunchMoney::Budget, budget)
+              assert_kind_of(LunchMoney::Objects::Budget, budget)
             end
           end
         end

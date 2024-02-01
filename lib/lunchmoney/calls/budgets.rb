@@ -1,7 +1,7 @@
 # typed: strict
 # frozen_string_literal: true
 
-require_relative "../budget/budget"
+require_relative "../objects/budget"
 
 module LunchMoney
   module Calls
@@ -12,7 +12,7 @@ module LunchMoney
           start_date: String,
           end_date: String,
           currency: T.nilable(String),
-        ).returns(T.any(T::Array[LunchMoney::Budget], LunchMoney::Errors))
+        ).returns(T.any(T::Array[LunchMoney::Objects::Budget], LunchMoney::Errors))
       end
       def budgets(start_date:, end_date:, currency: nil)
         params = clean_params({ start_date:, end_date:, currency: })
@@ -25,22 +25,22 @@ module LunchMoney
           if budget[:data]
             data_keys = budget[:data].keys
             data_keys.each do |data_key|
-              budget[:data][data_key] = LunchMoney::Data.new(**budget[:data][data_key])
+              budget[:data][data_key] = LunchMoney::Objects::Data.new(**budget[:data][data_key])
             end
           end
 
           if budget[:config]
             config_keys = budget[:config].keys
             config_keys.each do |config_key|
-              budget[:config][config_key] = LunchMoney::Data.new(**budget[:config][config_key])
+              budget[:config][config_key] = LunchMoney::Objects::Data.new(**budget[:config][config_key])
             end
           end
 
           if budget[:recurring]
-            budget[:recurring][:list]&.map! { |recurring| LunchMoney::RecurringExpenseBase.new(**recurring) }
+            budget[:recurring][:list]&.map! { |recurring| LunchMoney::Objects::RecurringExpenseBase.new(**recurring) }
           end
 
-          LunchMoney::Budget.new(**budget)
+          LunchMoney::Objects::Budget.new(**budget)
         end
       end
 

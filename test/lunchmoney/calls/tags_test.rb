@@ -15,7 +15,7 @@ module LunchMoney
             api_call = LunchMoney::Calls::Tags.new.tags
 
             api_call.each do |tag|
-              assert_kind_of(LunchMoney::Tag, tag)
+              assert_kind_of(LunchMoney::Objects::Tag, tag)
             end
           end
         end

@@ -1,13 +1,13 @@
 # typed: strict
 # frozen_string_literal: true
 
-require_relative "../assets/asset"
+require_relative "../objects/asset"
 
 module LunchMoney
   module Calls
     # https://lunchmoney.dev/#assets
     class Assets < LunchMoney::Calls::Base
-      sig { returns(T.any(T::Array[LunchMoney::Asset], LunchMoney::Errors)) }
+      sig { returns(T.any(T::Array[LunchMoney::Objects::Asset], LunchMoney::Errors)) }
       def assets
         response = get("assets")
 
@@ -15,7 +15,7 @@ module LunchMoney
         return api_errors if api_errors.present?
 
         response.body[:assets].map do |asset|
-          LunchMoney::Asset.new(**asset)
+          LunchMoney::Objects::Asset.new(**asset)
         end
       end
 
@@ -31,7 +31,7 @@ module LunchMoney
           institution_name: T.nilable(String),
           closed_on: T.nilable(String),
           exclude_transactions: T.nilable(T::Boolean),
-        ).returns(T.any(LunchMoney::Asset, LunchMoney::Errors))
+        ).returns(T.any(LunchMoney::Objects::Asset, LunchMoney::Errors))
       end
       def create_asset(type_name:, name:, balance:, subtype_name: nil, display_name: nil, balance_as_of: nil,
         currency: nil, institution_name: nil, closed_on: nil, exclude_transactions: nil)
@@ -53,7 +53,7 @@ module LunchMoney
         api_errors = errors(response)
         return api_errors if api_errors.present?
 
-        LunchMoney::Asset.new(**response.body)
+        LunchMoney::Objects::Asset.new(**response.body)
       end
 
       sig do
@@ -69,7 +69,7 @@ module LunchMoney
           institution_name: T.nilable(String),
           closed_on: T.nilable(String),
           exclude_transactions: T.nilable(T::Boolean),
-        ).returns(T.any(LunchMoney::Asset, LunchMoney::Errors))
+        ).returns(T.any(LunchMoney::Objects::Asset, LunchMoney::Errors))
       end
       def update_asset(asset_id, type_name: nil, name: nil, balance: nil, subtype_name: nil, display_name: nil,
         balance_as_of: nil, currency: nil, institution_name: nil, closed_on: nil, exclude_transactions: nil)
@@ -91,7 +91,7 @@ module LunchMoney
         api_errors = errors(response)
         return api_errors if api_errors.present?
 
-        LunchMoney::Asset.new(**response.body)
+        LunchMoney::Objects::Asset.new(**response.body)
       end
     end
   end

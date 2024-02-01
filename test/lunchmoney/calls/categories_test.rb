@@ -15,7 +15,7 @@ module LunchMoney
             api_call = LunchMoney::Calls::Categories.new.categories
 
             api_call.each do |category|
-              assert_kind_of(LunchMoney::Category, category)
+              assert_kind_of(LunchMoney::Objects::Category, category)
             end
           end
         end
@@ -69,7 +69,7 @@ module LunchMoney
           VCR.use_cassette("categories/category_category_success") do
             api_call = LunchMoney::Calls::Categories.new.category(777052)
 
-            assert_kind_of(LunchMoney::Category, api_call)
+            assert_kind_of(LunchMoney::Objects::Category, api_call)
           end
         end
       end
@@ -79,7 +79,7 @@ module LunchMoney
           VCR.use_cassette("categories/category_category_group_success") do
             api_call = LunchMoney::Calls::Categories.new.category(777021)
 
-            assert_kind_of(LunchMoney::Category, api_call)
+            assert_kind_of(LunchMoney::Objects::Category, api_call)
           end
         end
       end
@@ -152,7 +152,7 @@ module LunchMoney
             new_categories: ["New Category Test"],
           )
 
-          assert_kind_of(LunchMoney::Category, api_call)
+          assert_kind_of(LunchMoney::Objects::Category, api_call)
         end
       end
 

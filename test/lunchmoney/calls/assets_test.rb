@@ -15,7 +15,7 @@ module LunchMoney
             api_call = LunchMoney::Calls::Assets.new.assets
 
             api_call.each do |asset|
-              assert_kind_of(LunchMoney::Asset, asset)
+              assert_kind_of(LunchMoney::Objects::Asset, asset)
             end
           end
         end

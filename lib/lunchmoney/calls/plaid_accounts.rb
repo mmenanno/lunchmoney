@@ -1,13 +1,13 @@
 # typed: strict
 # frozen_string_literal: true
 
-require_relative "../plaid_accounts/plaid_account"
+require_relative "../objects/plaid_account"
 
 module LunchMoney
   module Calls
     # https://lunchmoney.dev/#plaid-accounts
     class PlaidAccounts < LunchMoney::Calls::Base
-      sig { returns(T.any(T::Array[LunchMoney::PlaidAccount], LunchMoney::Errors)) }
+      sig { returns(T.any(T::Array[LunchMoney::Objects::PlaidAccount], LunchMoney::Errors)) }
       def plaid_accounts
         response = get("plaid_accounts")
 
@@ -15,7 +15,7 @@ module LunchMoney
         return api_errors if api_errors.present?
 
         response.body[:plaid_accounts].map do |plaid_account|
-          LunchMoney::PlaidAccount.new(**plaid_account)
+          LunchMoney::Objects::PlaidAccount.new(**plaid_account)
         end
       end
 

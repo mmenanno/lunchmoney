@@ -1,7 +1,7 @@
 # typed: strict
 # frozen_string_literal: true
 
-require_relative "../categories/category/category"
+require_relative "../objects/category"
 
 module LunchMoney
   module Calls
@@ -19,7 +19,7 @@ module LunchMoney
       sig do
         params(
           format: T.nilable(T.any(String, Symbol)),
-        ).returns(T.any(T::Array[LunchMoney::Category], LunchMoney::Errors))
+        ).returns(T.any(T::Array[LunchMoney::Objects::Category], LunchMoney::Errors))
       end
       def categories(format: nil)
         response = get("categories", query_params: categories_params(format:))
@@ -28,22 +28,22 @@ module LunchMoney
         return api_errors if api_errors.present?
 
         response.body[:categories].map do |category|
-          category[:children]&.map! { |child_category| LunchMoney::Category.new(**child_category) }
+          category[:children]&.map! { |child_category| LunchMoney::Objects::Category.new(**child_category) }
 
-          LunchMoney::Category.new(**category)
+          LunchMoney::Objects::Category.new(**category)
         end
       end
 
-      sig { params(category_id: Integer).returns(T.any(LunchMoney::Category, LunchMoney::Errors)) }
+      sig { params(category_id: Integer).returns(T.any(LunchMoney::Objects::Category, LunchMoney::Errors)) }
       def category(category_id)
         response = get("categories/#{category_id}")
 
         api_errors = errors(response)
         return api_errors if api_errors.present?
 
-        response.body[:children]&.map! { |child_category| LunchMoney::ChildCategory.new(**child_category) }
+        response.body[:children]&.map! { |child_category| LunchMoney::Objects::ChildCategory.new(**child_category) }
 
-        LunchMoney::Category.new(**response.body)
+        LunchMoney::Objects::Category.new(**response.body)
       end
 
       sig do
@@ -145,7 +145,7 @@ module LunchMoney
           group_id: Integer,
           category_ids: T::Array[Integer],
           new_categories: T::Array[String],
-        ).returns(T.any(LunchMoney::Category, LunchMoney::Errors))
+        ).returns(T.any(LunchMoney::Objects::Category, LunchMoney::Errors))
       end
       def add_to_category_group(group_id, category_ids: [], new_categories: [])
         params = {
@@ -158,7 +158,7 @@ module LunchMoney
         api_errors = errors(response)
         return api_errors if api_errors.present?
 
-        LunchMoney::Category.new(**response.body)
+        LunchMoney::Objects::Category.new(**response.body)
       end
 
       sig { params(category_id: Integer).returns(T.any(T::Boolean, LunchMoney::Errors)) }

@@ -18,7 +18,7 @@ module LunchMoney
             )
 
             api_call.each do |transaction|
-              assert_kind_of(LunchMoney::Transaction, transaction)
+              assert_kind_of(LunchMoney::Objects::Transaction, transaction)
             end
           end
         end
@@ -38,7 +38,7 @@ module LunchMoney
           VCR.use_cassette("transactions/transaction_success") do
             api_call = LunchMoney::Calls::Transactions.new.transaction(893631800)
 
-            assert_kind_of(LunchMoney::Transaction, api_call)
+            assert_kind_of(LunchMoney::Objects::Transaction, api_call)
           end
         end
       end
@@ -57,7 +57,7 @@ module LunchMoney
           VCR.use_cassette("transactions/transaction_group_success") do
             api_call = LunchMoney::Calls::Transactions.new.transaction(894063595)
 
-            assert_kind_of(LunchMoney::Transaction, api_call)
+            assert_kind_of(LunchMoney::Objects::Transaction, api_call)
           end
         end
       end
@@ -108,8 +108,8 @@ module LunchMoney
       test "update_transaction returns a hash containing an updated boolean and split ids on success split response" do
         VCR.use_cassette("transactions/update_transactions_split_success") do
           split = [
-            LunchMoney::Split.new(amount: "10.00"),
-            LunchMoney::Split.new(amount: "47.54"),
+            LunchMoney::Objects::Split.new(amount: "10.00"),
+            LunchMoney::Objects::Split.new(amount: "47.54"),
           ]
           api_call = LunchMoney::Calls::Transactions.new.update_transaction(904778058, split:)
 
@@ -206,14 +206,14 @@ module LunchMoney
 
       private
 
-      sig { params(status: String).returns(LunchMoney::UpdateTransaction) }
+      sig { params(status: String).returns(LunchMoney::Objects::UpdateTransaction) }
       def random_update_transaction(status: "uncleared")
         date = Time.now.utc.strftime("%F")
         amount = rand(0.1..99.9).to_s
         payee = "Gem Remote Testing"
         notes = "Remote test at #{Time.now.utc}"
         currency = "cad"
-        LunchMoney::UpdateTransaction.new(date:, amount:, payee:, notes:, currency:, status:)
+        LunchMoney::Objects::UpdateTransaction.new(date:, amount:, payee:, notes:, currency:, status:)
       end
     end
   end

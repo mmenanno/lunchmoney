@@ -1,10 +1,10 @@
 # typed: strict
 # frozen_string_literal: true
 
-require_relative "../transactions/transaction/child_transaction"
-require_relative "../transactions/transaction/transaction"
-require_relative "../transactions/transaction/split"
-require_relative "../transactions/transaction/update_transaction"
+require_relative "../objects/child_transaction"
+require_relative "../objects/transaction"
+require_relative "../objects/split"
+require_relative "../objects/update_transaction"
 
 module LunchMoney
   module Calls
@@ -25,7 +25,7 @@ module LunchMoney
           pending: T.nilable(T::Boolean),
           offset: T.nilable(Integer),
           limit: T.nilable(Integer),
-        ).returns(T.any(T::Array[LunchMoney::Transaction], LunchMoney::Errors))
+        ).returns(T.any(T::Array[LunchMoney::Objects::Transaction], LunchMoney::Errors))
       end
       def transactions(
         tag_id: nil,
@@ -64,11 +64,13 @@ module LunchMoney
         return api_errors if api_errors.present?
 
         response.body[:transactions].map do |transaction|
-          transaction[:tags].map! { |tag| LunchMoney::TagBase.new(**tag) }
+          transaction[:tags].map! { |tag| LunchMoney::Objects::TagBase.new(**tag) }
 
-          transaction[:children]&.map! { |child_transaction| LunchMoney::ChildTransaction.new(**child_transaction) }
+          transaction[:children]&.map! do |child_transaction|
+            LunchMoney::Objects::ChildTransaction.new(**child_transaction)
+          end
 
-          LunchMoney::Transaction.new(**transaction)
+          LunchMoney::Objects::Transaction.new(**transaction)
         end
       end
 
@@ -76,7 +78,7 @@ module LunchMoney
         params(
           transaction_id: Integer,
           debit_as_negative: T.nilable(T::Boolean),
-        ).returns(T.any(LunchMoney::Transaction, LunchMoney::Errors))
+        ).returns(T.any(LunchMoney::Objects::Transaction, LunchMoney::Errors))
       end
       def transaction(transaction_id, debit_as_negative: nil)
         params = clean_params({ debit_as_negative: })
@@ -85,12 +87,12 @@ module LunchMoney
         api_errors = errors(response)
         return api_errors if api_errors.present?
 
-        LunchMoney::Transaction.new(**response.body)
+        LunchMoney::Objects::Transaction.new(**response.body)
       end
 
       sig do
         params(
-          transactions: T::Array[LunchMoney::UpdateTransaction],
+          transactions: T::Array[LunchMoney::Objects::UpdateTransaction],
           apply_rules: T.nilable(T::Boolean),
           skip_duplicates: T.nilable(T::Boolean),
           check_for_recurring: T.nilable(T::Boolean),
@@ -119,8 +121,8 @@ module LunchMoney
       sig do
         params(
           transaction_id: Integer,
-          transaction: T.nilable(LunchMoney::UpdateTransaction),
-          split: T.nilable(T::Array[LunchMoney::Split]),
+          transaction: T.nilable(LunchMoney::Objects::UpdateTransaction),
+          split: T.nilable(T::Array[LunchMoney::Objects::Split]),
           debit_as_negative: T.nilable(T::Boolean),
           skip_balance_update: T.nilable(T::Boolean),
         ).returns(T.any({ updated: T::Boolean, split: T.nilable(T::Array[Integer]) }, LunchMoney::Errors))
@@ -162,14 +164,14 @@ module LunchMoney
         response.body
       end
 
-      sig { params(transaction_id: Integer).returns(T.any(LunchMoney::Transaction, LunchMoney::Errors)) }
+      sig { params(transaction_id: Integer).returns(T.any(LunchMoney::Objects::Transaction, LunchMoney::Errors)) }
       def transaction_group(transaction_id)
         response = get("transactions/group", query_params: { transaction_id: })
 
         api_errors = errors(response)
         return api_errors if api_errors.present?
 
-        LunchMoney::Transaction.new(**response.body)
+        LunchMoney::Objects::Transaction.new(**response.body)
       end
 
       sig do

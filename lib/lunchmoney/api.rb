@@ -5,7 +5,7 @@ require_relative "exceptions"
 require_relative "configuration"
 
 require_relative "calls/base"
-require_relative "data_object"
+require_relative "objects/object"
 require_relative "calls/users"
 require_relative "calls/categories"
 require_relative "calls/tags"

@@ -14,7 +14,7 @@ module LunchMoney
           VCR.use_cassette("user/me_success") do
             api_call = LunchMoney::Calls::Users.new.me
 
-            assert_kind_of(LunchMoney::User, api_call)
+            assert_kind_of(LunchMoney::Objects::User, api_call)
           end
         end
       end

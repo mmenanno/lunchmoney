@@ -15,7 +15,7 @@ module LunchMoney
             api_call = LunchMoney::Calls::RecurringExpenses.new.recurring_expenses
 
             api_call.each do |recurring_expense|
-              assert_kind_of(LunchMoney::RecurringExpense, recurring_expense)
+              assert_kind_of(LunchMoney::Objects::RecurringExpense, recurring_expense)
             end
           end
         end

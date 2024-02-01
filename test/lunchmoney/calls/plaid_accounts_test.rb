@@ -15,7 +15,7 @@ module LunchMoney
             api_call = LunchMoney::Calls::PlaidAccounts.new.plaid_accounts
 
             api_call.each do |plaid_account|
-              assert_kind_of(LunchMoney::PlaidAccount, plaid_account)
+              assert_kind_of(LunchMoney::Objects::PlaidAccount, plaid_account)
             end
           end
         end

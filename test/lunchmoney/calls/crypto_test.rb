@@ -15,7 +15,7 @@ module LunchMoney
             api_call = LunchMoney::Calls::Crypto.new.crypto
 
             api_call.each do |crypto|
-              assert_kind_of(LunchMoney::Crypto, crypto)
+              assert_kind_of(LunchMoney::Objects::Crypto, crypto)
             end
           end
         end
@@ -34,7 +34,7 @@ module LunchMoney
         VCR.use_cassette("crypto/update_crypto_success") do
           api_call = LunchMoney::Calls::Crypto.new.update_crypto(7638, balance: "2.000000000000000000")
 
-          assert_kind_of(LunchMoney::CryptoBase, api_call)
+          assert_kind_of(LunchMoney::Objects::CryptoBase, api_call)
         end
       end
 
