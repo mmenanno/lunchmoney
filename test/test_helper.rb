@@ -5,7 +5,7 @@ $LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
 
 require "sorbet-runtime"
 require "dotenv/load"
-require "lunchmoney-ruby"
+require "lunchmoney"
 require "minitest/autorun"
 require "minitest/pride"
 require "active_support"

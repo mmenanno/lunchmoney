@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    lunchmoney-ruby (0.9.1)
+    lunchmoney (0.9.1)
       activesupport (>= 6.1)
       faraday (>= 1.0.0)
       sorbet-runtime (>= 0.5)
@@ -153,7 +153,7 @@ PLATFORMS
 DEPENDENCIES
   appraisal
   dotenv
-  lunchmoney-ruby!
+  lunchmoney!
   minitest (~> 5.21)
   mocha (~> 2.1.0)
   pry-sorbet (~> 0.2)
