@@ -35,6 +35,7 @@ module LunchMoney
           "employee compensation",
           "other liability",
           "other asset",
+          "depository",
         ],
         T::Array[String],
       )
