@@ -4,9 +4,15 @@
 require_relative "../errors"
 
 module LunchMoney
-  # Namespace for API call classes
+  # Namespace for all API call classes. The methods on these classes should not typically be accessed directly.
+  # Instead they should be accessed through `LunchMoney::Api` instances, which will handle delegating the methods to
+  # the appropriate Calls class.
+  # @example
+  #   api = LunchMoney::Api.new
+  #   api.categories # This will be delegated to LunchMoney::Calls::Categories#categories
   module Calls
-    # Base class for all API call types
+    # Base class for all API call types. Containing the base methods got HTTP call types like GET / POST / PUT / DELETE
+    # as well as the general error handler
     class Base
       # Base URL used for API calls
       BASE_URL = "https://dev.lunchmoney.app/v1/"
