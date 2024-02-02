@@ -10,23 +10,20 @@ jobs:
     runs-on: ubuntu-latest
     environment: rubygems
 
-    steps:
-      - uses: actions/checkout@v4
+    permissions:
+      contents: write
+      id-token: write
 
+    steps:
+      # Set up
+      - uses: actions/checkout@v4
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.3.0
           bundler-cache: true
-      - name: Release Gem
-        if: contains(github.ref, 'refs/tags/v')
-        run: |
-          mkdir -p $HOME/.gem
-          touch $HOME/.gem/credentials
-          chmod 0600 $HOME/.gem/credentials
-          printf -- "---\n:rubygems_api_key: ${RUBYGEMS_API_KEY}\n" > $HOME/.gem/credentials
-          gem build *.gemspec
-          gem push *.gem
-        env:
-          RUBYGEMS_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
+          ruby-version: ruby
+
+      # Release
+      - name: Publish to RubyGems
+        uses: rubygems/release-gem@v1
 
