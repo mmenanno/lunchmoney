@@ -3,7 +3,6 @@ on:
   pull_request:
     paths:
       - 'Gemfile.lock'
-      - 'Gemfile'
 
 jobs:
   update-rbis:
