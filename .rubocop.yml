@@ -22,14 +22,17 @@ Sorbet/FalseSigil:
 Sorbet/StrictSigil:
   Enabled: true
   Exclude:
-    - "test/*"
     - ".toys/**/*"
 
 Sorbet/ForbidTStruct:
+# Context for why this is preferable https://github.com/Shopify/rubocop-sorbet/pull/178#issuecomment-1739924189
   Enabled: true
-  # Context for why this is preferable https://github.com/Shopify/rubocop-sorbet/pull/178#issuecomment-1739924189
+
 
 Sorbet/RedundantExtendTSig:
+  Enabled: true
+
+Sorbet/ForbidTUnsafe:
   Enabled: true
 
 Minitest:
