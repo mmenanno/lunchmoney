@@ -1,9 +1,8 @@
 name: Publish Gem
 
 on:
-  push:
-    tags:
-      - v*
+  workflow_call:
+
 jobs:
   build:
     name: Build & Release Gem

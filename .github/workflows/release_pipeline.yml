@@ -1,0 +1,19 @@
+name: Release Pipeline
+
+on:
+    push:
+        tags:
+            - v*
+
+jobs:
+    ci:
+        if: always() && contains(needs.*.result, 'skipped')
+        name: "CI"
+        uses: halorrr/lunchmoney/.github/workflows/ci.yml@main
+        secrets: inherit
+    release:
+        needs: ci
+        if: always() && !contains(needs.*.result, 'failed') && !contains(needs.*.result, 'cancelled')
+        name: "Release"
+        uses: halorrr/lunchmoney/.github/workflows/publish_gem.yml@main
+        secrets: inherit
