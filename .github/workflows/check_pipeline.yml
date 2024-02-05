@@ -18,7 +18,7 @@ jobs:
 
   ci:
     needs: update-rbis
-    if: always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
+    if: always() && contains(needs.*.result, 'skipped')
     name: "CI"
     uses: halorrr/lunchmoney/.github/workflows/ci.yml@main
     secrets: inherit
