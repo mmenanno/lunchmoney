@@ -93,15 +93,13 @@ module LunchMoney
       end
 
       test "update_transaction returns a hash containing an updated boolean on success response" do
-        with_real_ci_connections do
-          VCR.use_cassette("transactions/update_transactions_success") do
-            api_call = LunchMoney::Calls::Transactions.new.update_transaction(
-              897349559,
-              transaction: random_update_transaction(status: "cleared"),
-            )
+        VCR.use_cassette("transactions/update_transactions_success") do
+          api_call = LunchMoney::Calls::Transactions.new.update_transaction(
+            897349559,
+            transaction: random_update_transaction(status: "cleared"),
+          )
 
-            assert(api_call[:updated])
-          end
+          assert(api_call[:updated])
         end
       end
 
