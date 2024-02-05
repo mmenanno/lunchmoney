@@ -1,11 +1,12 @@
 name: CI
 
 on:
-  push:
-    paths-ignore:
-      - ".gitignore"
-      - "README.md"
+  # push:
+  #   paths-ignore:
+  #     - ".gitignore"
+  #     - "README.md"
   workflow_dispatch:
+  workflow_call:
   schedule:
     # Every day at 9pm
     - cron: '0 21 * * *'
