@@ -1,6 +1,6 @@
 name: Dependabot RBI Updater
 on:
-  workflow_dispatch:
+  workflow_call:
   # pull_request:
   #   paths:
   #     - 'Gemfile.lock'
