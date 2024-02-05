@@ -33,13 +33,13 @@
 # source://toys//lib/toys/version.rb#3
 module Toys
   class << self
-    # source://toys-core/0.15.4/lib/toys/dsl/base.rb#28
+    # source://toys-core/0.15.5/lib/toys/dsl/base.rb#28
     def Tool(*args, name: T.unsafe(nil), base: T.unsafe(nil)); end
 
-    # source://toys-core/0.15.4/lib/toys-core.rb#114
+    # source://toys-core/0.15.5/lib/toys-core.rb#114
     def executable_path; end
 
-    # source://toys-core/0.15.4/lib/toys-core.rb#114
+    # source://toys-core/0.15.5/lib/toys-core.rb#114
     def executable_path=(_arg0); end
   end
 end
