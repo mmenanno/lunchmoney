@@ -2,11 +2,13 @@ name: Check Pipeline
 
 on:
   push:
+    branches-ignore:
+        - main
     paths-ignore:
-      - ".gitignore"
-      - "README.md"
+        - ".gitignore"
+        - "README.md"
     tags-ignore:
-      - v*
+        - v*
 
 jobs:
   update-rbis:
