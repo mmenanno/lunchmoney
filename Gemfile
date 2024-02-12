@@ -7,7 +7,7 @@ gemspec
 
 # Specify development dependencies here
 gem "toys"
-gem "minitest", "~> 5.21", require: false
+gem "minitest", "~> 5.22", require: false
 gem "mocha", "~> 2.1.0", require: false
 gem "webmock", require: false
 gem "vcr", require: false
