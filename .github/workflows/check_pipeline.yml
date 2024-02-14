@@ -13,12 +13,12 @@ on:
 jobs:
   update-rbis:
     name: RBI Updater
-    uses: halorrr/lunchmoney/.github/workflows/dependabot-rbi-updater.yml@main
+    uses: mmenanno/lunchmoney/.github/workflows/dependabot-rbi-updater.yml@main
     secrets: inherit
 
   ci:
     needs: update-rbis
     if: always() && contains(needs.*.result, 'skipped')
     name: "CI"
-    uses: halorrr/lunchmoney/.github/workflows/ci.yml@main
+    uses: mmenanno/lunchmoney/.github/workflows/ci.yml@main
     secrets: inherit
