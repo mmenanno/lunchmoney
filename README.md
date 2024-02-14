@@ -1,12 +1,12 @@
 # lunchmoney
 
 [![Gem Version](https://badge.fury.io/rb/lunchmoney.svg)](https://badge.fury.io/rb/lunchmoney)
-[![CI](https://github.com/halorrr/lunchmoney/actions/workflows/ci.yml/badge.svg)](https://github.com/halorrr/lunchmoney/actions/workflows/ci.yml)
-[![Yard Docs](https://github.com/halorrr/lunchmoney/actions/workflows/build_and_publish_yard_docs.yml/badge.svg)](https://github.com/halorrr/lunchmoney/actions/workflows/build_and_publish_yard_docs.yml)
+[![CI](https://github.com/mmenanno/lunchmoney/actions/workflows/ci.yml/badge.svg)](https://github.com/mmenanno/lunchmoney/actions/workflows/ci.yml)
+[![Yard Docs](https://github.com/mmenanno/lunchmoney/actions/workflows/build_and_publish_yard_docs.yml/badge.svg)](https://github.com/mmenanno/lunchmoney/actions/workflows/build_and_publish_yard_docs.yml)
 
 This gem is a API client library of the [LunchMoney API](https://lunchmoney.dev/) for the wonderful [LunchMoney](http://lunchmoney.app/) web app for personal finance & budgeting.
 
-Documentation is still a work in process, but you can find the yard docs for this gem [here](https://halorrr.github.io/lunchmoney/) as well as some write ups of the basics below. An example of every call is listed on the [Api class in the yard docs](https://halorrr.github.io/lunchmoney/LunchMoney/Api.html).
+Documentation is still a work in process, but you can find the yard docs for this gem [here](https://mmenanno.github.io/lunchmoney/) as well as some write ups of the basics below. An example of every call is listed on the [Api class in the yard docs](https://mmenanno.github.io/lunchmoney/LunchMoney/Api.html).
 
 ## Usage
 
