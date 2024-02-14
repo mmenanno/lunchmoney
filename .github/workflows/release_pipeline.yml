@@ -7,7 +7,6 @@ on:
 
 jobs:
     ci:
-        if: always() && contains(needs.*.result, 'skipped')
         name: "CI"
         uses: mmenanno/lunchmoney/.github/workflows/ci.yml@main
         secrets: inherit
