@@ -1,6 +1,7 @@
 name: Release Pipeline
 
 on:
+    workflow_dispatch:
     push:
         tags:
             - v*
@@ -11,6 +12,10 @@ jobs:
         uses: mmenanno/lunchmoney/.github/workflows/ci.yml@main
         secrets: inherit
     release:
+        permissions:
+            contents: write
+            id-token: write
+
         needs: ci
         if: always() && !contains(needs.*.result, 'failed') && !contains(needs.*.result, 'cancelled')
         name: "Release"
