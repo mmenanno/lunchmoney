@@ -5,18 +5,17 @@ require_relative "lib/lunchmoney/version"
 Gem::Specification.new do |spec|
   spec.name                   = "lunchmoney"
   spec.version                = LunchMoney::VERSION
-  spec.author                 = "@halorrr"
-  spec.email                  = "halorrr@gmail.com"
+  spec.author                 = "@mmenanno"
 
   spec.summary                = "LunchMoney API client library."
-  spec.homepage               = "https://github.com/halorrr/lunchmoney"
+  spec.homepage               = "https://github.com/mmenanno/lunchmoney"
   spec.required_ruby_version  = ">= 3.1"
   spec.license = "MIT"
 
   spec.metadata["allowed_push_host"]  = "https://rubygems.org"
   spec.metadata["homepage_uri"]       = spec.homepage
   spec.metadata["source_code_uri"]    = spec.homepage
-  spec.metadata["documentation_uri"]  = "https://halorrr.github.io/lunchmoney/"
+  spec.metadata["documentation_uri"]  = "https://mmenanno.github.io/lunchmoney/"
   spec.metadata["changelog_uri"]      = "#{spec.homepage}/releases"
 
   # Specify which files should be added to the gem when it is released.
