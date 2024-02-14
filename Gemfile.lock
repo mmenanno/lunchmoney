@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    lunchmoney (1.1.0)
+    lunchmoney (1.1.1)
       activesupport (>= 6.1)
       faraday (>= 1.0.0)
       sorbet-runtime (>= 0.5)
