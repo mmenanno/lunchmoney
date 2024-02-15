@@ -25,3 +25,4 @@ gem "yard-sorbet", require: false
 gem "appraisal", require: false
 gem "simplecov", require: false
 gem "simplecov_json_formatter", require: false
+gem "mdl", require: false

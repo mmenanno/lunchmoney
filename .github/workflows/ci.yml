@@ -42,6 +42,9 @@ jobs:
         name: Check for DSL rbi updates
         run: bin/tapioca dsl --verify
       -
+        name: Markdown Lint
+        run: bin/toys mdl
+      -
         name: Run Tests (Using Cassettes)
         if: ${{ ! endsWith(matrix.ruby-version, '3.3') }}
         run: bin/toys test

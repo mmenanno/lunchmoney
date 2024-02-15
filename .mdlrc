@@ -1,0 +1,4 @@
+all
+rule 'ol-prefix', :style => "ordered"
+
+exclude_rule 'line-length'
