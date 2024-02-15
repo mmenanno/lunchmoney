@@ -1,6 +1,8 @@
 # typed: strict
 # frozen_string_literal: true
 
+require "simplecov"
+
 $LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
 
 require "sorbet-runtime"
