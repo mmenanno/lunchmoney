@@ -2,7 +2,6 @@
 # frozen_string_literal: true
 
 require "simplecov"
-require "simplecov_json_formatter"
 
 $LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
 
