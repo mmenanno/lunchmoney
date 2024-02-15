@@ -9,7 +9,7 @@ on:
 jobs:
     ci:
         name: "CI"
-        uses: mmenanno/lunchmoney/.github/workflows/ci.yml@main
+        uses: ./.github/workflows/ci.yml
         secrets: inherit
     release:
         needs: ci
