@@ -3,7 +3,8 @@
 [![Gem Version](https://badge.fury.io/rb/lunchmoney.svg)](https://badge.fury.io/rb/lunchmoney)
 [![CI](https://github.com/mmenanno/lunchmoney/actions/workflows/ci.yml/badge.svg)](https://github.com/mmenanno/lunchmoney/actions/workflows/ci.yml)
 [![Yard Docs](https://github.com/mmenanno/lunchmoney/actions/workflows/build_and_publish_yard_docs.yml/badge.svg)](https://github.com/mmenanno/lunchmoney/actions/workflows/build_and_publish_yard_docs.yml)
-<a href="https://codeclimate.com/github/mmenanno/lunchmoney/maintainability" target="_blank"><img src="https://api.codeclimate.com/v1/badges/6e84458e8cf831e6a6fa/maintainability" /></a>
+[![Maintainability](https://api.codeclimate.com/v1/badges/6e84458e8cf831e6a6fa/maintainability)](https://codeclimate.com/github/mmenanno/lunchmoney/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/6e84458e8cf831e6a6fa/test_coverage)](https://codeclimate.com/github/mmenanno/lunchmoney/test_coverage)
 
 This gem is a API client library of the [LunchMoney API](https://lunchmoney.dev/) for the wonderful [LunchMoney](http://lunchmoney.app/) web app for personal finance & budgeting.
 
