@@ -1,0 +1,6 @@
+version: "2"         # required to adjust maintainability checks
+plugins:
+  flog:
+      enabled: true
+      config:
+        score_threshold: 20.0
