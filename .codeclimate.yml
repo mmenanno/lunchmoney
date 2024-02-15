@@ -2,5 +2,6 @@ version: "2"         # required to adjust maintainability checks
 plugins:
   flog:
       enabled: true
+      channel: flog-4-6-6
       config:
         score_threshold: 20.0
