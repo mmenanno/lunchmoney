@@ -170,6 +170,7 @@ DEPENDENCIES
   rubocop-shopify
   rubocop-sorbet
   simplecov
+  simplecov_json_formatter
   sorbet-static-and-runtime
   spoom
   tapioca

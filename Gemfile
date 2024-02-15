@@ -24,3 +24,4 @@ gem "yard", require: false
 gem "yard-sorbet", require: false
 gem "appraisal", require: false
 gem "simplecov", require: false
+gem "simplecov_json_formatter", require: false

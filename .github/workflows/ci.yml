@@ -46,10 +46,15 @@ jobs:
         if: ${{ ! endsWith(matrix.ruby-version, '3.3') }}
         run: bin/toys test
       -
-        name: Run Tests (With Remote Calls)
+        name: Run Tests (With Remote Calls & Coverage Report)
         if: ${{ endsWith(matrix.ruby-version, '3.3') }}
-        run: bin/toys test
+        uses: paambaati/codeclimate-action@v2.2.4
         env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
           REMOTE_TESTS_ENABLED: ${{ vars.REMOTE_TESTS_ENABLED }}
           LUNCHMONEY_TOKEN: ${{ secrets.LUNCHMONEY_TOKEN }}
+        with:
+          coverageCommand: bin/toys test
+          coverageLocations: |
+            ${{ github.workspace }}/coverage/coverage.json:simplecov
 

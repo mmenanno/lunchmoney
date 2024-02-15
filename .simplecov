@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require "simplecov_json_formatter"
+
+SimpleCov.formatter = SimpleCov::Formatter::JSONFormatter
 SimpleCov.minimum_coverage(95)
 SimpleCov.maximum_coverage_drop(1)
 SimpleCov.start do
