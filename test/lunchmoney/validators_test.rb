@@ -72,4 +72,12 @@ class ValidatorsTest < ActiveSupport::TestCase
 
     assert_match(/is not a valid ISO 8601 string/, error.message)
   end
+
+  test "validate_iso8601 raises an ArgumentError when the message is not invalid xmlschema format" do
+    Time.expects(:iso8601).raises(ArgumentError, "unexpected error return")
+
+    assert_raises(ArgumentError) do
+      validate_iso8601!("2023-01-01")
+    end
+  end
 end
