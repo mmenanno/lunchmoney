@@ -6,7 +6,7 @@ require "test_helper"
 module LunchMoney
   class ErrorsTest < ActiveSupport::TestCase
     setup do
-      @error = LunchMoney::Errors.new
+      @error = T.let(LunchMoney::Errors.new, LunchMoney::Errors)
     end
 
     test "initializes error with message" do
