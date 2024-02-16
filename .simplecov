@@ -2,7 +2,11 @@
 
 require "simplecov_json_formatter"
 
-SimpleCov.formatter = SimpleCov::Formatter::JSONFormatter
+SimpleCov.formatters = SimpleCov::Formatter::MultiFormatter.new([
+  SimpleCov::Formatter::HTMLFormatter,
+  SimpleCov::Formatter::JSONFormatter,
+])
+
 SimpleCov.minimum_coverage(95)
 SimpleCov.maximum_coverage_drop(1)
 SimpleCov.start do
