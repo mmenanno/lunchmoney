@@ -6,7 +6,7 @@ module LunchMoney
   module Objects
     # Base data object for the objects returned and used when calling the LunchMoney API
     class Object
-      sig { params(symbolize_keys: T::Boolean).returns(T::Hash[String, T.untyped]) }
+      sig { params(symbolize_keys: T::Boolean).returns(T::Hash[T.any(String, Symbol), T.untyped]) }
       def serialize(symbolize_keys: false)
         ivars = instance_variables
 
