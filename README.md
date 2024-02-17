@@ -6,6 +6,8 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/6e84458e8cf831e6a6fa/maintainability)](https://codeclimate.com/github/mmenanno/lunchmoney/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/6e84458e8cf831e6a6fa/test_coverage)](https://codeclimate.com/github/mmenanno/lunchmoney/test_coverage)
 
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/gbraad)
+
 This gem is a API client library of the [LunchMoney API](https://lunchmoney.dev/) for the wonderful [LunchMoney](http://lunchmoney.app/) web app for personal finance & budgeting.
 
 Documentation is still a work in process, but you can find the yard docs for this gem [here](https://mmenanno.github.io/lunchmoney/) as well as some write ups of the basics below. An example of every call is listed on the [Api class in the yard docs](https://mmenanno.github.io/lunchmoney/LunchMoney/Api.html).
