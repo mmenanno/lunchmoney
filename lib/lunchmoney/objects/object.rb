@@ -23,6 +23,8 @@ module LunchMoney
 
         output
       end
+
+      delegate :to_h, to: :serialize
     end
   end
 end
