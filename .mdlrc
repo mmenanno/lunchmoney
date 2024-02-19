@@ -1,4 +1,5 @@
 all
 rule 'ol-prefix', :style => "ordered"
+rule 'no-inline-html', :allowed_elements => 'a, img'
 
 exclude_rule 'line-length'
