@@ -37,7 +37,7 @@ GEM
       bigdecimal
       rexml
     docile (1.4.0)
-    dotenv (2.8.1)
+    dotenv (3.0.2)
     drb (2.2.0)
       ruby2_keywords
     erubi (1.12.0)
