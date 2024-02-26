@@ -10908,43 +10908,43 @@ class ActiveSupport::TestCase < ::Minitest::Test
   # source://activesupport//lib/active_support/callbacks.rb#963
   def _teardown_callbacks; end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#736
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#736
   def assert_no_match(matcher, obj, msg = T.unsafe(nil)); end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#665
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#665
   def assert_not_empty(obj, msg = T.unsafe(nil)); end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#676
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#676
   def assert_not_equal(exp, act, msg = T.unsafe(nil)); end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#688
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#688
   def assert_not_in_delta(exp, act, delta = T.unsafe(nil), msg = T.unsafe(nil)); end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#700
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#700
   def assert_not_in_epsilon(a, b, epsilon = T.unsafe(nil), msg = T.unsafe(nil)); end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#707
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#707
   def assert_not_includes(collection, obj, msg = T.unsafe(nil)); end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#718
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#718
   def assert_not_instance_of(cls, obj, msg = T.unsafe(nil)); end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#728
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#728
   def assert_not_kind_of(cls, obj, msg = T.unsafe(nil)); end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#746
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#746
   def assert_not_nil(obj, msg = T.unsafe(nil)); end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#781
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#781
   def assert_not_operator(o1, op, o2 = T.unsafe(nil), msg = T.unsafe(nil)); end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#804
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#804
   def assert_not_predicate(o1, op, msg = T.unsafe(nil)); end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#813
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#813
   def assert_not_respond_to(obj, meth, msg = T.unsafe(nil), include_all: T.unsafe(nil)); end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#822
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#822
   def assert_not_same(exp, act, msg = T.unsafe(nil)); end
 
   # source://activesupport//lib/active_support/testing/file_fixtures.rb#20
@@ -10956,7 +10956,7 @@ class ActiveSupport::TestCase < ::Minitest::Test
   # source://activesupport//lib/active_support/test_case.rb#298
   def inspect; end
 
-  # source://minitest/5.21.2/lib/minitest.rb#311
+  # source://minitest/5.22.2/lib/minitest.rb#332
   def method_name; end
 
   class << self
@@ -13175,7 +13175,7 @@ ActiveSupport::VERSION::MAJOR = T.let(T.unsafe(nil), Integer)
 ActiveSupport::VERSION::MINOR = T.let(T.unsafe(nil), Integer)
 
 # source://activesupport//lib/active_support/gem_version.rb#13
-ActiveSupport::VERSION::PRE = T.let(T.unsafe(nil), T.untyped)
+ActiveSupport::VERSION::PRE = T.let(T.unsafe(nil), String)
 
 # source://activesupport//lib/active_support/gem_version.rb#15
 ActiveSupport::VERSION::STRING = T.let(T.unsafe(nil), String)
@@ -13364,7 +13364,7 @@ end
 # source://activesupport//lib/active_support/xml_mini/rexml.rb#11
 ActiveSupport::XmlMini_REXML::CONTENT_KEY = T.let(T.unsafe(nil), String)
 
-# source://activesupport//lib/active_support/core_ext/object/to_query.rb#39
+# source://activesupport//lib/active_support/core_ext/object/blank.rb#83
 class Array
   include ::Enumerable
 
@@ -13698,13 +13698,6 @@ class Date
   #
   # source://activesupport//lib/active_support/core_ext/date/calculations.rb#152
   def <=>(other); end
-
-  # Duck-types as a Date-like class. See Object#acts_like?.
-  #
-  # @return [Boolean]
-  #
-  # source://activesupport//lib/active_support/core_ext/date/acts_like.rb#7
-  def acts_like_date?; end
 
   # Provides precise Date calculations for years, months, and days. The +options+ parameter takes a hash with
   # any of these keys: <tt>:years</tt>, <tt>:months</tt>, <tt>:weeks</tt>, <tt>:days</tt>.
@@ -15260,7 +15253,7 @@ class Exception
   def as_json(options = T.unsafe(nil)); end
 end
 
-# source://activesupport//lib/active_support/core_ext/object/to_query.rb#32
+# source://activesupport//lib/active_support/core_ext/object/blank.rb#61
 class FalseClass
   # source://activesupport//lib/active_support/core_ext/object/json.rb#89
   def as_json(options = T.unsafe(nil)); end
@@ -16404,7 +16397,7 @@ class NameError < ::StandardError
   include ::DidYouMean::Correctable
 end
 
-# source://activesupport//lib/active_support/core_ext/object/to_query.rb#18
+# source://activesupport//lib/active_support/core_ext/object/blank.rb#50
 class NilClass
   # source://activesupport//lib/active_support/core_ext/object/json.rb#95
   def as_json(options = T.unsafe(nil)); end
@@ -16445,7 +16438,7 @@ class NilClass
   def try!(*_arg0); end
 end
 
-# source://activesupport//lib/active_support/core_ext/numeric/time.rb#9
+# source://activesupport//lib/active_support/core_ext/object/blank.rb#134
 class Numeric
   include ::Comparable
 
@@ -16476,20 +16469,6 @@ class Numeric
   # source://activesupport//lib/active_support/core_ext/numeric/bytes.rb#15
   def bytes; end
 
-  # Returns a Duration instance matching the number of days provided.
-  #
-  #   2.days # => 2 days
-  #
-  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#37
-  def day; end
-
-  # Returns a Duration instance matching the number of days provided.
-  #
-  #   2.days # => 2 days
-  #
-  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#37
-  def days; end
-
   # Returns the number of bytes equivalent to the exabytes provided.
   #
   #   2.exabytes # => 2_305_843_009_213_693_952
@@ -16503,20 +16482,6 @@ class Numeric
   #
   # source://activesupport//lib/active_support/core_ext/numeric/bytes.rb#63
   def exabytes; end
-
-  # Returns a Duration instance matching the number of fortnights provided.
-  #
-  #   2.fortnights # => 4 weeks
-  #
-  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#53
-  def fortnight; end
-
-  # Returns a Duration instance matching the number of fortnights provided.
-  #
-  #   2.fortnights # => 4 weeks
-  #
-  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#53
-  def fortnights; end
 
   # Returns the number of bytes equivalent to the gigabytes provided.
   #
@@ -16532,33 +16497,10 @@ class Numeric
   # source://activesupport//lib/active_support/core_ext/numeric/bytes.rb#39
   def gigabytes; end
 
-  # Returns a Duration instance matching the number of hours provided.
-  #
-  #   2.hours # => 2 hours
-  #
-  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#29
-  def hour; end
-
-  # Returns a Duration instance matching the number of hours provided.
-  #
-  #   2.hours # => 2 hours
-  #
-  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#29
-  def hours; end
-
   # @return [Boolean]
   #
   # source://activesupport//lib/active_support/core_ext/string/output_safety.rb#13
   def html_safe?; end
-
-  # Returns the number of milliseconds equivalent to the seconds provided.
-  # Used with the standard time durations.
-  #
-  #   2.in_milliseconds # => 2000
-  #   1.hour.in_milliseconds # => 3600000
-  #
-  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#63
-  def in_milliseconds; end
 
   # Returns the number of bytes equivalent to the kilobytes provided.
   #
@@ -16588,20 +16530,6 @@ class Numeric
   # source://activesupport//lib/active_support/core_ext/numeric/bytes.rb#31
   def megabytes; end
 
-  # Returns a Duration instance matching the number of minutes provided.
-  #
-  #   2.minutes # => 2 minutes
-  #
-  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#21
-  def minute; end
-
-  # Returns a Duration instance matching the number of minutes provided.
-  #
-  #   2.minutes # => 2 minutes
-  #
-  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#21
-  def minutes; end
-
   # Returns the number of bytes equivalent to the petabytes provided.
   #
   #   2.petabytes # => 2_251_799_813_685_248
@@ -16616,20 +16544,6 @@ class Numeric
   # source://activesupport//lib/active_support/core_ext/numeric/bytes.rb#55
   def petabytes; end
 
-  # Returns a Duration instance matching the number of seconds provided.
-  #
-  #   2.seconds # => 2 seconds
-  #
-  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#13
-  def second; end
-
-  # Returns a Duration instance matching the number of seconds provided.
-  #
-  #   2.seconds # => 2 seconds
-  #
-  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#13
-  def seconds; end
-
   # Returns the number of bytes equivalent to the terabytes provided.
   #
   #   2.terabytes # => 2_199_023_255_552
@@ -16643,20 +16557,6 @@ class Numeric
   #
   # source://activesupport//lib/active_support/core_ext/numeric/bytes.rb#47
   def terabytes; end
-
-  # Returns a Duration instance matching the number of weeks provided.
-  #
-  #   2.weeks # => 2 weeks
-  #
-  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#45
-  def week; end
-
-  # Returns a Duration instance matching the number of weeks provided.
-  #
-  #   2.weeks # => 2 weeks
-  #
-  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#45
-  def weeks; end
 
   # Returns the number of bytes equivalent to the zettabytes provided.
   #
@@ -16713,7 +16613,7 @@ Numeric::ZETTABYTE = T.let(T.unsafe(nil), Integer)
 # using that rescue idiom.
 # ++
 #
-# source://activesupport//lib/active_support/core_ext/object/to_query.rb#5
+# source://activesupport//lib/active_support/core_ext/object/blank.rb#5
 class Object < ::BasicObject
   include ::ActiveSupport::ToJsonWithActiveSupportEncoder
   include ::ActiveSupport::Dependencies::RequireDependency
@@ -16920,7 +16820,7 @@ end
 #
 #   'ScaleScore'.tableize # => "scale_scores"
 #
-# source://activesupport//lib/active_support/core_ext/string/multibyte.rb#5
+# source://activesupport//lib/active_support/core_ext/object/blank.rb#103
 class String
   include ::Comparable
 
@@ -17577,7 +17477,7 @@ class Thread
   def active_support_execution_state=(_arg0); end
 end
 
-# source://activesupport//lib/active_support/core_ext/time/conversions.rb#7
+# source://activesupport//lib/active_support/core_ext/object/blank.rb#146
 class Time
   include ::Comparable
   include ::DateAndTime::Zones
@@ -18074,7 +17974,7 @@ Time::COMMON_YEAR_DAYS_IN_MONTH = T.let(T.unsafe(nil), Array)
 # source://activesupport//lib/active_support/core_ext/time/conversions.rb#8
 Time::DATE_FORMATS = T.let(T.unsafe(nil), Hash)
 
-# source://activesupport//lib/active_support/core_ext/object/to_query.rb#25
+# source://activesupport//lib/active_support/core_ext/object/blank.rb#72
 class TrueClass
   # source://activesupport//lib/active_support/core_ext/object/json.rb#83
   def as_json(options = T.unsafe(nil)); end
