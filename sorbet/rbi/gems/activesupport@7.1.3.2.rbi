@@ -10908,43 +10908,43 @@ class ActiveSupport::TestCase < ::Minitest::Test
   # source://activesupport//lib/active_support/callbacks.rb#963
   def _teardown_callbacks; end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#736
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#736
   def assert_no_match(matcher, obj, msg = T.unsafe(nil)); end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#665
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#665
   def assert_not_empty(obj, msg = T.unsafe(nil)); end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#676
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#676
   def assert_not_equal(exp, act, msg = T.unsafe(nil)); end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#688
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#688
   def assert_not_in_delta(exp, act, delta = T.unsafe(nil), msg = T.unsafe(nil)); end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#700
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#700
   def assert_not_in_epsilon(a, b, epsilon = T.unsafe(nil), msg = T.unsafe(nil)); end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#707
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#707
   def assert_not_includes(collection, obj, msg = T.unsafe(nil)); end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#718
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#718
   def assert_not_instance_of(cls, obj, msg = T.unsafe(nil)); end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#728
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#728
   def assert_not_kind_of(cls, obj, msg = T.unsafe(nil)); end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#746
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#746
   def assert_not_nil(obj, msg = T.unsafe(nil)); end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#781
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#781
   def assert_not_operator(o1, op, o2 = T.unsafe(nil), msg = T.unsafe(nil)); end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#804
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#804
   def assert_not_predicate(o1, op, msg = T.unsafe(nil)); end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#813
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#813
   def assert_not_respond_to(obj, meth, msg = T.unsafe(nil), include_all: T.unsafe(nil)); end
 
-  # source://minitest/5.21.2/lib/minitest/assertions.rb#822
+  # source://minitest/5.22.2/lib/minitest/assertions.rb#822
   def assert_not_same(exp, act, msg = T.unsafe(nil)); end
 
   # source://activesupport//lib/active_support/testing/file_fixtures.rb#20
@@ -10956,7 +10956,7 @@ class ActiveSupport::TestCase < ::Minitest::Test
   # source://activesupport//lib/active_support/test_case.rb#298
   def inspect; end
 
-  # source://minitest/5.21.2/lib/minitest.rb#311
+  # source://minitest/5.22.2/lib/minitest.rb#332
   def method_name; end
 
   class << self
@@ -13175,7 +13175,7 @@ ActiveSupport::VERSION::MAJOR = T.let(T.unsafe(nil), Integer)
 ActiveSupport::VERSION::MINOR = T.let(T.unsafe(nil), Integer)
 
 # source://activesupport//lib/active_support/gem_version.rb#13
-ActiveSupport::VERSION::PRE = T.let(T.unsafe(nil), T.untyped)
+ActiveSupport::VERSION::PRE = T.let(T.unsafe(nil), String)
 
 # source://activesupport//lib/active_support/gem_version.rb#15
 ActiveSupport::VERSION::STRING = T.let(T.unsafe(nil), String)
@@ -13364,7 +13364,7 @@ end
 # source://activesupport//lib/active_support/xml_mini/rexml.rb#11
 ActiveSupport::XmlMini_REXML::CONTENT_KEY = T.let(T.unsafe(nil), String)
 
-# source://activesupport//lib/active_support/core_ext/object/to_query.rb#39
+# source://activesupport//lib/active_support/core_ext/object/blank.rb#83
 class Array
   include ::Enumerable
 
@@ -15260,7 +15260,7 @@ class Exception
   def as_json(options = T.unsafe(nil)); end
 end
 
-# source://activesupport//lib/active_support/core_ext/object/to_query.rb#32
+# source://activesupport//lib/active_support/core_ext/object/blank.rb#61
 class FalseClass
   # source://activesupport//lib/active_support/core_ext/object/json.rb#89
   def as_json(options = T.unsafe(nil)); end
@@ -16404,7 +16404,7 @@ class NameError < ::StandardError
   include ::DidYouMean::Correctable
 end
 
-# source://activesupport//lib/active_support/core_ext/object/to_query.rb#18
+# source://activesupport//lib/active_support/core_ext/object/blank.rb#50
 class NilClass
   # source://activesupport//lib/active_support/core_ext/object/json.rb#95
   def as_json(options = T.unsafe(nil)); end
@@ -16445,7 +16445,7 @@ class NilClass
   def try!(*_arg0); end
 end
 
-# source://activesupport//lib/active_support/core_ext/numeric/time.rb#9
+# source://activesupport//lib/active_support/core_ext/object/blank.rb#134
 class Numeric
   include ::Comparable
 
@@ -16713,7 +16713,7 @@ Numeric::ZETTABYTE = T.let(T.unsafe(nil), Integer)
 # using that rescue idiom.
 # ++
 #
-# source://activesupport//lib/active_support/core_ext/object/to_query.rb#5
+# source://activesupport//lib/active_support/core_ext/object/blank.rb#5
 class Object < ::BasicObject
   include ::ActiveSupport::ToJsonWithActiveSupportEncoder
   include ::ActiveSupport::Dependencies::RequireDependency
@@ -16920,7 +16920,7 @@ end
 #
 #   'ScaleScore'.tableize # => "scale_scores"
 #
-# source://activesupport//lib/active_support/core_ext/string/multibyte.rb#5
+# source://activesupport//lib/active_support/core_ext/object/blank.rb#103
 class String
   include ::Comparable
 
@@ -17577,7 +17577,7 @@ class Thread
   def active_support_execution_state=(_arg0); end
 end
 
-# source://activesupport//lib/active_support/core_ext/time/conversions.rb#7
+# source://activesupport//lib/active_support/core_ext/object/blank.rb#146
 class Time
   include ::Comparable
   include ::DateAndTime::Zones
@@ -18074,7 +18074,7 @@ Time::COMMON_YEAR_DAYS_IN_MONTH = T.let(T.unsafe(nil), Array)
 # source://activesupport//lib/active_support/core_ext/time/conversions.rb#8
 Time::DATE_FORMATS = T.let(T.unsafe(nil), Hash)
 
-# source://activesupport//lib/active_support/core_ext/object/to_query.rb#25
+# source://activesupport//lib/active_support/core_ext/object/blank.rb#72
 class TrueClass
   # source://activesupport//lib/active_support/core_ext/object/json.rb#83
   def as_json(options = T.unsafe(nil)); end
