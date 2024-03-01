@@ -13699,6 +13699,13 @@ class Date
   # source://activesupport//lib/active_support/core_ext/date/calculations.rb#152
   def <=>(other); end
 
+  # Duck-types as a Date-like class. See Object#acts_like?.
+  #
+  # @return [Boolean]
+  #
+  # source://activesupport//lib/active_support/core_ext/date/acts_like.rb#7
+  def acts_like_date?; end
+
   # Provides precise Date calculations for years, months, and days. The +options+ parameter takes a hash with
   # any of these keys: <tt>:years</tt>, <tt>:months</tt>, <tt>:weeks</tt>, <tt>:days</tt>.
   #
@@ -16469,6 +16476,20 @@ class Numeric
   # source://activesupport//lib/active_support/core_ext/numeric/bytes.rb#15
   def bytes; end
 
+  # Returns a Duration instance matching the number of days provided.
+  #
+  #   2.days # => 2 days
+  #
+  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#37
+  def day; end
+
+  # Returns a Duration instance matching the number of days provided.
+  #
+  #   2.days # => 2 days
+  #
+  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#37
+  def days; end
+
   # Returns the number of bytes equivalent to the exabytes provided.
   #
   #   2.exabytes # => 2_305_843_009_213_693_952
@@ -16482,6 +16503,20 @@ class Numeric
   #
   # source://activesupport//lib/active_support/core_ext/numeric/bytes.rb#63
   def exabytes; end
+
+  # Returns a Duration instance matching the number of fortnights provided.
+  #
+  #   2.fortnights # => 4 weeks
+  #
+  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#53
+  def fortnight; end
+
+  # Returns a Duration instance matching the number of fortnights provided.
+  #
+  #   2.fortnights # => 4 weeks
+  #
+  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#53
+  def fortnights; end
 
   # Returns the number of bytes equivalent to the gigabytes provided.
   #
@@ -16497,10 +16532,33 @@ class Numeric
   # source://activesupport//lib/active_support/core_ext/numeric/bytes.rb#39
   def gigabytes; end
 
+  # Returns a Duration instance matching the number of hours provided.
+  #
+  #   2.hours # => 2 hours
+  #
+  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#29
+  def hour; end
+
+  # Returns a Duration instance matching the number of hours provided.
+  #
+  #   2.hours # => 2 hours
+  #
+  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#29
+  def hours; end
+
   # @return [Boolean]
   #
   # source://activesupport//lib/active_support/core_ext/string/output_safety.rb#13
   def html_safe?; end
+
+  # Returns the number of milliseconds equivalent to the seconds provided.
+  # Used with the standard time durations.
+  #
+  #   2.in_milliseconds # => 2000
+  #   1.hour.in_milliseconds # => 3600000
+  #
+  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#63
+  def in_milliseconds; end
 
   # Returns the number of bytes equivalent to the kilobytes provided.
   #
@@ -16530,6 +16588,20 @@ class Numeric
   # source://activesupport//lib/active_support/core_ext/numeric/bytes.rb#31
   def megabytes; end
 
+  # Returns a Duration instance matching the number of minutes provided.
+  #
+  #   2.minutes # => 2 minutes
+  #
+  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#21
+  def minute; end
+
+  # Returns a Duration instance matching the number of minutes provided.
+  #
+  #   2.minutes # => 2 minutes
+  #
+  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#21
+  def minutes; end
+
   # Returns the number of bytes equivalent to the petabytes provided.
   #
   #   2.petabytes # => 2_251_799_813_685_248
@@ -16544,6 +16616,20 @@ class Numeric
   # source://activesupport//lib/active_support/core_ext/numeric/bytes.rb#55
   def petabytes; end
 
+  # Returns a Duration instance matching the number of seconds provided.
+  #
+  #   2.seconds # => 2 seconds
+  #
+  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#13
+  def second; end
+
+  # Returns a Duration instance matching the number of seconds provided.
+  #
+  #   2.seconds # => 2 seconds
+  #
+  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#13
+  def seconds; end
+
   # Returns the number of bytes equivalent to the terabytes provided.
   #
   #   2.terabytes # => 2_199_023_255_552
@@ -16557,6 +16643,20 @@ class Numeric
   #
   # source://activesupport//lib/active_support/core_ext/numeric/bytes.rb#47
   def terabytes; end
+
+  # Returns a Duration instance matching the number of weeks provided.
+  #
+  #   2.weeks # => 2 weeks
+  #
+  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#45
+  def week; end
+
+  # Returns a Duration instance matching the number of weeks provided.
+  #
+  #   2.weeks # => 2 weeks
+  #
+  # source://activesupport//lib/active_support/core_ext/numeric/time.rb#45
+  def weeks; end
 
   # Returns the number of bytes equivalent to the zettabytes provided.
   #

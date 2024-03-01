@@ -7,4 +7,5 @@
 require "minitest/autorun"
 require "sorbet-runtime"
 require "active_support"
+require "active_support/core_ext/numeric/time.rb"
 require "mocha/minitest"
