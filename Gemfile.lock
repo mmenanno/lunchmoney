@@ -37,7 +37,7 @@ GEM
       bigdecimal
       rexml
     docile (1.4.0)
-    dotenv (3.0.2)
+    dotenv (3.1.0)
     drb (2.2.1)
     erubi (1.12.0)
     faraday (2.9.0)
