@@ -394,7 +394,7 @@ class RuboCop::Cop::Rails::ActionControllerFlashBeforeRender < ::RuboCop::Cop::B
 
   private
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/action_controller_flash_before_render.rb#106
+  # source://rubocop-rails//lib/rubocop/cop/rails/action_controller_flash_before_render.rb#108
   def find_ancestor(node, type:); end
 
   # @return [Boolean]
@@ -808,7 +808,10 @@ RuboCop::Cop::Rails::ActiveSupportAliases::RESTRICT_ON_SEND = T.let(T.unsafe(nil
 class RuboCop::Cop::Rails::ActiveSupportOnLoad < ::RuboCop::Cop::Base
   extend ::RuboCop::Cop::AutoCorrector
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/active_support_on_load.rb#58
+  # source://rubocop-rails//lib/rubocop/cop/rails/active_support_on_load.rb#81
+  def hook_for_const(const_name); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/active_support_on_load.rb#71
   def on_send(node); end
 end
 
@@ -817,6 +820,12 @@ RuboCop::Cop::Rails::ActiveSupportOnLoad::LOAD_HOOKS = T.let(T.unsafe(nil), Hash
 
 # source://rubocop-rails//lib/rubocop/cop/rails/active_support_on_load.rb#23
 RuboCop::Cop::Rails::ActiveSupportOnLoad::MSG = T.let(T.unsafe(nil), String)
+
+# source://rubocop-rails//lib/rubocop/cop/rails/active_support_on_load.rb#58
+RuboCop::Cop::Rails::ActiveSupportOnLoad::RAILS_5_2_LOAD_HOOKS = T.let(T.unsafe(nil), Hash)
+
+# source://rubocop-rails//lib/rubocop/cop/rails/active_support_on_load.rb#62
+RuboCop::Cop::Rails::ActiveSupportOnLoad::RAILS_7_1_LOAD_HOOKS = T.let(T.unsafe(nil), Hash)
 
 # source://rubocop-rails//lib/rubocop/cop/rails/active_support_on_load.rb#24
 RuboCop::Cop::Rails::ActiveSupportOnLoad::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
@@ -7006,18 +7015,18 @@ class RuboCop::Cop::Rails::SaveBang < ::RuboCop::Cop::Base
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#261
+  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#263
   def allowed_receiver?(node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#319
+  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#321
   def argument?(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#221
+  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#223
   def array_parent(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#202
+  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#204
   def assignable_node(node); end
 
   # @return [Boolean]
@@ -7025,17 +7034,17 @@ class RuboCop::Cop::Rails::SaveBang < ::RuboCop::Cop::Base
   # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#198
   def call_to_persisted?(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#228
+  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#230
   def check_used_in_condition_or_compound_boolean(node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#257
+  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#259
   def checked_immediately?(node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#248
+  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#250
   def conditional?(parent); end
 
   # Const == Const
@@ -7049,48 +7058,48 @@ class RuboCop::Cop::Rails::SaveBang < ::RuboCop::Cop::Base
   #
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#294
+  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#296
   def const_matches?(const, allowed_const); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#252
+  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#254
   def deparenthesize(node); end
 
   # Check argument signature as no arguments or one hash
   #
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#338
+  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#340
   def expected_signature?(node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#323
+  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#325
   def explicit_return?(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#311
+  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#313
   def find_method_with_sibling_index(node, sibling_index = T.unsafe(nil)); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#211
+  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#213
   def hash_parent(node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#301
+  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#303
   def implicit_return?(node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#236
+  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#238
   def in_condition_or_compound_boolean?(node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#244
+  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#246
   def operator_or_single_negative?(node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#333
+  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#335
   def persist_method?(node, methods = T.unsafe(nil)); end
 
   # @return [Boolean]
@@ -7100,7 +7109,7 @@ class RuboCop::Cop::Rails::SaveBang < ::RuboCop::Cop::Base
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#271
+  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#273
   def receiver_chain_matches?(node, allowed_receiver); end
 
   # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#171
@@ -7108,7 +7117,7 @@ class RuboCop::Cop::Rails::SaveBang < ::RuboCop::Cop::Base
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#328
+  # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#330
   def return_value_assigned?(node); end
 
   # source://rubocop-rails//lib/rubocop/cop/rails/save_bang.rb#182
@@ -7647,42 +7656,45 @@ class RuboCop::Cop::Rails::TimeZone < ::RuboCop::Cop::Base
   def on_const(node); end
 
   # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#68
+  def on_csend(node); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#68
   def on_send(node); end
 
   private
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#228
+  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#229
   def acceptable_methods(klass, method_name, node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#135
+  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#136
   def attach_timezone_specifier?(date); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#78
+  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#79
   def autocorrect(corrector, node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#95
+  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#96
   def autocorrect_time_new(node, corrector); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#139
+  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#140
   def build_message(klass, method_name, node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#188
+  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#189
   def check_localtime(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#117
+  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#118
   def check_time_node(klass, node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#152
+  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#153
   def extract_method_chain(node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#212
+  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#213
   def flexible?; end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#220
+  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#221
   def good_methods; end
 
   # Only add the method to the chain if the method being
@@ -7690,7 +7702,7 @@ class RuboCop::Cop::Rails::TimeZone < ::RuboCop::Cop::Base
   #
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#163
+  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#164
   def method_from_time_class?(node); end
 
   # checks that parent node of send_type
@@ -7698,22 +7710,22 @@ class RuboCop::Cop::Rails::TimeZone < ::RuboCop::Cop::Base
   #
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#174
+  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#175
   def method_send?(node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#208
+  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#209
   def need_check_localtime?(chain); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#204
+  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#205
   def not_danger_chain?(chain); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#251
+  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#252
   def offset_option_provided?(node); end
 
   # Time.new, Time.at, and Time.now can be called with a time zone offset
@@ -7723,20 +7735,20 @@ class RuboCop::Cop::Rails::TimeZone < ::RuboCop::Cop::Base
   #
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#242
+  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#243
   def offset_provided?(node); end
 
   # remove redundant `.in_time_zone` from `Time.zone.now.in_time_zone`
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#104
+  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#105
   def remove_redundant_in_time_zone(corrector, node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#180
+  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#181
   def safe_method(method_name, node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#216
+  # source://rubocop-rails//lib/rubocop/cop/rails/time_zone.rb#217
   def strict?; end
 end
 
@@ -8067,10 +8079,13 @@ class RuboCop::Cop::Rails::UniqBeforePluck < ::RuboCop::Cop::Base
 
   private
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/uniq_before_pluck.rb#84
+  # source://rubocop-rails//lib/rubocop/cop/rails/uniq_before_pluck.rb#77
+  def autocorrect(corrector, node); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/uniq_before_pluck.rb#92
   def dot_method_begin_pos(method, node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/uniq_before_pluck.rb#80
+  # source://rubocop-rails//lib/rubocop/cop/rails/uniq_before_pluck.rb#88
   def dot_method_with_whitespace(method, node); end
 end
 
@@ -8587,18 +8602,18 @@ class RuboCop::Cop::Rails::WhereMissing < ::RuboCop::Cop::Base
 
   private
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/where_missing.rb#111
+  # source://rubocop-rails//lib/rubocop/cop/rails/where_missing.rb#115
   def message(node, where_argument); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/where_missing.rb#107
+  # source://rubocop-rails//lib/rubocop/cop/rails/where_missing.rb#111
   def multi_condition?(where_arg); end
 
   # source://rubocop-rails//lib/rubocop/cop/rails/where_missing.rb#67
   def register_offense(node, where_node, where_argument, range); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/where_missing.rb#92
+  # source://rubocop-rails//lib/rubocop/cop/rails/where_missing.rb#93
   def remove_where_method(corrector, node, where_node); end
 
   # source://rubocop-rails//lib/rubocop/cop/rails/where_missing.rb#84
@@ -8612,7 +8627,7 @@ class RuboCop::Cop::Rails::WhereMissing < ::RuboCop::Cop::Base
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/where_missing.rb#103
+  # source://rubocop-rails//lib/rubocop/cop/rails/where_missing.rb#107
   def same_line?(left_joins_node, where_node); end
 
   # @return [Boolean]
@@ -8749,66 +8764,66 @@ RuboCop::Cop::Rails::WhereNotWithMultipleConditions::RESTRICT_ON_SEND = T.let(T.
 module RuboCop::Cop::Style; end
 
 class RuboCop::Cop::Style::InverseMethods < ::RuboCop::Cop::Base
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/inverse_methods.rb#70
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/inverse_methods.rb#70
   def inverse_block?(param0 = T.unsafe(nil)); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/inverse_methods.rb#61
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/inverse_methods.rb#61
   def inverse_candidate?(param0 = T.unsafe(nil)); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/inverse_methods.rb#92
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/inverse_methods.rb#92
   def on_block(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/inverse_methods.rb#78
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/inverse_methods.rb#78
   def on_csend(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/inverse_methods.rb#92
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/inverse_methods.rb#92
   def on_numblock(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/inverse_methods.rb#78
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/inverse_methods.rb#78
   def on_send(node); end
 
   private
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/inverse_methods.rb#177
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/inverse_methods.rb#177
   def camel_case_constant?(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/inverse_methods.rb#121
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/inverse_methods.rb#121
   def correct_inverse_block(corrector, node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/inverse_methods.rb#112
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/inverse_methods.rb#112
   def correct_inverse_method(corrector, node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/inverse_methods.rb#128
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/inverse_methods.rb#128
   def correct_inverse_selector(block, corrector); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/inverse_methods.rb#181
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/inverse_methods.rb#181
   def dot_range(loc); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/inverse_methods.rb#166
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/inverse_methods.rb#166
   def end_parentheses(node, method_call); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/inverse_methods.rb#150
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/inverse_methods.rb#150
   def inverse_blocks; end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/inverse_methods.rb#145
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/inverse_methods.rb#145
   def inverse_methods; end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/inverse_methods.rb#191
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/inverse_methods.rb#191
   def message(method, inverse); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/inverse_methods.rb#154
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/inverse_methods.rb#154
   def negated?(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/inverse_methods.rb#162
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/inverse_methods.rb#162
   def not_to_receiver(node, method_call); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/inverse_methods.rb#172
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/inverse_methods.rb#172
   def possible_class_hierarchy_check?(lhs, rhs, method); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/inverse_methods.rb#158
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/inverse_methods.rb#158
   def relational_comparison_with_safe_navigation?(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/inverse_methods.rb#185
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/inverse_methods.rb#185
   def remove_end_parenthesis(corrector, node, method, method_call); end
 
   class << self
@@ -8818,24 +8833,24 @@ class RuboCop::Cop::Style::InverseMethods < ::RuboCop::Cop::Base
 end
 
 class RuboCop::Cop::Style::MethodCallWithArgsParentheses < ::RuboCop::Cop::Base
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/method_call_with_args_parentheses.rb#217
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/method_call_with_args_parentheses.rb#217
   def on_csend(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/method_call_with_args_parentheses.rb#217
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/method_call_with_args_parentheses.rb#217
   def on_send(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/method_call_with_args_parentheses.rb#217
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/method_call_with_args_parentheses.rb#217
   def on_yield(node); end
 
   private
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/method_call_with_args_parentheses.rb#225
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/method_call_with_args_parentheses.rb#225
   def args_begin(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/method_call_with_args_parentheses.rb#233
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/method_call_with_args_parentheses.rb#233
   def args_end(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/method_call_with_args_parentheses.rb#237
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/method_call_with_args_parentheses.rb#237
   def args_parenthesized?(node); end
 
   class << self
@@ -8845,84 +8860,84 @@ class RuboCop::Cop::Style::MethodCallWithArgsParentheses < ::RuboCop::Cop::Base
 end
 
 class RuboCop::Cop::Style::RedundantSelf < ::RuboCop::Cop::Base
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#60
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#60
   def initialize(config = T.unsafe(nil), options = T.unsafe(nil)); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#68
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#68
   def on_and_asgn(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#86
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#86
   def on_args(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#120
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#120
   def on_block(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#90
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#90
   def on_blockarg(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#81
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#81
   def on_def(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#81
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#81
   def on_defs(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#126
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#126
   def on_if(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#104
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#104
   def on_in_pattern(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#99
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#99
   def on_lvasgn(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#94
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#94
   def on_masgn(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#120
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#120
   def on_numblock(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#74
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#74
   def on_op_asgn(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#68
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#68
   def on_or_asgn(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#108
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#108
   def on_send(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#126
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#126
   def on_until(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#126
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#126
   def on_while(node); end
 
   private
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#196
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#196
   def add_lhs_to_local_variables_scopes(rhs, lhs); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#204
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#204
   def add_masgn_lhs_variables(rhs, lhs); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#210
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#210
   def add_match_var_scopes(in_pattern_node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#144
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#144
   def add_scope(node, local_variables = T.unsafe(nil)); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#190
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#190
   def allow_self(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#150
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#150
   def allowed_send_node?(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#165
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#165
   def it_method_in_block?(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#181
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#181
   def on_argument(node); end
 
-  # source://rubocop/1.61.0/lib/rubocop/cop/style/redundant_self.rb#173
+  # source://rubocop/1.62.1/lib/rubocop/cop/style/redundant_self.rb#173
   def regular_method_call?(node); end
 
   class << self
@@ -8999,84 +9014,84 @@ end
 
 # Represent an `add_index`
 #
-# source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#176
+# source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#177
 class RuboCop::Rails::SchemaLoader::AddIndex < ::RuboCop::Rails::SchemaLoader::Index
   # @return [AddIndex] a new instance of AddIndex
   #
-  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#179
+  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#180
   def initialize(node); end
 
   # Returns the value of attribute table_name.
   #
-  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#177
+  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#178
   def table_name; end
 end
 
 # Represent a column
 #
-# source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#116
+# source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#117
 class RuboCop::Rails::SchemaLoader::Column
   # @return [Column] a new instance of Column
   #
-  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#119
+  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#120
   def initialize(node); end
 
   # Returns the value of attribute name.
   #
-  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#117
+  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#118
   def name; end
 
   # Returns the value of attribute not_null.
   #
-  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#117
+  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#118
   def not_null; end
 
   # Returns the value of attribute type.
   #
-  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#117
+  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#118
   def type; end
 
   private
 
-  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#129
+  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#130
   def analyze_keywords!(node); end
 end
 
 # Represent an index
 #
-# source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#140
+# source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#141
 class RuboCop::Rails::SchemaLoader::Index
   # @return [Index] a new instance of Index
   #
-  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#143
+  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#144
   def initialize(node); end
 
   # Returns the value of attribute columns.
   #
-  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#141
+  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#142
   def columns; end
 
   # Returns the value of attribute expression.
   #
-  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#141
+  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#142
   def expression; end
 
   # Returns the value of attribute name.
   #
-  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#141
+  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#142
   def name; end
 
   # Returns the value of attribute unique.
   #
-  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#141
+  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#142
   def unique; end
 
   private
 
-  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#160
+  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#161
   def analyze_keywords!(node); end
 
-  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#152
+  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#153
   def build_columns_or_expr(columns); end
 end
 
@@ -9110,51 +9125,51 @@ class RuboCop::Rails::SchemaLoader::Schema
   # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#31
   def build!(ast); end
 
-  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#59
+  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#60
   def each_add_index(ast); end
 
-  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#46
+  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#47
   def each_table(ast); end
 end
 
 # Represent a table
 #
-# source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#70
+# source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#71
 class RuboCop::Rails::SchemaLoader::Table
   # @return [Table] a new instance of Table
   #
-  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#73
+  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#74
   def initialize(node); end
 
   # Returns the value of attribute columns.
   #
-  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#71
+  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#72
   def columns; end
 
   # Returns the value of attribute indices.
   #
-  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#71
+  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#72
   def indices; end
 
   # Returns the value of attribute name.
   #
-  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#71
+  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#72
   def name; end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#79
+  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#80
   def with_column?(name:); end
 
   private
 
-  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#85
+  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#86
   def build_columns(node); end
 
-  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#94
+  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#95
   def build_indices(node); end
 
-  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#103
+  # source://rubocop-rails//lib/rubocop/rails/schema_loader/schema.rb#104
   def each_content(node, &block); end
 end
 
