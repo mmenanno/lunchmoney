@@ -73,6 +73,7 @@ module LunchMoney
           "institution_name": nil,
           "status": status,
           "created_at": created_at,
+          "to_base": 1.0,
         )
       end
     end
