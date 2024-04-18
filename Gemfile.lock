@@ -66,7 +66,7 @@ GEM
       tomlrb
     mixlib-shellout (3.2.7)
       chef-utils
-    mocha (2.1.0)
+    mocha (2.2.0)
       ruby2_keywords (>= 0.0.5)
     mutex_m (0.2.0)
     net-http (0.4.1)
@@ -181,7 +181,7 @@ DEPENDENCIES
   lunchmoney!
   mdl
   minitest (~> 5.22)
-  mocha (~> 2.1.0)
+  mocha (~> 2.2.0)
   pry-sorbet (~> 0.2)
   rubocop-minitest
   rubocop-rails
