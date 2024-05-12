@@ -13,7 +13,7 @@ on:
 jobs:
   update-rbis:
     name: RBI Updater
-    uses: ./.github/workflows/dependabot-rbi-updater.yml
+    uses: ./.github/workflows/rbi-updater.yml
     secrets: inherit
 
   ci:
