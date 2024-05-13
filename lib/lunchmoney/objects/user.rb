@@ -25,7 +25,8 @@ module LunchMoney
           api_key_label: T.nilable(String),
         ).void
       end
-      def initialize(user_id:, user_name:, user_email:, account_id:, budget_name:, primary_currency:, api_key_label: nil)
+      def initialize(user_id:, user_name:, user_email:, account_id:, budget_name:, primary_currency:,
+        api_key_label: nil)
         super()
         @user_id = user_id
         @user_name = user_name
