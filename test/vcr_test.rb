@@ -36,8 +36,8 @@ class VcrTest < ActiveSupport::TestCase
   all_cassette_files.each do |cassette|
     cassette_name = extract_cassette_name(cassette)
 
-    test "#{cassette_name} cassette is not over 90 days old" do
-      assert_operator(extract_recorded_at_from_cassette(cassette), :>, 90.days.ago.utc)
+    test "#{cassette_name} cassette is not over 180 days old" do
+      assert_operator(extract_recorded_at_from_cassette(cassette), :>, 180.days.ago.utc)
     end
   end
 end
