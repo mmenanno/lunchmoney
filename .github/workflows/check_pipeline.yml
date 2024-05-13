@@ -18,7 +18,7 @@ jobs:
 
   ci:
     needs: update-rbis
-    if: always() && contains(needs.*.result, 'skipped')
+    if: always() && contains(needs.*.result, 'success')
     name: "CI"
     uses: ./.github/workflows/ci.yml
     secrets: inherit
