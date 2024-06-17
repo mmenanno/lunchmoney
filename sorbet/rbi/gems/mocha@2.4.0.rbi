@@ -5,7 +5,7 @@
 # Please instead update this file by running `bin/tapioca gem mocha`.
 
 
-# source://mocha//lib/mocha/inspect.rb#45
+# source://mocha//lib/mocha/inspect.rb#56
 class Array
   include ::Enumerable
   include ::Mocha::Inspect::ArrayMethods
@@ -15,7 +15,7 @@ class Class < ::Module
   include ::Mocha::ClassMethods
 end
 
-# source://mocha//lib/mocha/inspect.rb#57
+# source://mocha//lib/mocha/inspect.rb#68
 class Date
   include ::Comparable
   include ::Mocha::Inspect::DateMethods
@@ -1726,9 +1726,9 @@ module Mocha::Inspect::ArrayMethods
   def mocha_inspect(wrapped = T.unsafe(nil)); end
 end
 
-# source://mocha//lib/mocha/inspect.rb#33
+# source://mocha//lib/mocha/inspect.rb#44
 module Mocha::Inspect::DateMethods
-  # source://mocha//lib/mocha/inspect.rb#34
+  # source://mocha//lib/mocha/inspect.rb#45
   def mocha_inspect; end
 end
 
@@ -1744,9 +1744,9 @@ module Mocha::Inspect::ObjectMethods
   def mocha_inspect; end
 end
 
-# source://mocha//lib/mocha/inspect.rb#27
+# source://mocha//lib/mocha/inspect.rb#38
 module Mocha::Inspect::TimeMethods
-  # source://mocha//lib/mocha/inspect.rb#28
+  # source://mocha//lib/mocha/inspect.rb#39
   def mocha_inspect; end
 end
 
@@ -3964,7 +3964,7 @@ class Object < ::BasicObject
   include ::Mocha::ObjectMethods
 end
 
-# source://mocha//lib/mocha/inspect.rb#53
+# source://mocha//lib/mocha/inspect.rb#64
 class Time
   include ::Comparable
   include ::Mocha::Inspect::TimeMethods
