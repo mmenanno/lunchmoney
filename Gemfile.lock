@@ -73,7 +73,7 @@ GEM
       uri
     netrc (0.11.0)
     parallel (1.25.1)
-    parser (3.3.1.0)
+    parser (3.3.3.0)
       ast (~> 2.4.1)
       racc
     prism (0.30.0)
@@ -84,16 +84,16 @@ GEM
       pry
     public_suffix (5.0.5)
     racc (1.8.0)
-    rack (3.0.11)
+    rack (3.1.4)
     rainbow (3.1.1)
     rake (13.1.0)
     rbi (0.1.13)
       prism (>= 0.18.0, < 1.0.0)
       sorbet-runtime (>= 0.5.9204)
     regexp_parser (2.9.2)
-    rexml (3.2.8)
-      strscan (>= 3.0.9)
-    rubocop (1.63.5)
+    rexml (3.3.1)
+      strscan
+    rubocop (1.64.1)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
       parallel (~> 1.10)
@@ -109,7 +109,7 @@ GEM
     rubocop-minitest (0.35.0)
       rubocop (>= 1.61, < 2.0)
       rubocop-ast (>= 1.31.1, < 2.0)
-    rubocop-rails (2.25.0)
+    rubocop-rails (2.25.1)
       activesupport (>= 4.2.0)
       rack (>= 1.1)
       rubocop (>= 1.33.0, < 2.0)
