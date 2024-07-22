@@ -21,17 +21,10 @@ class Date
   include ::Mocha::Inspect::DateMethods
 end
 
-# @private
-#
-# source://mocha//lib/mocha/parameter_matchers/instance_methods.rb#22
+# source://mocha//lib/mocha/inspect.rb#60
 class Hash
   include ::Enumerable
   include ::Mocha::Inspect::HashMethods
-
-  # @private
-  #
-  # source://mocha//lib/mocha/parameter_matchers/instance_methods.rb#24
-  def to_matcher(expectation = T.unsafe(nil)); end
 end
 
 class Minitest::Test < ::Minitest::Runnable
@@ -3168,13 +3161,8 @@ class Mocha::ParameterMatchers::Base
   # @return [AllOf] parameter matcher.
   # @see Expectation#with
   #
-  # source://mocha//lib/mocha/parameter_matchers/base.rb#30
+  # source://mocha//lib/mocha/parameter_matchers/base.rb#25
   def &(other); end
-
-  # @private
-  #
-  # source://mocha//lib/mocha/parameter_matchers/base.rb#6
-  def to_matcher(_expectation = T.unsafe(nil)); end
 
   # A shorthand way of combining two matchers when at least one must match.
   #
@@ -3200,7 +3188,7 @@ class Mocha::ParameterMatchers::Base
   # @return [AnyOf] parameter matcher.
   # @see Expectation#with
   #
-  # source://mocha//lib/mocha/parameter_matchers/base.rb#60
+  # source://mocha//lib/mocha/parameter_matchers/base.rb#55
   def |(other); end
 end
 
@@ -3390,12 +3378,12 @@ end
 
 # @private
 #
-# source://mocha//lib/mocha/parameter_matchers/instance_methods.rb#7
+# source://mocha//lib/mocha/parameter_matchers/instance_methods.rb#8
 module Mocha::ParameterMatchers::InstanceMethods
   # @private
   #
-  # source://mocha//lib/mocha/parameter_matchers/instance_methods.rb#9
-  def to_matcher(_expectation = T.unsafe(nil)); end
+  # source://mocha//lib/mocha/parameter_matchers/instance_methods.rb#10
+  def to_matcher(expectation: T.unsafe(nil), top_level: T.unsafe(nil)); end
 end
 
 # Parameter matcher which matches when actual parameter is an instance of the specified class.
@@ -3955,7 +3943,7 @@ end
 
 # @private
 #
-# source://mocha//lib/mocha/parameter_matchers/instance_methods.rb#17
+# source://mocha//lib/mocha/parameter_matchers/instance_methods.rb#24
 class Object < ::BasicObject
   include ::Kernel
   include ::PP::ObjectMixin
