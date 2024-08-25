@@ -14,7 +14,6 @@ require "active_support"
 require "mocha/minitest"
 require "webmock/minitest"
 require "vcr"
-require "pry"
 
 require_relative "helpers/configuration_helper"
 require_relative "helpers/mocha_typed"
