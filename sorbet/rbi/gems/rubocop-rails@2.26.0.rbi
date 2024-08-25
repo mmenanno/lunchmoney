@@ -1566,6 +1566,8 @@ RuboCop::Cop::Rails::BulkChangeTable::POSTGRESQL_COMBINABLE_TRANSFORMATIONS_SINC
 #   # bad
 #   collection.reject(&:blank?)
 #   collection.reject { |_k, v| v.blank? }
+#   collection.select(&:present?)
+#   collection.select { |_k, v| v.present? }
 #
 #   # good
 #   collection.compact_blank
@@ -1573,55 +1575,61 @@ RuboCop::Cop::Rails::BulkChangeTable::POSTGRESQL_COMBINABLE_TRANSFORMATIONS_SINC
 #   # bad
 #   collection.delete_if(&:blank?)            # Same behavior as `Array#compact_blank!` and `Hash#compact_blank!`
 #   collection.delete_if { |_k, v| v.blank? } # Same behavior as `Array#compact_blank!` and `Hash#compact_blank!`
-#   collection.reject!(&:blank?)              # Same behavior as `ActionController::Parameters#compact_blank!`
-#   collection.reject! { |_k, v| v.blank? }   # Same behavior as `ActionController::Parameters#compact_blank!`
+#   collection.keep_if(&:present?)            # Same behavior as `Array#compact_blank!` and `Hash#compact_blank!`
+#   collection.keep_if { |_k, v| v.present? } # Same behavior as `Array#compact_blank!` and `Hash#compact_blank!`
 #
 #   # good
 #   collection.compact_blank!
 #
-# source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#40
+# source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#41
 class RuboCop::Cop::Rails::CompactBlank < ::RuboCop::Cop::Base
   include ::RuboCop::Cop::RangeHelp
   extend ::RuboCop::Cop::AutoCorrector
   extend ::RuboCop::Cop::TargetRailsVersion
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#64
+  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#79
   def on_send(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#50
+  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#51
   def reject_with_block?(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#58
+  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#59
   def reject_with_block_pass?(param0 = T.unsafe(nil)); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#65
+  def select_with_block?(param0 = T.unsafe(nil)); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#73
+  def select_with_block_pass?(param0 = T.unsafe(nil)); end
 
   private
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#76
+  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#91
   def bad_method?(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#95
+  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#112
   def offense_range(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#105
+  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#122
   def preferred_method(node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#91
+  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#108
   def use_hash_value_block_argument?(arguments, receiver_in_block); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#87
+  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#104
   def use_single_value_block_argument?(arguments, receiver_in_block); end
 end
 
-# source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#45
+# source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#46
 RuboCop::Cop::Rails::CompactBlank::MSG = T.let(T.unsafe(nil), String)
 
-# source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#46
+# source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#47
 RuboCop::Cop::Rails::CompactBlank::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 
 # Checks legacy syntax usage of `tag`
@@ -1819,10 +1827,10 @@ RuboCop::Cop::Rails::DangerousColumnNames::RESTRICT_ON_SEND = T.let(T.unsafe(nil
 # The cop also reports warnings when you are using `to_time` method,
 # because it doesn't know about Rails time zone either.
 #
-# Two styles are supported for this cop. When `EnforcedStyle` is 'strict'
+# Two styles are supported for this cop. When `EnforcedStyle` is `strict`
 # then the Date methods `today`, `current`, `yesterday`, and `tomorrow`
 # are prohibited and the usage of both `to_time`
-# and 'to_time_in_current_zone' are reported as warning.
+# and `to_time_in_current_zone` are reported as warning.
 #
 # When `EnforcedStyle` is `flexible` then only `Date.today` is prohibited.
 #
@@ -2587,42 +2595,139 @@ RuboCop::Cop::Rails::EagerEvaluationLogMessage::RESTRICT_ON_SEND = T.let(T.unsaf
 #
 # @example
 #   # bad
+#   enum :status, [:active, :archived]
+#
+#   # good
+#   enum :status, { active: 0, archived: 1 }
+#
+#   # bad
 #   enum status: [:active, :archived]
 #
 #   # good
 #   enum status: { active: 0, archived: 1 }
 #
-# source://rubocop-rails//lib/rubocop/cop/rails/enum_hash.rb#20
+# source://rubocop-rails//lib/rubocop/cop/rails/enum_hash.rb#26
 class RuboCop::Cop::Rails::EnumHash < ::RuboCop::Cop::Base
   extend ::RuboCop::Cop::AutoCorrector
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/enum_hash.rb#30
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_hash.rb#40
   def array_pair?(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/enum_hash.rb#26
-  def enum?(param0 = T.unsafe(nil)); end
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_hash.rb#32
+  def enum_with_array?(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/enum_hash.rb#34
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_hash.rb#36
+  def enum_with_old_syntax?(param0 = T.unsafe(nil)); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_hash.rb#44
   def on_send(node); end
 
   private
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/enum_hash.rb#53
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_hash.rb#89
+  def build_hash(array); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_hash.rb#69
   def enum_name(key); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/enum_hash.rb#62
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_hash.rb#65
+  def message(key); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_hash.rb#78
   def source(elem); end
 end
 
-# source://rubocop-rails//lib/rubocop/cop/rails/enum_hash.rb#23
+# source://rubocop-rails//lib/rubocop/cop/rails/enum_hash.rb#29
 RuboCop::Cop::Rails::EnumHash::MSG = T.let(T.unsafe(nil), String)
 
-# source://rubocop-rails//lib/rubocop/cop/rails/enum_hash.rb#24
+# source://rubocop-rails//lib/rubocop/cop/rails/enum_hash.rb#30
 RuboCop::Cop::Rails::EnumHash::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
+
+# Looks for enums written with keyword arguments syntax.
+#
+# Defining enums with keyword arguments syntax is deprecated and will be removed in Rails 8.0.
+# Positional arguments should be used instead:
+#
+# @example
+#   # bad
+#   enum status: { active: 0, archived: 1 }, _prefix: true
+#
+#   # good
+#   enum :status, { active: 0, archived: 1 }, prefix: true
+#
+# source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#18
+class RuboCop::Cop::Rails::EnumSyntax < ::RuboCop::Cop::Base
+  extend ::RuboCop::Cop::AutoCorrector
+  extend ::RuboCop::Cop::TargetRailsVersion
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#29
+  def enum?(param0 = T.unsafe(nil)); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#41
+  def enum_options(param0 = T.unsafe(nil)); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#37
+  def enum_values(param0 = T.unsafe(nil)); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#33
+  def enum_with_options?(param0 = T.unsafe(nil)); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#45
+  def on_send(node); end
+
+  private
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#52
+  def check_and_correct_keyword_args(node); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#63
+  def check_enum_options(node); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#73
+  def correct_keyword_args(node, key, values, options); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#110
+  def correct_options(options); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#99
+  def enum_name(elem); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#90
+  def enum_name_value(key); end
+
+  # @return [Boolean]
+  #
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#84
+  def multiple_enum_definitions?(node); end
+end
+
+# source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#24
+RuboCop::Cop::Rails::EnumSyntax::MSG = T.let(T.unsafe(nil), String)
+
+# source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#25
+RuboCop::Cop::Rails::EnumSyntax::MSG_OPTIONS = T.let(T.unsafe(nil), String)
+
+# source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#27
+RuboCop::Cop::Rails::EnumSyntax::OPTION_NAMES = T.let(T.unsafe(nil), Array)
+
+# source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#26
+RuboCop::Cop::Rails::EnumSyntax::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 
 # Looks for duplicate values in enum declarations.
 #
 # @example
+#   # bad
+#   enum :status, { active: 0, archived: 0 }
+#
+#   # good
+#   enum :status, { active: 0, archived: 1 }
+#
+#   # bad
+#   enum :status, [:active, :archived, :active]
+#
+#   # good
+#   enum :status, [:active, :archived]
+#
 #   # bad
 #   enum status: { active: 0, archived: 0 }
 #
@@ -2635,29 +2740,35 @@ RuboCop::Cop::Rails::EnumHash::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 #   # good
 #   enum status: [:active, :archived]
 #
-# source://rubocop-rails//lib/rubocop/cop/rails/enum_uniqueness.rb#20
+# source://rubocop-rails//lib/rubocop/cop/rails/enum_uniqueness.rb#32
 class RuboCop::Cop::Rails::EnumUniqueness < ::RuboCop::Cop::Base
   include ::RuboCop::Cop::Duplication
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/enum_uniqueness.rb#26
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_uniqueness.rb#38
   def enum?(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/enum_uniqueness.rb#30
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_uniqueness.rb#46
   def enum_values(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/enum_uniqueness.rb#34
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_uniqueness.rb#42
+  def enum_with_old_syntax?(param0 = T.unsafe(nil)); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_uniqueness.rb#50
   def on_send(node); end
 
   private
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/enum_uniqueness.rb#52
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_uniqueness.rb#70
   def enum_name(key); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_uniqueness.rb#79
+  def message(key, item); end
 end
 
-# source://rubocop-rails//lib/rubocop/cop/rails/enum_uniqueness.rb#23
+# source://rubocop-rails//lib/rubocop/cop/rails/enum_uniqueness.rb#35
 RuboCop::Cop::Rails::EnumUniqueness::MSG = T.let(T.unsafe(nil), String)
 
-# source://rubocop-rails//lib/rubocop/cop/rails/enum_uniqueness.rb#24
+# source://rubocop-rails//lib/rubocop/cop/rails/enum_uniqueness.rb#36
 RuboCop::Cop::Rails::EnumUniqueness::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 
 # Checks for usage of `Rails.env.development? || Rails.env.test?` which
@@ -5122,11 +5233,12 @@ RuboCop::Cop::Rails::PluckId::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 # and can be replaced with `select`.
 #
 # Since `pluck` is an eager method and hits the database immediately,
-# using `select` helps to avoid additional database queries.
+# using `select` helps to avoid additional database queries by running as
+# a subquery.
 #
-# This cop has two different enforcement modes. When the `EnforcedStyle`
-# is `conservative` (the default) then only calls to `pluck` on a constant
-# (i.e. a model class) in the `where` is used as offenses.
+# This cop has two modes of enforcement. When the `EnforcedStyle` is set
+# to `conservative` (the default), only calls to `pluck` on a constant
+# (e.g. a model class) within `where` are considered offenses.
 #
 # @example
 #   # bad
@@ -5145,31 +5257,31 @@ RuboCop::Cop::Rails::PluckId::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 #   # bad
 #   Post.where(user_id: active_users.pluck(:id))
 #
-# source://rubocop-rails//lib/rubocop/cop/rails/pluck_in_where.rb#41
+# source://rubocop-rails//lib/rubocop/cop/rails/pluck_in_where.rb#50
 class RuboCop::Cop::Rails::PluckInWhere < ::RuboCop::Cop::Base
   include ::RuboCop::Cop::ActiveRecordHelper
   include ::RuboCop::Cop::ConfigurableEnforcedStyle
   extend ::RuboCop::Cop::AutoCorrector
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/pluck_in_where.rb#50
+  # source://rubocop-rails//lib/rubocop/cop/rails/pluck_in_where.rb#59
   def on_csend(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/pluck_in_where.rb#50
+  # source://rubocop-rails//lib/rubocop/cop/rails/pluck_in_where.rb#59
   def on_send(node); end
 
   private
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/pluck_in_where.rb#72
+  # source://rubocop-rails//lib/rubocop/cop/rails/pluck_in_where.rb#81
   def root_receiver(node); end
 end
 
-# source://rubocop-rails//lib/rubocop/cop/rails/pluck_in_where.rb#47
+# source://rubocop-rails//lib/rubocop/cop/rails/pluck_in_where.rb#56
 RuboCop::Cop::Rails::PluckInWhere::MSG_IDS = T.let(T.unsafe(nil), String)
 
-# source://rubocop-rails//lib/rubocop/cop/rails/pluck_in_where.rb#46
+# source://rubocop-rails//lib/rubocop/cop/rails/pluck_in_where.rb#55
 RuboCop::Cop::Rails::PluckInWhere::MSG_SELECT = T.let(T.unsafe(nil), String)
 
-# source://rubocop-rails//lib/rubocop/cop/rails/pluck_in_where.rb#48
+# source://rubocop-rails//lib/rubocop/cop/rails/pluck_in_where.rb#57
 RuboCop::Cop::Rails::PluckInWhere::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 
 # Checks for correct grammar when using ActiveSupport's
@@ -5179,79 +5291,83 @@ RuboCop::Cop::Rails::PluckInWhere::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array
 #   # bad
 #   3.day.ago
 #   1.months.ago
+#   5.megabyte
+#   1.gigabyte
 #
 #   # good
 #   3.days.ago
 #   1.month.ago
+#   5.megabytes
+#   1.gigabyte
 #
-# source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#17
+# source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#21
 class RuboCop::Cop::Rails::PluralizationGrammar < ::RuboCop::Cop::Base
   extend ::RuboCop::Cop::AutoCorrector
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#35
+  # source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#49
   def on_send(node); end
 
   private
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#53
+  # source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#67
   def correct_method(method_name); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#96
+  # source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#110
   def duration_method?(method_name); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#84
+  # source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#98
   def literal_number?(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#49
+  # source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#63
   def message(number, method_name); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#61
+  # source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#75
   def offense?(node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#68
+  # source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#82
   def plural_method?(method_name); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#80
+  # source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#94
   def plural_receiver?(number); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#88
+  # source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#102
   def pluralize(method_name); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#72
+  # source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#86
   def singular_method?(method_name); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#76
+  # source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#90
   def singular_receiver?(number); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#92
+  # source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#106
   def singularize(method_name); end
 end
 
-# source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#33
+# source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#47
 RuboCop::Cop::Rails::PluralizationGrammar::MSG = T.let(T.unsafe(nil), String)
 
-# source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#31
-RuboCop::Cop::Rails::PluralizationGrammar::PLURAL_DURATION_METHODS = T.let(T.unsafe(nil), Hash)
+# source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#45
+RuboCop::Cop::Rails::PluralizationGrammar::PLURAL_METHODS = T.let(T.unsafe(nil), Hash)
 
-# source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#29
+# source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#43
 RuboCop::Cop::Rails::PluralizationGrammar::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 
-# source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#20
-RuboCop::Cop::Rails::PluralizationGrammar::SINGULAR_DURATION_METHODS = T.let(T.unsafe(nil), Hash)
+# source://rubocop-rails//lib/rubocop/cop/rails/pluralization_grammar.rb#24
+RuboCop::Cop::Rails::PluralizationGrammar::SINGULAR_METHODS = T.let(T.unsafe(nil), Hash)
 
 # Checks code that can be written more easily using
 # `Object#presence` defined by Active Support.
@@ -5780,7 +5896,7 @@ class RuboCop::Cop::Rails::RedundantPresenceValidationOnBelongsTo < ::RuboCop::C
   # @param association [Symbol]
   # @return [Array<RuboCop::AST::Node>, nil] matching node
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#106
+  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#109
   def any_belongs_to?(param0 = T.unsafe(nil), association:); end
 
   # Match a class with a matching association, either by name or an explicit
@@ -5797,7 +5913,7 @@ class RuboCop::Cop::Rails::RedundantPresenceValidationOnBelongsTo < ::RuboCop::C
   # @param fk [Symbol] e.g. `:user_id`
   # @return [Array<RuboCop::AST::Node>] matching nodes
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#132
+  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#135
   def belongs_to?(param0 = T.unsafe(nil), key:, fk:); end
 
   # Match a matching `belongs_to` association with a matching explicit `foreign_key` option
@@ -5808,7 +5924,7 @@ class RuboCop::Cop::Rails::RedundantPresenceValidationOnBelongsTo < ::RuboCop::C
   # @param fk [Symbol] e.g. `:user_id`
   # @return [Array<RuboCop::AST::Node>] matching nodes
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#167
+  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#170
   def belongs_to_with_a_matching_fk?(param0 = T.unsafe(nil), param1); end
 
   # Match a matching `belongs_to` association, without an explicit `foreign_key` option
@@ -5817,20 +5933,20 @@ class RuboCop::Cop::Rails::RedundantPresenceValidationOnBelongsTo < ::RuboCop::C
   # @param key [Symbol] e.g. `:user`
   # @return [Array<RuboCop::AST::Node>] matching nodes
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#150
+  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#153
   def belongs_to_without_fk?(param0 = T.unsafe(nil), param1); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#171
+  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#174
   def on_send(node); end
 
   # Match a `belongs_to` association with an optional option in a hash
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#81
+  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#84
   def optional?(param0 = T.unsafe(nil)); end
 
   # Match an optional option in a hash
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#87
+  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#90
   def optional_option?(param0 = T.unsafe(nil)); end
 
   # Match a `validates` statement with a presence check
@@ -5850,41 +5966,46 @@ class RuboCop::Cop::Rails::RedundantPresenceValidationOnBelongsTo < ::RuboCop::C
   # @example source that DOES NOT match - custom strict validation
   #   validates :user_id, presence: true, strict: MissingUserError
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#67
+  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#70
   def presence_validation?(param0 = T.unsafe(nil)); end
 
   private
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#182
+  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#191
   def add_offense_and_correct(node, all_keys, keys, options, presence); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#210
+  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#219
   def belongs_to_for(model_class_node, key); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#242
+  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#251
   def extract_validation_for_keys(corrector, node, keys, options); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#198
+  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#207
   def message_for(keys); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#203
+  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#212
   def non_optional_belongs_to(node, keys); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#223
+  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#232
   def remove_keys_from_validation(corrector, node, keys); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#234
+  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#243
   def remove_presence_option(corrector, presence); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#219
+  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#228
   def remove_validation(corrector, node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#258
+  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#267
   def validation_range(node); end
 end
 
 # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#39
 RuboCop::Cop::Rails::RedundantPresenceValidationOnBelongsTo::MSG = T.let(T.unsafe(nil), String)
+
+# From https://github.com/rails/rails/blob/7a0bf93b9dd291c7f61121a41b3a813ac8857e6a/activemodel/lib/active_model/validations/validates.rb#L157-L159
+#
+# source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#43
+RuboCop::Cop::Rails::RedundantPresenceValidationOnBelongsTo::NON_VALIDATION_OPTIONS = T.let(T.unsafe(nil), Array)
 
 # source://rubocop-rails//lib/rubocop/cop/rails/redundant_presence_validation_on_belongs_to.rb#40
 RuboCop::Cop::Rails::RedundantPresenceValidationOnBelongsTo::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
@@ -6276,12 +6397,12 @@ class RuboCop::Cop::Rails::RenderPlainText < ::RuboCop::Cop::Base
   # @return [Boolean]
   #
   # source://rubocop-rails//lib/rubocop/cop/rails/render_plain_text.rb#56
-  def compatible_content_type?(node); end
+  def compatible_content_type?(pair_node); end
 
   # source://rubocop-rails//lib/rubocop/cop/rails/render_plain_text.rb#52
   def find_content_type(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/render_plain_text.rb#61
+  # source://rubocop-rails//lib/rubocop/cop/rails/render_plain_text.rb#64
   def replacement(rest_options, option_value); end
 end
 
@@ -6413,25 +6534,21 @@ RuboCop::Cop::Rails::ResponseParsedBody::RESTRICT_ON_SEND = T.let(T.unsafe(nil),
 # reversible.
 #
 # @example
+#   # remove_index
+#
 #   # bad
 #   def change
-#   change_table :users do |t|
-#   t.remove :name
-#   end
+#   remove_index :users, name: :index_users_on_email
 #   end
 #
 #   # good
 #   def change
-#   change_table :users do |t|
-#   t.remove :name, type: :string
-#   end
+#   remove_index :users, :email
 #   end
 #
 #   # good
 #   def change
-#   create_table :users do |t|
-#   t.string :name
-#   end
+#   remove_index :users, column: :email
 #   end
 # @example
 #   # drop_table
@@ -6533,21 +6650,25 @@ RuboCop::Cop::Rails::ResponseParsedBody::RESTRICT_ON_SEND = T.let(T.unsafe(nil),
 #   remove_columns :users, :name, :email, type: :string
 #   end
 # @example
-#   # remove_index
-#
 #   # bad
 #   def change
-#   remove_index :users, name: :index_users_on_email
+#   change_table :users do |t|
+#   t.remove :name
+#   end
 #   end
 #
 #   # good
 #   def change
-#   remove_index :users, :email
+#   change_table :users do |t|
+#   t.remove :name, type: :string
+#   end
 #   end
 #
 #   # good
 #   def change
-#   remove_index :users, column: :email
+#   create_table :users do |t|
+#   t.string :name
+#   end
 #   end
 #
 # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#153
@@ -6786,7 +6907,7 @@ class RuboCop::Cop::Rails::RootPathnameMethods < ::RuboCop::Cop::Base
   private
 
   # source://rubocop-rails//lib/rubocop/cop/rails/root_pathname_methods.rb#220
-  def build_path_glob_replacement(path, method); end
+  def build_path_glob_replacement(path); end
 
   # source://rubocop-rails//lib/rubocop/cop/rails/root_pathname_methods.rb#228
   def build_path_replacement(path, method, args); end
@@ -8490,11 +8611,13 @@ RuboCop::Cop::Rails::Validation::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 RuboCop::Cop::Rails::Validation::TYPES = T.let(T.unsafe(nil), Array)
 
 # Identifies places where manually constructed SQL
-# in `where` can be replaced with `where(attribute: value)`.
+# in `where` and `where.not` can be replaced with
+# `where(attribute: value)` and `where.not(attribute: value)`.
 #
 # @example
 #   # bad
 #   User.where('name = ?', 'Gabe')
+#   User.where.not('name = ?', 'Gabe')
 #   User.where('name = :name', name: 'Gabe')
 #   User.where('name IS NULL')
 #   User.where('name IN (?)', ['john', 'jane'])
@@ -8503,65 +8626,71 @@ RuboCop::Cop::Rails::Validation::TYPES = T.let(T.unsafe(nil), Array)
 #
 #   # good
 #   User.where(name: 'Gabe')
+#   User.where.not(name: 'Gabe')
 #   User.where(name: nil)
 #   User.where(name: ['john', 'jane'])
 #   User.where(users: { name: 'Gabe' })
 #
-# source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#27
+# source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#30
 class RuboCop::Cop::Rails::WhereEquals < ::RuboCop::Cop::Base
   include ::RuboCop::Cop::RangeHelp
   extend ::RuboCop::Cop::AutoCorrector
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#41
+  # source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#44
   def on_csend(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#41
+  # source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#44
   def on_send(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#34
+  # source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#37
   def where_method_call?(param0 = T.unsafe(nil)); end
 
   private
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#91
-  def build_good_method(column, value); end
+  # source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#96
+  def build_good_method(method_name, column, value); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#72
+  # source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#77
   def extract_column_and_value(template_node, value_node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#68
+  # source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#73
   def offense_range(node); end
+
+  # @return [Boolean]
+  #
+  # source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#106
+  def where_not?(node); end
 end
 
 # column = ?
 #
-# source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#60
+# source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#65
 RuboCop::Cop::Rails::WhereEquals::EQ_ANONYMOUS_RE = T.let(T.unsafe(nil), Regexp)
 
 # column = :column
 #
-# source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#62
+# source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#67
 RuboCop::Cop::Rails::WhereEquals::EQ_NAMED_RE = T.let(T.unsafe(nil), Regexp)
 
 # column IN (?)
 #
-# source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#61
+# source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#66
 RuboCop::Cop::Rails::WhereEquals::IN_ANONYMOUS_RE = T.let(T.unsafe(nil), Regexp)
 
 # column IN (:column)
 #
-# source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#63
+# source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#68
 RuboCop::Cop::Rails::WhereEquals::IN_NAMED_RE = T.let(T.unsafe(nil), Regexp)
 
 # column IS NULL
 #
-# source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#64
+# source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#69
 RuboCop::Cop::Rails::WhereEquals::IS_NULL_RE = T.let(T.unsafe(nil), Regexp)
 
-# source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#31
+# source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#34
 RuboCop::Cop::Rails::WhereEquals::MSG = T.let(T.unsafe(nil), String)
 
-# source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#32
+# source://rubocop-rails//lib/rubocop/cop/rails/where_equals.rb#35
 RuboCop::Cop::Rails::WhereEquals::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 
 # Enforces consistent style when using `exists?`.
@@ -8952,66 +9081,66 @@ RuboCop::Cop::Rails::WhereRange::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 module RuboCop::Cop::Style; end
 
 class RuboCop::Cop::Style::InverseMethods < ::RuboCop::Cop::Base
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/inverse_methods.rb#70
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/inverse_methods.rb#70
   def inverse_block?(param0 = T.unsafe(nil)); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/inverse_methods.rb#61
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/inverse_methods.rb#61
   def inverse_candidate?(param0 = T.unsafe(nil)); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/inverse_methods.rb#92
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/inverse_methods.rb#92
   def on_block(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/inverse_methods.rb#78
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/inverse_methods.rb#78
   def on_csend(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/inverse_methods.rb#92
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/inverse_methods.rb#92
   def on_numblock(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/inverse_methods.rb#78
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/inverse_methods.rb#78
   def on_send(node); end
 
   private
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/inverse_methods.rb#177
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/inverse_methods.rb#177
   def camel_case_constant?(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/inverse_methods.rb#121
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/inverse_methods.rb#121
   def correct_inverse_block(corrector, node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/inverse_methods.rb#112
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/inverse_methods.rb#112
   def correct_inverse_method(corrector, node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/inverse_methods.rb#128
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/inverse_methods.rb#128
   def correct_inverse_selector(block, corrector); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/inverse_methods.rb#181
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/inverse_methods.rb#181
   def dot_range(loc); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/inverse_methods.rb#166
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/inverse_methods.rb#166
   def end_parentheses(node, method_call); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/inverse_methods.rb#150
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/inverse_methods.rb#150
   def inverse_blocks; end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/inverse_methods.rb#145
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/inverse_methods.rb#145
   def inverse_methods; end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/inverse_methods.rb#191
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/inverse_methods.rb#191
   def message(method, inverse); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/inverse_methods.rb#154
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/inverse_methods.rb#154
   def negated?(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/inverse_methods.rb#162
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/inverse_methods.rb#162
   def not_to_receiver(node, method_call); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/inverse_methods.rb#172
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/inverse_methods.rb#172
   def possible_class_hierarchy_check?(lhs, rhs, method); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/inverse_methods.rb#158
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/inverse_methods.rb#158
   def relational_comparison_with_safe_navigation?(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/inverse_methods.rb#185
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/inverse_methods.rb#185
   def remove_end_parenthesis(corrector, node, method, method_call); end
 
   class << self
@@ -9021,24 +9150,24 @@ class RuboCop::Cop::Style::InverseMethods < ::RuboCop::Cop::Base
 end
 
 class RuboCop::Cop::Style::MethodCallWithArgsParentheses < ::RuboCop::Cop::Base
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/method_call_with_args_parentheses.rb#217
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/method_call_with_args_parentheses.rb#217
   def on_csend(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/method_call_with_args_parentheses.rb#217
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/method_call_with_args_parentheses.rb#217
   def on_send(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/method_call_with_args_parentheses.rb#217
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/method_call_with_args_parentheses.rb#217
   def on_yield(node); end
 
   private
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/method_call_with_args_parentheses.rb#225
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/method_call_with_args_parentheses.rb#225
   def args_begin(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/method_call_with_args_parentheses.rb#233
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/method_call_with_args_parentheses.rb#233
   def args_end(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/method_call_with_args_parentheses.rb#237
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/method_call_with_args_parentheses.rb#237
   def args_parenthesized?(node); end
 
   class << self
@@ -9048,84 +9177,84 @@ class RuboCop::Cop::Style::MethodCallWithArgsParentheses < ::RuboCop::Cop::Base
 end
 
 class RuboCop::Cop::Style::RedundantSelf < ::RuboCop::Cop::Base
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#60
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#60
   def initialize(config = T.unsafe(nil), options = T.unsafe(nil)); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#68
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#68
   def on_and_asgn(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#86
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#86
   def on_args(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#120
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#120
   def on_block(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#90
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#90
   def on_blockarg(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#81
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#81
   def on_def(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#81
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#81
   def on_defs(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#126
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#126
   def on_if(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#104
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#104
   def on_in_pattern(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#99
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#99
   def on_lvasgn(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#94
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#94
   def on_masgn(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#120
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#120
   def on_numblock(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#74
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#74
   def on_op_asgn(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#68
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#68
   def on_or_asgn(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#108
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#108
   def on_send(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#126
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#126
   def on_until(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#126
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#126
   def on_while(node); end
 
   private
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#196
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#196
   def add_lhs_to_local_variables_scopes(rhs, lhs); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#204
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#204
   def add_masgn_lhs_variables(rhs, lhs); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#210
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#210
   def add_match_var_scopes(in_pattern_node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#144
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#144
   def add_scope(node, local_variables = T.unsafe(nil)); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#190
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#190
   def allow_self(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#150
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#150
   def allowed_send_node?(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#165
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#165
   def it_method_in_block?(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#181
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#181
   def on_argument(node); end
 
-  # source://rubocop/1.64.1/lib/rubocop/cop/style/redundant_self.rb#173
+  # source://rubocop/1.65.1/lib/rubocop/cop/style/redundant_self.rb#173
   def regular_method_call?(node); end
 
   class << self

@@ -21,17 +21,10 @@ class Date
   include ::Mocha::Inspect::DateMethods
 end
 
-# @private
-#
-# source://mocha//lib/mocha/parameter_matchers/instance_methods.rb#22
+# source://mocha//lib/mocha/inspect.rb#60
 class Hash
   include ::Enumerable
   include ::Mocha::Inspect::HashMethods
-
-  # @private
-  #
-  # source://mocha//lib/mocha/parameter_matchers/instance_methods.rb#24
-  def to_matcher(expectation = T.unsafe(nil)); end
 end
 
 class Minitest::Test < ::Minitest::Runnable
@@ -1170,10 +1163,6 @@ class Mocha::Expectation
 
   # Modifies expectation so that when the expected method is called, it raises the specified +exception+ with the specified +message+ i.e. calls +Kernel#raise(exception, message)+.
   #
-  # @example Raise specified exception if expected method is invoked.
-  #   object = stub()
-  #   object.stubs(:expected_method).raises(Exception, 'message')
-  #   object.expected_method # => raises exception of class Exception and with message 'message'
   # @example Raise custom exception with extra constructor parameters by passing in an instance of the exception.
   #   object = stub()
   #   object.stubs(:expected_method).raises(MyException.new('message', 1, 2, 3))
@@ -1183,6 +1172,10 @@ class Mocha::Expectation
   #   object.stubs(:expected_method).raises(Exception1).then.raises(Exception2)
   #   object.expected_method # => raises exception of class Exception1
   #   object.expected_method # => raises exception of class Exception2
+  # @example Raise specified exception if expected method is invoked.
+  #   object = stub()
+  #   object.stubs(:expected_method).raises(Exception, 'message')
+  #   object.expected_method # => raises exception of class Exception and with message 'message'
   # @example Raise an exception on first invocation of expected method and then return values on subsequent invocations.
   #   object = stub()
   #   object.stubs(:expected_method).raises(Exception).then.returns(2, 3)
@@ -1271,14 +1264,14 @@ class Mocha::Expectation
 
   # Modifies expectation so that when the expected method is called, it throws the specified +tag+ with the specific return value +object+ i.e. calls +Kernel#throw(tag, object)+.
   #
-  # @example Throw tag when expected method is invoked.
-  #   object = stub()
-  #   object.stubs(:expected_method).throws(:done)
-  #   object.expected_method # => throws tag :done
   # @example Throw tag with return value +object+ c.f. +Kernel#throw+.
   #   object = stub()
   #   object.stubs(:expected_method).throws(:done, 'result')
   #   object.expected_method # => throws tag :done and causes catch block to return 'result'
+  # @example Throw tag when expected method is invoked.
+  #   object = stub()
+  #   object.stubs(:expected_method).throws(:done)
+  #   object.expected_method # => throws tag :done
   # @example Throw different tags on consecutive invocations of the expected method.
   #   object = stub()
   #   object.stubs(:expected_method).throws(:done).then.throws(:continue)
@@ -3168,13 +3161,8 @@ class Mocha::ParameterMatchers::Base
   # @return [AllOf] parameter matcher.
   # @see Expectation#with
   #
-  # source://mocha//lib/mocha/parameter_matchers/base.rb#30
+  # source://mocha//lib/mocha/parameter_matchers/base.rb#25
   def &(other); end
-
-  # @private
-  #
-  # source://mocha//lib/mocha/parameter_matchers/base.rb#6
-  def to_matcher(_expectation = T.unsafe(nil)); end
 
   # A shorthand way of combining two matchers when at least one must match.
   #
@@ -3200,7 +3188,7 @@ class Mocha::ParameterMatchers::Base
   # @return [AnyOf] parameter matcher.
   # @see Expectation#with
   #
-  # source://mocha//lib/mocha/parameter_matchers/base.rb#60
+  # source://mocha//lib/mocha/parameter_matchers/base.rb#55
   def |(other); end
 end
 
@@ -3263,17 +3251,17 @@ class Mocha::ParameterMatchers::HasEntries < ::Mocha::ParameterMatchers::Base
   # @return [HasEntries] a new instance of HasEntries
   #
   # source://mocha//lib/mocha/parameter_matchers/has_entries.rb#33
-  def initialize(entries); end
+  def initialize(entries, exact: T.unsafe(nil)); end
 
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/has_entries.rb#38
+  # source://mocha//lib/mocha/parameter_matchers/has_entries.rb#39
   def matches?(available_parameters); end
 
   # @private
   #
-  # source://mocha//lib/mocha/parameter_matchers/has_entries.rb#45
+  # source://mocha//lib/mocha/parameter_matchers/has_entries.rb#50
   def mocha_inspect; end
 end
 
@@ -3390,12 +3378,12 @@ end
 
 # @private
 #
-# source://mocha//lib/mocha/parameter_matchers/instance_methods.rb#7
+# source://mocha//lib/mocha/parameter_matchers/instance_methods.rb#8
 module Mocha::ParameterMatchers::InstanceMethods
   # @private
   #
-  # source://mocha//lib/mocha/parameter_matchers/instance_methods.rb#9
-  def to_matcher(_expectation = T.unsafe(nil)); end
+  # source://mocha//lib/mocha/parameter_matchers/instance_methods.rb#10
+  def to_matcher(expectation: T.unsafe(nil), top_level: T.unsafe(nil)); end
 end
 
 # Parameter matcher which matches when actual parameter is an instance of the specified class.
@@ -3510,43 +3498,43 @@ end
 
 # @private
 #
-# source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#8
+# source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#9
 class Mocha::ParameterMatchers::PositionalOrKeywordHash < ::Mocha::ParameterMatchers::Base
   # @return [PositionalOrKeywordHash] a new instance of PositionalOrKeywordHash
   #
-  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#9
+  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#10
   def initialize(value, expectation); end
 
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#14
+  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#15
   def matches?(available_parameters); end
 
-  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#28
+  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#29
   def mocha_inspect; end
 
   private
 
-  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#42
+  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#43
   def deprecation_warning(actual, expected); end
 
-  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#58
+  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#59
   def expectation_definition; end
 
-  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#34
+  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#35
   def extract_parameter(available_parameters); end
 
-  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#50
+  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#51
   def hash_type(hash); end
 
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#54
+  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#55
   def ruby2_keywords_hash?(hash); end
 
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#38
+  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#39
   def same_type_of_hash?(actual, expected); end
 end
 
@@ -3955,7 +3943,7 @@ end
 
 # @private
 #
-# source://mocha//lib/mocha/parameter_matchers/instance_methods.rb#17
+# source://mocha//lib/mocha/parameter_matchers/instance_methods.rb#24
 class Object < ::BasicObject
   include ::Kernel
   include ::PP::ObjectMixin
