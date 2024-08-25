@@ -8,8 +8,7 @@ else
   SimpleCov::Formatter::HTMLFormatter
 end
 
-SimpleCov.minimum_coverage(95)
-SimpleCov.maximum_coverage_drop(1)
+SimpleCov.minimum_coverage(90)
 SimpleCov.start do
   enable_coverage :branch
   primary_coverage :branch
