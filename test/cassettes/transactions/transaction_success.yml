@@ -8,7 +8,7 @@ http_interactions:
       string: ''
     headers:
       User-Agent:
-      - Faraday v2.9.0
+      - Faraday v2.10.1
       Authorization:
       - Bearer <BEARER_TOKEN>
       Accept-Encoding:
@@ -23,9 +23,9 @@ http_interactions:
       Server:
       - Cowboy
       Report-To:
-      - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1706475306&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=%2BVzUDYpjezEu4BkKzv%2FdNHiVuMB04GKiBaq%2FBed98d4%3D"}]}'
+      - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1724616267&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=k96Y5vynZ5cXIzCDU%2FTGz%2FjdjxyJf3D0n4tfq7BA7gw%3D"}]}'
       Reporting-Endpoints:
-      - heroku-nel=https://nel.heroku.com/reports?ts=1706475306&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=%2BVzUDYpjezEu4BkKzv%2FdNHiVuMB04GKiBaq%2FBed98d4%3D
+      - heroku-nel=https://nel.heroku.com/reports?ts=1724616267&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=k96Y5vynZ5cXIzCDU%2FTGz%2FjdjxyJf3D0n4tfq7BA7gw%3D
       Nel:
       - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
       Connection:
@@ -39,9 +39,9 @@ http_interactions:
       Content-Type:
       - application/json; charset=utf-8
       Etag:
-      - W/"460-7RrUKDBgS5tvpLOK0ukSqenaEYo"
+      - W/"497-tZeLMRSbqDyzTStF08dvxTe97Bc"
       Date:
-      - Sun, 28 Jan 2024 20:55:06 GMT
+      - Sun, 25 Aug 2024 20:04:27 GMT
       Transfer-Encoding:
       - chunked
       Via:
@@ -50,8 +50,8 @@ http_interactions:
       encoding: ASCII-8BIT
       string: '{"id":893631800,"date":"2024-01-01","amount":"-10000.0000","currency":"cad","to_base":-10000,"payee":"Money
         Tree","category_id":777067,"category_name":"Job Income","category_group_id":777059,"category_group_name":"Income","is_income":true,"exclude_from_budget":true,"exclude_from_totals":false,"created_at":"2024-01-28T17:03:02.471Z","updated_at":"2024-01-28T17:03:05.819Z","status":"cleared","is_pending":false,"notes":null,"original_name":"Money
-        Tree","recurring_id":null,"recurring_payee":null,"recurring_description":null,"recurring_cadence":null,"recurring_type":null,"recurring_amount":null,"recurring_currency":null,"parent_id":null,"has_children":false,"group_id":null,"is_group":false,"asset_id":92657,"asset_institution_name":null,"asset_name":"Infinite
+        Tree","recurring_id":null,"recurring_payee":null,"recurring_description":null,"recurring_cadence":null,"recurring_granularity":null,"recurring_quantity":null,"recurring_type":null,"recurring_amount":null,"recurring_currency":null,"parent_id":null,"has_children":false,"group_id":null,"is_group":false,"asset_id":92657,"asset_institution_name":null,"asset_name":"Infinite
         Cash","asset_display_name":"Infinite Cash","asset_status":"active","plaid_account_id":null,"plaid_account_name":null,"plaid_account_mask":null,"institution_name":null,"plaid_account_display_name":null,"plaid_metadata":null,"source":"manual","display_name":"Money
         Tree","display_notes":"","account_display_name":"Infinite Cash","tags":[],"external_id":null}'
-  recorded_at: Sun, 28 Jan 2024 20:55:06 GMT
-recorded_with: VCR 6.2.0
+  recorded_at: Sun, 25 Aug 2024 20:04:27 GMT
+recorded_with: VCR 6.3.1

@@ -53,6 +53,10 @@ module LunchMoney
       sig { returns(T.nilable(T::Array[LunchMoney::Objects::ChildTransaction])) }
       attr_accessor :children
 
+      # TODO: Fix types when I have a response on what they should be https://github.com/mmenanno/lunchmoney/issues/329
+      sig { returns(T.untyped) }
+      attr_accessor :recurring_granularity, :recurring_quantity
+
       sig do
         params(
           id: Integer,
@@ -103,6 +107,8 @@ module LunchMoney
           display_notes: T.nilable(String),
           external_id: T.nilable(Integer),
           children: T.nilable(T::Array[LunchMoney::Objects::ChildTransaction]),
+          recurring_granularity: T.untyped,
+          recurring_quantity: T.untyped,
         ).void
       end
       def initialize(id:, date:, amount:, currency:, to_base:, payee:, is_income:, exclude_from_budget:,
@@ -113,7 +119,7 @@ module LunchMoney
         recurring_currency: nil, parent_id: nil, group_id: nil, asset_id: nil, asset_institution_name: nil,
         asset_name: nil, asset_display_name: nil, asset_status: nil, plaid_account_id: nil, plaid_account_name: nil,
         plaid_account_mask: nil, institution_name: nil, plaid_account_display_name: nil, plaid_metadata: nil,
-        display_notes: nil, external_id: nil, children: nil)
+        display_notes: nil, external_id: nil, children: nil, recurring_granularity: nil, recurring_quantity: nil)
         super(id:, date:, amount:, currency:, to_base:, payee:, notes:, asset_id:, plaid_account_id:)
         @is_income = is_income
         @exclude_from_budget = exclude_from_budget
@@ -154,6 +160,8 @@ module LunchMoney
         @display_notes = display_notes
         @children = children
         @external_id = external_id
+        @recurring_granularity = recurring_granularity
+        @recurring_quantity = recurring_quantity
       end
     end
   end

@@ -10,8 +10,6 @@ module LunchMoney
       include VcrHelper
 
       test "transactions returns an array of Transaction objects on success response" do
-        skip("Skipping until I can resolve https://github.com/mmenanno/lunchmoney/issues/328")
-
         with_real_ci_connections do
           VCR.use_cassette("transactions/transactions_success") do
             api_call = LunchMoney::Calls::Transactions.new.transactions(
@@ -36,8 +34,6 @@ module LunchMoney
       end
 
       test "transaction returns a Transaction objects on success response" do
-        skip("Skipping until I can resolve https://github.com/mmenanno/lunchmoney/issues/328")
-
         with_real_ci_connections do
           VCR.use_cassette("transactions/transaction_success") do
             api_call = LunchMoney::Calls::Transactions.new.transaction(893631800)
@@ -57,8 +53,6 @@ module LunchMoney
       end
 
       test "transaction_group returns a Transaction objects on success response" do
-        skip("Skipping until I can resolve https://github.com/mmenanno/lunchmoney/issues/328")
-
         with_real_ci_connections do
           VCR.use_cassette("transactions/transaction_group_success") do
             api_call = LunchMoney::Calls::Transactions.new.transaction_group(894063595)
