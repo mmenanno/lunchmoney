@@ -51,7 +51,7 @@ jobs:
       -
         name: Run Tests (With Remote Calls & Coverage Report)
         if: ${{ endsWith(matrix.ruby-version, '3.3') }}
-        uses: paambaati/codeclimate-action@v8.0.0
+        uses: paambaati/codeclimate-action@v9.0.0
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
           REMOTE_TESTS_ENABLED: ${{ vars.REMOTE_TESTS_ENABLED }}
