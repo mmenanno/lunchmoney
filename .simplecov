@@ -21,6 +21,7 @@ SimpleCov.start do
     "lib/lunchmoney.rb",
     "lib/lunchmoney/api.rb",
     "lib/lunchmoney/configuration.rb",
+    "lib/lunchmoney/deprecate.rb",
     "lib/lunchmoney/errors.rb",
     "lib/lunchmoney/exceptions.rb",
     "lib/lunchmoney/validators.rb",
