@@ -3,6 +3,7 @@
 
 require_relative "exceptions"
 require_relative "configuration"
+require_relative "deprecate"
 
 require_relative "calls/base"
 require_relative "objects/object"
