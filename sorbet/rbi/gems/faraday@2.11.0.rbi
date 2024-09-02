@@ -93,12 +93,12 @@ module Faraday
     # @example With an URL argument
     #   Faraday.new 'http://faraday.com'
     #   # => Faraday::Connection to http://faraday.com
+    # @example With an URL argument and an options hash
+    #   Faraday.new 'http://faraday.com', params: { page: 1 }
+    #   # => Faraday::Connection to http://faraday.com?page=1
     # @example With everything in an options hash
     #   Faraday.new url: 'http://faraday.com',
     #   params: { page: 1 }
-    #   # => Faraday::Connection to http://faraday.com?page=1
-    # @example With an URL argument and an options hash
-    #   Faraday.new 'http://faraday.com', params: { page: 1 }
     #   # => Faraday::Connection to http://faraday.com?page=1
     # @option options
     # @option options
@@ -587,7 +587,7 @@ class Faraday::Connection
   #   replace the query values
   # @return [URI]
   #
-  # source://faraday//lib/faraday/connection.rb#470
+  # source://faraday//lib/faraday/connection.rb#478
   def build_exclusive_url(url = T.unsafe(nil), params = T.unsafe(nil), params_encoder = T.unsafe(nil)); end
 
   # Creates and configures the request object.
@@ -596,7 +596,7 @@ class Faraday::Connection
   # @return [Faraday::Request]
   # @yield [Faraday::Request] if block given
   #
-  # source://faraday//lib/faraday/connection.rb#453
+  # source://faraday//lib/faraday/connection.rb#461
   def build_request(method); end
 
   # Takes a relative url for a request and combines it with the defaults
@@ -616,7 +616,7 @@ class Faraday::Connection
   # @param url [String, URI, nil]
   # @param extra_params [Hash]
   #
-  # source://faraday//lib/faraday/connection.rb#407
+  # source://faraday//lib/faraday/connection.rb#415
   def build_url(url = T.unsafe(nil), extra_params = T.unsafe(nil)); end
 
   # @return [Faraday::RackBuilder] Builder for this Connection.
@@ -653,10 +653,10 @@ class Faraday::Connection
   # @api private
   # @return [Faraday::Connection]
   #
-  # source://faraday//lib/faraday/connection.rb#491
+  # source://faraday//lib/faraday/connection.rb#499
   def dup; end
 
-  # source://faraday//lib/faraday/connection.rb#534
+  # source://faraday//lib/faraday/connection.rb#542
   def find_default_proxy; end
 
   # source://faraday//lib/faraday/connection.rb#199
@@ -691,7 +691,7 @@ class Faraday::Connection
   # @yield a block to execute multiple requests.
   #
   # source://faraday//lib/faraday/connection.rb#317
-  def in_parallel(manager = T.unsafe(nil)); end
+  def in_parallel(manager = T.unsafe(nil), &block); end
 
   # Determine if this Faraday::Connection can make parallel requests.
   #
@@ -742,7 +742,7 @@ class Faraday::Connection
   # @param value [String]
   # @return [String] the new path prefix
   #
-  # source://faraday//lib/faraday/connection.rb#382
+  # source://faraday//lib/faraday/connection.rb#390
   def path_prefix=(value); end
 
   # source://forwardable/1.3.3/forwardable.rb#231
@@ -763,13 +763,13 @@ class Faraday::Connection
   #
   # @param new_value [Object]
   #
-  # source://faraday//lib/faraday/connection.rb#333
+  # source://faraday//lib/faraday/connection.rb#341
   def proxy=(new_value); end
 
-  # source://faraday//lib/faraday/connection.rb#542
+  # source://faraday//lib/faraday/connection.rb#550
   def proxy_for_request(url); end
 
-  # source://faraday//lib/faraday/connection.rb#514
+  # source://faraday//lib/faraday/connection.rb#522
   def proxy_from_env(url); end
 
   # source://faraday//lib/faraday/connection.rb#279
@@ -790,7 +790,7 @@ class Faraday::Connection
   # @param headers [Hash, nil] unencoded HTTP header key/value pairs.
   # @return [Faraday::Response]
   #
-  # source://faraday//lib/faraday/connection.rb#431
+  # source://faraday//lib/faraday/connection.rb#439
   def run_request(method, url, body, headers); end
 
   # source://forwardable/1.3.3/forwardable.rb#231
@@ -799,7 +799,7 @@ class Faraday::Connection
   # source://forwardable/1.3.3/forwardable.rb#231
   def scheme=(*args, **_arg1, &block); end
 
-  # source://faraday//lib/faraday/connection.rb#371
+  # source://faraday//lib/faraday/connection.rb#379
   def set_basic_auth(user, password); end
 
   # @return [Hash] SSL options.
@@ -809,7 +809,7 @@ class Faraday::Connection
 
   # @return [Boolean]
   #
-  # source://faraday//lib/faraday/connection.rb#552
+  # source://faraday//lib/faraday/connection.rb#560
   def support_parallel?(adapter); end
 
   # source://faraday//lib/faraday/connection.rb#199
@@ -836,7 +836,7 @@ class Faraday::Connection
   # @param url [String, URI]
   # @param encoder [Object]
   #
-  # source://faraday//lib/faraday/connection.rb#356
+  # source://faraday//lib/faraday/connection.rb#364
   def url_prefix=(url, encoder = T.unsafe(nil)); end
 
   # source://forwardable/1.3.3/forwardable.rb#231
@@ -851,7 +851,7 @@ class Faraday::Connection
   # @yieldparam username [String] any username from URI
   # @yieldparam password [String] any password from URI
   #
-  # source://faraday//lib/faraday/connection.rb#508
+  # source://faraday//lib/faraday/connection.rb#516
   def with_uri_credentials(uri); end
 end
 
@@ -2504,7 +2504,7 @@ class Faraday::SSLError < ::Faraday::Error; end
 
 # SSL-related options.
 #
-# source://faraday//lib/faraday/options/ssl_options.rb#50
+# source://faraday//lib/faraday/options/ssl_options.rb#53
 class Faraday::SSLOptions < ::Faraday::Options
   # @return [String] CA file
   def ca_file; end
@@ -2530,6 +2530,12 @@ class Faraday::SSLOptions < ::Faraday::Options
   # @return [OpenSSL::X509::Certificate] certificate (Excon only)
   def certificate=(_); end
 
+  # @return [String] cipher list in OpenSSL format (see https://ruby-doc.org/stdlib-2.5.1/libdoc/openssl/rdoc/OpenSSL/SSL/SSLContext.html#method-i-ciphers-3D)
+  def ciphers; end
+
+  # @return [String] cipher list in OpenSSL format (see https://ruby-doc.org/stdlib-2.5.1/libdoc/openssl/rdoc/OpenSSL/SSL/SSLContext.html#method-i-ciphers-3D)
+  def ciphers=(_); end
+
   # @return [String, OpenSSL::X509::Certificate] client certificate
   def client_cert; end
 
@@ -2542,7 +2548,7 @@ class Faraday::SSLOptions < ::Faraday::Options
   # @return [String, OpenSSL::PKey::RSA, OpenSSL::PKey::DSA] client key
   def client_key=(_); end
 
-  # source://faraday//lib/faraday/options/ssl_options.rb#61
+  # source://faraday//lib/faraday/options/ssl_options.rb#64
   def disable?; end
 
   # @return [String, Symbol] maximum SSL version (see https://ruby-doc.org/stdlib-2.5.1/libdoc/openssl/rdoc/OpenSSL/SSL/SSLContext.html#method-i-max_version-3D)
@@ -2569,7 +2575,7 @@ class Faraday::SSLOptions < ::Faraday::Options
   # @return [Boolean] whether to verify SSL certificates or not
   def verify=(_); end
 
-  # source://faraday//lib/faraday/options/ssl_options.rb#56
+  # source://faraday//lib/faraday/options/ssl_options.rb#59
   def verify?; end
 
   # @return [Integer] maximum depth for the certificate chain verification
@@ -2586,7 +2592,7 @@ class Faraday::SSLOptions < ::Faraday::Options
   #   during the handshake or not (see https://github.com/ruby/openssl/pull/60)
   def verify_hostname=(_); end
 
-  # source://faraday//lib/faraday/options/ssl_options.rb#66
+  # source://faraday//lib/faraday/options/ssl_options.rb#69
   def verify_hostname?; end
 
   # @return [Integer] Any `OpenSSL::SSL::` constant (see https://ruby-doc.org/stdlib-2.5.1/libdoc/openssl/rdoc/OpenSSL/SSL.html)
