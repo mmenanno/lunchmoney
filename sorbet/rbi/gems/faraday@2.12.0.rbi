@@ -2469,10 +2469,10 @@ end
 #
 # source://faraday//lib/faraday/response/raise_error.rb#7
 class Faraday::Response::RaiseError < ::Faraday::Middleware
-  # source://faraday//lib/faraday/response/raise_error.rb#15
+  # source://faraday//lib/faraday/response/raise_error.rb#25
   def on_complete(env); end
 
-  # source://faraday//lib/faraday/response/raise_error.rb#77
+  # source://faraday//lib/faraday/response/raise_error.rb#75
   def query_params(env); end
 
   # Returns a hash of response data with the following keys:
@@ -2484,14 +2484,17 @@ class Faraday::Response::RaiseError < ::Faraday::Middleware
   # The `request` key is omitted when the middleware is explicitly
   # configured with the option `include_request: false`.
   #
-  # source://faraday//lib/faraday/response/raise_error.rb#54
+  # source://faraday//lib/faraday/response/raise_error.rb#52
   def response_values(env); end
 end
 
 # source://faraday//lib/faraday/response/raise_error.rb#9
 Faraday::Response::RaiseError::ClientErrorStatuses = T.let(T.unsafe(nil), Range)
 
-# source://faraday//lib/faraday/response/raise_error.rb#13
+# source://faraday//lib/faraday/response/raise_error.rb#11
+Faraday::Response::RaiseError::ClientErrorStatusesWithCustomExceptions = T.let(T.unsafe(nil), Hash)
+
+# source://faraday//lib/faraday/response/raise_error.rb#23
 Faraday::Response::RaiseError::DEFAULT_OPTIONS = T.let(T.unsafe(nil), Hash)
 
 # source://faraday//lib/faraday/response/raise_error.rb#10
