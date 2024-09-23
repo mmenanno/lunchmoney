@@ -1554,6 +1554,8 @@ RuboCop::Cop::Rails::BulkChangeTable::POSTGRESQL_COMBINABLE_TRANSFORMATIONS_SINC
 #   collection.reject { |_k, v| v.blank? }
 #   collection.select(&:present?)
 #   collection.select { |_k, v| v.present? }
+#   collection.filter(&:present?)
+#   collection.filter { |_k, v| v.present? }
 #
 #   # good
 #   collection.compact_blank
@@ -1567,55 +1569,58 @@ RuboCop::Cop::Rails::BulkChangeTable::POSTGRESQL_COMBINABLE_TRANSFORMATIONS_SINC
 #   # good
 #   collection.compact_blank!
 #
-# source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#41
+# source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#43
 class RuboCop::Cop::Rails::CompactBlank < ::RuboCop::Cop::Base
   include ::RuboCop::Cop::RangeHelp
   extend ::RuboCop::Cop::AutoCorrector
   extend ::RuboCop::Cop::TargetRailsVersion
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#79
+  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#82
   def on_send(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#51
+  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#54
   def reject_with_block?(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#59
+  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#62
   def reject_with_block_pass?(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#65
+  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#68
   def select_with_block?(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#73
+  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#76
   def select_with_block_pass?(param0 = T.unsafe(nil)); end
 
   private
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#91
+  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#95
   def bad_method?(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#112
+  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#116
   def offense_range(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#122
+  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#126
   def preferred_method(node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#108
+  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#112
   def use_hash_value_block_argument?(arguments, receiver_in_block); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#104
+  # source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#108
   def use_single_value_block_argument?(arguments, receiver_in_block); end
 end
 
-# source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#46
+# source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#50
+RuboCop::Cop::Rails::CompactBlank::DESTRUCTIVE_METHODS = T.let(T.unsafe(nil), Array)
+
+# source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#48
 RuboCop::Cop::Rails::CompactBlank::MSG = T.let(T.unsafe(nil), String)
 
-# source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#47
+# source://rubocop-rails//lib/rubocop/cop/rails/compact_blank.rb#49
 RuboCop::Cop::Rails::CompactBlank::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 
 # Checks legacy syntax usage of `tag`
@@ -2644,63 +2649,64 @@ RuboCop::Cop::Rails::EnumHash::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#18
 class RuboCop::Cop::Rails::EnumSyntax < ::RuboCop::Cop::Base
   extend ::RuboCop::Cop::AutoCorrector
+  extend ::RuboCop::Cop::TargetRubyVersion
   extend ::RuboCop::Cop::TargetRailsVersion
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#32
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#34
   def enum?(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#36
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#38
   def enum_with_options?(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#40
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#42
   def on_send(node); end
 
   private
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#47
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#49
   def check_and_correct_keyword_args(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#57
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#59
   def check_enum_options(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#69
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#71
   def correct_keyword_args(node, key, values, options); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#110
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#112
   def correct_options(options); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#95
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#97
   def enum_name(elem); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#86
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#88
   def enum_name_value(key); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#80
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#82
   def multiple_enum_definitions?(node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#106
+  # source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#108
   def option_key?(pair); end
 end
 
-# source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#24
+# source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#26
 RuboCop::Cop::Rails::EnumSyntax::MSG = T.let(T.unsafe(nil), String)
 
-# source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#25
+# source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#27
 RuboCop::Cop::Rails::EnumSyntax::MSG_OPTIONS = T.let(T.unsafe(nil), String)
 
 # From https://github.com/rails/rails/blob/v7.2.1/activerecord/lib/active_record/enum.rb#L231
 #
-# source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#29
+# source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#31
 RuboCop::Cop::Rails::EnumSyntax::OPTION_NAMES = T.let(T.unsafe(nil), Array)
 
-# source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#26
+# source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#28
 RuboCop::Cop::Rails::EnumSyntax::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 
-# source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#30
+# source://rubocop-rails//lib/rubocop/cop/rails/enum_syntax.rb#32
 RuboCop::Cop::Rails::EnumSyntax::UNDERSCORED_OPTION_NAMES = T.let(T.unsafe(nil), Array)
 
 # Looks for duplicate values in enum declarations.
