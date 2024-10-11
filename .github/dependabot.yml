@@ -11,6 +11,13 @@ updates:
     open-pull-requests-limit: 100
     schedule:
       interval: weekly
+    groups:
+      minor_updates:
+        update-types:
+          - "minor"
+      patch_updates:
+        update-types:
+          - "patch"
   - package-ecosystem: github-actions
     directory: "/"
     open-pull-requests-limit: 100
