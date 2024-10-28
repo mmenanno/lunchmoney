@@ -1163,6 +1163,10 @@ class Mocha::Expectation
 
   # Modifies expectation so that when the expected method is called, it raises the specified +exception+ with the specified +message+ i.e. calls +Kernel#raise(exception, message)+.
   #
+  # @example Raise specified exception if expected method is invoked.
+  #   object = stub()
+  #   object.stubs(:expected_method).raises(Exception, 'message')
+  #   object.expected_method # => raises exception of class Exception and with message 'message'
   # @example Raise custom exception with extra constructor parameters by passing in an instance of the exception.
   #   object = stub()
   #   object.stubs(:expected_method).raises(MyException.new('message', 1, 2, 3))
@@ -1172,10 +1176,6 @@ class Mocha::Expectation
   #   object.stubs(:expected_method).raises(Exception1).then.raises(Exception2)
   #   object.expected_method # => raises exception of class Exception1
   #   object.expected_method # => raises exception of class Exception2
-  # @example Raise specified exception if expected method is invoked.
-  #   object = stub()
-  #   object.stubs(:expected_method).raises(Exception, 'message')
-  #   object.expected_method # => raises exception of class Exception and with message 'message'
   # @example Raise an exception on first invocation of expected method and then return values on subsequent invocations.
   #   object = stub()
   #   object.stubs(:expected_method).raises(Exception).then.returns(2, 3)
@@ -1264,14 +1264,14 @@ class Mocha::Expectation
 
   # Modifies expectation so that when the expected method is called, it throws the specified +tag+ with the specific return value +object+ i.e. calls +Kernel#throw(tag, object)+.
   #
-  # @example Throw tag with return value +object+ c.f. +Kernel#throw+.
-  #   object = stub()
-  #   object.stubs(:expected_method).throws(:done, 'result')
-  #   object.expected_method # => throws tag :done and causes catch block to return 'result'
   # @example Throw tag when expected method is invoked.
   #   object = stub()
   #   object.stubs(:expected_method).throws(:done)
   #   object.expected_method # => throws tag :done
+  # @example Throw tag with return value +object+ c.f. +Kernel#throw+.
+  #   object = stub()
+  #   object.stubs(:expected_method).throws(:done, 'result')
+  #   object.expected_method # => throws tag :done and causes catch block to return 'result'
   # @example Throw different tags on consecutive invocations of the expected method.
   #   object = stub()
   #   object.stubs(:expected_method).throws(:done).then.throws(:continue)
@@ -3630,6 +3630,9 @@ end
 
 # source://mocha//lib/mocha/ruby_version.rb#2
 Mocha::RUBY_V27_PLUS = T.let(T.unsafe(nil), TrueClass)
+
+# source://mocha//lib/mocha/ruby_version.rb#3
+Mocha::RUBY_V34_PLUS = T.let(T.unsafe(nil), FalseClass)
 
 # source://mocha//lib/mocha/raised_exception.rb#2
 class Mocha::RaisedException
