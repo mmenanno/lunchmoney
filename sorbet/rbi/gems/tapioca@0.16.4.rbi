@@ -218,7 +218,7 @@ class RBI::TypedParam < ::T::Struct
   const :type, ::String
 
   class << self
-    # source://sorbet-runtime/0.5.11597/lib/types/struct.rb#13
+    # source://sorbet-runtime/0.5.11645/lib/types/struct.rb#13
     def inherited(s); end
   end
 end
@@ -1141,7 +1141,7 @@ class Tapioca::ConfigHelper::ConfigError < ::T::Struct
   const :message_parts, T::Array[::Tapioca::ConfigHelper::ConfigErrorMessagePart]
 
   class << self
-    # source://sorbet-runtime/0.5.11597/lib/types/struct.rb#13
+    # source://sorbet-runtime/0.5.11645/lib/types/struct.rb#13
     def inherited(s); end
   end
 end
@@ -1152,7 +1152,7 @@ class Tapioca::ConfigHelper::ConfigErrorMessagePart < ::T::Struct
   const :colors, T::Array[::Symbol]
 
   class << self
-    # source://sorbet-runtime/0.5.11597/lib/types/struct.rb#13
+    # source://sorbet-runtime/0.5.11645/lib/types/struct.rb#13
     def inherited(s); end
   end
 end
@@ -2221,7 +2221,7 @@ class Tapioca::GemInfo < ::T::Struct
     sig { params(spec: ::Bundler::LazySpecification).returns(::Tapioca::GemInfo) }
     def from_spec(spec); end
 
-    # source://sorbet-runtime/0.5.11597/lib/types/struct.rb#13
+    # source://sorbet-runtime/0.5.11645/lib/types/struct.rb#13
     def inherited(s); end
   end
 end
@@ -2736,7 +2736,7 @@ module Tapioca::RBIHelper
   sig { params(name: ::String).returns(T::Boolean) }
   def valid_method_name?(name); end
 
-  # source://tapioca//lib/tapioca/helpers/rbi_helper.rb#123
+  # source://tapioca//lib/tapioca/helpers/rbi_helper.rb#114
   sig { params(name: ::String).returns(T::Boolean) }
   def valid_parameter_name?(name); end
 
@@ -2955,7 +2955,7 @@ module Tapioca::Runtime::Reflection
   extend ::Tapioca::Runtime::AttachedClassOf
   extend ::Tapioca::Runtime::Reflection
 
-  # source://tapioca//lib/tapioca/runtime/reflection.rb#201
+  # source://tapioca//lib/tapioca/runtime/reflection.rb#207
   sig { params(constant: ::Module).returns(T.untyped) }
   def abstract_type_of(constant); end
 
@@ -3008,11 +3008,11 @@ module Tapioca::Runtime::Reflection
   end
   def descendants_of(klass); end
 
-  # source://tapioca//lib/tapioca/runtime/reflection.rb#194
+  # source://tapioca//lib/tapioca/runtime/reflection.rb#200
   sig { params(constant: ::Module).returns(T::Set[::String]) }
   def file_candidates_for(constant); end
 
-  # source://tapioca//lib/tapioca/runtime/reflection.rb#207
+  # source://tapioca//lib/tapioca/runtime/reflection.rb#213
   sig { params(constant: ::Module).returns(T::Boolean) }
   def final_module?(constant); end
 
@@ -3053,14 +3053,15 @@ module Tapioca::Runtime::Reflection
   def qualified_name_of(constant); end
 
   # Examines the call stack to identify the closest location where a "require" is performed
-  # by searching for the label "<top (required)>". If none is found, it returns the location
+  # by searching for the label "<top (required)>" or "block in <class:...>" in the
+  # case of an ActiveSupport.on_load hook. If none is found, it returns the location
   # labeled "<main>", which is the original call site.
   #
-  # source://tapioca//lib/tapioca/runtime/reflection.rb#184
+  # source://tapioca//lib/tapioca/runtime/reflection.rb#185
   sig { params(locations: T.nilable(T::Array[::Thread::Backtrace::Location])).returns(::String) }
   def resolve_loc(locations); end
 
-  # source://tapioca//lib/tapioca/runtime/reflection.rb#212
+  # source://tapioca//lib/tapioca/runtime/reflection.rb#218
   sig { params(constant: ::Module).returns(T::Boolean) }
   def sealed_module?(constant); end
 
@@ -3082,23 +3083,23 @@ module Tapioca::Runtime::Reflection
 
   private
 
-  # source://tapioca//lib/tapioca/runtime/reflection.rb#249
+  # source://tapioca//lib/tapioca/runtime/reflection.rb#255
   sig { params(parent: ::Module, name: ::String).returns(T.nilable(::Module)) }
   def child_module_for_parent_with_name(parent, name); end
 
-  # source://tapioca//lib/tapioca/runtime/reflection.rb#265
+  # source://tapioca//lib/tapioca/runtime/reflection.rb#271
   sig { params(name: ::String).returns(T::Boolean) }
   def has_aliased_namespace?(name); end
 
-  # source://tapioca//lib/tapioca/runtime/reflection.rb#260
+  # source://tapioca//lib/tapioca/runtime/reflection.rb#266
   sig { params(method: ::UnboundMethod).returns(T::Boolean) }
   def method_defined_by_forwardable_module?(method); end
 
-  # source://tapioca//lib/tapioca/runtime/reflection.rb#235
+  # source://tapioca//lib/tapioca/runtime/reflection.rb#241
   sig { params(constant: ::Module).returns(T::Array[::UnboundMethod]) }
   def methods_for(constant); end
 
-  # source://tapioca//lib/tapioca/runtime/reflection.rb#219
+  # source://tapioca//lib/tapioca/runtime/reflection.rb#225
   sig { params(constant: ::Module).returns(T::Array[::UnboundMethod]) }
   def relevant_methods_for(constant); end
 end
@@ -3545,11 +3546,6 @@ end
 # source://tapioca//lib/tapioca/version.rb#5
 Tapioca::VERSION = T.let(T.unsafe(nil), String)
 
-# source://tapioca//lib/tapioca/helpers/source_uri.rb#6
-module URI
-  include ::URI::RFC2396_REGEXP
-end
-
 # source://tapioca//lib/tapioca/helpers/source_uri.rb#7
 class URI::Source < ::URI::File
   # source://tapioca//lib/tapioca/helpers/source_uri.rb#65
@@ -3599,5 +3595,3 @@ URI::Source::COMPONENT = T.let(T.unsafe(nil), Array)
 #
 # source://tapioca//lib/tapioca/helpers/source_uri.rb#26
 URI::Source::PARSER = T.let(T.unsafe(nil), URI::RFC2396_Parser)
-
-class URI::WSS < ::URI::WS; end
