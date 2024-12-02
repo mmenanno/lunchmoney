@@ -70,7 +70,7 @@ GEM
       tomlrb
     mixlib-shellout (3.2.8)
       chef-utils
-    mocha (2.6.0)
+    mocha (2.6.1)
       ruby2_keywords (>= 0.0.5)
     net-http (0.5.0)
       uri
@@ -123,20 +123,20 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.12.3)
     simplecov_json_formatter (0.1.4)
-    sorbet (0.5.11663)
-      sorbet-static (= 0.5.11663)
-    sorbet-runtime (0.5.11663)
-    sorbet-static (0.5.11663-universal-darwin)
-    sorbet-static (0.5.11663-x86_64-linux)
-    sorbet-static-and-runtime (0.5.11663)
-      sorbet (= 0.5.11663)
-      sorbet-runtime (= 0.5.11663)
+    sorbet (0.5.11670)
+      sorbet-static (= 0.5.11670)
+    sorbet-runtime (0.5.11670)
+    sorbet-static (0.5.11670-universal-darwin)
+    sorbet-static (0.5.11670-x86_64-linux)
+    sorbet-static-and-runtime (0.5.11670)
+      sorbet (= 0.5.11670)
+      sorbet-runtime (= 0.5.11670)
     spoom (1.5.0)
       erubi (>= 1.10.0)
       prism (>= 0.28.0)
       sorbet-static-and-runtime (>= 0.5.10187)
       thor (>= 0.19.2)
-    tapioca (0.16.4)
+    tapioca (0.16.5)
       bundler (>= 2.2.25)
       netrc (>= 0.11.0)
       parallel (>= 1.21.0)
@@ -177,7 +177,7 @@ DEPENDENCIES
   lunchmoney!
   mdl
   minitest (~> 5.25)
-  mocha (~> 2.6.0)
+  mocha (~> 2.6.1)
   rubocop-minitest
   rubocop-rails
   rubocop-shopify
