@@ -2029,7 +2029,7 @@ class Mocha::Mock
 
   # @private
   #
-  # source://mocha//lib/mocha/mock.rb#358
+  # source://mocha//lib/mocha/mock.rb#364
   def __expire__(origin); end
 
   def __singleton_class__; end
@@ -2061,7 +2061,7 @@ class Mocha::Mock
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/mock.rb#353
+  # source://mocha//lib/mocha/mock.rb#359
   def __verified__?(assertion_counter = T.unsafe(nil)); end
 
   # @private
@@ -2072,12 +2072,12 @@ class Mocha::Mock
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/mock.rb#378
+  # source://mocha//lib/mocha/mock.rb#384
   def any_expectations?; end
 
   # @private
   #
-  # source://mocha//lib/mocha/mock.rb#373
+  # source://mocha//lib/mocha/mock.rb#379
   def ensure_method_not_already_defined(method_name); end
 
   # @private
@@ -2123,7 +2123,7 @@ class Mocha::Mock
 
   # @private
   #
-  # source://mocha//lib/mocha/mock.rb#368
+  # source://mocha//lib/mocha/mock.rb#374
   def inspect; end
 
   # @private
@@ -2133,7 +2133,7 @@ class Mocha::Mock
 
   # @private
   #
-  # source://mocha//lib/mocha/mock.rb#363
+  # source://mocha//lib/mocha/mock.rb#369
   def mocha_inspect; end
 
   # Constrains the {Mock} instance so that it can only expect or stub methods to which +responder+ responds publicly. The constraint is only applied at method invocation time.
@@ -2351,22 +2351,22 @@ class Mocha::Mock
 
   # @raise [StubbingError]
   #
-  # source://mocha//lib/mocha/mock.rb#413
+  # source://mocha//lib/mocha/mock.rb#419
   def check_expiry; end
 
-  # source://mocha//lib/mocha/mock.rb#407
+  # source://mocha//lib/mocha/mock.rb#413
   def check_responder_responds_to(symbol); end
 
-  # source://mocha//lib/mocha/mock.rb#384
+  # source://mocha//lib/mocha/mock.rb#390
   def invocation_not_allowed_warning(invocation, expectation); end
 
-  # source://mocha//lib/mocha/mock.rb#392
+  # source://mocha//lib/mocha/mock.rb#398
   def raise_unexpected_invocation_error(invocation, matching_expectation); end
 
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/mock.rb#344
+  # source://mocha//lib/mocha/mock.rb#350
   def respond_to_missing?(symbol, _include_all); end
 end
 
