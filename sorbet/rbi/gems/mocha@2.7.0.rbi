@@ -1944,6 +1944,9 @@ end
 # while an +expects(:foo).at_least_once+ expectation will always be matched
 # against invocations.
 #
+# However, note that if the expectation that matches the invocation has a
+# cardinality of "never", then an unexpected invocation error is reported.
+#
 # This scheme allows you to:
 #
 # - Set up default stubs in your the +setup+ method of your test class and
@@ -1983,17 +1986,17 @@ end
 #   object.expected_method # => 2
 #   object.expected_method # => raises exception of class Exception1
 #
-# source://mocha//lib/mocha/mock.rb#76
+# source://mocha//lib/mocha/mock.rb#79
 class Mocha::Mock
   # @private
   # @return [Mock] a new instance of Mock
   #
-  # source://mocha//lib/mocha/mock.rb#276
+  # source://mocha//lib/mocha/mock.rb#279
   def initialize(mockery, name = T.unsafe(nil), receiver = T.unsafe(nil)); end
 
   # @private
   #
-  # source://mocha//lib/mocha/mock.rb#300
+  # source://mocha//lib/mocha/mock.rb#303
   def __expectations__; end
 
   # Adds an expectation that the specified method must be called exactly once with any parameters.
@@ -2024,12 +2027,12 @@ class Mocha::Mock
   # @overload expects
   # @return [Expectation] last-built expectation which can be further modified by methods on {Expectation}.
   #
-  # source://mocha//lib/mocha/mock.rb#111
+  # source://mocha//lib/mocha/mock.rb#114
   def __expects__(method_name_or_hash, backtrace = T.unsafe(nil)); end
 
   # @private
   #
-  # source://mocha//lib/mocha/mock.rb#364
+  # source://mocha//lib/mocha/mock.rb#363
   def __expire__(origin); end
 
   def __singleton_class__; end
@@ -2055,34 +2058,34 @@ class Mocha::Mock
   # @overload stubs
   # @return [Expectation] last-built expectation which can be further modified by methods on {Expectation}.
   #
-  # source://mocha//lib/mocha/mock.rb#150
+  # source://mocha//lib/mocha/mock.rb#153
   def __stubs__(method_name_or_hash, backtrace = T.unsafe(nil)); end
 
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/mock.rb#359
+  # source://mocha//lib/mocha/mock.rb#358
   def __verified__?(assertion_counter = T.unsafe(nil)); end
 
   # @private
   #
-  # source://mocha//lib/mocha/mock.rb#310
+  # source://mocha//lib/mocha/mock.rb#313
   def all_expectations; end
 
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/mock.rb#384
+  # source://mocha//lib/mocha/mock.rb#383
   def any_expectations?; end
 
   # @private
   #
-  # source://mocha//lib/mocha/mock.rb#379
+  # source://mocha//lib/mocha/mock.rb#378
   def ensure_method_not_already_defined(method_name); end
 
   # @private
   #
-  # source://mocha//lib/mocha/mock.rb#288
+  # source://mocha//lib/mocha/mock.rb#291
   def everything_stubbed; end
 
   # Adds an expectation that the specified method must be called exactly once with any parameters.
@@ -2113,27 +2116,27 @@ class Mocha::Mock
   # @overload expects
   # @return [Expectation] last-built expectation which can be further modified by methods on {Expectation}.
   #
-  # source://mocha//lib/mocha/mock.rb#111
+  # source://mocha//lib/mocha/mock.rb#114
   def expects(method_name_or_hash, backtrace = T.unsafe(nil)); end
 
   # @private
   #
-  # source://mocha//lib/mocha/mock.rb#321
+  # source://mocha//lib/mocha/mock.rb#324
   def handle_method_call(symbol, arguments, block); end
 
   # @private
   #
-  # source://mocha//lib/mocha/mock.rb#374
+  # source://mocha//lib/mocha/mock.rb#373
   def inspect; end
 
   # @private
   #
-  # source://mocha//lib/mocha/mock.rb#315
+  # source://mocha//lib/mocha/mock.rb#318
   def method_missing(symbol, *arguments, **_arg2, &block); end
 
   # @private
   #
-  # source://mocha//lib/mocha/mock.rb#369
+  # source://mocha//lib/mocha/mock.rb#368
   def mocha_inspect; end
 
   # Constrains the {Mock} instance so that it can only expect or stub methods to which +responder+ responds publicly. The constraint is only applied at method invocation time.
@@ -2183,7 +2186,7 @@ class Mocha::Mock
   # @return [Mock] the same {Mock} instance, thereby allowing invocations of other {Mock} methods to be chained.
   # @see #responds_like_instance_of
   #
-  # source://mocha//lib/mocha/mock.rb#238
+  # source://mocha//lib/mocha/mock.rb#241
   def quacks_like(responder); end
 
   # Constrains the {Mock} instance so that it can only expect or stub methods to which an instance of the +responder_class+ responds publicly. The constraint is only applied at method invocation time. Note that the responder instance is instantiated using +Class#allocate+.
@@ -2214,7 +2217,7 @@ class Mocha::Mock
   # @return [Mock] the same {Mock} instance, thereby allowing invocations of other {Mock} methods to be chained.
   # @see #responds_like
   #
-  # source://mocha//lib/mocha/mock.rb#271
+  # source://mocha//lib/mocha/mock.rb#274
   def quacks_like_instance_of(responder_class); end
 
   # Constrains the {Mock} instance so that it can only expect or stub methods to which +responder+ responds publicly. The constraint is only applied at method invocation time.
@@ -2264,7 +2267,7 @@ class Mocha::Mock
   # @return [Mock] the same {Mock} instance, thereby allowing invocations of other {Mock} methods to be chained.
   # @see #responds_like_instance_of
   #
-  # source://mocha//lib/mocha/mock.rb#238
+  # source://mocha//lib/mocha/mock.rb#241
   def responds_like(responder); end
 
   # Constrains the {Mock} instance so that it can only expect or stub methods to which an instance of the +responder_class+ responds publicly. The constraint is only applied at method invocation time. Note that the responder instance is instantiated using +Class#allocate+.
@@ -2295,12 +2298,12 @@ class Mocha::Mock
   # @return [Mock] the same {Mock} instance, thereby allowing invocations of other {Mock} methods to be chained.
   # @see #responds_like
   #
-  # source://mocha//lib/mocha/mock.rb#271
+  # source://mocha//lib/mocha/mock.rb#274
   def responds_like_instance_of(responder_class); end
 
   # @private
   #
-  # source://mocha//lib/mocha/mock.rb#305
+  # source://mocha//lib/mocha/mock.rb#308
   def stub_everything; end
 
   # Adds an expectation that the specified method may be called any number of times with any parameters.
@@ -2324,7 +2327,7 @@ class Mocha::Mock
   # @overload stubs
   # @return [Expectation] last-built expectation which can be further modified by methods on {Expectation}.
   #
-  # source://mocha//lib/mocha/mock.rb#150
+  # source://mocha//lib/mocha/mock.rb#153
   def stubs(method_name_or_hash, backtrace = T.unsafe(nil)); end
 
   # Removes the specified stubbed methods (added by calls to {#expects} or {#stubs}) and all expectations associated with them.
@@ -2344,29 +2347,26 @@ class Mocha::Mock
   #   multiplier.unstub(:triple)
   # @param method_names [Array<Symbol>] names of methods to unstub.
   #
-  # source://mocha//lib/mocha/mock.rb#183
+  # source://mocha//lib/mocha/mock.rb#186
   def unstub(*method_names); end
 
   private
 
   # @raise [StubbingError]
   #
-  # source://mocha//lib/mocha/mock.rb#419
+  # source://mocha//lib/mocha/mock.rb#410
   def check_expiry; end
 
-  # source://mocha//lib/mocha/mock.rb#413
+  # source://mocha//lib/mocha/mock.rb#404
   def check_responder_responds_to(symbol); end
 
-  # source://mocha//lib/mocha/mock.rb#390
-  def invocation_not_allowed_warning(invocation, expectation); end
-
-  # source://mocha//lib/mocha/mock.rb#398
+  # source://mocha//lib/mocha/mock.rb#389
   def raise_unexpected_invocation_error(invocation, matching_expectation); end
 
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/mock.rb#350
+  # source://mocha//lib/mocha/mock.rb#349
   def respond_to_missing?(symbol, _include_all); end
 end
 
