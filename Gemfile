@@ -8,7 +8,7 @@ gemspec
 # Specify development dependencies here
 gem "toys"
 gem "minitest", "~> 5.25", require: false
-gem "mocha", "~> 2.6.1", require: false
+gem "mocha", "~> 2.7.1", require: false
 gem "webmock", require: false
 gem "vcr", require: false
 gem "rubocop-shopify", require: false
