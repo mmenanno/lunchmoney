@@ -39,10 +39,10 @@ GEM
       bigdecimal
       rexml
     docile (1.4.1)
-    dotenv (3.1.4)
+    dotenv (3.1.7)
     drb (2.2.1)
     erubi (1.13.0)
-    faraday (2.12.1)
+    faraday (2.12.2)
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
@@ -51,20 +51,20 @@ GEM
     hashdiff (1.1.1)
     i18n (1.14.6)
       concurrent-ruby (~> 1.0)
-    json (2.8.2)
+    json (2.9.1)
     kramdown (2.4.0)
       rexml
     kramdown-parser-gfm (1.1.0)
       kramdown (~> 2.0)
     language_server-protocol (3.17.0.3)
-    logger (1.6.1)
+    logger (1.6.4)
     mdl (0.13.0)
       kramdown (~> 2.3)
       kramdown-parser-gfm (~> 1.1)
       mixlib-cli (~> 2.1, >= 2.1.1)
       mixlib-config (>= 2.2.1, < 4)
       mixlib-shellout
-    minitest (5.25.2)
+    minitest (5.25.4)
     mixlib-cli (2.1.8)
     mixlib-config (3.0.27)
       tomlrb
@@ -72,7 +72,7 @@ GEM
       chef-utils
     mocha (2.6.1)
       ruby2_keywords (>= 0.0.5)
-    net-http (0.5.0)
+    net-http (0.6.0)
       uri
     netrc (0.11.0)
     parallel (1.26.3)
@@ -123,14 +123,14 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.12.3)
     simplecov_json_formatter (0.1.4)
-    sorbet (0.5.11670)
-      sorbet-static (= 0.5.11670)
-    sorbet-runtime (0.5.11670)
-    sorbet-static (0.5.11670-universal-darwin)
-    sorbet-static (0.5.11670-x86_64-linux)
-    sorbet-static-and-runtime (0.5.11670)
-      sorbet (= 0.5.11670)
-      sorbet-runtime (= 0.5.11670)
+    sorbet (0.5.11718)
+      sorbet-static (= 0.5.11718)
+    sorbet-runtime (0.5.11718)
+    sorbet-static (0.5.11718-universal-darwin)
+    sorbet-static (0.5.11718-x86_64-linux)
+    sorbet-static-and-runtime (0.5.11718)
+      sorbet (= 0.5.11718)
+      sorbet-runtime (= 0.5.11718)
     spoom (1.5.0)
       erubi (>= 1.10.0)
       prism (>= 0.28.0)
