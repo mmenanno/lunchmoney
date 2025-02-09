@@ -89,7 +89,6 @@ module LunchMoney
       end
       def create_category_group(name:, description: nil, is_income: false, exclude_from_budget: false,
         exclude_from_totals: false, category_ids: [], new_categories: [])
-
         params = {
           name:,
           description:,
@@ -122,7 +121,6 @@ module LunchMoney
       end
       def update_category(category_id, name: nil, description: nil, is_income: nil, exclude_from_budget: nil,
         exclude_from_totals: nil, archived: nil, group_id: nil)
-
         params = clean_params({
           name:,
           description:,
