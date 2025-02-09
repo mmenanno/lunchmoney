@@ -42,7 +42,6 @@ module LunchMoney
         offset: nil,
         limit: nil
       )
-
         params = clean_params({
           tag_id:,
           recurring_id:,
