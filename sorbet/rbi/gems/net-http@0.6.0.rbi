@@ -2331,9 +2331,6 @@ module Net::HTTP::ProxyDelta
   def edit_path(path); end
 end
 
-# source://net-http//lib/net/http/backward.rb#7
-Net::HTTP::ProxyMod = Net::HTTP::ProxyDelta
-
 # :stopdoc:
 #
 # source://net-http//lib/net/http.rb#733
@@ -2363,9 +2360,6 @@ Net::HTTPAlreadyReported::HAS_BODY = T.let(T.unsafe(nil), TrueClass)
 # source://net-http//lib/net/http/responses.rb#67
 Net::HTTPClientError::EXCEPTION_TYPE = Net::HTTPClientException
 
-# source://net-http//lib/net/http/backward.rb#23
-Net::HTTPClientErrorCode = Net::HTTPClientError
-
 # Response class for <tt>Early Hints</tt> responses (status code 103).
 #
 # The <tt>Early Hints</tt> indicates that the server has received
@@ -2385,9 +2379,6 @@ class Net::HTTPEarlyHints < ::Net::HTTPInformation; end
 
 # source://net-http//lib/net/http/responses.rb#148
 Net::HTTPEarlyHints::HAS_BODY = T.let(T.unsafe(nil), FalseClass)
-
-# source://net-http//lib/net/http/backward.rb#24
-Net::HTTPFatalErrorCode = Net::HTTPClientError
 
 # \HTTPGenericRequest is the parent of the Net::HTTPRequest class.
 #
@@ -3495,9 +3486,6 @@ Net::HTTPHeader::MAX_KEY_LENGTH = T.let(T.unsafe(nil), Integer)
 # source://net-http//lib/net/http/responses.rb#23
 Net::HTTPInformation::EXCEPTION_TYPE = Net::HTTPError
 
-# source://net-http//lib/net/http/backward.rb#19
-Net::HTTPInformationCode = Net::HTTPInformation
-
 # Response class for <tt>Loop Detected (WebDAV)</tt> responses (status code 508).
 #
 # The server detected an infinite loop while processing the request.
@@ -3614,16 +3602,8 @@ Net::HTTPRangeNotSatisfiable::HAS_BODY = T.let(T.unsafe(nil), TrueClass)
 # source://net-http//lib/net/http/responses.rb#53
 Net::HTTPRedirection::EXCEPTION_TYPE = Net::HTTPRetriableError
 
-# source://net-http//lib/net/http/backward.rb#21
-Net::HTTPRedirectionCode = Net::HTTPRedirection
-
 # source://net-http//lib/net/http/responses.rb#709
 Net::HTTPRequestURITooLarge = Net::HTTPURITooLong
-
-# Typo since 2001
-#
-# source://net-http//lib/net/http/backward.rb#28
-Net::HTTPResponceReceiver = Net::HTTPResponse
 
 # This class is the base class for \Net::HTTP response classes.
 #
@@ -4093,26 +4073,18 @@ class Net::HTTPResponse::Inflater
   def read_all(dest); end
 end
 
-# source://net-http//lib/net/http/backward.rb#26
-Net::HTTPResponseReceiver = Net::HTTPResponse
-
-# source://net-http//lib/net/http/backward.rb#22
-Net::HTTPRetriableCode = Net::HTTPRedirection
-
 # source://net-http//lib/net/http/responses.rb#81
 Net::HTTPServerError::EXCEPTION_TYPE = Net::HTTPFatalError
 
-# source://net-http//lib/net/http/backward.rb#25
-Net::HTTPServerErrorCode = Net::HTTPServerError
-
-# source://net-http//lib/net/http/backward.rb#17
+# for backward compatibility until Ruby 3.5
+# https://bugs.ruby-lang.org/issues/20900
+# https://github.com/bblimke/webmock/pull/1081
+#
+# source://net-http//lib/net/http.rb#2565
 Net::HTTPSession = Net::HTTP
 
 # source://net-http//lib/net/http/responses.rb#38
 Net::HTTPSuccess::EXCEPTION_TYPE = Net::HTTPError
-
-# source://net-http//lib/net/http/backward.rb#20
-Net::HTTPSuccessCode = Net::HTTPSuccess
 
 # Response class for <tt>URI Too Long</tt> responses (status code 414).
 #
@@ -4152,6 +4124,3 @@ class Net::HTTPVariantAlsoNegotiates < ::Net::HTTPServerError; end
 
 # source://net-http//lib/net/http/responses.rb#1030
 Net::HTTPVariantAlsoNegotiates::HAS_BODY = T.let(T.unsafe(nil), TrueClass)
-
-# source://net-http//lib/net/http/backward.rb#12
-Net::NetPrivate::HTTPRequest = Net::HTTPRequest
