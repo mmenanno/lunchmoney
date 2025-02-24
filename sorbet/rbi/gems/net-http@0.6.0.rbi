@@ -2331,9 +2331,6 @@ module Net::HTTP::ProxyDelta
   def edit_path(path); end
 end
 
-# source://net-http//lib/net/http/backward.rb#7
-Net::HTTP::ProxyMod = Net::HTTP::ProxyDelta
-
 # :stopdoc:
 #
 # source://net-http//lib/net/http.rb#733
@@ -2363,8 +2360,10 @@ Net::HTTPAlreadyReported::HAS_BODY = T.let(T.unsafe(nil), TrueClass)
 # source://net-http//lib/net/http/responses.rb#67
 Net::HTTPClientError::EXCEPTION_TYPE = Net::HTTPClientException
 
-# source://net-http//lib/net/http/backward.rb#23
-Net::HTTPClientErrorCode = Net::HTTPClientError
+# source://net-http//lib/net/http/exceptions.rb#23
+class Net::HTTPClientException < ::Net::ProtoServerError
+  include ::Net::HTTPExceptions
+end
 
 # Response class for <tt>Early Hints</tt> responses (status code 103).
 #
@@ -2386,8 +2385,30 @@ class Net::HTTPEarlyHints < ::Net::HTTPInformation; end
 # source://net-http//lib/net/http/responses.rb#148
 Net::HTTPEarlyHints::HAS_BODY = T.let(T.unsafe(nil), FalseClass)
 
-# source://net-http//lib/net/http/backward.rb#24
-Net::HTTPFatalErrorCode = Net::HTTPClientError
+# source://net-http//lib/net/http/exceptions.rb#15
+class Net::HTTPError < ::Net::ProtocolError
+  include ::Net::HTTPExceptions
+end
+
+# Net::HTTP exception class.
+# You cannot use Net::HTTPExceptions directly; instead, you must use
+# its subclasses.
+#
+# source://net-http//lib/net/http/exceptions.rb#6
+module Net::HTTPExceptions
+  # source://net-http//lib/net/http/exceptions.rb#7
+  def initialize(msg, res); end
+
+  # Returns the value of attribute response.
+  #
+  # source://net-http//lib/net/http/exceptions.rb#11
+  def response; end
+end
+
+# source://net-http//lib/net/http/exceptions.rb#27
+class Net::HTTPFatalError < ::Net::ProtoFatalError
+  include ::Net::HTTPExceptions
+end
 
 # \HTTPGenericRequest is the parent of the Net::HTTPRequest class.
 #
@@ -3495,9 +3516,6 @@ Net::HTTPHeader::MAX_KEY_LENGTH = T.let(T.unsafe(nil), Integer)
 # source://net-http//lib/net/http/responses.rb#23
 Net::HTTPInformation::EXCEPTION_TYPE = Net::HTTPError
 
-# source://net-http//lib/net/http/backward.rb#19
-Net::HTTPInformationCode = Net::HTTPInformation
-
 # Response class for <tt>Loop Detected (WebDAV)</tt> responses (status code 508).
 #
 # The server detected an infinite loop while processing the request.
@@ -3614,16 +3632,94 @@ Net::HTTPRangeNotSatisfiable::HAS_BODY = T.let(T.unsafe(nil), TrueClass)
 # source://net-http//lib/net/http/responses.rb#53
 Net::HTTPRedirection::EXCEPTION_TYPE = Net::HTTPRetriableError
 
-# source://net-http//lib/net/http/backward.rb#21
-Net::HTTPRedirectionCode = Net::HTTPRedirection
+# This class is the base class for \Net::HTTP request classes.
+# The class should not be used directly;
+# instead you should use its subclasses, listed below.
+#
+# == Creating a Request
+#
+# An request object may be created with either a URI or a string hostname:
+#
+#   require 'net/http'
+#   uri = URI('https://jsonplaceholder.typicode.com/')
+#   req = Net::HTTP::Get.new(uri)          # => #<Net::HTTP::Get GET>
+#   req = Net::HTTP::Get.new(uri.hostname) # => #<Net::HTTP::Get GET>
+#
+# And with any of the subclasses:
+#
+#   req = Net::HTTP::Head.new(uri) # => #<Net::HTTP::Head HEAD>
+#   req = Net::HTTP::Post.new(uri) # => #<Net::HTTP::Post POST>
+#   req = Net::HTTP::Put.new(uri)  # => #<Net::HTTP::Put PUT>
+#   # ...
+#
+# The new instance is suitable for use as the argument to Net::HTTP#request.
+#
+# == Request Headers
+#
+# A new request object has these header fields by default:
+#
+#   req.to_hash
+#   # =>
+#   {"accept-encoding"=>["gzip;q=1.0,deflate;q=0.6,identity;q=0.3"],
+#   "accept"=>["*/*"],
+#   "user-agent"=>["Ruby"],
+#   "host"=>["jsonplaceholder.typicode.com"]}
+#
+# See:
+#
+# - {Request header Accept-Encoding}[https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Accept-Encoding]
+#   and {Compression and Decompression}[rdoc-ref:Net::HTTP@Compression+and+Decompression].
+# - {Request header Accept}[https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#accept-request-header].
+# - {Request header User-Agent}[https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#user-agent-request-header].
+# - {Request header Host}[https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#host-request-header].
+#
+# You can add headers or override default headers:
+#
+#   #   res = Net::HTTP::Get.new(uri, {'foo' => '0', 'bar' => '1'})
+#
+# This class (and therefore its subclasses) also includes (indirectly)
+# module Net::HTTPHeader, which gives access to its
+# {methods for setting headers}[rdoc-ref:Net::HTTPHeader@Setters].
+#
+# == Request Subclasses
+#
+# Subclasses for HTTP requests:
+#
+# - Net::HTTP::Get
+# - Net::HTTP::Head
+# - Net::HTTP::Post
+# - Net::HTTP::Put
+# - Net::HTTP::Delete
+# - Net::HTTP::Options
+# - Net::HTTP::Trace
+# - Net::HTTP::Patch
+#
+# Subclasses for WebDAV requests:
+#
+# - Net::HTTP::Propfind
+# - Net::HTTP::Proppatch
+# - Net::HTTP::Mkcol
+# - Net::HTTP::Copy
+# - Net::HTTP::Move
+# - Net::HTTP::Lock
+# - Net::HTTP::Unlock
+#
+# source://net-http//lib/net/http/request.rb#75
+class Net::HTTPRequest < ::Net::HTTPGenericRequest
+  # Creates an HTTP request object for +path+.
+  #
+  # +initheader+ are the default headers to use.  Net::HTTP adds
+  # Accept-Encoding to enable compression of the response body unless
+  # Accept-Encoding or Range are supplied in +initheader+.
+  #
+  # @return [HTTPRequest] a new instance of HTTPRequest
+  #
+  # source://net-http//lib/net/http/request.rb#82
+  def initialize(path, initheader = T.unsafe(nil)); end
+end
 
 # source://net-http//lib/net/http/responses.rb#709
 Net::HTTPRequestURITooLarge = Net::HTTPURITooLong
-
-# Typo since 2001
-#
-# source://net-http//lib/net/http/backward.rb#28
-Net::HTTPResponceReceiver = Net::HTTPResponse
 
 # This class is the base class for \Net::HTTP response classes.
 #
@@ -4093,26 +4189,23 @@ class Net::HTTPResponse::Inflater
   def read_all(dest); end
 end
 
-# source://net-http//lib/net/http/backward.rb#26
-Net::HTTPResponseReceiver = Net::HTTPResponse
-
-# source://net-http//lib/net/http/backward.rb#22
-Net::HTTPRetriableCode = Net::HTTPRedirection
+# source://net-http//lib/net/http/exceptions.rb#19
+class Net::HTTPRetriableError < ::Net::ProtoRetriableError
+  include ::Net::HTTPExceptions
+end
 
 # source://net-http//lib/net/http/responses.rb#81
 Net::HTTPServerError::EXCEPTION_TYPE = Net::HTTPFatalError
 
-# source://net-http//lib/net/http/backward.rb#25
-Net::HTTPServerErrorCode = Net::HTTPServerError
-
-# source://net-http//lib/net/http/backward.rb#17
+# for backward compatibility until Ruby 3.5
+# https://bugs.ruby-lang.org/issues/20900
+# https://github.com/bblimke/webmock/pull/1081
+#
+# source://net-http//lib/net/http.rb#2565
 Net::HTTPSession = Net::HTTP
 
 # source://net-http//lib/net/http/responses.rb#38
 Net::HTTPSuccess::EXCEPTION_TYPE = Net::HTTPError
-
-# source://net-http//lib/net/http/backward.rb#20
-Net::HTTPSuccessCode = Net::HTTPSuccess
 
 # Response class for <tt>URI Too Long</tt> responses (status code 414).
 #
@@ -4152,6 +4245,3 @@ class Net::HTTPVariantAlsoNegotiates < ::Net::HTTPServerError; end
 
 # source://net-http//lib/net/http/responses.rb#1030
 Net::HTTPVariantAlsoNegotiates::HAS_BODY = T.let(T.unsafe(nil), TrueClass)
-
-# source://net-http//lib/net/http/backward.rb#12
-Net::NetPrivate::HTTPRequest = Net::HTTPRequest
