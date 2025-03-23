@@ -312,10 +312,10 @@ module Minitest::Assertions
   # source://minitest//lib/minitest/assertions.rb#287
   def assert_match(matcher, obj, msg = T.unsafe(nil)); end
 
-  # Assert that the mock verifies correctly.
+  # Assert that the mock verifies correctly and fail if not.
   #
   # source://minitest//lib/minitest/mock.rb#253
-  def assert_mock(mock); end
+  def assert_mock(mock, msg = T.unsafe(nil)); end
 
   # Fails unless +obj+ is nil
   #
@@ -828,6 +828,9 @@ class Minitest::Expectation < ::Struct
   def must_throw(*args, **_arg1); end
 
   # source://minitest//lib/minitest/spec.rb#25
+  def must_verify(*args, **_arg1); end
+
+  # source://minitest//lib/minitest/spec.rb#25
   def path_must_exist(*args, **_arg1); end
 
   # source://minitest//lib/minitest/spec.rb#25
@@ -960,6 +963,9 @@ module Minitest::Expectations
 
   # source://minitest//lib/minitest/spec.rb#15
   def must_throw(*args, **_arg1); end
+
+  # source://minitest//lib/minitest/spec.rb#15
+  def must_verify(*args, **_arg1); end
 
   # source://minitest//lib/minitest/spec.rb#15
   def path_must_exist(*args, **_arg1); end
@@ -1286,7 +1292,7 @@ end
 # source://minitest//lib/minitest.rb#592
 Minitest::Reportable::BASE_DIR = T.let(T.unsafe(nil), String)
 
-# source://minitest//lib/minitest.rb#735
+# source://minitest//lib/minitest.rb#733
 class Minitest::Reporter < ::Minitest::AbstractReporter
   # @return [Reporter] a new instance of Reporter
   #
@@ -1962,8 +1968,8 @@ end
 #
 # source://minitest//lib/minitest/test.rb#10
 class Minitest::Test < ::Minitest::Runnable
-  include ::Minitest::Assertions
   include ::Minitest::Reportable
+  include ::Minitest::Assertions
   include ::Minitest::Test::LifecycleHooks
   include ::Minitest::Guard
   include ::Mocha::ParameterMatchers
@@ -2207,6 +2213,6 @@ class Object < ::BasicObject
   # NOTE: keyword args in callables are NOT checked for correctness
   # against the existing method. Too many edge cases to be worth it.
   #
-  # source://minitest//lib/minitest/mock.rb#283
+  # source://minitest//lib/minitest/mock.rb#298
   def stub(name, val_or_callable, *block_args, **block_kwargs, &block); end
 end
