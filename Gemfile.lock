@@ -39,10 +39,10 @@ GEM
       bigdecimal
       rexml
     docile (1.4.1)
-    dotenv (3.1.4)
+    dotenv (3.1.7)
     drb (2.2.1)
     erubi (1.13.1)
-    faraday (2.12.1)
+    faraday (2.12.2)
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
@@ -51,20 +51,20 @@ GEM
     hashdiff (1.1.2)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
-    json (2.9.1)
+    json (2.10.2)
     kramdown (2.4.0)
       rexml
     kramdown-parser-gfm (1.1.0)
       kramdown (~> 2.0)
     language_server-protocol (3.17.0.4)
-    logger (1.6.5)
+    logger (1.6.6)
     mdl (0.13.0)
       kramdown (~> 2.3)
       kramdown-parser-gfm (~> 1.1)
       mixlib-cli (~> 2.1, >= 2.1.1)
       mixlib-config (>= 2.2.1, < 4)
       mixlib-shellout
-    minitest (5.25.2)
+    minitest (5.25.5)
     mixlib-cli (2.1.8)
     mixlib-config (3.0.27)
       tomlrb
@@ -72,7 +72,7 @@ GEM
       chef-utils
     mocha (2.7.1)
       ruby2_keywords (>= 0.0.5)
-    net-http (0.5.0)
+    net-http (0.6.0)
       uri
     netrc (0.11.0)
     parallel (1.26.3)
@@ -92,7 +92,7 @@ GEM
     rbs (3.9.0)
       logger
     regexp_parser (2.10.0)
-    rexml (3.4.0)
+    rexml (3.4.1)
     rubocop (1.71.2)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
@@ -160,10 +160,10 @@ GEM
     unicode-display_width (3.1.4)
       unicode-emoji (~> 4.0, >= 4.0.4)
     unicode-emoji (4.0.4)
-    uri (1.0.2)
+    uri (1.0.3)
     vcr (6.3.1)
       base64
-    webmock (3.25.0)
+    webmock (3.25.1)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
