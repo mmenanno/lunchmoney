@@ -27,6 +27,9 @@ module LunchMoney
       sig { returns(T.nilable(Integer)) }
       attr_accessor :limit
 
+      sig { returns(T.nilable(Number)) }
+      attr_accessor :to_base
+
       sig do
         params(
           date_linked: String,
@@ -46,11 +49,12 @@ module LunchMoney
           subtype: T.nilable(String),
           import_start_date: T.nilable(String),
           last_fetch: T.nilable(String),
+          to_base: T.nilable(Number),
         ).void
       end
       def initialize(date_linked:, name:, type:, mask:, institution_name:, status:, balance:, currency:,
         balance_last_update:, display_name:, id:, plaid_last_successful_update:, last_import: nil, limit: nil,
-        subtype: nil, import_start_date: nil, last_fetch: nil)
+        subtype: nil, import_start_date: nil, last_fetch: nil, to_base: nil)
         super()
         @id = id
         @date_linked = date_linked
@@ -69,6 +73,7 @@ module LunchMoney
         @last_import = last_import
         @last_fetch = last_fetch
         @plaid_last_successful_update = plaid_last_successful_update
+        @to_base = to_base
       end
     end
   end

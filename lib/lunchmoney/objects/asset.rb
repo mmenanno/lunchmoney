@@ -22,6 +22,9 @@ module LunchMoney
       sig { returns(T::Boolean) }
       attr_accessor :exclude_transactions
 
+      sig { returns(T.nilable(Number)) }
+      attr_accessor :to_base
+
       # Valid asset type names
       VALID_TYPE_NAMES = T.let(
         [
@@ -54,10 +57,11 @@ module LunchMoney
           display_name: T.nilable(String),
           closed_on: T.nilable(String),
           institution_name: T.nilable(String),
+          to_base: T.nilable(Number),
         ).void
       end
       def initialize(created_at:, type_name:, name:, balance:, balance_as_of:, currency:, exclude_transactions:, id:,
-        subtype_name: nil, display_name: nil, closed_on: nil, institution_name: nil)
+        subtype_name: nil, display_name: nil, closed_on: nil, institution_name: nil, to_base: nil)
         super()
         @created_at = T.let(validate_iso8601!(created_at), String)
         @type_name = T.let(validate_one_of!(type_name, VALID_TYPE_NAMES), String)
@@ -71,6 +75,7 @@ module LunchMoney
         @display_name = display_name
         @closed_on = closed_on
         @institution_name = institution_name
+        @to_base = to_base
       end
 
       sig { params(name: String).void }

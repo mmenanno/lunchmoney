@@ -185,7 +185,7 @@ module LunchMoney
 
       test "delete_transaction_group returns an array of transaction ids from the deleted group on success response" do
         VCR.use_cassette("transactions/delete_transaction_group_success") do
-          api_call = LunchMoney::Calls::Transactions.new.delete_transaction_group(905483362)
+          api_call = LunchMoney::Calls::Transactions.new.delete_transaction_group(2266193461)
 
           api_call[:transactions].each do |transaction_id|
             assert_kind_of(Integer, transaction_id)

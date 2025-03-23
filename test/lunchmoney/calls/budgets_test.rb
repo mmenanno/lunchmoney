@@ -56,7 +56,7 @@ module LunchMoney
       end
 
       test "remove_budget returns a boolean on success response" do
-        VCR.use_cassette("budget/remove_budgett_success") do
+        VCR.use_cassette("budget/remove_budget_success") do
           api_call = LunchMoney::Calls::Budgets.new.remove_budget(start_date: "2023-01-01", category_id: 777052)
 
           assert_includes([TrueClass, FalseClass], api_call.class)

@@ -130,7 +130,7 @@ module LunchMoney
 
       test "update_category returns a boolean on success response" do
         VCR.use_cassette("categories/update_category_success") do
-          api_call = LunchMoney::Calls::Categories.new.update_category(784587, name: "Update Category Test")
+          api_call = LunchMoney::Calls::Categories.new.update_category(1445992, name: "Update Category Test")
 
           assert_includes([TrueClass, FalseClass], api_call.class)
         end
@@ -148,7 +148,7 @@ module LunchMoney
       test "add_to_category_group returns a Category object on success response" do
         VCR.use_cassette("categories/add_to_category_group_success") do
           api_call = LunchMoney::Calls::Categories.new.add_to_category_group(
-            784588,
+            1445993,
             new_categories: ["New Category Test"],
           )
 
@@ -161,7 +161,7 @@ module LunchMoney
         LunchMoney::Calls::Categories.any_instance.stubs(:post).returns(response)
 
         api_call = LunchMoney::Calls::Categories.new.add_to_category_group(
-          784588,
+          1445993,
           new_categories: ["New Category Test"],
         )
 
@@ -170,7 +170,7 @@ module LunchMoney
 
       test "delete_category returns a boolean on success response" do
         VCR.use_cassette("categories/delete_category_success") do
-          api_call = LunchMoney::Calls::Categories.new.delete_category(784587)
+          api_call = LunchMoney::Calls::Categories.new.delete_category(1445992)
 
           assert_includes([TrueClass, FalseClass], api_call.class)
         end
@@ -187,7 +187,7 @@ module LunchMoney
 
       test "force_delete_category returns a boolean on success response" do
         VCR.use_cassette("categories/force_delete_category_success") do
-          api_call = LunchMoney::Calls::Categories.new.force_delete_category(784588)
+          api_call = LunchMoney::Calls::Categories.new.force_delete_category(1446014)
 
           assert_includes([TrueClass, FalseClass], api_call.class)
         end
