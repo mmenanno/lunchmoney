@@ -8,7 +8,7 @@ http_interactions:
       string: '{"type_name":null,"name":null,"balance":"99.99","subtype_name":null,"display_name":null,"balance_as_of":null,"currency":null,"institution_name":null,"closed_on":null,"exclude_transactions":null}'
     headers:
       User-Agent:
-      - Faraday v2.9.0
+      - Faraday v2.12.2
       Authorization:
       - Bearer <BEARER_TOKEN>
       Content-Type:
@@ -25,9 +25,9 @@ http_interactions:
       Server:
       - Cowboy
       Report-To:
-      - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1706815145&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=UKWGfVf7ep58%2FB6nXlsfIWhvtQ0agOCk4Cjw26OXPM8%3D"}]}'
+      - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1742766902&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=2XX23QzFX7OEf%2FYRhXvCDWdfqxWklFUvwZEp6Idgcck%3D"}]}'
       Reporting-Endpoints:
-      - heroku-nel=https://nel.heroku.com/reports?ts=1706815145&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=UKWGfVf7ep58%2FB6nXlsfIWhvtQ0agOCk4Cjw26OXPM8%3D
+      - heroku-nel=https://nel.heroku.com/reports?ts=1742766902&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=2XX23QzFX7OEf%2FYRhXvCDWdfqxWklFUvwZEp6Idgcck%3D
       Nel:
       - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
       Connection:
@@ -41,16 +41,16 @@ http_interactions:
       Content-Type:
       - application/json; charset=utf-8
       Content-Length:
-      - '288'
+      - '304'
       Etag:
-      - W/"120-WsKdH6hsY8FVR5eES+WXWiMZRb0"
+      - W/"130-PEuJbaizZ74JK9c3je6HJGWOUhY"
       Date:
-      - Thu, 01 Feb 2024 19:19:05 GMT
+      - Sun, 23 Mar 2025 21:55:02 GMT
       Via:
       - 1.1 vegur
     body:
       encoding: UTF-8
       string: '{"id":93746,"type_name":"cash","subtype_name":null,"name":"Create Asset
-        Test","display_name":null,"balance":"99.9900","balance_as_of":"2024-02-01T19:19:05.771Z","closed_on":null,"currency":"cad","institution_name":null,"exclude_transactions":false,"created_at":"2024-02-01T19:13:35.715Z"}'
-  recorded_at: Thu, 01 Feb 2024 19:19:05 GMT
-recorded_with: VCR 6.2.0
+        Test","display_name":null,"balance":"99.9900","to_base":99.99,"balance_as_of":"2025-03-23T21:55:02.838Z","closed_on":null,"currency":"cad","institution_name":null,"exclude_transactions":false,"created_at":"2024-02-01T19:13:35.715Z"}'
+  recorded_at: Sun, 23 Mar 2025 21:55:02 GMT
+recorded_with: VCR 6.3.1
