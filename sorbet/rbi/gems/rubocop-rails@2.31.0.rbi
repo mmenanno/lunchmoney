@@ -164,23 +164,23 @@ RuboCop::Cop::DatabaseTypeResolvable::POSTGRESQL = T.let(T.unsafe(nil), String)
 
 # Common functionality for enforcing a specific superclass.
 #
-# source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#6
+# source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#11
 module RuboCop::Cop::EnforceSuperclass
-  # source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#19
+  # source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#24
   def on_class(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#25
+  # source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#30
   def on_send(node); end
 
   private
 
-  # source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#33
+  # source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#38
   def register_offense(offense_node); end
 
   class << self
     # @private
     #
-    # source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#7
+    # source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#12
     def included(base); end
   end
 end
@@ -228,56 +228,59 @@ module RuboCop::Cop::IndexMethod
   # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#74
   def on_block(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#98
+  # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#99
   def on_csend(node); end
+
+  # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#74
+  def on_itblock(node); end
 
   # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#74
   def on_numblock(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#88
+  # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#89
   def on_send(node); end
 
   private
 
-  # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#162
+  # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#163
   def execute_correction(corrector, node, correction); end
 
-  # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#139
+  # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#140
   def extract_captures(match); end
 
-  # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#126
+  # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#127
   def handle_possible_offense(node, match, match_desc); end
 
   # @raise [NotImplementedError]
   #
-  # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#144
+  # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#145
   def new_method_name; end
 
   # @abstract Implemented with `def_node_matcher`
   # @raise [NotImplementedError]
   #
-  # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#107
+  # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#108
   def on_bad_each_with_object(_node); end
 
   # @abstract Implemented with `def_node_matcher`
   # @raise [NotImplementedError]
   #
-  # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#122
+  # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#123
   def on_bad_hash_brackets_map(_node); end
 
   # @abstract Implemented with `def_node_matcher`
   # @raise [NotImplementedError]
   #
-  # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#117
+  # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#118
   def on_bad_map_to_h(_node); end
 
   # @abstract Implemented with `def_node_matcher`
   # @raise [NotImplementedError]
   #
-  # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#112
+  # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#113
   def on_bad_to_h(_node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#148
+  # source://rubocop-rails//lib/rubocop/cop/mixin/index_method.rb#149
   def prepare_correction(node); end
 end
 
@@ -2455,10 +2458,10 @@ class RuboCop::Cop::Rails::ApplicationController < ::RuboCop::Cop::Base
   include ::RuboCop::Cop::EnforceSuperclass
   extend ::RuboCop::Cop::AutoCorrector
 
-  # source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#8
+  # source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#13
   def class_definition(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#12
+  # source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#17
   def class_new_definition(param0 = T.unsafe(nil)); end
 end
 
@@ -2495,10 +2498,10 @@ class RuboCop::Cop::Rails::ApplicationJob < ::RuboCop::Cop::Base
   # source://rubocop-rails//lib/rubocop/cop/rails/application_job.rb#37
   def autocorrect(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#8
+  # source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#13
   def class_definition(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#12
+  # source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#17
   def class_new_definition(param0 = T.unsafe(nil)); end
 end
 
@@ -2532,10 +2535,10 @@ class RuboCop::Cop::Rails::ApplicationMailer < ::RuboCop::Cop::Base
   extend ::RuboCop::Cop::AutoCorrector
   extend ::RuboCop::Cop::TargetRailsVersion
 
-  # source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#8
+  # source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#13
   def class_definition(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#12
+  # source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#17
   def class_new_definition(param0 = T.unsafe(nil)); end
 end
 
@@ -2573,10 +2576,10 @@ class RuboCop::Cop::Rails::ApplicationRecord < ::RuboCop::Cop::Base
   extend ::RuboCop::Cop::AutoCorrector
   extend ::RuboCop::Cop::TargetRailsVersion
 
-  # source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#8
+  # source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#13
   def class_definition(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#12
+  # source://rubocop-rails//lib/rubocop/cop/mixin/enforce_superclass.rb#17
   def class_new_definition(param0 = T.unsafe(nil)); end
 end
 
@@ -2591,9 +2594,9 @@ RuboCop::Cop::Rails::ApplicationRecord::SUPERCLASS = T.let(T.unsafe(nil), String
 
 # Prevents usage of `"*"` on an Arel::Table column reference.
 #
-# Using `arel_table["*"]` causes the outputted string to be a literal
-# quoted asterisk (e.g. <tt>`my_model`.`*`</tt>). This causes the
-# database to look for a column named <tt>`*`</tt> (or `"*"`) as opposed
+# Using `arel_table["\*"]` causes the outputted string to be a literal
+# quoted asterisk (e.g. `my_model`.`*`). This causes the
+# database to look for a column named `\*` (or `"*"`) as opposed
 # to expanding the column list as one would likely expect.
 #
 # @example
@@ -4119,10 +4122,10 @@ class RuboCop::Cop::Rails::EagerEvaluationLogMessage < ::RuboCop::Cop::Base
 
   private
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/eager_evaluation_log_message.rb#61
+  # source://rubocop-rails//lib/rubocop/cop/rails/eager_evaluation_log_message.rb#59
   def replacement_range(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/eager_evaluation_log_message.rb#72
+  # source://rubocop-rails//lib/rubocop/cop/rails/eager_evaluation_log_message.rb#70
   def replacement_source(node, arguments); end
 
   class << self
@@ -5775,10 +5778,10 @@ class RuboCop::Cop::Rails::IndexBy < ::RuboCop::Cop::Base
   # source://rubocop-rails//lib/rubocop/cop/rails/index_by.rb#24
   def on_bad_each_with_object(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/index_by.rb#57
+  # source://rubocop-rails//lib/rubocop/cop/rails/index_by.rb#63
   def on_bad_hash_brackets_map(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/index_by.rb#43
+  # source://rubocop-rails//lib/rubocop/cop/rails/index_by.rb#46
   def on_bad_map_to_h(param0 = T.unsafe(nil)); end
 
   # source://rubocop-rails//lib/rubocop/cop/rails/index_by.rb#31
@@ -5786,7 +5789,7 @@ class RuboCop::Cop::Rails::IndexBy < ::RuboCop::Cop::Base
 
   private
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/index_by.rb#75
+  # source://rubocop-rails//lib/rubocop/cop/rails/index_by.rb#84
   def new_method_name; end
 end
 
@@ -5815,10 +5818,10 @@ class RuboCop::Cop::Rails::IndexWith < ::RuboCop::Cop::Base
   # source://rubocop-rails//lib/rubocop/cop/rails/index_with.rb#27
   def on_bad_each_with_object(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/index_with.rb#60
+  # source://rubocop-rails//lib/rubocop/cop/rails/index_with.rb#66
   def on_bad_hash_brackets_map(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/index_with.rb#46
+  # source://rubocop-rails//lib/rubocop/cop/rails/index_with.rb#49
   def on_bad_map_to_h(param0 = T.unsafe(nil)); end
 
   # source://rubocop-rails//lib/rubocop/cop/rails/index_with.rb#34
@@ -5826,7 +5829,7 @@ class RuboCop::Cop::Rails::IndexWith < ::RuboCop::Cop::Base
 
   private
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/index_with.rb#78
+  # source://rubocop-rails//lib/rubocop/cop/rails/index_with.rb#87
   def new_method_name; end
 end
 
@@ -6646,28 +6649,25 @@ class RuboCop::Cop::Rails::Output < ::RuboCop::Cop::Base
   include ::RuboCop::Cop::RangeHelp
   extend ::RuboCop::Cop::AutoCorrector
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/output.rb#32
+  # source://rubocop-rails//lib/rubocop/cop/rails/output.rb#31
   def io_output?(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/output.rb#42
+  # source://rubocop-rails//lib/rubocop/cop/rails/output.rb#41
   def on_send(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/output.rb#28
+  # source://rubocop-rails//lib/rubocop/cop/rails/output.rb#27
   def output?(param0 = T.unsafe(nil)); end
 
   private
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/output.rb#55
+  # source://rubocop-rails//lib/rubocop/cop/rails/output.rb#54
   def match_gvar?(sym); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/output.rb#59
+  # source://rubocop-rails//lib/rubocop/cop/rails/output.rb#58
   def offense_range(node); end
 end
-
-# source://rubocop-rails//lib/rubocop/cop/rails/output.rb#26
-RuboCop::Cop::Rails::Output::ALLOWED_TYPES = T.let(T.unsafe(nil), Array)
 
 # source://rubocop-rails//lib/rubocop/cop/rails/output.rb#24
 RuboCop::Cop::Rails::Output::MSG = T.let(T.unsafe(nil), String)
@@ -6862,10 +6862,13 @@ class RuboCop::Cop::Rails::Pluck < ::RuboCop::Cop::Base
   extend ::RuboCop::Cop::AutoCorrector
   extend ::RuboCop::Cop::TargetRailsVersion
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/pluck.rb#62
+  # source://rubocop-rails//lib/rubocop/cop/rails/pluck.rb#63
   def on_block(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/pluck.rb#62
+  # source://rubocop-rails//lib/rubocop/cop/rails/pluck.rb#63
+  def on_itblock(node); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/pluck.rb#63
   def on_numblock(node); end
 
   # source://rubocop-rails//lib/rubocop/cop/rails/pluck.rb#58
@@ -6873,23 +6876,23 @@ class RuboCop::Cop::Rails::Pluck < ::RuboCop::Cop::Base
 
   private
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/pluck.rb#108
+  # source://rubocop-rails//lib/rubocop/cop/rails/pluck.rb#114
   def message(replacement, node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/pluck.rb#95
+  # source://rubocop-rails//lib/rubocop/cop/rails/pluck.rb#101
   def offense_range(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/pluck.rb#99
+  # source://rubocop-rails//lib/rubocop/cop/rails/pluck.rb#105
   def register_offense(node, key); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/pluck.rb#89
+  # source://rubocop-rails//lib/rubocop/cop/rails/pluck.rb#95
   def use_block_argument_in_key?(block_argument, key); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/pluck.rb#83
+  # source://rubocop-rails//lib/rubocop/cop/rails/pluck.rb#88
   def use_one_block_argument?(argument); end
 end
 
@@ -7801,27 +7804,30 @@ class RuboCop::Cop::Rails::RedundantReceiverInWithOptions < ::RuboCop::Cop::Base
   def on_block(node); end
 
   # source://rubocop-rails//lib/rubocop/cop/rails/redundant_receiver_in_with_options.rb#71
+  def on_itblock(node); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_receiver_in_with_options.rb#71
   def on_numblock(node); end
 
   private
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_receiver_in_with_options.rb#91
+  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_receiver_in_with_options.rb#92
   def autocorrect(corrector, send_node, node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_receiver_in_with_options.rb#110
+  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_receiver_in_with_options.rb#115
   def block_argument_range(node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_receiver_in_with_options.rb#97
+  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_receiver_in_with_options.rb#99
   def redundant_receiver?(send_nodes, node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_receiver_in_with_options.rb#132
+  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_receiver_in_with_options.rb#137
   def same_value?(arg_node, recv_node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_receiver_in_with_options.rb#122
+  # source://rubocop-rails//lib/rubocop/cop/rails/redundant_receiver_in_with_options.rb#127
   def search_begin_pos_of_space_before_block_argument(begin_pos); end
 end
 
@@ -8424,6 +8430,9 @@ class RuboCop::Cop::Rails::ReversibleMigration < ::RuboCop::Cop::Base
   def on_block(node); end
 
   # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#199
+  def on_itblock(node); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#199
   def on_numblock(node); end
 
   # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#186
@@ -8445,49 +8454,49 @@ class RuboCop::Cop::Rails::ReversibleMigration < ::RuboCop::Cop::Base
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#316
+  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#317
   def all_hash_key?(args, *keys); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#247
+  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#248
   def check_change_table_node(node, block); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#277
+  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#278
   def check_change_table_offense(receiver, node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#217
+  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#218
   def check_drop_table_node(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#211
+  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#212
   def check_irreversible_schema_statement_node(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#233
+  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#234
   def check_remove_column_node(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#259
+  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#260
   def check_remove_columns_node(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#239
+  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#240
   def check_remove_foreign_key_node(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#269
+  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#270
   def check_remove_index_node(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#227
+  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#228
   def check_reversible_hash_node(node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#290
+  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#291
   def reversible_change_table_call?(node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#304
+  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#305
   def within_change_method?(node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#310
+  # source://rubocop-rails//lib/rubocop/cop/rails/reversible_migration.rb#311
   def within_reversible_or_up_only_block?(node); end
 end
 
@@ -11471,6 +11480,10 @@ class RuboCop::Cop::Style::HashExcept < ::RuboCop::Cop::Base
   include ::RuboCop::Cop::RangeHelp
 end
 
+class RuboCop::Cop::Style::HashFetchChain < ::RuboCop::Cop::Base
+  include ::RuboCop::Rails::MigrationFileSkippable
+end
+
 class RuboCop::Cop::Style::HashLikeCase < ::RuboCop::Cop::Base
   include ::RuboCop::Rails::MigrationFileSkippable
 end
@@ -11548,6 +11561,10 @@ class RuboCop::Cop::Style::IpAddresses < ::RuboCop::Cop::Base
 end
 
 class RuboCop::Cop::Style::ItAssignment < ::RuboCop::Cop::Base
+  include ::RuboCop::Rails::MigrationFileSkippable
+end
+
+class RuboCop::Cop::Style::ItBlockParameter < ::RuboCop::Cop::Base
   include ::RuboCop::Rails::MigrationFileSkippable
 end
 
