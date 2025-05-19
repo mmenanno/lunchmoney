@@ -30,7 +30,7 @@ module LunchMoney
 
     sig { params(api_key: T.nilable(String)).void }
     def initialize(api_key: nil)
-      @api_key = T.let((api_key || LunchMoney.configuration.api_key), T.nilable(String))
+      @api_key = T.let(api_key || LunchMoney.configuration.api_key, T.nilable(String))
     end
 
     delegate :me, to: :user_calls
