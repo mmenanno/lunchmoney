@@ -22,55 +22,55 @@ class ApiTest < ActiveSupport::TestCase
   test "all asset instance methods are delegated" do
     asset_instance_methods = LunchMoney::Calls::Assets.instance_methods(false)
 
-    assert_empty((asset_instance_methods - api_instance_methods))
+    assert_empty(asset_instance_methods - api_instance_methods)
   end
 
   test "all budget instance methods are delegated" do
     budget_instance_methods = LunchMoney::Calls::Budgets.instance_methods(false)
 
-    assert_empty((budget_instance_methods - api_instance_methods))
+    assert_empty(budget_instance_methods - api_instance_methods)
   end
 
   test "all category instance methods are delegated" do
     category_instance_methods = LunchMoney::Calls::Categories.instance_methods(false)
 
-    assert_empty((category_instance_methods - api_instance_methods))
+    assert_empty(category_instance_methods - api_instance_methods)
   end
 
   test "all crypto instance methods are delegated" do
     crypto_instance_methods = LunchMoney::Calls::Crypto.instance_methods(false)
 
-    assert_empty((crypto_instance_methods - api_instance_methods))
+    assert_empty(crypto_instance_methods - api_instance_methods)
   end
 
   test "all plaid_account instance methods are delegated" do
     plaid_account_instance_methods = LunchMoney::Calls::PlaidAccounts.instance_methods(false)
 
-    assert_empty((plaid_account_instance_methods - api_instance_methods))
+    assert_empty(plaid_account_instance_methods - api_instance_methods)
   end
 
   test "all recurring_expense instance methods are delegated" do
     recurring_expense_instance_methods = LunchMoney::Calls::RecurringExpenses.instance_methods(false)
 
-    assert_empty((recurring_expense_instance_methods - api_instance_methods))
+    assert_empty(recurring_expense_instance_methods - api_instance_methods)
   end
 
   test "all tag instance methods are delegated" do
     tag_instance_methods = LunchMoney::Calls::Tags.instance_methods(false)
 
-    assert_empty((tag_instance_methods - api_instance_methods))
+    assert_empty(tag_instance_methods - api_instance_methods)
   end
 
   test "all transaction instance methods are delegated" do
     transaction_instance_methods = LunchMoney::Calls::Transactions.instance_methods(false)
 
-    assert_empty((transaction_instance_methods - api_instance_methods))
+    assert_empty(transaction_instance_methods - api_instance_methods)
   end
 
   test "all user instance methods are delegated" do
     user_instance_methods = LunchMoney::Calls::Users.instance_methods(false)
 
-    assert_empty((user_instance_methods - api_instance_methods))
+    assert_empty(user_instance_methods - api_instance_methods)
   end
 
   [
