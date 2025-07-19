@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
 
   spec.summary                = "LunchMoney API client library."
   spec.homepage               = "https://github.com/mmenanno/lunchmoney"
-  spec.required_ruby_version  = ">= 3.1"
+  spec.required_ruby_version  = ">= 3.2"
   spec.license = "MIT"
 
   spec.metadata["allowed_push_host"]  = "https://rubygems.org"
