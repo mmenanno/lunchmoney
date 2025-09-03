@@ -8,7 +8,7 @@ GIT
 PATH
   remote: .
   specs:
-    lunchmoney (1.4.1)
+    lunchmoney (1.5.0)
       activesupport (>= 6.1)
       faraday (>= 1.0.0)
       sorbet-runtime (>= 0.5)
