@@ -59,10 +59,4 @@ jobs:
           REMOTE_TESTS_ENABLED: ${{ vars.REMOTE_TESTS_ENABLED }}
           LUNCHMONEY_TOKEN: ${{ secrets.LUNCHMONEY_TOKEN }}
         run: bin/toys test
-      -
-        name: Upload Coverage to Qlty
-        if: ${{ endsWith(matrix.ruby-version, '3.4') }}
-        uses: qlty-sh/qlty-action@v1
-        with:
-          coverage_files: coverage/coverage.json
 
