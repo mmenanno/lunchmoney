@@ -41,9 +41,7 @@ module LunchMoney
     #   api.me
     sig { returns(LunchMoney::Calls::Base) }
     def user_calls
-      with_valid_api_key do
-        @user_calls ||= T.let(LunchMoney::Calls::Users.new(api_key:), T.nilable(LunchMoney::Calls::Users))
-      end
+      memoized_call_instance(:@user_calls, LunchMoney::Calls::Users)
     end
 
     delegate :categories,
@@ -84,9 +82,7 @@ module LunchMoney
     #   api.force_delete_category(1234567)
     sig { returns(LunchMoney::Calls::Base) }
     def category_calls
-      with_valid_api_key do
-        @category_calls ||= T.let(LunchMoney::Calls::Categories.new(api_key:), T.nilable(LunchMoney::Calls::Categories))
-      end
+      memoized_call_instance(:@category_calls, LunchMoney::Calls::Categories)
     end
 
     delegate :tags, to: :tag_calls
@@ -97,9 +93,7 @@ module LunchMoney
     #   api.tags
     sig { returns(LunchMoney::Calls::Base) }
     def tag_calls
-      with_valid_api_key do
-        @tag_calls ||= T.let(LunchMoney::Calls::Tags.new(api_key:), T.nilable(LunchMoney::Calls::Tags))
-      end
+      memoized_call_instance(:@tag_calls, LunchMoney::Calls::Tags)
     end
 
     delegate :transactions,
@@ -160,12 +154,7 @@ module LunchMoney
     #   api.delete_transaction_group(905483362)
     sig { returns(LunchMoney::Calls::Base) }
     def transaction_calls
-      with_valid_api_key do
-        @transaction_calls ||= T.let(
-          LunchMoney::Calls::Transactions.new(api_key:),
-          T.nilable(LunchMoney::Calls::Transactions),
-        )
-      end
+      memoized_call_instance(:@transaction_calls, LunchMoney::Calls::Transactions)
     end
 
     delegate :recurring_expenses, to: :recurring_expense_calls
@@ -176,12 +165,7 @@ module LunchMoney
     #   api.recurring_expenses
     sig { returns(LunchMoney::Calls::Base) }
     def recurring_expense_calls
-      with_valid_api_key do
-        @recurring_expense_calls ||= T.let(
-          LunchMoney::Calls::RecurringExpenses.new(api_key:),
-          T.nilable(LunchMoney::Calls::RecurringExpenses),
-        )
-      end
+      memoized_call_instance(:@recurring_expense_calls, LunchMoney::Calls::RecurringExpenses)
     end
 
     delegate :budgets, :upsert_budget, :remove_budget, to: :budget_calls
@@ -198,9 +182,7 @@ module LunchMoney
     #   api.remove_budget(start_date: "2023-01-01", category_id: 777052)
     sig { returns(LunchMoney::Calls::Base) }
     def budget_calls
-      with_valid_api_key do
-        @budget_calls ||= T.let(LunchMoney::Calls::Budgets.new(api_key:), T.nilable(LunchMoney::Calls::Budgets))
-      end
+      memoized_call_instance(:@budget_calls, LunchMoney::Calls::Budgets)
     end
 
     delegate :assets, :create_asset, :update_asset, to: :asset_calls
@@ -221,9 +203,7 @@ module LunchMoney
     #   api.update_asset(93746, balance: "99.99")
     sig { returns(LunchMoney::Calls::Base) }
     def asset_calls
-      with_valid_api_key do
-        @asset_calls ||= T.let(LunchMoney::Calls::Assets.new(api_key:), T.nilable(LunchMoney::Calls::Assets))
-      end
+      memoized_call_instance(:@asset_calls, LunchMoney::Calls::Assets)
     end
 
     delegate :plaid_accounts, :plaid_accounts_fetch, to: :plaid_account_calls
@@ -237,12 +217,7 @@ module LunchMoney
     #   api.plaid_accounts_fetch
     sig { returns(LunchMoney::Calls::Base) }
     def plaid_account_calls
-      with_valid_api_key do
-        @plaid_account_calls ||= T.let(
-          LunchMoney::Calls::PlaidAccounts.new(api_key:),
-          T.nilable(LunchMoney::Calls::PlaidAccounts),
-        )
-      end
+      memoized_call_instance(:@plaid_account_calls, LunchMoney::Calls::PlaidAccounts)
     end
 
     delegate :crypto, :update_crypto, to: :crypto_calls
@@ -256,9 +231,7 @@ module LunchMoney
     #   api.update_crypto(1234567, name: "New Crypto Name")
     sig { returns(LunchMoney::Calls::Base) }
     def crypto_calls
-      with_valid_api_key do
-        @crypto_calls ||= T.let(LunchMoney::Calls::Crypto.new(api_key:), T.nilable(LunchMoney::Calls::Crypto))
-      end
+      memoized_call_instance(:@crypto_calls, LunchMoney::Calls::Crypto)
     end
 
     private
@@ -268,6 +241,20 @@ module LunchMoney
       raise(InvalidApiKey, "API key is missing or invalid") if api_key.blank?
 
       yield
+    end
+
+    sig do
+      type_parameters(:T)
+        .params(
+          ivar_name: Symbol,
+          klass: T.class_of(LunchMoney::Calls::Base),
+        )
+        .returns(LunchMoney::Calls::Base)
+    end
+    def memoized_call_instance(ivar_name, klass)
+      with_valid_api_key do
+        instance_variable_get(ivar_name) || instance_variable_set(ivar_name, klass.new(api_key:))
+      end
     end
   end
 end
