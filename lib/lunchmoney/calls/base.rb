@@ -23,13 +23,14 @@ module LunchMoney
       sig { params(api_key: T.nilable(String)).void }
       def initialize(api_key: nil)
         @api_key = T.let(api_key || LunchMoney.configuration.api_key, T.nilable(String))
+        @connections = T.let({}, T::Hash[Symbol, Faraday::Connection])
       end
 
       private
 
       sig { params(endpoint: String, query_params: T.nilable(T::Hash[Symbol, T.untyped])).returns(Faraday::Response) }
       def get(endpoint, query_params: nil)
-        connection = request(flat_params: true)
+        connection = connection_for(:flat_params)
 
         if query_params.present?
           connection.get(BASE_URL + endpoint, query_params)
@@ -40,19 +41,19 @@ module LunchMoney
 
       sig { params(endpoint: String, params: T.nilable(T::Hash[Symbol, T.untyped])).returns(Faraday::Response) }
       def post(endpoint, params)
-        request(json_request: true).post(BASE_URL + endpoint, params)
+        connection_for(:json).post(BASE_URL + endpoint, params)
       end
 
       sig { params(endpoint: String, body: T::Hash[Symbol, T.untyped]).returns(Faraday::Response) }
       def put(endpoint, body)
-        request(json_request: true).put(BASE_URL + endpoint) do |req|
+        connection_for(:json).put(BASE_URL + endpoint) do |req|
           req.body = body
         end
       end
 
       sig { params(endpoint: String, query_params: T.nilable(T::Hash[Symbol, T.untyped])).returns(Faraday::Response) }
       def delete(endpoint, query_params: nil)
-        connection = request(flat_params: true)
+        connection = connection_for(:flat_params)
 
         if query_params.present?
           connection.delete(BASE_URL + endpoint, query_params)
@@ -61,12 +62,24 @@ module LunchMoney
         end
       end
 
+      sig { params(connection_type: Symbol).returns(Faraday::Connection) }
+      def connection_for(connection_type)
+        @connections[connection_type] ||= case connection_type
+        when :json
+          build_connection(json_request: true)
+        when :flat_params
+          build_connection(flat_params: true)
+        else
+          build_connection
+        end
+      end
+
       sig { params(json_request: T::Boolean, flat_params: T::Boolean).returns(Faraday::Connection) }
-      def request(json_request: false, flat_params: false)
+      def build_connection(json_request: false, flat_params: false)
         Faraday.new do |conn|
           conn.request(:authorization, "Bearer", @api_key)
           conn.request(:json) if json_request
-          # conn.options.params_encoder = Faraday::FlatParamsEncoder if flat_params
+          conn.options.params_encoder = Faraday::FlatParamsEncoder if flat_params
           conn.response(:json, content_type: /json$/, parser_options: { symbolize_names: true })
         end
       end
