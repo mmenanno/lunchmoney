@@ -141,6 +141,30 @@ module LunchMoney
 
         yield(response.body)
       end
+
+      sig do
+        type_parameters(:T)
+          .params(
+            response: Faraday::Response,
+            collection_key: Symbol,
+            lazy: T::Boolean,
+            block: T.proc.params(item: T.untyped).returns(T.type_parameter(:T)),
+          )
+          .returns(T.any(T::Enumerable[T.type_parameter(:T)], T::Array[T.type_parameter(:T)], LunchMoney::Errors))
+      end
+      def handle_collection_response(response, collection_key, lazy: false, &block)
+        api_errors = errors(response)
+        return api_errors if api_errors.present?
+
+        collection = response.body[collection_key]
+        return [] unless collection
+
+        if lazy
+          collection.lazy.map(&block)
+        else
+          collection.map(&block)
+        end
+      end
     end
   end
 end
