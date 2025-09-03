@@ -11,11 +11,10 @@ module LunchMoney
       def assets
         response = get("assets")
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
-
-        response.body[:assets].map do |asset|
-          LunchMoney::Objects::Asset.new(**asset)
+        handle_api_response(response) do |body|
+          body[:assets].map do |asset|
+            LunchMoney::Objects::Asset.new(**asset)
+          end
         end
       end
 
@@ -50,10 +49,9 @@ module LunchMoney
 
         response = post("assets", params)
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
-
-        LunchMoney::Objects::Asset.new(**response.body)
+        handle_api_response(response) do |body|
+          LunchMoney::Objects::Asset.new(**body)
+        end
       end
 
       sig do
@@ -88,10 +86,9 @@ module LunchMoney
 
         response = put("assets/#{asset_id}", params)
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
-
-        LunchMoney::Objects::Asset.new(**response.body)
+        handle_api_response(response) do |body|
+          LunchMoney::Objects::Asset.new(**body)
+        end
       end
     end
   end

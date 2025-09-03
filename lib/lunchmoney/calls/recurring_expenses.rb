@@ -17,11 +17,10 @@ module LunchMoney
         params = clean_params({ start_date:, end_date: })
         response = get("recurring_expenses", query_params: params)
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
-
-        response.body[:recurring_expenses].map do |recurring_expense|
-          LunchMoney::Objects::RecurringExpense.new(**recurring_expense)
+        handle_api_response(response) do |body|
+          body[:recurring_expenses].map do |recurring_expense|
+            LunchMoney::Objects::RecurringExpense.new(**recurring_expense)
+          end
         end
       end
     end

@@ -59,17 +59,16 @@ module LunchMoney
         })
         response = get("transactions", query_params: params)
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
+        handle_api_response(response) do |body|
+          body[:transactions].map do |transaction|
+            transaction[:tags].map! { |tag| LunchMoney::Objects::TagBase.new(**tag) }
 
-        response.body[:transactions].map do |transaction|
-          transaction[:tags].map! { |tag| LunchMoney::Objects::TagBase.new(**tag) }
+            transaction[:children]&.map! do |child_transaction|
+              LunchMoney::Objects::ChildTransaction.new(**child_transaction)
+            end
 
-          transaction[:children]&.map! do |child_transaction|
-            LunchMoney::Objects::ChildTransaction.new(**child_transaction)
+            LunchMoney::Objects::Transaction.new(**transaction)
           end
-
-          LunchMoney::Objects::Transaction.new(**transaction)
         end
       end
 
@@ -83,10 +82,9 @@ module LunchMoney
         params = clean_params({ debit_as_negative: })
         response = get("transactions/#{transaction_id}", query_params: params)
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
-
-        LunchMoney::Objects::Transaction.new(**response.body)
+        handle_api_response(response) do |body|
+          LunchMoney::Objects::Transaction.new(**body)
+        end
       end
 
       sig do
@@ -111,10 +109,9 @@ module LunchMoney
         })
         response = post("transactions", params)
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
-
-        response.body
+        handle_api_response(response) do |body|
+          body
+        end
       end
 
       sig do
@@ -141,10 +138,9 @@ module LunchMoney
         })
         response = put("transactions/#{transaction_id}", params)
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
-
-        response.body
+        handle_api_response(response) do |body|
+          body
+        end
       end
 
       sig do
@@ -157,20 +153,18 @@ module LunchMoney
         params = { parent_ids:, remove_parents: }
         response = post("transactions/unsplit", params)
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
-
-        response.body
+        handle_api_response(response) do |body|
+          body
+        end
       end
 
       sig { params(transaction_id: Integer).returns(T.any(LunchMoney::Objects::Transaction, LunchMoney::Errors)) }
       def transaction_group(transaction_id)
         response = get("transactions/group", query_params: { transaction_id: })
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
-
-        LunchMoney::Objects::Transaction.new(**response.body)
+        handle_api_response(response) do |body|
+          LunchMoney::Objects::Transaction.new(**body)
+        end
       end
 
       sig do
@@ -194,10 +188,9 @@ module LunchMoney
         })
         response = post("transactions/group", params)
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
-
-        response.body
+        handle_api_response(response) do |body|
+          body
+        end
       end
 
       sig do
@@ -209,10 +202,9 @@ module LunchMoney
       def delete_transaction_group(transaction_id)
         response = delete("transactions/group/#{transaction_id}")
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
-
-        response.body
+        handle_api_response(response) do |body|
+          body
+        end
       end
     end
   end

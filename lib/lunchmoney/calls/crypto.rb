@@ -11,11 +11,10 @@ module LunchMoney
       def crypto
         response = get("crypto")
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
-
-        response.body[:crypto].map do |crypto|
-          LunchMoney::Objects::Crypto.new(**crypto)
+        handle_api_response(response) do |body|
+          body[:crypto].map do |crypto|
+            LunchMoney::Objects::Crypto.new(**crypto)
+          end
         end
       end
 
@@ -40,10 +39,9 @@ module LunchMoney
 
         response = put("crypto/manual/#{crypto_id}", params)
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
-
-        LunchMoney::Objects::CryptoBase.new(**response.body)
+        handle_api_response(response) do |body|
+          LunchMoney::Objects::CryptoBase.new(**body)
+        end
       end
     end
   end
