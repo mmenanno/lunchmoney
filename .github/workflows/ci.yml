@@ -55,13 +55,14 @@ jobs:
         name: Run Tests (With Remote Calls & Coverage Report)
         if: ${{ endsWith(matrix.ruby-version, '3.4') }}
         continue-on-error: true
-        uses: paambaati/codeclimate-action@v9.0.0
         env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
           REMOTE_TESTS_ENABLED: ${{ vars.REMOTE_TESTS_ENABLED }}
           LUNCHMONEY_TOKEN: ${{ secrets.LUNCHMONEY_TOKEN }}
+        run: bin/toys test
+      -
+        name: Upload Coverage to Qlty
+        if: ${{ endsWith(matrix.ruby-version, '3.4') }}
+        uses: qlty-sh/qlty-action@v1
         with:
-          coverageCommand: bin/toys test
-          coverageLocations: |
-            ${{ github.workspace }}/coverage/coverage.json:simplecov
+          coverage_files: coverage/coverage.json
 

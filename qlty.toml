@@ -1,0 +1,33 @@
+# Qlty configuration for lunchmoney gem
+# See https://docs.qlty.sh/configuration for all options
+
+[language.ruby]
+enabled = true
+
+[language.yaml]
+enabled = true
+
+[language.markdown]
+enabled = true
+
+# Configure coverage settings
+[coverage]
+# Require at least 95% coverage
+threshold = 95.0
+
+# Configure specific tools
+[tools.rubocop]
+enabled = true
+
+[tools.sorbet]
+enabled = true
+
+# Exclude certain paths from analysis
+[exclude]
+paths = [
+  "coverage/",
+  "sorbet/rbi/",
+  "test/cassettes/",
+  "bin/",
+  "*.gemspec"
+]
