@@ -28,6 +28,9 @@ jobs:
           bundler-cache: true
           ruby-version: ${{ matrix.ruby-version }}
       -
+        name: Check for newer VCR version
+        run: bin/toys check-vcr-version
+      -
         name: RuboCop
         run: bin/rubocop
       -
