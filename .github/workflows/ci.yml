@@ -28,6 +28,9 @@ jobs:
           bundler-cache: true
           ruby-version: ${{ matrix.ruby-version }}
       -
+        name: Check for newer VCR version
+        run: bin/toys check-vcr-version
+      -
         name: RuboCop
         run: bin/rubocop
       -
@@ -46,19 +49,14 @@ jobs:
         run: bin/toys mdl
       -
         name: Run Tests (Using Cassettes)
-        if: ${{ ! endsWith(matrix.ruby-version, '3.3') }}
+        if: ${{ ! endsWith(matrix.ruby-version, '3.4') }}
         run: bin/toys test
       -
         name: Run Tests (With Remote Calls & Coverage Report)
-        if: ${{ endsWith(matrix.ruby-version, '3.3') }}
+        if: ${{ endsWith(matrix.ruby-version, '3.4') }}
         continue-on-error: true
-        uses: paambaati/codeclimate-action@v9.0.0
         env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
           REMOTE_TESTS_ENABLED: ${{ vars.REMOTE_TESTS_ENABLED }}
           LUNCHMONEY_TOKEN: ${{ secrets.LUNCHMONEY_TOKEN }}
-        with:
-          coverageCommand: bin/toys test
-          coverageLocations: |
-            ${{ github.workspace }}/coverage/coverage.json:simplecov
+        run: bin/toys test
 

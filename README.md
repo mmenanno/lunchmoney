@@ -3,8 +3,6 @@
 [![Gem Version](https://badge.fury.io/rb/lunchmoney.svg)](https://badge.fury.io/rb/lunchmoney)
 [![CI](https://github.com/mmenanno/lunchmoney/actions/workflows/ci.yml/badge.svg)](https://github.com/mmenanno/lunchmoney/actions/workflows/ci.yml)
 [![Yard Docs](https://github.com/mmenanno/lunchmoney/actions/workflows/build_and_publish_yard_docs.yml/badge.svg)](https://github.com/mmenanno/lunchmoney/actions/workflows/build_and_publish_yard_docs.yml)
-[![Maintainability](https://api.codeclimate.com/v1/badges/6e84458e8cf831e6a6fa/maintainability)](https://codeclimate.com/github/mmenanno/lunchmoney/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/6e84458e8cf831e6a6fa/test_coverage)](https://codeclimate.com/github/mmenanno/lunchmoney/test_coverage)
 
 <a href="https://www.buymeacoffee.com/mmenanno" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
