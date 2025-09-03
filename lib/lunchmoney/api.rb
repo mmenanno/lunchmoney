@@ -177,7 +177,7 @@ module LunchMoney
     # @example [Upsert Budget](https://lunchmoney.dev/#upsert-budget)
     #   api = LunchMoney::Api.new
     #   api.upsert_budget(start_date: "2023-01-01", category_id: 777052, amount: 400.99)
-    # @example [Remove Budget(https://lunchmoney.dev/#remove-budget)
+    # @example [Remove Budget](https://lunchmoney.dev/#remove-budget)
     #   api = LunchMoney::Api.new
     #   api.remove_budget(start_date: "2023-01-01", category_id: 777052)
     sig { returns(LunchMoney::Calls::Base) }

@@ -7,7 +7,7 @@ module LunchMoney
   module Calls
     # https://lunchmoney.dev/#categories
     class Categories < LunchMoney::Calls::Base
-      # Valid query parameter formets for categories
+      # Valid query parameter formats for categories
       VALID_FORMATS = T.let(
         [
           "flattened",
