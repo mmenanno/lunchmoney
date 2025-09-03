@@ -8,17 +8,12 @@ module LunchMoney
     class Object
       sig { params(symbolize_keys: T::Boolean).returns(T::Hash[T.any(String, Symbol), T.untyped]) }
       def serialize(symbolize_keys: false)
-        ivars = instance_variables
-
         output = {}
 
-        ivars.each do |ivar|
-          key = ivar.to_s.gsub("@", "")
-          key = key.to_sym if symbolize_keys
-
-          value = instance_variable_get(ivar)
-
-          output[key] = value
+        instance_variables.each do |ivar|
+          key_string = ivar.to_s.delete_prefix("@")
+          key = symbolize_keys ? key_string.to_sym : key_string
+          output[key] = instance_variable_get(ivar)
         end
 
         output
