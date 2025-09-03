@@ -11,11 +11,10 @@ module LunchMoney
       def plaid_accounts
         response = get("plaid_accounts")
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
-
-        response.body[:plaid_accounts].map do |plaid_account|
-          LunchMoney::Objects::PlaidAccount.new(**plaid_account)
+        handle_api_response(response) do |body|
+          body[:plaid_accounts].map do |plaid_account|
+            LunchMoney::Objects::PlaidAccount.new(**plaid_account)
+          end
         end
       end
 
@@ -30,10 +29,9 @@ module LunchMoney
         params = clean_params({ start_date:, end_date:, plaid_account_id: })
         response = post("plaid_accounts/fetch", params)
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
-
-        response.body
+        handle_api_response(response) do |body|
+          body
+        end
       end
     end
   end

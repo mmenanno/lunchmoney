@@ -24,13 +24,12 @@ module LunchMoney
       def categories(format: nil)
         response = get("categories", query_params: categories_params(format:))
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
+        handle_api_response(response) do |body|
+          body[:categories].map do |category|
+            category[:children]&.map! { |child_category| LunchMoney::Objects::Category.new(**child_category) }
 
-        response.body[:categories].map do |category|
-          category[:children]&.map! { |child_category| LunchMoney::Objects::Category.new(**child_category) }
-
-          LunchMoney::Objects::Category.new(**category)
+            LunchMoney::Objects::Category.new(**category)
+          end
         end
       end
 
@@ -38,12 +37,11 @@ module LunchMoney
       def category(category_id)
         response = get("categories/#{category_id}")
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
+        handle_api_response(response) do |body|
+          body[:children]&.map! { |child_category| LunchMoney::Objects::ChildCategory.new(**child_category) }
 
-        response.body[:children]&.map! { |child_category| LunchMoney::Objects::ChildCategory.new(**child_category) }
-
-        LunchMoney::Objects::Category.new(**response.body)
+          LunchMoney::Objects::Category.new(**body)
+        end
       end
 
       sig do
@@ -70,10 +68,9 @@ module LunchMoney
         })
         response = post("categories", params)
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
-
-        response.body
+        handle_api_response(response) do |body|
+          body
+        end
       end
 
       sig do
@@ -101,10 +98,9 @@ module LunchMoney
 
         response = post("categories/group", params)
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
-
-        response.body
+        handle_api_response(response) do |body|
+          body
+        end
       end
 
       sig do
@@ -132,10 +128,9 @@ module LunchMoney
         })
         response = put("categories/#{category_id}", params)
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
-
-        response.body
+        handle_api_response(response) do |body|
+          body
+        end
       end
 
       sig do
@@ -153,30 +148,27 @@ module LunchMoney
 
         response = post("categories/group/#{group_id}/add", params)
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
-
-        LunchMoney::Objects::Category.new(**response.body)
+        handle_api_response(response) do |body|
+          LunchMoney::Objects::Category.new(**body)
+        end
       end
 
       sig { params(category_id: Integer).returns(T.any(T::Boolean, LunchMoney::Errors)) }
       def delete_category(category_id)
         response = delete("categories/#{category_id}")
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
-
-        response.body
+        handle_api_response(response) do |body|
+          body
+        end
       end
 
       sig { params(category_id: Integer).returns(T.any(T::Boolean, LunchMoney::Errors)) }
       def force_delete_category(category_id)
         response = delete("categories/#{category_id}/force")
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
-
-        response.body
+        handle_api_response(response) do |body|
+          body
+        end
       end
 
       private

@@ -11,10 +11,9 @@ module LunchMoney
       def tags
         response = get("tags")
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
-
-        response.body.map { |tag| LunchMoney::Objects::Tag.new(**tag) }
+        handle_api_response(response) do |body|
+          body.map { |tag| LunchMoney::Objects::Tag.new(**tag) }
+        end
       end
     end
   end

@@ -11,10 +11,9 @@ module LunchMoney
       def me
         response = get("me")
 
-        api_errors = errors(response)
-        return api_errors if api_errors.present?
-
-        LunchMoney::Objects::User.new(**response.body)
+        handle_api_response(response) do |body|
+          LunchMoney::Objects::User.new(**body)
+        end
       end
     end
   end

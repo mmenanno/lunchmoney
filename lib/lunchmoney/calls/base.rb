@@ -126,6 +126,21 @@ module LunchMoney
       def clean_params(params)
         params.reject! { |_key, value| value.nil? }
       end
+
+      sig do
+        type_parameters(:T)
+          .params(
+            response: Faraday::Response,
+            block: T.proc.params(body: T.untyped).returns(T.type_parameter(:T)),
+          )
+          .returns(T.any(T.type_parameter(:T), LunchMoney::Errors))
+      end
+      def handle_api_response(response, &block)
+        api_errors = errors(response)
+        return api_errors if api_errors.present?
+
+        yield(response.body)
+      end
     end
   end
 end
