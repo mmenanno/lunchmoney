@@ -19,6 +19,20 @@ module LunchMoney
 
         "This is the old endpoint"
       end
+
+      sig { returns(String) }
+      def old_endpoint_error_level
+        deprecate_endpoint(level: :error)
+
+        "This is the old endpoint with error level"
+      end
+
+      sig { returns(String) }
+      def old_endpoint_info_level
+        deprecate_endpoint(level: :info)
+
+        "This is the old endpoint with info level"
+      end
     end
   end
 end

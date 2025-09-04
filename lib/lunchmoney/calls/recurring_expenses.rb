@@ -17,7 +17,7 @@ module LunchMoney
         ).returns(T.any(T::Array[LunchMoney::Objects::RecurringExpense], LunchMoney::Errors))
       end
       def recurring_expenses(start_date: nil, end_date: nil)
-        deprecate_endpoint("recurring_items")
+        deprecate_endpoint("recurring_items", level: :warning)
         params = clean_params({ start_date:, end_date: })
         response = get("recurring_expenses", query_params: params)
 
