@@ -1,0 +1,52 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://dev.lunchmoney.app/v1/recurring_items?end_date=2024-12-31&start_date=2024-01-01
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v2.13.4
+      Authorization:
+      - Bearer <BEARER_TOKEN>
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Content-Length:
+      - '1003'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 04 Sep 2025 00:18:48 GMT
+      Etag:
+      - W/"3eb-GkPwtOcEPvXemIqXegAazXs6EL4"
+      Nel:
+      - '{"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}'
+      Report-To:
+      - '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=%2FS8B39R4xD80gumSN7SaOF4Xnu775NjrC0t4lQhhbEU%3D\u0026sid=1b10b0ff-8a76-4548-befa-353fc6c6c045\u0026ts=1756945128"}],"max_age":3600}'
+      Reporting-Endpoints:
+      - heroku-nel="https://nel.heroku.com/reports?s=%2FS8B39R4xD80gumSN7SaOF4Xnu775NjrC0t4lQhhbEU%3D&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&ts=1756945128"
+      Server:
+      - Heroku
+      Vary:
+      - Origin, Accept-Encoding
+      Via:
+      - 1.1 heroku-router
+      X-Powered-By:
+      - Express
+    body:
+      encoding: UTF-8
+      string: '[{"id":697462,"start_date":"2023-01-01","end_date":null,"payee":"Expense
+        that Recurs","currency":"cad","created_by":7344,"created_at":"2024-01-28T15:29:58.922Z","updated_at":"2024-01-28T15:29:58.922Z","billing_date":"2024-01-01","original_name":null,"description":null,"plaid_account_id":null,"asset_id":92657,"source":"manual","amount":"250.0000","notes":null,"category_id":777049,"category_group_id":777042,"is_income":false,"exclude_from_totals":false,"cadence":"monthly","granularity":"month","quantity":1,"occurrences":{"2023-12-01":[],"2024-01-01":[],"2024-02-01":[],"2024-03-01":[],"2024-04-01":[],"2024-05-01":[],"2024-06-01":[],"2024-07-01":[],"2024-08-01":[],"2024-09-01":[],"2024-10-01":[],"2024-11-01":[],"2024-12-01":[],"2025-01-01":[]},"transactions_within_range":[],"missing_dates_within_range":["2024-01-01","2024-02-01","2024-03-01","2024-04-01","2024-05-01","2024-06-01","2024-07-01","2024-08-01","2024-09-01","2024-10-01","2024-11-01","2024-12-01"],"date":"2025-09-04","to_base":250}]'
+  recorded_at: Thu, 04 Sep 2025 00:18:48 GMT
+recorded_with: VCR 6.3.1
