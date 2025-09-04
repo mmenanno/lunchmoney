@@ -1,8 +1,12 @@
-name: Build and Publish Yard Docs
+name: Documentation
 
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'lib/**'
+      - '*.md'
+      - '.github/workflows/build_and_publish_yard_docs.yml'
   workflow_dispatch:
 
 permissions:
@@ -15,33 +19,47 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-  build:
-    name: Build and Publish Yard Docs
+  build-and-deploy:
+    name: Build & Deploy Documentation
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout
+        uses: actions/checkout@v5
 
       - name: Set up Ruby
-        uses: ruby/setup-ruby@v1.218.0
+        uses: ruby/setup-ruby@v1
         with:
-          ruby-version: head
+          ruby-version: '3.4'
           bundler-cache: true
 
-      - name: Install YARD
-        run: gem install yard yard-sorbet
+      - name: Cache YARD documentation
+        uses: actions/cache@v4
+        with:
+          path: |
+            .yardoc
+            doc
+          key: yard-${{ hashFiles('lib/**/*.rb', 'Gemfile.lock') }}
+          restore-keys: yard-
 
-      - name: Generate docs
-        run: yard doc -o doc
+      - name: Generate documentation
+        run: |
+          # Use YARD from Gemfile if available, otherwise install
+          if bundle exec yard --version >/dev/null 2>&1; then
+            bundle exec yard doc -o doc --markup markdown
+          else
+            gem install yard yard-sorbet
+            yard doc -o doc --markup markdown
+          fi
 
       - name: Setup Github Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload Artifact
+      - name: Upload documentation artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: "doc"
 
-      - name: Publish to Github Pages
+      - name: Deploy to Github Pages
         id: deployment
         uses: actions/deploy-pages@v4

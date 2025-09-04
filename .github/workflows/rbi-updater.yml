@@ -2,38 +2,59 @@ name: RBI Updater
 on:
   workflow_call:
 
+permissions:
+  contents: write
+
 jobs:
   update-rbis:
+    name: Update RBI Files
     runs-on: ubuntu-latest
 
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v5
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           token: ${{ secrets.LUNCHMONEY_PAT_TOKEN }}
           fetch-depth: 0
-      -
-        name: Setup Ruby
+
+      - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-      -
-        name: Update RBIs
+          ruby-version: '3.4'
+
+      - name: Cache RBI files
+        uses: actions/cache@v4
+        with:
+          path: sorbet/rbi
+          key: rbi-${{ hashFiles('Gemfile.lock') }}
+          restore-keys: rbi-
+
+      - name: Update RBIs
         run: bin/toys rbi all_types
-      -
-        name: Commit RBIs
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet sorbet/; then
+            echo "no_changes=true" >> $GITHUB_OUTPUT
+            echo "No RBI changes detected"
+          else
+            echo "RBI changes detected"
+            git diff --name-only sorbet/
+          fi
+
+      - name: Commit RBIs
+        if: steps.changes.outputs.no_changes != 'true'
         run: |
           git config --local user.name "RBI Updater"
-          git config --local user.email action@github.com
+          git config --local user.email "action@github.com"
           git add sorbet/*
-          git diff-index --cached --quiet HEAD || git commit -m "[dependabot skip] Update RBIs"
-      -
-        name: Push changes
-        uses: ad-m/github-push-action@v0.8.0
-        with:
-          github_token: ${{ secrets.LUNCHMONEY_PAT_TOKEN }}
-          branch: ${{ github.ref }}
+          git commit -m "[dependabot skip] Update RBIs"
+
+      - name: Push changes
+        if: steps.changes.outputs.no_changes != 'true'
+        run: git push
 
 

@@ -1,0 +1,119 @@
+name: Performance Monitor
+
+on:
+  workflow_run:
+    workflows: ["CI", "Check Pipeline"]
+    types: [completed]
+  schedule:
+    # Daily at midnight UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  checks: read
+
+jobs:
+  monitor:
+    name: Performance Monitoring
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install GitHub CLI
+        run: |
+          type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+          && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+          && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+          && sudo apt update \
+          && sudo apt install gh -y
+
+      - name: Analyze Workflow Performance
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "# Workflow Performance Report" > performance-report.md
+          echo "Generated on: $(date)" >> performance-report.md
+          echo "" >> performance-report.md
+
+          # Get recent workflow runs
+          echo "## Recent Workflow Runs (Last 10)" >> performance-report.md
+          gh run list --limit 10 --json databaseId,name,status,conclusion,createdAt,updatedAt,runStartedAt \
+            --template '{{range .}}{{.name}} | {{.status}} | {{.conclusion}} | {{.createdAt}} | Duration: {{if .runStartedAt}}{{timeago .runStartedAt}}{{else}}N/A{{end}}
+          {{end}}' >> performance-report.md
+
+          echo "" >> performance-report.md
+          echo "## Workflow Statistics" >> performance-report.md
+
+          # Get CI workflow statistics
+          echo "### CI Workflow Performance" >> performance-report.md
+          gh run list --workflow=ci.yml --limit 50 --json conclusion,createdAt,updatedAt \
+            --jq '[.[] | select(.conclusion == "success")] | length' | \
+            xargs -I {} echo "✅ Successful runs (last 50): {}" >> performance-report.md
+
+          gh run list --workflow=ci.yml --limit 50 --json conclusion,createdAt,updatedAt \
+            --jq '[.[] | select(.conclusion == "failure")] | length' | \
+            xargs -I {} echo "❌ Failed runs (last 50): {}" >> performance-report.md
+
+          # Display the report
+          echo "Performance report generated:"
+          cat performance-report.md
+
+      - name: Check for Long Running Workflows
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Checking for workflows running longer than 30 minutes..."
+
+          # Get currently running workflows
+          LONG_RUNNING=$(gh run list --status in_progress --json databaseId,name,createdAt,runStartedAt \
+            --jq '.[] | select((.runStartedAt | fromdateiso8601) < (now - 1800)) | .name + " (ID: " + (.databaseId | tostring) + ")"')
+
+          if [ -n "$LONG_RUNNING" ]; then
+            echo "⚠️  Long running workflows detected:"
+            echo "$LONG_RUNNING"
+          else
+            echo "✅ No long running workflows detected"
+          fi
+
+      - name: Workflow Health Check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "## Workflow Health Summary" >> performance-report.md
+
+          # Check failure rate for main workflows
+          for workflow in "ci.yml" "check_pipeline.yml" "release_pipeline.yml"; do
+            echo "### $workflow" >> performance-report.md
+
+            TOTAL=$(gh run list --workflow="$workflow" --limit 20 --json conclusion | jq length)
+            SUCCESS=$(gh run list --workflow="$workflow" --limit 20 --json conclusion \
+              --jq '[.[] | select(.conclusion == "success")] | length')
+
+            if [ "$TOTAL" -gt 0 ]; then
+              SUCCESS_RATE=$(echo "scale=2; $SUCCESS * 100 / $TOTAL" | bc -l 2>/dev/null || echo "N/A")
+              echo "- Success rate (last 20 runs): ${SUCCESS_RATE}%" >> performance-report.md
+              echo "- Total runs analyzed: $TOTAL" >> performance-report.md
+            else
+              echo "- No recent runs found" >> performance-report.md
+            fi
+            echo "" >> performance-report.md
+          done
+
+          echo "Health check completed"
+
+      - name: Upload Performance Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-report-${{ github.run_number }}
+          path: performance-report.md
+          retention-days: 30

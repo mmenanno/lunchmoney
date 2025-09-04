@@ -6,11 +6,17 @@ on:
         tags:
             - v*
 
+permissions:
+  contents: write
+  id-token: write
+  checks: read
+
 jobs:
     ci:
-        name: "CI"
+        name: Continuous Integration
         uses: ./.github/workflows/ci.yml
         secrets: inherit
+
     release:
         needs: ci
         if: always() && !contains(needs.*.result, 'failed') && !contains(needs.*.result, 'cancelled')
@@ -23,14 +29,14 @@ jobs:
             id-token: write
 
         steps:
-            # Set up
-            - uses: actions/checkout@v5
+            - name: Checkout
+              uses: actions/checkout@v5
+
             - name: Set up Ruby
               uses: ruby/setup-ruby@v1
               with:
                 bundler-cache: true
-                ruby-version: ruby
+                ruby-version: '3.4'
 
-            # Release
             - name: Publish to RubyGems
               uses: rubygems/release-gem@v1

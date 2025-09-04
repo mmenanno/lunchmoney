@@ -1,0 +1,65 @@
+name: Security Audit
+
+on:
+  schedule:
+    # Weekly on Monday at 6 AM UTC
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+  push:
+    paths:
+      - 'Gemfile*'
+      - '.github/workflows/security-audit.yml'
+
+permissions:
+  contents: read
+  security-events: write
+  issues: write
+
+jobs:
+  audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Install bundle-audit
+        run: |
+          gem install bundle-audit
+          bundle-audit update
+
+      - name: Run bundle-audit
+        run: bundle-audit check --update --verbose
+
+      - name: Run bundler-leak_check
+        run: |
+          gem install bundler-leak_check
+          bundler-leak_check
+
+      - name: Check for known vulnerabilities in dependencies
+        continue-on-error: true
+        run: |
+          # Additional security checks can be added here
+          echo "Security audit completed"
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: moderate
+          allow-licenses: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC

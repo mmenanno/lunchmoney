@@ -7,56 +7,100 @@ on:
     # Every day at 9pm
     - cron: '0 21 * * *'
 
+permissions:
+  contents: read
+  checks: write
+
 jobs:
-  validate:
-    name: Validate code
+  lint:
+    name: Code Quality & Linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          ruby-version: '3.4'
+
+      - name: Cache RBI files
+        uses: actions/cache@v4
+        with:
+          path: sorbet/rbi
+          key: rbi-${{ hashFiles('Gemfile.lock') }}
+          restore-keys: rbi-
+
+      - name: Check for newer VCR version
+        run: bin/toys check-vcr-version
+
+      - name: RuboCop
+        run: bin/rubocop
+
+      - name: Typecheck
+        run: bin/srb tc
+
+      - name: Check for Updatable Sigils
+        run: |
+          bin/spoom bump --from false --to true --dry
+          bin/spoom bump --from true --to strict --dry
+
+      - name: Check for DSL rbi updates
+        run: bin/tapioca dsl --verify
+
+      - name: Markdown Lint
+        run: bin/toys mdl
+
+  test:
+    name: Test Suite
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        ruby-version: [3.2, 3.3, 3.4, head]
-    continue-on-error: ${{ endsWith(matrix.ruby-version, 'head') }}
+        ruby-version: [3.2, 3.3, 3.4]
+        include:
+          - ruby-version: head
+            experimental: true
+      fail-fast: false
+
+    continue-on-error: ${{ matrix.experimental == true }}
 
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v5
-      -
-        name: Setup Ruby
+
+      - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
           ruby-version: ${{ matrix.ruby-version }}
-      -
-        name: Check for newer VCR version
-        run: bin/toys check-vcr-version
-      -
-        name: RuboCop
-        run: bin/rubocop
-      -
-        name: Typecheck
-        run: bin/srb tc
-      -
-        name: Check for Updatable Sigils
-        run: |
-            bin/spoom bump --from false --to true --dry
-            bin/spoom bump --from true --to strict --dry
-      -
-        name: Check for DSL rbi updates
-        run: bin/tapioca dsl --verify
-      -
-        name: Markdown Lint
-        run: bin/toys mdl
-      -
-        name: Run Tests (Using Cassettes)
-        if: ${{ ! endsWith(matrix.ruby-version, '3.4') }}
+
+      - name: Cache test fixtures
+        uses: actions/cache@v4
+        with:
+          path: test/cassettes
+          key: vcr-cassettes-${{ hashFiles('test/cassettes/**/*.yml') }}
+          restore-keys: vcr-cassettes-
+
+      - name: Run Tests (Using Cassettes)
+        if: matrix.ruby-version != '3.4'
         run: bin/toys test
-      -
-        name: Run Tests (With Remote Calls & Coverage Report)
-        if: ${{ endsWith(matrix.ruby-version, '3.4') }}
+
+      - name: Run Tests (With Remote Calls & Coverage Report)
+        if: matrix.ruby-version == '3.4'
         continue-on-error: true
         env:
           REMOTE_TESTS_ENABLED: ${{ vars.REMOTE_TESTS_ENABLED }}
           LUNCHMONEY_TOKEN: ${{ secrets.LUNCHMONEY_TOKEN }}
         run: bin/toys test
+
+      - name: Upload Coverage Report
+        if: matrix.ruby-version == '3.4'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 7
 
