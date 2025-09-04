@@ -59,13 +59,18 @@ jobs:
 
     strategy:
       matrix:
-        ruby-version: [3.2, 3.3, 3.4]
         include:
-          - ruby-version: head
+          - ruby-version: '3.2'
+            experimental: false
+          - ruby-version: '3.3'
+            experimental: false
+          - ruby-version: '3.4'
+            experimental: false
+          - ruby-version: 'head'
             experimental: true
       fail-fast: false
 
-    continue-on-error: ${{ matrix.experimental == true }}
+    continue-on-error: ${{ matrix.experimental }}
 
     steps:
       - name: Checkout
