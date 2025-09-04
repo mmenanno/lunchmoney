@@ -38,17 +38,6 @@ jobs:
       - name: Run bundle-audit
         run: bundle-audit check --update --verbose
 
-      - name: Check for known vulnerabilities
-        run: |
-          # Additional security checks
-          echo "Security audit with bundle-audit completed successfully"
-
-      - name: Check for known vulnerabilities in dependencies
-        continue-on-error: true
-        run: |
-          # Additional security checks can be added here
-          echo "Security audit completed"
-
   dependency-review:
     name: Dependency Review
     runs-on: ubuntu-latest
