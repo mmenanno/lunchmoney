@@ -10,15 +10,19 @@ on:
     tags-ignore:
         - v*
 
+permissions:
+  contents: write
+  checks: write
+
 jobs:
   update-rbis:
-    name: RBI Updater
+    name: Update RBIs
     uses: ./.github/workflows/rbi-updater.yml
     secrets: inherit
 
   ci:
     needs: update-rbis
     if: always() && contains(needs.*.result, 'success')
-    name: "CI"
+    name: CI
     uses: ./.github/workflows/ci.yml
     secrets: inherit
