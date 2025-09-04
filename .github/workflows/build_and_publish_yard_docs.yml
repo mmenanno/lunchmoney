@@ -20,7 +20,7 @@ concurrency:
 
 jobs:
   build-and-deploy:
-    name: Build & Deploy Documentation
+    name: Build & Deploy Docs
     runs-on: ubuntu-latest
 
     steps:

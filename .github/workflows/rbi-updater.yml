@@ -7,7 +7,7 @@ permissions:
 
 jobs:
   update-rbis:
-    name: Update RBI Files
+    name: Update RBIs
     runs-on: ubuntu-latest
 
     steps:

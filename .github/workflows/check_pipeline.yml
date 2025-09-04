@@ -16,13 +16,13 @@ permissions:
 
 jobs:
   update-rbis:
-    name: Update RBI Files
+    name: Update RBIs
     uses: ./.github/workflows/rbi-updater.yml
     secrets: inherit
 
   ci:
     needs: update-rbis
     if: always() && contains(needs.*.result, 'success')
-    name: Continuous Integration
+    name: CI
     uses: ./.github/workflows/ci.yml
     secrets: inherit

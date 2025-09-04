@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   lint:
-    name: Code Quality & Linting
+    name: Lint
     runs-on: ubuntu-latest
 
     steps:
@@ -54,7 +54,7 @@ jobs:
         run: bin/toys mdl
 
   test:
-    name: Test Suite
+    name: Test
     runs-on: ubuntu-latest
 
     strategy:

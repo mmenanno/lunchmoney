@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   monitor:
-    name: Performance Monitoring
+    name: Monitor
     runs-on: ubuntu-latest
 
     steps:
