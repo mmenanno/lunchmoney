@@ -124,7 +124,7 @@ module LunchMoney
 
       sig { params(params: T::Hash[Symbol, T.untyped]).returns(T::Hash[Symbol, T.untyped]) }
       def clean_params(params)
-        params.reject! { |_key, value| value.nil? }
+        params.reject { |_key, value| value.nil? }
       end
 
       sig do
