@@ -5021,8 +5021,13 @@ class RuboCop::Cop::Rails::FindByOrAssignmentMemoization < ::RuboCop::Cop::Base
   # source://rubocop-rails//lib/rubocop/cop/rails/find_by_or_assignment_memoization.rb#58
   def on_def(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/find_by_or_assignment_memoization.rb#73
+  # source://rubocop-rails//lib/rubocop/cop/rails/find_by_or_assignment_memoization.rb#75
   def on_send(node); end
+
+  private
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/find_by_or_assignment_memoization.rb#97
+  def correct_to_regular_method_definition(corrector, node); end
 end
 
 # source://rubocop-rails//lib/rubocop/cop/rails/find_by_or_assignment_memoization.rb#46
@@ -11374,6 +11379,10 @@ class RuboCop::Cop::Style::ArrayFirstLast < ::RuboCop::Cop::Base
 end
 
 class RuboCop::Cop::Style::ArrayIntersect < ::RuboCop::Cop::Base
+  include ::RuboCop::Rails::MigrationFileSkippable
+end
+
+class RuboCop::Cop::Style::ArrayIntersectWithSingleElement < ::RuboCop::Cop::Base
   include ::RuboCop::Rails::MigrationFileSkippable
 end
 
