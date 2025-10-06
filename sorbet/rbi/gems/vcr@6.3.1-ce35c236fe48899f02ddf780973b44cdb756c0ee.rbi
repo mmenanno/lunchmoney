@@ -206,10 +206,10 @@ module VCR
   # @raise [VCR::Errors::CassetteInUseError] if there is currently a cassette in use
   # @raise [ArgumentError] if you pass an invalid option
   # @return [void]
-  # @see #turned_on
   # @see #turn_off!
   # @see #turn_on!
   # @see #turned_on?
+  # @see #turned_on
   #
   # source://vcr//lib/vcr.rb#270
   def turned_off(options = T.unsafe(nil)); end
