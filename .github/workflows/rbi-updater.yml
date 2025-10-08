@@ -23,14 +23,6 @@ jobs:
         with:
           bundler-cache: true
           ruby-version: '3.4'
-
-      - name: Cache RBI files
-        uses: actions/cache@v4
-        with:
-          path: sorbet/rbi
-          key: rbi-${{ hashFiles('Gemfile.lock') }}
-          restore-keys: rbi-
-
       - name: Update RBIs
         run: bin/toys rbi all_types
 
