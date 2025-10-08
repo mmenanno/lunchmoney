@@ -770,137 +770,122 @@ end
 
 # source://minitest//lib/minitest/spec.rb#41
 class Minitest::Expectation < ::Struct
-  # source://minitest//lib/minitest/spec.rb#41
   def ctx; end
-
-  # source://minitest//lib/minitest/spec.rb#41
   def ctx=(_); end
 
-  # source://minitest//lib/minitest/expectations.rb#116
+  # source://minitest//lib/minitest/spec.rb#25
   def must_be(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#47
+  # source://minitest//lib/minitest/spec.rb#25
   def must_be_close_to(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#29
+  # source://minitest//lib/minitest/spec.rb#25
   def must_be_empty(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#76
+  # source://minitest//lib/minitest/spec.rb#25
   def must_be_instance_of(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#85
+  # source://minitest//lib/minitest/spec.rb#25
   def must_be_kind_of(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#103
+  # source://minitest//lib/minitest/spec.rb#25
   def must_be_nil(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#161
+  # source://minitest//lib/minitest/spec.rb#25
   def must_be_same_as(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#170
+  # source://minitest//lib/minitest/spec.rb#25
   def must_be_silent(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#49
+  # source://minitest//lib/minitest/spec.rb#25
   def must_be_within_delta(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#58
+  # source://minitest//lib/minitest/spec.rb#25
   def must_be_within_epsilon(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#38
+  # source://minitest//lib/minitest/spec.rb#25
   def must_equal(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#67
+  # source://minitest//lib/minitest/spec.rb#25
   def must_include(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#94
+  # source://minitest//lib/minitest/spec.rb#25
   def must_match(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#125
+  # source://minitest//lib/minitest/spec.rb#25
   def must_output(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#134
+  # source://minitest//lib/minitest/spec.rb#25
   def must_pattern_match(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#143
+  # source://minitest//lib/minitest/spec.rb#25
   def must_raise(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#152
+  # source://minitest//lib/minitest/spec.rb#25
   def must_respond_to(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#179
+  # source://minitest//lib/minitest/spec.rb#25
   def must_throw(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/mock.rb#269
+  # source://minitest//lib/minitest/spec.rb#25
   def must_verify(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#188
+  # source://minitest//lib/minitest/spec.rb#25
   def path_must_exist(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#197
+  # source://minitest//lib/minitest/spec.rb#25
   def path_wont_exist(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/spec.rb#41
   def target; end
-
-  # source://minitest//lib/minitest/spec.rb#41
   def target=(_); end
 
-  # source://minitest//lib/minitest/expectations.rb#293
+  # source://minitest//lib/minitest/spec.rb#25
   def wont_be(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#224
+  # source://minitest//lib/minitest/spec.rb#25
   def wont_be_close_to(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#206
+  # source://minitest//lib/minitest/spec.rb#25
   def wont_be_empty(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#253
+  # source://minitest//lib/minitest/spec.rb#25
   def wont_be_instance_of(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#262
+  # source://minitest//lib/minitest/spec.rb#25
   def wont_be_kind_of(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#280
+  # source://minitest//lib/minitest/spec.rb#25
   def wont_be_nil(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#320
+  # source://minitest//lib/minitest/spec.rb#25
   def wont_be_same_as(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#226
+  # source://minitest//lib/minitest/spec.rb#25
   def wont_be_within_delta(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#235
+  # source://minitest//lib/minitest/spec.rb#25
   def wont_be_within_epsilon(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#215
+  # source://minitest//lib/minitest/spec.rb#25
   def wont_equal(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#244
+  # source://minitest//lib/minitest/spec.rb#25
   def wont_include(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#271
+  # source://minitest//lib/minitest/spec.rb#25
   def wont_match(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#302
+  # source://minitest//lib/minitest/spec.rb#25
   def wont_pattern_match(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#311
+  # source://minitest//lib/minitest/spec.rb#25
   def wont_respond_to(*args, **_arg1); end
 
   class << self
-    # source://minitest//lib/minitest/spec.rb#41
     def [](*_arg0); end
-
-    # source://minitest//lib/minitest/spec.rb#41
     def inspect; end
-
-    # source://minitest//lib/minitest/spec.rb#41
     def keyword_init?; end
-
-    # source://minitest//lib/minitest/spec.rb#41
     def members; end
-
-    # source://minitest//lib/minitest/spec.rb#41
     def new(*_arg0); end
   end
 end
@@ -925,109 +910,109 @@ end
 #
 # source://minitest//lib/minitest/expectations.rb#20
 module Minitest::Expectations
-  # source://minitest//lib/minitest/expectations.rb#116
+  # source://minitest//lib/minitest/spec.rb#15
   def must_be(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#47
+  # source://minitest//lib/minitest/spec.rb#15
   def must_be_close_to(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#29
+  # source://minitest//lib/minitest/spec.rb#15
   def must_be_empty(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#76
+  # source://minitest//lib/minitest/spec.rb#15
   def must_be_instance_of(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#85
+  # source://minitest//lib/minitest/spec.rb#15
   def must_be_kind_of(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#103
+  # source://minitest//lib/minitest/spec.rb#15
   def must_be_nil(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#161
+  # source://minitest//lib/minitest/spec.rb#15
   def must_be_same_as(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#170
+  # source://minitest//lib/minitest/spec.rb#15
   def must_be_silent(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#49
+  # source://minitest//lib/minitest/spec.rb#15
   def must_be_within_delta(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#58
+  # source://minitest//lib/minitest/spec.rb#15
   def must_be_within_epsilon(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#38
+  # source://minitest//lib/minitest/spec.rb#15
   def must_equal(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#67
+  # source://minitest//lib/minitest/spec.rb#15
   def must_include(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#94
+  # source://minitest//lib/minitest/spec.rb#15
   def must_match(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#125
+  # source://minitest//lib/minitest/spec.rb#15
   def must_output(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#134
+  # source://minitest//lib/minitest/spec.rb#15
   def must_pattern_match(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#143
+  # source://minitest//lib/minitest/spec.rb#15
   def must_raise(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#152
+  # source://minitest//lib/minitest/spec.rb#15
   def must_respond_to(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#179
+  # source://minitest//lib/minitest/spec.rb#15
   def must_throw(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/mock.rb#269
+  # source://minitest//lib/minitest/spec.rb#15
   def must_verify(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#188
+  # source://minitest//lib/minitest/spec.rb#15
   def path_must_exist(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#197
+  # source://minitest//lib/minitest/spec.rb#15
   def path_wont_exist(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#293
+  # source://minitest//lib/minitest/spec.rb#15
   def wont_be(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#224
+  # source://minitest//lib/minitest/spec.rb#15
   def wont_be_close_to(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#206
+  # source://minitest//lib/minitest/spec.rb#15
   def wont_be_empty(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#253
+  # source://minitest//lib/minitest/spec.rb#15
   def wont_be_instance_of(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#262
+  # source://minitest//lib/minitest/spec.rb#15
   def wont_be_kind_of(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#280
+  # source://minitest//lib/minitest/spec.rb#15
   def wont_be_nil(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#320
+  # source://minitest//lib/minitest/spec.rb#15
   def wont_be_same_as(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#226
+  # source://minitest//lib/minitest/spec.rb#15
   def wont_be_within_delta(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#235
+  # source://minitest//lib/minitest/spec.rb#15
   def wont_be_within_epsilon(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#215
+  # source://minitest//lib/minitest/spec.rb#15
   def wont_equal(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#244
+  # source://minitest//lib/minitest/spec.rb#15
   def wont_include(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#271
+  # source://minitest//lib/minitest/spec.rb#15
   def wont_match(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#302
+  # source://minitest//lib/minitest/spec.rb#15
   def wont_pattern_match(*args, **_arg1); end
 
-  # source://minitest//lib/minitest/expectations.rb#311
+  # source://minitest//lib/minitest/spec.rb#15
   def wont_respond_to(*args, **_arg1); end
 end
 
@@ -1107,7 +1092,6 @@ class Minitest::Mock
   # source://minitest//lib/minitest/mock.rb#125
   def __call(name, data); end
 
-  # source://minitest//lib/minitest/mock.rb#11
   def __respond_to?(*_arg0); end
 
   # source://minitest//lib/minitest/mock.rb#34
@@ -1308,7 +1292,7 @@ end
 # source://minitest//lib/minitest.rb#592
 Minitest::Reportable::BASE_DIR = T.let(T.unsafe(nil), String)
 
-# source://minitest//lib/minitest.rb#735
+# source://minitest//lib/minitest.rb#733
 class Minitest::Reporter < ::Minitest::AbstractReporter
   # @return [Reporter] a new instance of Reporter
   #
@@ -1680,7 +1664,7 @@ module Minitest::Spec::DSL
   # Hint: If you _do_ want inheritance, use minitest/test. You can mix
   # and match between assertions and expectations as much as you want.
   #
-  # source://minitest//lib/minitest/spec.rb#293
+  # source://minitest//lib/minitest/spec.rb#224
   def specify(desc = T.unsafe(nil), &block); end
 
   # Another lazy man's accessor generator. Made even more lazy by
@@ -1754,7 +1738,7 @@ module Minitest::Spec::DSL::InstanceMethods
   #     value(1 + 1).must_equal 2
   #    expect(1 + 1).must_equal 2
   #
-  # source://minitest//lib/minitest/spec.rb#328
+  # source://minitest//lib/minitest/spec.rb#323
   def expect(value = T.unsafe(nil), &block); end
 
   # Takes a value or a block and returns a value monad that has
@@ -1780,7 +1764,7 @@ module Minitest::Spec::DSL::InstanceMethods
   #     value(1 + 1).must_equal 2
   #    expect(1 + 1).must_equal 2
   #
-  # source://minitest//lib/minitest/spec.rb#327
+  # source://minitest//lib/minitest/spec.rb#323
   def value(value = T.unsafe(nil), &block); end
 end
 

@@ -13,7 +13,7 @@ module Addressable; end
 # source://addressable//lib/addressable/idna/pure.rb#21
 module Addressable::IDNA
   class << self
-    # source://addressable//lib/addressable/idna/pure.rb#122
+    # source://addressable//lib/addressable/idna/pure.rb#117
     def _deprecated_unicode_normalize_kc(value); end
 
     # Converts from a Unicode internationalized domain name to an ASCII
@@ -29,8 +29,6 @@ module Addressable::IDNA
     def to_unicode(input); end
 
     # @deprecated Use {String#unicode_normalize(:nfkc)} instead
-    #
-    # source://addressable//lib/addressable/idna/pure.rb#117
     def unicode_normalize_kc(*args, **_arg1, &block); end
 
     private
@@ -202,7 +200,7 @@ class Addressable::Template
   #   otherwise.
   # @see #==
   #
-  # source://addressable//lib/addressable/template.rb#283
+  # source://addressable//lib/addressable/template.rb#274
   def eql?(template); end
 
   # Expands a URI template into a full URI.
@@ -337,7 +335,7 @@ class Addressable::Template
   #
   # @return [Array] The variables present in the template's pattern.
   #
-  # source://addressable//lib/addressable/template.rb#610
+  # source://addressable//lib/addressable/template.rb#607
   def keys; end
 
   # Extracts match data from the URI using a URI Template pattern.
@@ -418,7 +416,7 @@ class Addressable::Template
   #
   # @return [Array] The variables present in the template's pattern.
   #
-  # source://addressable//lib/addressable/template.rb#611
+  # source://addressable//lib/addressable/template.rb#607
   def names; end
 
   # Expands a URI template into another URI template.
@@ -656,7 +654,7 @@ class Addressable::Template::MatchData
   #   Note that this list will include nils for any variables which
   #   were in the Template, but did not appear in the URI.
   #
-  # source://addressable//lib/addressable/template.rb#149
+  # source://addressable//lib/addressable/template.rb#143
   def captures; end
 
   # Returns a <tt>String</tt> representation of the MatchData's state.
@@ -670,7 +668,7 @@ class Addressable::Template::MatchData
   #   Note that this list will include variables which do not appear
   #   in the mapping because they were not present in URI.
   #
-  # source://addressable//lib/addressable/template.rb#135
+  # source://addressable//lib/addressable/template.rb#132
   def keys; end
 
   # @return [Hash] The mapping that resulted from the match.
@@ -685,14 +683,14 @@ class Addressable::Template::MatchData
   #   Note that this list will include variables which do not appear
   #   in the mapping because they were not present in URI.
   #
-  # source://addressable//lib/addressable/template.rb#136
+  # source://addressable//lib/addressable/template.rb#132
   def names; end
 
   # Dummy method for code expecting a ::MatchData instance
   #
   # @return [String] An empty string.
   #
-  # source://addressable//lib/addressable/template.rb#225
+  # source://addressable//lib/addressable/template.rb#222
   def post_match; end
 
   # Dummy method for code expecting a ::MatchData instance
@@ -704,7 +702,7 @@ class Addressable::Template::MatchData
 
   # @return [String] The matched URI as String.
   #
-  # source://addressable//lib/addressable/template.rb#194
+  # source://addressable//lib/addressable/template.rb#191
   def string; end
 
   # @return [Addressable::Template] The Template used for the match.
@@ -801,7 +799,7 @@ class Addressable::URI
   # @param The [String, Addressable::URI, #to_str] URI to join with.
   # @return [Addressable::URI] The joined URI.
   #
-  # source://addressable//lib/addressable/uri.rb#1982
+  # source://addressable//lib/addressable/uri.rb#1889
   def +(uri); end
 
   # Returns <code>true</code> if the URI objects are equal. This method
@@ -1405,7 +1403,7 @@ class Addressable::URI
   #
   # @return [String] The URI's <code>String</code> representation.
   #
-  # source://addressable//lib/addressable/uri.rb#2361
+  # source://addressable//lib/addressable/uri.rb#2341
   def to_str; end
 
   # The user component for this URI.
@@ -1573,7 +1571,7 @@ class Addressable::URI
     #   The return type is determined by the <code>return_type</code>
     #   parameter.
     #
-    # source://addressable//lib/addressable/uri.rb#651
+    # source://addressable//lib/addressable/uri.rb#616
     def escape(uri, return_type = T.unsafe(nil)); end
 
     # Percent encodes a URI component.
@@ -1606,7 +1604,7 @@ class Addressable::URI
     #   <code>character_class</code>.
     # @return [String] The encoded component.
     #
-    # source://addressable//lib/addressable/uri.rb#446
+    # source://addressable//lib/addressable/uri.rb#403
     def escape_component(component, character_class = T.unsafe(nil), upcase_encoded = T.unsafe(nil)); end
 
     # Encodes a set of key/value pairs according to the rules for the
@@ -1782,7 +1780,7 @@ class Addressable::URI
     #   The return type is determined by the <code>return_type</code>
     #   parameter.
     #
-    # source://addressable//lib/addressable/uri.rb#502
+    # source://addressable//lib/addressable/uri.rb#472
     def unencode_component(uri, return_type = T.unsafe(nil), leave_encoded = T.unsafe(nil)); end
 
     # Unencodes any percent encoded characters within a URI component.
@@ -1801,7 +1799,7 @@ class Addressable::URI
     #   The return type is determined by the <code>return_type</code>
     #   parameter.
     #
-    # source://addressable//lib/addressable/uri.rb#501
+    # source://addressable//lib/addressable/uri.rb#472
     def unescape(uri, return_type = T.unsafe(nil), leave_encoded = T.unsafe(nil)); end
 
     # Unencodes any percent encoded characters within a URI component.
@@ -1820,7 +1818,7 @@ class Addressable::URI
     #   The return type is determined by the <code>return_type</code>
     #   parameter.
     #
-    # source://addressable//lib/addressable/uri.rb#503
+    # source://addressable//lib/addressable/uri.rb#472
     def unescape_component(uri, return_type = T.unsafe(nil), leave_encoded = T.unsafe(nil)); end
   end
 end

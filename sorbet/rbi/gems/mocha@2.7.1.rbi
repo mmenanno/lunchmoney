@@ -465,7 +465,7 @@ end
 module Mocha::ClassMethods
   # @private
   #
-  # source://mocha//lib/mocha/class_methods.rb#60
+  # source://mocha//lib/mocha/class_methods.rb#54
   def __method_exists__?(method, include_public_methods = T.unsafe(nil)); end
 
   # @private
@@ -1175,6 +1175,10 @@ class Mocha::Expectation
 
   # Modifies expectation so that when the expected method is called, it raises the specified +exception+ with the specified +message+ i.e. calls +Kernel#raise(exception, message)+.
   #
+  # @example Raise specified exception if expected method is invoked.
+  #   object = stub()
+  #   object.stubs(:expected_method).raises(Exception, 'message')
+  #   object.expected_method # => raises exception of class Exception and with message 'message'
   # @example Raise custom exception with extra constructor parameters by passing in an instance of the exception.
   #   object = stub()
   #   object.stubs(:expected_method).raises(MyException.new('message', 1, 2, 3))
@@ -1184,10 +1188,6 @@ class Mocha::Expectation
   #   object.stubs(:expected_method).raises(Exception1).then.raises(Exception2)
   #   object.expected_method # => raises exception of class Exception1
   #   object.expected_method # => raises exception of class Exception2
-  # @example Raise specified exception if expected method is invoked.
-  #   object = stub()
-  #   object.stubs(:expected_method).raises(Exception, 'message')
-  #   object.expected_method # => raises exception of class Exception and with message 'message'
   # @example Raise an exception on first invocation of expected method and then return values on subsequent invocations.
   #   object = stub()
   #   object.stubs(:expected_method).raises(Exception).then.returns(2, 3)
@@ -1276,14 +1276,14 @@ class Mocha::Expectation
 
   # Modifies expectation so that when the expected method is called, it throws the specified +tag+ with the specific return value +object+ i.e. calls +Kernel#throw(tag, object)+.
   #
-  # @example Throw tag with return value +object+ c.f. +Kernel#throw+.
-  #   object = stub()
-  #   object.stubs(:expected_method).throws(:done, 'result')
-  #   object.expected_method # => throws tag :done and causes catch block to return 'result'
   # @example Throw tag when expected method is invoked.
   #   object = stub()
   #   object.stubs(:expected_method).throws(:done)
   #   object.expected_method # => throws tag :done
+  # @example Throw tag with return value +object+ c.f. +Kernel#throw+.
+  #   object = stub()
+  #   object.stubs(:expected_method).throws(:done, 'result')
+  #   object.expected_method # => throws tag :done and causes catch block to return 'result'
   # @example Throw different tags on consecutive invocations of the expected method.
   #   object = stub()
   #   object.stubs(:expected_method).throws(:done).then.throws(:continue)
@@ -2048,7 +2048,7 @@ class Mocha::Mock
   # @overload expects
   # @return [Expectation] last-built expectation which can be further modified by methods on {Expectation}.
   #
-  # source://mocha//lib/mocha/mock.rb#293
+  # source://mocha//lib/mocha/mock.rb#114
   def __expects__(method_name_or_hash, backtrace = T.unsafe(nil)); end
 
   # @private
@@ -2056,7 +2056,6 @@ class Mocha::Mock
   # source://mocha//lib/mocha/mock.rb#363
   def __expire__(origin); end
 
-  # source://mocha//lib/mocha/mock.rb#297
   def __singleton_class__; end
 
   # Adds an expectation that the specified method may be called any number of times with any parameters.
@@ -2080,7 +2079,7 @@ class Mocha::Mock
   # @overload stubs
   # @return [Expectation] last-built expectation which can be further modified by methods on {Expectation}.
   #
-  # source://mocha//lib/mocha/mock.rb#295
+  # source://mocha//lib/mocha/mock.rb#153
   def __stubs__(method_name_or_hash, backtrace = T.unsafe(nil)); end
 
   # @private
@@ -2208,7 +2207,7 @@ class Mocha::Mock
   # @return [Mock] the same {Mock} instance, thereby allowing invocations of other {Mock} methods to be chained.
   # @see #responds_like_instance_of
   #
-  # source://mocha//lib/mocha/mock.rb#299
+  # source://mocha//lib/mocha/mock.rb#241
   def quacks_like(responder); end
 
   # Constrains the {Mock} instance so that it can only expect or stub methods to which an instance of the +responder_class+ responds publicly. The constraint is only applied at method invocation time. Note that the responder instance is instantiated using +Class#allocate+.
@@ -2239,7 +2238,7 @@ class Mocha::Mock
   # @return [Mock] the same {Mock} instance, thereby allowing invocations of other {Mock} methods to be chained.
   # @see #responds_like
   #
-  # source://mocha//lib/mocha/mock.rb#300
+  # source://mocha//lib/mocha/mock.rb#274
   def quacks_like_instance_of(responder_class); end
 
   # Constrains the {Mock} instance so that it can only expect or stub methods to which +responder+ responds publicly. The constraint is only applied at method invocation time.
@@ -2526,8 +2525,6 @@ class Mocha::NotInitializedError < ::Mocha::ErrorWithFilteredBacktrace; end
 # source://mocha//lib/mocha/object_methods.rb#10
 module Mocha::ObjectMethods
   # @private
-  #
-  # source://mocha//lib/mocha/object_methods.rb#12
   def _method(_arg0); end
 
   # Adds an expectation that the specified method must be called exactly once with any parameters.
@@ -3668,7 +3665,7 @@ end
 Mocha::RUBY_V27_PLUS = T.let(T.unsafe(nil), TrueClass)
 
 # source://mocha//lib/mocha/ruby_version.rb#3
-Mocha::RUBY_V34_PLUS = T.let(T.unsafe(nil), TrueClass)
+Mocha::RUBY_V34_PLUS = T.let(T.unsafe(nil), FalseClass)
 
 # source://mocha//lib/mocha/raised_exception.rb#2
 class Mocha::RaisedException
@@ -3875,7 +3872,6 @@ class Mocha::StubbedMethod
   # source://mocha//lib/mocha/stubbed_method.rb#10
   def initialize(stubbee, method_name); end
 
-  # source://mocha//lib/mocha/stubbed_method.rb#62
   def ==(_arg0); end
 
   # source://mocha//lib/mocha/stubbed_method.rb#43
@@ -3990,11 +3986,6 @@ class Object < ::BasicObject
   include ::Mocha::ParameterMatchers::InstanceMethods
   include ::Mocha::Inspect::ObjectMethods
   include ::Mocha::ObjectMethods
-
-  # :stopdoc:
-  #
-  # source://mocha//lib/mocha/is_a.rb#4
-  def __is_a__(_arg0); end
 end
 
 # source://mocha//lib/mocha/inspect.rb#64
