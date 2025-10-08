@@ -77,14 +77,14 @@ class AST::Node
   #
   # @return [AST::Node]
   #
-  # source://ast//lib/ast/node.rb#172
+  # source://ast//lib/ast/node.rb#168
   def +(array); end
 
   # Appends `element` to `children` and returns the resulting node.
   #
   # @return [AST::Node]
   #
-  # source://ast//lib/ast/node.rb#181
+  # source://ast//lib/ast/node.rb#177
   def <<(element); end
 
   # Compares `self` to `other`, possibly converting with `to_ast`. Only
@@ -123,7 +123,7 @@ class AST::Node
   #
   # @return self
   #
-  # source://ast//lib/ast/node.rb#118
+  # source://ast//lib/ast/node.rb#115
   def clone; end
 
   # Concatenates `array` with `children` and returns the resulting node.
@@ -186,7 +186,7 @@ class AST::Node
   #
   # @return [Array]
   #
-  # source://ast//lib/ast/node.rb#57
+  # source://ast//lib/ast/node.rb#56
   def to_a; end
 
   # @return [AST::Node] self
@@ -199,7 +199,7 @@ class AST::Node
   # @param indent [Integer] Base indentation level.
   # @return [String]
   #
-  # source://ast//lib/ast/node.rb#204
+  # source://ast//lib/ast/node.rb#187
   def to_s(indent = T.unsafe(nil)); end
 
   # Converts `self` to a pretty-printed s-expression.
@@ -266,7 +266,6 @@ class AST::Node
 
   private
 
-  # source://ast//lib/ast/node.rb#107
   def original_dup; end
 end
 

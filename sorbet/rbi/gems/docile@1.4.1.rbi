@@ -145,7 +145,7 @@ module Docile
     #   `dsl` context object
     # @return [Object] the `dsl` context object after executing the block
     #
-    # source://docile//lib/docile.rb#51
+    # source://docile//lib/docile.rb#45
     def dsl_eval(dsl, *args, **_arg2, &block); end
 
     # Execute a block in the context of an immutable object whose methods,
@@ -178,7 +178,7 @@ module Docile
     #   `dsl` context object and successor return values
     # @return [Object] the return value of the final command in the block
     #
-    # source://docile//lib/docile.rb#133
+    # source://docile//lib/docile.rb#128
     def dsl_eval_immutable(dsl, *args, **_arg2, &block); end
 
     # Execute a block in the context of an object whose methods represent the
@@ -213,7 +213,7 @@ module Docile
     #   `dsl` context object
     # @return [Object] the return value from executing the block
     #
-    # source://docile//lib/docile.rb#94
+    # source://docile//lib/docile.rb#87
     def dsl_eval_with_block_return(dsl, *args, **_arg2, &block); end
   end
 end
@@ -300,7 +300,7 @@ module Docile::Execution
     # @param block [Proc] the block of DSL commands to be executed
     # @return [Object] the return value of the block
     #
-    # source://docile//lib/docile/execution.rb#51
+    # source://docile//lib/docile/execution.rb#19
     def exec_in_proxy_context(dsl, proxy_type, *args, **_arg3, &block); end
   end
 end

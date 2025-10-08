@@ -1028,7 +1028,7 @@ class Toys::ArgParser::UsageError
   #
   # @return [String]
   #
-  # source://toys-core//lib/toys/arg_parser.rb#82
+  # source://toys-core//lib/toys/arg_parser.rb#74
   def to_s; end
 
   # The value that was rejected.
@@ -1722,7 +1722,7 @@ class Toys::Completion::Candidate
   #
   # @return [String]
   #
-  # source://toys-core//lib/toys/completion.rb#162
+  # source://toys-core//lib/toys/completion.rb#161
   def to_s; end
 
   class << self
@@ -1804,7 +1804,7 @@ class Toys::Completion::Context
   # @param key [Symbol]
   # @return [Object]
   #
-  # source://toys-core//lib/toys/completion.rb#87
+  # source://toys-core//lib/toys/completion.rb#84
   def get(key); end
 
   # @private
@@ -2011,7 +2011,7 @@ class Toys::Context
   #
   # @return [Array<String>]
   #
-  # source://toys-core//lib/toys/context.rb#150
+  # source://toys-core//lib/toys/context.rb#147
   def __args; end
 
   # The currently running CLI.
@@ -2023,7 +2023,7 @@ class Toys::Context
   #
   # @return [Toys::CLI]
   #
-  # source://toys-core//lib/toys/context.rb#165
+  # source://toys-core//lib/toys/context.rb#162
   def __cli; end
 
   # Return the context directory for this tool. Generally, this defaults
@@ -2039,7 +2039,7 @@ class Toys::Context
   # @return [String] Context directory path
   # @return [nil] if there is no context.
   #
-  # source://toys-core//lib/toys/context.rb#184
+  # source://toys-core//lib/toys/context.rb#181
   def __context_directory; end
 
   # Exit immediately with the given status code.
@@ -2051,7 +2051,7 @@ class Toys::Context
   #   or nonzero for an error condition. Default is 0.
   # @return [void]
   #
-  # source://toys-core//lib/toys/context.rb#364
+  # source://toys-core//lib/toys/context.rb#361
   def __exit(code = T.unsafe(nil)); end
 
   # Find the given data file or directory in this tool's search path.
@@ -2065,7 +2065,7 @@ class Toys::Context
   # @return [String] Absolute path of the result
   # @return [nil] if the data was not found.
   #
-  # source://toys-core//lib/toys/context.rb#349
+  # source://toys-core//lib/toys/context.rb#346
   def __find_data(path, type: T.unsafe(nil)); end
 
   # Fetch an option or other piece of data by key.
@@ -2076,7 +2076,7 @@ class Toys::Context
   # @param key [Symbol]
   # @return [Object]
   #
-  # source://toys-core//lib/toys/context.rb#274
+  # source://toys-core//lib/toys/context.rb#270
   def __get(key); end
 
   # The logger for this execution.
@@ -2088,7 +2088,7 @@ class Toys::Context
   #
   # @return [Logger]
   #
-  # source://toys-core//lib/toys/context.rb#199
+  # source://toys-core//lib/toys/context.rb#196
   def __logger; end
 
   # The subset of the context that uses string or symbol keys. By convention,
@@ -2101,7 +2101,7 @@ class Toys::Context
   #
   # @return [Hash]
   #
-  # source://toys-core//lib/toys/context.rb#331
+  # source://toys-core//lib/toys/context.rb#326
   def __options; end
 
   # Set one or more options or other context data by key.
@@ -2113,7 +2113,7 @@ class Toys::Context
   # @overload set
   # @return [self]
   #
-  # source://toys-core//lib/toys/context.rb#313
+  # source://toys-core//lib/toys/context.rb#305
   def __set(key, value = T.unsafe(nil)); end
 
   # The full name of the tool being executed, as an array of strings.
@@ -2125,7 +2125,7 @@ class Toys::Context
   #
   # @return [Array<String>]
   #
-  # source://toys-core//lib/toys/context.rb#214
+  # source://toys-core//lib/toys/context.rb#211
   def __tool_name; end
 
   # The source of the tool being executed.
@@ -2137,7 +2137,7 @@ class Toys::Context
   #
   # @return [Toys::SourceInfo]
   #
-  # source://toys-core//lib/toys/context.rb#229
+  # source://toys-core//lib/toys/context.rb#226
   def __tool_source; end
 
   # The (possibly empty) array of errors detected during argument parsing.
@@ -2149,7 +2149,7 @@ class Toys::Context
   #
   # @return [Array<Toys::ArgParser::UsageError>]
   #
-  # source://toys-core//lib/toys/context.rb#244
+  # source://toys-core//lib/toys/context.rb#241
   def __usage_errors; end
 
   # The current verbosity setting as an integer.
@@ -2161,7 +2161,7 @@ class Toys::Context
   #
   # @return [Integer]
   #
-  # source://toys-core//lib/toys/context.rb#259
+  # source://toys-core//lib/toys/context.rb#256
   def __verbosity; end
 
   # The raw arguments passed to the tool, as an array of strings.
@@ -2239,7 +2239,7 @@ class Toys::Context
   # @param key [Symbol]
   # @return [Object]
   #
-  # source://toys-core//lib/toys/context.rb#273
+  # source://toys-core//lib/toys/context.rb#270
   def get(key); end
 
   # Include the tool name in the object inspection dump.
@@ -3625,7 +3625,7 @@ module Toys::DSL::Tool
   #   for the directives that can be called in this block.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#777
+  # source://toys-core//lib/toys/dsl/tool.rb#772
   def at_least_one_required(desc: T.unsafe(nil), long_desc: T.unsafe(nil), name: T.unsafe(nil), report_collisions: T.unsafe(nil), prepend: T.unsafe(nil), &block); end
 
   # Create a flag group of type `:at_most_one`. If a block is given, flags
@@ -3701,7 +3701,7 @@ module Toys::DSL::Tool
   #   for the directives that can be called in this block.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#733
+  # source://toys-core//lib/toys/dsl/tool.rb#728
   def at_most_one_required(desc: T.unsafe(nil), long_desc: T.unsafe(nil), name: T.unsafe(nil), report_collisions: T.unsafe(nil), prepend: T.unsafe(nil), &block); end
 
   # Set the shell completion strategy for this tool's arguments.
@@ -3994,7 +3994,7 @@ module Toys::DSL::Tool
   #   for the directives that can be called in this block.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#821
+  # source://toys-core//lib/toys/dsl/tool.rb#816
   def exactly_one_required(desc: T.unsafe(nil), long_desc: T.unsafe(nil), name: T.unsafe(nil), report_collisions: T.unsafe(nil), prepend: T.unsafe(nil), &block); end
 
   # Expand the given template in the current location.
@@ -4507,7 +4507,7 @@ module Toys::DSL::Tool
   # @param block [Proc] The run handler as a block.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1503
+  # source://toys-core//lib/toys/dsl/tool.rb#1498
   def on_run(handler = T.unsafe(nil), &block); end
 
   # Specify how to handle the given signal.
@@ -4626,7 +4626,7 @@ module Toys::DSL::Tool
   #   this block.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1165
+  # source://toys-core//lib/toys/dsl/tool.rb#1152
   def optional(key, default: T.unsafe(nil), accept: T.unsafe(nil), complete: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), add_method: T.unsafe(nil), &block); end
 
   # Add an optional positional argument to the current tool. You must
@@ -4756,7 +4756,7 @@ module Toys::DSL::Tool
   #   this block.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1244
+  # source://toys-core//lib/toys/dsl/tool.rb#1231
   def remaining(key, default: T.unsafe(nil), accept: T.unsafe(nil), complete: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), add_method: T.unsafe(nil), &block); end
 
   # Specify what should be done with unmatched positional arguments. You
@@ -4894,7 +4894,7 @@ module Toys::DSL::Tool
   #   this block.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1086
+  # source://toys-core//lib/toys/dsl/tool.rb#1073
   def required(key, accept: T.unsafe(nil), complete: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), add_method: T.unsafe(nil), &block); end
 
   # Add a required positional argument to the current tool. You must
@@ -5021,7 +5021,7 @@ module Toys::DSL::Tool
   # @param str [Toys::WrappableString, String, Array<String>]
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#552
+  # source://toys-core//lib/toys/dsl/tool.rb#546
   def short_desc(str); end
 
   # Return the current source info object.
@@ -5531,7 +5531,8 @@ class Toys::Flag
   class << self
     # Create a flag definition.
     #
-    # @param used_flags [Array<String>] An array of flags already in use.
+    # @param key [String, Symbol] The key to use to retrieve the value from
+    #   the execution context.
     # @param flags [Array<String>] The flags in OptionParser format. If empty,
     #   a flag will be inferred from the key.
     # @param accept [Object] An acceptor that validates and/or converts the
@@ -5570,8 +5571,7 @@ class Toys::Flag
     #   for a description of allowed formats. Defaults to the empty array.
     # @param display_name [String] A display name for this flag, used in help
     #   text and error messages.
-    # @param key [String, Symbol] The key to use to retrieve the value from
-    #   the execution context.
+    # @param used_flags [Array<String>] An array of flags already in use.
     #
     # source://toys-core//lib/toys/flag.rb#437
     def create(key, flags = T.unsafe(nil), used_flags: T.unsafe(nil), report_collisions: T.unsafe(nil), accept: T.unsafe(nil), handler: T.unsafe(nil), default: T.unsafe(nil), complete_flags: T.unsafe(nil), complete_values: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), group: T.unsafe(nil)); end
@@ -6719,7 +6719,7 @@ class Toys::Middleware::Spec
   # @param other [Object]
   # @return [Boolean]
   #
-  # source://toys-core//lib/toys/middleware.rb#260
+  # source://toys-core//lib/toys/middleware.rb#252
   def eql?(other); end
 
   # Return the hash code
@@ -6820,7 +6820,7 @@ class Toys::Middleware::Stack
   # @param other [Object]
   # @return [Boolean]
   #
-  # source://toys-core//lib/toys/middleware.rb#365
+  # source://toys-core//lib/toys/middleware.rb#359
   def eql?(other); end
 
   # Return the hash code
@@ -8076,7 +8076,7 @@ class Toys::SourceInfo
   #
   # @return [String]
   #
-  # source://toys-core//lib/toys/source_info.rb#152
+  # source://toys-core//lib/toys/source_info.rb#151
   def to_s; end
 
   private
@@ -8272,7 +8272,7 @@ module Toys::Template::ClassMethods
   # @param block [Proc] The expansion of this template.
   # @return [self]
   #
-  # source://toys-core//lib/toys/template.rb#103
+  # source://toys-core//lib/toys/template.rb#99
   def to_expand(&block); end
 end
 
@@ -9309,16 +9309,16 @@ end
 #
 # source://toys-core//lib/toys/tool_definition.rb#209
 class Toys::ToolDefinition::Settings < ::Toys::Settings
-  # source://toys-core//lib/toys/tool_definition.rb#210
+  # source://toys-core//lib/toys/settings.rb#888
   def propagate_helper_methods; end
 
-  # source://toys-core//lib/toys/tool_definition.rb#210
+  # source://toys-core//lib/toys/settings.rb#894
   def propagate_helper_methods=(val); end
 
-  # source://toys-core//lib/toys/tool_definition.rb#210
+  # source://toys-core//lib/toys/settings.rb#900
   def propagate_helper_methods_set?; end
 
-  # source://toys-core//lib/toys/tool_definition.rb#210
+  # source://toys-core//lib/toys/settings.rb#906
   def propagate_helper_methods_unset!; end
 end
 
@@ -9388,7 +9388,7 @@ class Toys::WrappableString
   # @param other [Object]
   # @return [Boolean]
   #
-  # source://toys-core//lib/toys/wrappable_string.rb#74
+  # source://toys-core//lib/toys/wrappable_string.rb#70
   def eql?(other); end
 
   # Returns the string fragments, i.e. the individual "words" for wrapping.
@@ -9416,7 +9416,7 @@ class Toys::WrappableString
   #
   # @return [String]
   #
-  # source://toys-core//lib/toys/wrappable_string.rb#63
+  # source://toys-core//lib/toys/wrappable_string.rb#60
   def to_s; end
 
   # Wraps the string to the given width.
