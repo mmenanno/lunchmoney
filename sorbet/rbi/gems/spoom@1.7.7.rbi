@@ -4849,17 +4849,32 @@ class Spoom::Sorbet::Translate::SorbetAssertionsToRBSComments < ::Spoom::Sorbet:
 
   # @return [Boolean]
   #
-  # source://spoom//lib/spoom/sorbet/translate/sorbet_assertions_to_rbs_comments.rb#166
+  # source://spoom//lib/spoom/sorbet/translate/sorbet_assertions_to_rbs_comments.rb#174
   sig { params(node: ::Prism::Node).returns(T::Boolean) }
   def at_end_of_line?(node); end
 
-  # source://spoom//lib/spoom/sorbet/translate/sorbet_assertions_to_rbs_comments.rb#108
+  # source://spoom//lib/spoom/sorbet/translate/sorbet_assertions_to_rbs_comments.rb#116
   sig { params(call: ::Prism::CallNode).returns(::String) }
   def build_rbs_annotation(call); end
 
-  # source://spoom//lib/spoom/sorbet/translate/sorbet_assertions_to_rbs_comments.rb#173
+  # source://spoom//lib/spoom/sorbet/translate/sorbet_assertions_to_rbs_comments.rb#214
   sig { params(assign: ::Prism::Node, value: ::Prism::Node).returns(::String) }
   def dedent_value(assign, value); end
+
+  # Extract any trailing comment after the node
+  # Returns [comment_text, comment_end_offset] or [nil, nil] if no comment or RBS annotation
+  #
+  # source://spoom//lib/spoom/sorbet/translate/sorbet_assertions_to_rbs_comments.rb#194
+  sig { params(node: ::Prism::Node).returns([T.nilable(::String), T.nilable(::Integer)]) }
+  def extract_trailing_comment(node); end
+
+  # Check if the node has an RBS annotation comment (#:) after it
+  #
+  # @return [Boolean]
+  #
+  # source://spoom//lib/spoom/sorbet/translate/sorbet_assertions_to_rbs_comments.rb#183
+  sig { params(node: ::Prism::Node).returns(T::Boolean) }
+  def has_rbs_annotation?(node); end
 
   # source://spoom//lib/spoom/sorbet/translate/sorbet_assertions_to_rbs_comments.rb#71
   sig { params(node: ::Prism::Node).returns(T::Boolean) }
@@ -4869,7 +4884,7 @@ class Spoom::Sorbet::Translate::SorbetAssertionsToRBSComments < ::Spoom::Sorbet:
   #
   # @return [Boolean]
   #
-  # source://spoom//lib/spoom/sorbet/translate/sorbet_assertions_to_rbs_comments.rb#133
+  # source://spoom//lib/spoom/sorbet/translate/sorbet_assertions_to_rbs_comments.rb#141
   sig { params(node: T.nilable(::Prism::Node)).returns(T::Boolean) }
   def t?(node); end
 
@@ -4877,7 +4892,7 @@ class Spoom::Sorbet::Translate::SorbetAssertionsToRBSComments < ::Spoom::Sorbet:
   #
   # @return [Boolean]
   #
-  # source://spoom//lib/spoom/sorbet/translate/sorbet_assertions_to_rbs_comments.rb#146
+  # source://spoom//lib/spoom/sorbet/translate/sorbet_assertions_to_rbs_comments.rb#154
   sig { params(node: ::Prism::CallNode).returns(T::Boolean) }
   def translatable_annotation?(node); end
 end
