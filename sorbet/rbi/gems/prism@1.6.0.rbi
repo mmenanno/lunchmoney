@@ -39,17 +39,17 @@ module Prism
   class << self
     # Mirror the Prism.dump API by using the serialization API.
     #
-    # source://prism//lib/prism.rb#85
+    # source://prism//lib/prism.rb#106
     def dump(*_arg0); end
 
     # Mirror the Prism.dump_file API by using the serialization API.
     #
-    # source://prism//lib/prism.rb#85
+    # source://prism//lib/prism.rb#106
     def dump_file(*_arg0); end
 
     # Mirror the Prism.lex API by using the serialization API.
     #
-    # source://prism//lib/prism.rb#85
+    # source://prism//lib/prism.rb#106
     def lex(*_arg0); end
 
     # :call-seq:
@@ -61,13 +61,13 @@ module Prism
     #
     # For supported options, see Prism::parse.
     #
-    # source://prism//lib/prism.rb#48
+    # source://prism//lib/prism.rb#69
     sig { params(source: String, options: T::Hash[Symbol, T.untyped]).returns(Prism::LexCompat::Result) }
     def lex_compat(source, **options); end
 
     # Mirror the Prism.lex_file API by using the serialization API.
     #
-    # source://prism//lib/prism.rb#85
+    # source://prism//lib/prism.rb#106
     def lex_file(*_arg0); end
 
     # :call-seq:
@@ -77,7 +77,7 @@ module Prism
     # returns the same tokens. Raises SyntaxError if the syntax in source is
     # invalid.
     #
-    # source://prism//lib/prism.rb#58
+    # source://prism//lib/prism.rb#79
     sig { params(source: String).returns(T::Array[T.untyped]) }
     def lex_ripper(source); end
 
@@ -86,85 +86,85 @@ module Prism
     #
     # Load the serialized AST using the source as a reference into a tree.
     #
-    # source://prism//lib/prism.rb#66
+    # source://prism//lib/prism.rb#87
     sig { params(source: String, serialized: String, freeze: T.nilable(T::Boolean)).returns(Prism::ParseResult) }
     def load(source, serialized, freeze = T.unsafe(nil)); end
 
     # Mirror the Prism.parse API by using the serialization API.
     #
-    # source://prism//lib/prism.rb#85
+    # source://prism//lib/prism.rb#106
     def parse(*_arg0); end
 
     # Mirror the Prism.parse_comments API by using the serialization API.
     #
-    # source://prism//lib/prism.rb#85
+    # source://prism//lib/prism.rb#106
     def parse_comments(*_arg0); end
 
     # Mirror the Prism.parse_failure? API by using the serialization API.
     #
     # @return [Boolean]
     #
-    # source://prism//lib/prism.rb#85
+    # source://prism//lib/prism.rb#106
     def parse_failure?(*_arg0); end
 
     # Mirror the Prism.parse_file API by using the serialization API. This uses
     # native strings instead of Ruby strings because it allows us to use mmap
     # when it is available.
     #
-    # source://prism//lib/prism.rb#85
+    # source://prism//lib/prism.rb#106
     def parse_file(*_arg0); end
 
     # Mirror the Prism.parse_file_comments API by using the serialization
     # API. This uses native strings instead of Ruby strings because it allows us
     # to use mmap when it is available.
     #
-    # source://prism//lib/prism.rb#85
+    # source://prism//lib/prism.rb#106
     def parse_file_comments(*_arg0); end
 
     # Mirror the Prism.parse_file_failure? API by using the serialization API.
     #
     # @return [Boolean]
     #
-    # source://prism//lib/prism.rb#85
+    # source://prism//lib/prism.rb#106
     def parse_file_failure?(*_arg0); end
 
     # Mirror the Prism.parse_file_success? API by using the serialization API.
     #
     # @return [Boolean]
     #
-    # source://prism//lib/prism.rb#85
+    # source://prism//lib/prism.rb#106
     def parse_file_success?(*_arg0); end
 
     # Mirror the Prism.parse_lex API by using the serialization API.
     #
-    # source://prism//lib/prism.rb#85
+    # source://prism//lib/prism.rb#106
     def parse_lex(*_arg0); end
 
     # Mirror the Prism.parse_lex_file API by using the serialization API.
     #
-    # source://prism//lib/prism.rb#85
+    # source://prism//lib/prism.rb#106
     def parse_lex_file(*_arg0); end
 
     # Mirror the Prism.parse_stream API by using the serialization API.
     #
-    # source://prism//lib/prism.rb#85
+    # source://prism//lib/prism.rb#106
     def parse_stream(*_arg0); end
 
     # Mirror the Prism.parse_success? API by using the serialization API.
     #
     # @return [Boolean]
     #
-    # source://prism//lib/prism.rb#85
+    # source://prism//lib/prism.rb#106
     def parse_success?(*_arg0); end
 
     # Mirror the Prism.profile API by using the serialization API.
     #
-    # source://prism//lib/prism.rb#85
+    # source://prism//lib/prism.rb#106
     def profile(*_arg0); end
 
     # Mirror the Prism.profile_file API by using the serialization API.
     #
-    # source://prism//lib/prism.rb#85
+    # source://prism//lib/prism.rb#106
     def profile_file(*_arg0); end
 
     # Create a new scope with the given locals and forwarding options that is
@@ -1689,7 +1689,7 @@ end
 
 # The FFI backend is used on other Ruby implementations.
 #
-# source://prism//lib/prism.rb#83
+# source://prism//lib/prism.rb#104
 Prism::BACKEND = T.let(T.unsafe(nil), Symbol)
 
 # Represents reading a reference to a field in the previous match.
@@ -8529,6 +8529,18 @@ class Prism::ConstantWriteNode < ::Prism::Node
     # source://prism//lib/prism/node.rb#5896
     def type; end
   end
+end
+
+# Raised when requested to parse as the currently running Ruby version but Prism has no support for it.
+#
+# source://prism//lib/prism.rb#41
+class Prism::CurrentVersionError < ::ArgumentError
+  # Initialize a new exception for the given ruby version string.
+  #
+  # @return [CurrentVersionError] a new instance of CurrentVersionError
+  #
+  # source://prism//lib/prism.rb#43
+  def initialize(version); end
 end
 
 # The DSL module provides a set of methods that can be used to create prism
@@ -27754,7 +27766,7 @@ end
 # source://prism//lib/prism/pack.rb#8
 module Prism::Pack
   class << self
-    # source://prism//lib/prism.rb#85
+    # source://prism//lib/prism.rb#106
     def parse(_arg0, _arg1, _arg2); end
   end
 end
@@ -33746,21 +33758,21 @@ class Prism::StringQuery
     #
     # @return [Boolean]
     #
-    # source://prism//lib/prism.rb#85
+    # source://prism//lib/prism.rb#106
     def constant?(_arg0); end
 
     # Mirrors the C extension's StringQuery::local? method.
     #
     # @return [Boolean]
     #
-    # source://prism//lib/prism.rb#85
+    # source://prism//lib/prism.rb#106
     def local?(_arg0); end
 
     # Mirrors the C extension's StringQuery::method_name? method.
     #
     # @return [Boolean]
     #
-    # source://prism//lib/prism.rb#85
+    # source://prism//lib/prism.rb#106
     def method_name?(_arg0); end
   end
 end
