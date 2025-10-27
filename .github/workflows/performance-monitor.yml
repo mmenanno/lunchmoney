@@ -61,7 +61,7 @@ jobs:
           cat performance-report.md
 
       - name: Upload Performance Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: performance-report-${{ github.run_number }}
           path: performance-report.md
