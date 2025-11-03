@@ -67,12 +67,12 @@ class Toys::StandardCLI < ::Toys::CLI
   # Create a standard CLI, configured with the appropriate paths and
   # middleware.
   #
+  # @param cur_dir [String, nil] Starting search directory for configs.
+  #   Defaults to the current working directory.
   # @param custom_paths [String, Array<String>] Custom paths to use. If set,
   #   the CLI uses only the given paths. If not, the CLI will search for
   #   paths from the current directory and global paths.
   # @param include_builtins [boolean] Add the builtin tools. Default is true.
-  # @param cur_dir [String, nil] Starting search directory for configs.
-  #   Defaults to the current working directory.
   # @return [StandardCLI] a new instance of StandardCLI
   #
   # source://toys//lib/toys/standard_cli.rb#115

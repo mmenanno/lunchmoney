@@ -62,13 +62,13 @@ module Toys
     #       end
     #     end
     #
-    # @param name [String] Name of the tool. Defaults to a name inferred from the
-    #   class name. (See {Toys::Tool}.)
-    # @param base [Class] Use this tool class as the base class, and inherit helper
-    #   methods from it.
     # @param args [String, Class] Any string-valued positional argument is
     #   interpreted as the name. Any class-valued positional argument is
     #   interpreted as the base class.
+    # @param base [Class] Use this tool class as the base class, and inherit helper
+    #   methods from it.
+    # @param name [String] Name of the tool. Defaults to a name inferred from the
+    #   class name. (See {Toys::Tool}.)
     #
     # source://toys-core//lib/toys/dsl/base.rb#28
     def Tool(*args, name: T.unsafe(nil), base: T.unsafe(nil)); end
@@ -167,9 +167,9 @@ module Toys::Acceptor
     #     help text. Ignored if the spec indicates the default acceptor or a
     #     well-known acceptor.
     #
-    # @param spec [Object] See the description for recognized values.
-    # @param options [Hash] Additional options to pass to the acceptor.
     # @param block [Proc] See the description for recognized forms.
+    # @param options [Hash] Additional options to pass to the acceptor.
+    # @param spec [Object] See the description for recognized values.
     # @return [Toys::Acceptor::Base, Proc]
     #
     # source://toys-core//lib/toys/acceptor.rb#543
@@ -277,9 +277,9 @@ class Toys::Acceptor::Base
   # original input string and any other values returned from {#match}. It
   # must return the final converted value to use.
   #
-  # @param str [String] Original argument string.
   # @param extra [Object...] Zero or more additional arguments comprising
   #   additional elements returned from the match function.
+  # @param str [String] Original argument string.
   # @return [Object] The converted argument as it should be stored in the
   #   context data.
   #
@@ -381,9 +381,9 @@ Toys::Acceptor::DEFAULT_TYPE_DESC = T.let(T.unsafe(nil), String)
 class Toys::Acceptor::Enum < ::Toys::Acceptor::Base
   # Create an acceptor.
   #
-  # @param values [Array<Object>] Valid values.
   # @param type_desc [String] Type description string, shown in help.
   #   Defaults to {Toys::Acceptor::DEFAULT_TYPE_DESC}.
+  # @param values [Array<Object>] Valid values.
   # @param well_known_spec [Object] The well-known acceptor spec associated
   #   with this acceptor, or `nil` for none.
   # @return [Enum] a new instance of Enum
@@ -473,16 +473,16 @@ class Toys::Acceptor::Pattern < ::Toys::Acceptor::Base
   # If no converter is provided, no conversion is done and the input string
   # is returned.
   #
-  # @param regex [Regexp] Regular expression defining value values.
+  # @param block [Proc] A converter function, if not provided as a normal
+  #   parameter.
   # @param converter [Proc] An optional converter function. May also be
   #   given as a block. Note that the converter will be passed all
   #   elements of the `MatchData`.
+  # @param regex [Regexp] Regular expression defining value values.
   # @param type_desc [String] Type description string, shown in help.
   #   Defaults to {Toys::Acceptor::DEFAULT_TYPE_DESC}.
   # @param well_known_spec [Object] The well-known acceptor spec associated
   #   with this acceptor, or `nil` for none.
-  # @param block [Proc] A converter function, if not provided as a normal
-  #   parameter.
   # @return [Pattern] a new instance of Pattern
   #
   # source://toys-core//lib/toys/acceptor.rb#229
@@ -548,18 +548,18 @@ Toys::Acceptor::REJECT = T.let(T.unsafe(nil), Object)
 class Toys::Acceptor::Range < ::Toys::Acceptor::Simple
   # Create an acceptor.
   #
-  # @param range [Range] The range of acceptable values
+  # @param block [Proc] Converter function, if not provided as a normal
+  #   parameter.
   # @param converter [Proc] A converter proc that takes an input string and
   #   attempts to convert it to a type comparable by the range. For
   #   numeric ranges, this can be omitted because one is provided by
   #   default. You should provide a converter for other types of ranges.
   #   You can also pass the converter as a block.
+  # @param range [Range] The range of acceptable values
   # @param type_desc [String] Type description string, shown in help.
   #   Defaults to {Toys::Acceptor::DEFAULT_TYPE_DESC}.
   # @param well_known_spec [Object] The well-known acceptor spec associated
   #   with this acceptor, or `nil` for none.
-  # @param block [Proc] Converter function, if not provided as a normal
-  #   parameter.
   # @return [Range] a new instance of Range
   #
   # source://toys-core//lib/toys/acceptor.rb#361
@@ -594,13 +594,13 @@ class Toys::Acceptor::Simple < ::Toys::Acceptor::Base
   # the function may either raise an exception (which must descend from
   # `StandardError`) or return {Toys::Acceptor::REJECT}.
   #
+  # @param block [Proc] The acceptor function, if not provided as a normal
+  #   parameter.
   # @param function [Proc] The acceptor function
   # @param type_desc [String] Type description string, shown in help.
   #   Defaults to {Toys::Acceptor::DEFAULT_TYPE_DESC}.
   # @param well_known_spec [Object] The well-known acceptor spec associated
   #   with this acceptor, or `nil` for none.
-  # @param block [Proc] The acceptor function, if not provided as a normal
-  #   parameter.
   # @return [Simple] a new instance of Simple
   #
   # source://toys-core//lib/toys/acceptor.rb#172
@@ -640,10 +640,10 @@ class Toys::ArgParser
   # Create an argument parser for a particular tool.
   #
   # @param cli [Toys::CLI] The CLI in effect.
-  # @param tool [Toys::ToolDefinition] The tool defining the argument format.
   # @param default_data [Hash] Additional initial data (such as verbosity).
   # @param require_exact_flag_match [Boolean] Whether to require flag matches
   #   be exact (not partial). Default is false.
+  # @param tool [Toys::ToolDefinition] The tool defining the argument format.
   # @return [ArgParser] a new instance of ArgParser
   #
   # source://toys-core//lib/toys/arg_parser.rb#277
@@ -826,9 +826,9 @@ class Toys::ArgParser::ArgValueUnacceptableError < ::Toys::ArgParser::UsageError
   # @param message [String, nil] A custom message. Normally omitted, in
   #   which case an appropriate default is supplied.
   # @param name [String] The name of the argument. Normally required.
-  # @param value [String] The value given. Normally required.
   # @param suggestions [Array<String>] An array of suggestions to present
   #   to the user. Optional.
+  # @param value [String] The value given. Normally required.
   # @return [ArgValueUnacceptableError] a new instance of ArgValueUnacceptableError
   #
   # source://toys-core//lib/toys/arg_parser.rb#193
@@ -860,9 +860,9 @@ class Toys::ArgParser::FlagAmbiguousError < ::Toys::ArgParser::UsageError
   #
   # @param message [String, nil] A custom message. Normally omitted, in
   #   which case an appropriate default is supplied.
-  # @param value [String] The requested flag name. Normally required.
   # @param suggestions [Array<String>] An array of suggestions to present
   #   to the user. Optional.
+  # @param value [String] The requested flag name. Normally required.
   # @return [FlagAmbiguousError] a new instance of FlagAmbiguousError
   #
   # source://toys-core//lib/toys/arg_parser.rb#152
@@ -890,9 +890,9 @@ class Toys::ArgParser::FlagUnrecognizedError < ::Toys::ArgParser::UsageError
   #
   # @param message [String, nil] A custom message. Normally omitted, in
   #   which case an appropriate default is supplied.
-  # @param value [String] The requested flag name. Normally required.
   # @param suggestions [Array<String>] An array of suggestions to present
   #   to the user. Optional.
+  # @param value [String] The requested flag name. Normally required.
   # @return [FlagUnrecognizedError] a new instance of FlagUnrecognizedError
   #
   # source://toys-core//lib/toys/arg_parser.rb#132
@@ -940,9 +940,9 @@ class Toys::ArgParser::FlagValueUnacceptableError < ::Toys::ArgParser::UsageErro
   # @param message [String, nil] A custom message. Normally omitted, in
   #   which case an appropriate default is supplied.
   # @param name [String] The name of the flag. Normally required.
-  # @param value [String] The value given. Normally required.
   # @param suggestions [Array<String>] An array of suggestions to present
   #   to the user. Optional.
+  # @param value [String] The value given. Normally required.
   # @return [FlagValueUnacceptableError] a new instance of FlagValueUnacceptableError
   #
   # source://toys-core//lib/toys/arg_parser.rb#172
@@ -960,11 +960,11 @@ class Toys::ArgParser::ToolUnrecognizedError < ::Toys::ArgParser::UsageError
   #
   # @param message [String, nil] A custom message. Normally omitted, in
   #   which case an appropriate default is supplied.
+  # @param suggestions [Array<String>] An array of suggestions to present
+  #   to the user. Optional.
   # @param value [String] The requested subtool. Normally required.
   # @param values [Array<String>] The full path of the requested tool.
   #   Normally required.
-  # @param suggestions [Array<String>] An array of suggestions to present
-  #   to the user. Optional.
   # @return [ToolUnrecognizedError] a new instance of ToolUnrecognizedError
   #
   # source://toys-core//lib/toys/arg_parser.rb#247
@@ -984,10 +984,10 @@ class Toys::ArgParser::UsageError
   # @param name [String, nil] The name of the element (normally flag or
   #   positional argument) that reported the error, or nil if there is
   #   no definite element.
-  # @param value [String, nil] The value that was rejected, or nil if not
-  #   applicable.
   # @param suggestions [Array<String>, nil] An array of suggestions from
   #   DidYouMean, or nil if not applicable.
+  # @param value [String, nil] The value that was rejected, or nil if not
+  #   applicable.
   # @return [UsageError] a new instance of UsageError
   #
   # source://toys-core//lib/toys/arg_parser.rb#30
@@ -1126,20 +1126,32 @@ class Toys::CLI
   #      *  `preload_dir_name`: Name of preload directories in tool directories
   #      *  `data_dir_name`: Name of data directories in tool directories
   #
-  # @param logger [Logger] A global logger to use for all tools. This can be
-  #   set if the CLI will call at most one tool at a time. However, it will
-  #   behave incorrectly if CLI might run multiple tools at the same time
-  #   with different verbosity settings (since the logger cannot have
-  #   multiple level settings simultaneously). In that case, do not set a
-  #   global logger, but use the `logger_factory` parameter instead.
-  # @param logger_factory [Proc] A proc that takes a {Toys::ToolDefinition}
-  #   as an argument, and returns a `Logger` to use when running that tool.
-  #   Optional. If not provided (and no global logger is set),
-  #   {Toys::CLI.default_logger_factory} is called to get a basic default.
   # @param base_level [Integer] The logger level that should correspond
   #   to zero verbosity.
   #   Optional. If not provided, defaults to the current level of the
   #   logger (which is often `Logger::WARN`).
+  # @param completion [Toys::Completion::Base] A specifier for shell tab
+  #   completion for the CLI as a whole.
+  #   Optional. If not provided, {Toys::CLI.default_completion} is called
+  #   to get a default completion that delegates to the tool.
+  # @param config_dir_name [String] A directory with this name that appears
+  #   in the loader path, is treated as a configuration directory whose
+  #   contents are loaded into the toys configuration.
+  #   Optional. If not provided, toplevel configuration directories are
+  #   disabled.
+  #   Note: the standard toys executable sets this to `".toys"`.
+  # @param config_file_name [String] A file with this name that appears in
+  #   the loader path, is treated as a toplevel configuration file whose
+  #   contents are loaded into the toys configuration. This does not
+  #   include "index" configuration files located within a configuration
+  #   directory.
+  #   Optional. If not provided, toplevel configuration files are disabled.
+  #   Note: the standard toys executable sets this to `".toys.rb"`.
+  # @param data_dir_name [String] A directory with this name that appears in
+  #   any configuration directory is added to the data directory search
+  #   path for any tool file in that directory.
+  #   Optional. If not provided, data directories are disabled.
+  #   Note: the standard toys executable sets this to `".data"`.
   # @param error_handler [Proc, nil] A proc that is called when an unhandled
   #   exception (a normal exception subclassing `StandardError`, an error
   #   loading a toys config file subclassing `SyntaxError`, or an unhandled
@@ -1154,10 +1166,34 @@ class Toys::CLI
   # @param extra_delimiters [String] A string containing characters that can
   #   function as delimiters in a tool name. Defaults to empty. Allowed
   #   characters are period, colon, and slash.
-  # @param completion [Toys::Completion::Base] A specifier for shell tab
-  #   completion for the CLI as a whole.
-  #   Optional. If not provided, {Toys::CLI.default_completion} is called
-  #   to get a default completion that delegates to the tool.
+  # @param index_file_name [String] A file with this name that appears in any
+  #   configuration directory is loaded first as a standalone configuration
+  #   file. This does not include "toplevel" configuration files outside
+  #   configuration directories.
+  #   Optional. If not provided, index configuration files are disabled.
+  #   Note: the standard toys executable sets this to `".toys.rb"`.
+  # @param lib_dir_name [String] A directory with this name that appears in
+  #   any configuration directory is added to the Ruby load path when
+  #   executing any tool file in that directory.
+  #   Optional. If not provided, lib directories are disabled.
+  #   Note: the standard toys executable sets this to `".lib"`.
+  # @param logger [Logger] A global logger to use for all tools. This can be
+  #   set if the CLI will call at most one tool at a time. However, it will
+  #   behave incorrectly if CLI might run multiple tools at the same time
+  #   with different verbosity settings (since the logger cannot have
+  #   multiple level settings simultaneously). In that case, do not set a
+  #   global logger, but use the `logger_factory` parameter instead.
+  # @param logger_factory [Proc] A proc that takes a {Toys::ToolDefinition}
+  #   as an argument, and returns a `Logger` to use when running that tool.
+  #   Optional. If not provided (and no global logger is set),
+  #   {Toys::CLI.default_logger_factory} is called to get a basic default.
+  # @param middleware_lookup [Toys::ModuleLookup] A lookup for well-known
+  #   middleware classes.
+  #   Optional. If not provided, defaults to the set of standard middleware
+  #   classes provided by toys-core, as defined by
+  #   {Toys::CLI.default_middleware_lookup}. If you explicitly want no
+  #   standard middleware, pass an empty instance of
+  #   {Toys::ModuleLookup}.
   # @param middleware_stack [Array<Toys::Middleware::Spec>] An array of
   #   middleware that will be used by default for all tools.
   #   Optional. If not provided, uses a default set of middleware defined
@@ -1169,45 +1205,6 @@ class Toys::CLI
   #   provided by toys-core, as defined by
   #   {Toys::CLI.default_mixin_lookup}. If you explicitly want no standard
   #   mixins, pass an empty instance of {Toys::ModuleLookup}.
-  # @param middleware_lookup [Toys::ModuleLookup] A lookup for well-known
-  #   middleware classes.
-  #   Optional. If not provided, defaults to the set of standard middleware
-  #   classes provided by toys-core, as defined by
-  #   {Toys::CLI.default_middleware_lookup}. If you explicitly want no
-  #   standard middleware, pass an empty instance of
-  #   {Toys::ModuleLookup}.
-  # @param template_lookup [Toys::ModuleLookup] A lookup for well-known
-  #   template classes.
-  #   Optional. If not provided, defaults to the set of standard template
-  #   classes provided by toys core, as defined by
-  #   {Toys::CLI.default_template_lookup}. If you explicitly want no
-  #   standard tenokates, pass an empty instance of {Toys::ModuleLookup}.
-  # @param config_dir_name [String] A directory with this name that appears
-  #   in the loader path, is treated as a configuration directory whose
-  #   contents are loaded into the toys configuration.
-  #   Optional. If not provided, toplevel configuration directories are
-  #   disabled.
-  #   Note: the standard toys executable sets this to `".toys"`.
-  # @param config_file_name [String] A file with this name that appears in
-  #   the loader path, is treated as a toplevel configuration file whose
-  #   contents are loaded into the toys configuration. This does not
-  #   include "index" configuration files located within a configuration
-  #   directory.
-  #   Optional. If not provided, toplevel configuration files are disabled.
-  #   Note: the standard toys executable sets this to `".toys.rb"`.
-  # @param index_file_name [String] A file with this name that appears in any
-  #   configuration directory is loaded first as a standalone configuration
-  #   file. This does not include "toplevel" configuration files outside
-  #   configuration directories.
-  #   Optional. If not provided, index configuration files are disabled.
-  #   Note: the standard toys executable sets this to `".toys.rb"`.
-  # @param preload_file_name [String] A file with this name that appears
-  #   in any configuration directory is preloaded using `require` before
-  #   any tools in that configuration directory are defined. A preload file
-  #   includes normal Ruby code, rather than Toys DSL definitions. The
-  #   preload file is loaded before any files in a preload directory.
-  #   Optional. If not provided, preload files are disabled.
-  #   Note: the standard toys executable sets this to `".preload.rb"`.
   # @param preload_dir_name [String] A directory with this name that appears
   #   in any configuration directory is searched for Ruby files, which are
   #   preloaded using `require` before any tools in that configuration
@@ -1216,16 +1213,19 @@ class Toys::CLI
   #   directory are loaded after any standalone preload file.
   #   Optional. If not provided, preload directories are disabled.
   #   Note: the standard toys executable sets this to `".preload"`.
-  # @param data_dir_name [String] A directory with this name that appears in
-  #   any configuration directory is added to the data directory search
-  #   path for any tool file in that directory.
-  #   Optional. If not provided, data directories are disabled.
-  #   Note: the standard toys executable sets this to `".data"`.
-  # @param lib_dir_name [String] A directory with this name that appears in
-  #   any configuration directory is added to the Ruby load path when
-  #   executing any tool file in that directory.
-  #   Optional. If not provided, lib directories are disabled.
-  #   Note: the standard toys executable sets this to `".lib"`.
+  # @param preload_file_name [String] A file with this name that appears
+  #   in any configuration directory is preloaded using `require` before
+  #   any tools in that configuration directory are defined. A preload file
+  #   includes normal Ruby code, rather than Toys DSL definitions. The
+  #   preload file is loaded before any files in a preload directory.
+  #   Optional. If not provided, preload files are disabled.
+  #   Note: the standard toys executable sets this to `".preload.rb"`.
+  # @param template_lookup [Toys::ModuleLookup] A lookup for well-known
+  #   template classes.
+  #   Optional. If not provided, defaults to the set of standard template
+  #   classes provided by toys core, as defined by
+  #   {Toys::CLI.default_template_lookup}. If you explicitly want no
+  #   standard tenokates, pass an empty instance of {Toys::ModuleLookup}.
   # @return [CLI] a new instance of CLI
   #
   # source://toys-core//lib/toys/cli.rb#175
@@ -1236,16 +1236,16 @@ class Toys::CLI
   # This is used to create tools "inline", and is useful for simple command
   # line executables based on Toys.
   #
-  # @param high_priority [Boolean] Add the config at the head of the priority
-  #   list rather than the tail.
-  # @param source_name [String] The source name that will be shown in
-  #   documentation for tools defined in this block. If omitted, a default
-  #   unique string will be generated.
   # @param block [Proc] The block of configuration, executed in the context
   #   of the tool DSL {Toys::DSL::Tool}.
   # @param context_directory [String, nil] The context directory for tools
   #   loaded from this block. You can pass a directory path as a string, or
   #   `nil` to denote no context. Defaults to `nil`.
+  # @param high_priority [Boolean] Add the config at the head of the priority
+  #   list rather than the tail.
+  # @param source_name [String] The source name that will be shown in
+  #   documentation for tools defined in this block. If omitted, a default
+  #   unique string will be generated.
   # @return [self]
   #
   # source://toys-core//lib/toys/cli.rb#356
@@ -1259,16 +1259,16 @@ class Toys::CLI
   # the main Toys executable uses this to load the builtin tools from its
   # "builtins" directory.
   #
-  # @param path [String] A path to add. May reference a single Toys file or
-  #   a Toys directory.
-  # @param high_priority [Boolean] Add the config at the head of the priority
-  #   list rather than the tail.
-  # @param source_name [String] A custom name for the root source. Optional.
   # @param context_directory [String, nil, :path, :parent] The context directory
   #   for tools loaded from this path. You can pass a directory path as a
   #   string, `:path` to denote the given path, `:parent` to denote the
   #   given path's parent directory, or `nil` to denote no context.
   #   Defaults to `:parent`.
+  # @param high_priority [Boolean] Add the config at the head of the priority
+  #   list rather than the tail.
+  # @param path [String] A path to add. May reference a single Toys file or
+  #   a Toys directory.
+  # @param source_name [String] A custom name for the root source. Optional.
   # @return [self]
   #
   # source://toys-core//lib/toys/cli.rb#327
@@ -1280,14 +1280,14 @@ class Toys::CLI
   # The main Toys executable uses this method to load tools from directories
   # in the `TOYS_PATH`.
   #
-  # @param search_path [String] A path to search for configs.
-  # @param high_priority [Boolean] Add the configs at the head of the
-  #   priority list rather than the tail.
   # @param context_directory [String, nil, :path, :parent] The context directory
   #   for tools loaded from this path. You can pass a directory path as a
   #   string, `:path` to denote the given path, `:parent` to denote the
   #   given path's parent directory, or `nil` to denote no context.
   #   Defaults to `:path`.
+  # @param high_priority [Boolean] Add the configs at the head of the
+  #   priority list rather than the tail.
+  # @param search_path [String] A path to search for configs.
   # @return [self]
   #
   # source://toys-core//lib/toys/cli.rb#384
@@ -1299,14 +1299,14 @@ class Toys::CLI
   # The main Toys executable uses this method to load tools from the current
   # directory and its ancestors.
   #
+  # @param high_priority [Boolean] Add the configs at the head of the
+  #   priority list rather than the tail.
   # @param start [String] The first directory to add. Defaults to the current
   #   working directory.
   # @param terminate [Array<String>] Optional list of directories that should
   #   terminate the search. If the walk up the directory tree encounters
   #   one of these directories, the search is halted without checking the
   #   terminating directory.
-  # @param high_priority [Boolean] Add the configs at the head of the
-  #   priority list rather than the tail.
   # @return [self]
   #
   # source://toys-core//lib/toys/cli.rb#419
@@ -1395,10 +1395,10 @@ class Toys::CLI
   # @param args [String...] Command line arguments specifying which tool to
   #   run and what arguments to pass to it. You may pass either a single
   #   array of strings, or a series of string arguments.
-  # @param verbosity [Integer] Initial verbosity. Default is 0.
   # @param delegated_from [Toys::Context] The context from which this
   #   execution is delegated. Optional. Should be set only if this is a
   #   delegated execution.
+  # @param verbosity [Integer] Initial verbosity. Default is 0.
   # @return [Integer] The resulting process status code (i.e. 0 for success).
   #
   # source://toys-core//lib/toys/cli.rb#450
@@ -1412,21 +1412,21 @@ class Toys::CLI
   # source://toys-core//lib/toys/cli.rb#629
   def build_executor(tool, context); end
 
-  # source://toys-core//lib/toys/cli.rb#665
+  # source://toys-core//lib/toys/cli.rb#663
   def call_handler(context, handler, argument); end
 
   # source://toys-core//lib/toys/cli.rb#610
   def execute_tool(tool, context, &block); end
 
-  # source://toys-core//lib/toys/cli.rb#656
+  # source://toys-core//lib/toys/cli.rb#654
   def handle_signal_by_tool(context, tool, exception); end
 
   # @raise [ArgParsingError]
   #
-  # source://toys-core//lib/toys/cli.rb#649
+  # source://toys-core//lib/toys/cli.rb#647
   def handle_usage_errors(context, tool); end
 
-  # source://toys-core//lib/toys/cli.rb#674
+  # source://toys-core//lib/toys/cli.rb#672
   def make_executor(middleware, context, next_executor); end
 
   # source://toys-core//lib/toys/cli.rb#597
@@ -1511,76 +1511,61 @@ Toys::CORE_LIB_PATH = T.let(T.unsafe(nil), String)
 # source://toys-core//lib/toys/core.rb#20
 Toys::CORE_VERSION = T.let(T.unsafe(nil), String)
 
-# Compatibility wrappers for older Ruby versions.
+# Compatibility wrappers for certain Ruby implementations and versions, and
+# other environment differences.
 #
 # @private
 #
-# source://toys-core//lib/toys/compat.rb#11
+# source://toys-core//lib/toys/compat.rb#12
 module Toys::Compat
   class << self
     # @private
     # @return [Boolean]
     #
-    # source://toys-core//lib/toys/compat.rb#113
-    def absolute_path?(path); end
-
-    # @private
-    # @return [Boolean]
-    #
-    # source://toys-core//lib/toys/compat.rb#31
+    # source://toys-core//lib/toys/compat.rb#40
     def allow_fork?; end
 
     # @private
-    #
-    # source://toys-core//lib/toys/compat.rb#78
-    def dir_children(dir); end
-
-    # @private
-    #
-    # source://toys-core//lib/toys/compat.rb#65
-    def glob_in_dir(glob, dir); end
-
-    # @private
-    #
-    # source://toys-core//lib/toys/compat.rb#94
-    def instantiate(klass, args, kwargs, block); end
-
-    # @private
     # @return [Boolean]
     #
-    # source://toys-core//lib/toys/compat.rb#16
+    # source://toys-core//lib/toys/compat.rb#20
     def jruby?; end
 
     # @private
     # @return [Boolean]
     #
-    # source://toys-core//lib/toys/compat.rb#132
-    def method_defined_without_ancestors?(klass, name); end
+    # source://toys-core//lib/toys/compat.rb#35
+    def macos?; end
 
     # @private
     #
-    # source://toys-core//lib/toys/compat.rb#54
+    # source://toys-core//lib/toys/compat.rb#63
     def suggestions(word, list); end
 
     # @private
     # @return [Boolean]
     #
-    # source://toys-core//lib/toys/compat.rb#36
+    # source://toys-core//lib/toys/compat.rb#45
     def supports_suggestions?; end
 
     # @private
     # @return [Boolean]
     #
-    # source://toys-core//lib/toys/compat.rb#21
+    # source://toys-core//lib/toys/compat.rb#25
     def truffleruby?; end
 
     # @private
     # @return [Boolean]
     #
-    # source://toys-core//lib/toys/compat.rb#26
+    # source://toys-core//lib/toys/compat.rb#30
     def windows?; end
   end
 end
+
+# @private
+#
+# source://toys-core//lib/toys/compat.rb#17
+Toys::Compat::RUBY_VERSION_CODE = T.let(T.unsafe(nil), Integer)
 
 # A Completion is a callable Proc that determines candidates for shell tab
 # completion. You pass a {Toys::Completion::Context} object (which includes
@@ -1622,9 +1607,9 @@ module Toys::Completion
     #     for `:empty`). However, other completion resolution methods might
     #     have a different default.
     #
-    # @param spec [Object] See the description for recognized values.
-    # @param options [Hash] Additional options to pass to the completion.
     # @param block [Proc] See the description for recognized forms.
+    # @param options [Hash] Additional options to pass to the completion.
+    # @param spec [Object] See the description for recognized values.
     # @return [Toys::Completion::Base, Proc]
     #
     # source://toys-core//lib/toys/completion.rb#411
@@ -1673,9 +1658,9 @@ class Toys::Completion::Candidate
 
   # Create a new candidate
   #
-  # @param string [String] The candidate string
   # @param partial [Boolean] Whether the candidate is partial. Defaults
   #   to `false`.
+  # @param string [String] The candidate string
   # @return [Candidate] a new instance of Candidate
   #
   # source://toys-core//lib/toys/completion.rb#152
@@ -1743,12 +1728,12 @@ class Toys::Completion::Context
   # Create a completion context
   #
   # @param cli [Toys::CLI] The CLI being run. Required.
-  # @param previous_words [Array<String>] Array of complete strings that
-  #   appeared prior to the fragment to complete.
+  # @param fragment [String] The string fragment to complete.
   # @param fragment_prefix [String] A prefix in the fragment that does not
   #   participate in completion. (e.g. "key=")
-  # @param fragment [String] The string fragment to complete.
   # @param params [Hash] Miscellaneous context data
+  # @param previous_words [Array<String>] Array of complete strings that
+  #   appeared prior to the fragment to complete.
   # @return [Context] a new instance of Context
   #
   # source://toys-core//lib/toys/completion.rb#30
@@ -1853,9 +1838,9 @@ Toys::Completion::EMPTY = T.let(T.unsafe(nil), Toys::Completion::Base)
 class Toys::Completion::Enum < ::Toys::Completion::Base
   # Create a completion from a list of values.
   #
-  # @param values [Array<String>]
   # @param prefix_constraint [String, Regexp] Constraint on the fragment
   #   prefix. Defaults to requiring the prefix be empty.
+  # @param values [Array<String>]
   # @return [Enum] a new instance of Enum
   #
   # source://toys-core//lib/toys/completion.rb#339
@@ -1893,8 +1878,8 @@ class Toys::Completion::FileSystem < ::Toys::Completion::Base
   # system.
   #
   # @param cwd [String] Working directory (defaults to the current dir).
-  # @param omit_files [Boolean] Omit files from candidates
   # @param omit_directories [Boolean] Omit directories from candidates
+  # @param omit_files [Boolean] Omit files from candidates
   # @param prefix_constraint [String, Regexp] Constraint on the fragment
   #   prefix. Defaults to requiring the prefix be empty.
   # @return [FileSystem] a new instance of FileSystem
@@ -2646,9 +2631,9 @@ class Toys::DSL::Flag
   # or any of its ancestors, or any other specification recognized by
   # {Toys::Acceptor.create}.
   #
-  # @param spec [Object]
-  # @param options [Hash]
   # @param block [Proc]
+  # @param options [Hash]
+  # @param spec [Object]
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/flag.rb#100
@@ -2679,9 +2664,9 @@ class Toys::DSL::Flag
   #     (which is {Toys::Flag::DefaultCompletion} with no extra options).
   #  *  Any other specification recognized by {Toys::Completion.create}.
   #
-  # @param spec [Object]
-  # @param options [Hash]
   # @param block [Proc]
+  # @param options [Hash]
+  # @param spec [Object]
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/flag.rb#156
@@ -2692,9 +2677,9 @@ class Toys::DSL::Flag
   # tool or any of its ancestors, or any other specification recognized by
   # {Toys::Completion.create}.
   #
-  # @param spec [Object]
-  # @param options [Hash]
   # @param block [Proc]
+  # @param options [Hash]
+  # @param spec [Object]
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/flag.rb#172
@@ -2834,8 +2819,8 @@ class Toys::DSL::Flag
   # combined with setting the default value to `[]` and is intended for
   # "multi-valued" flags.
   #
-  # @param handler [Proc, :set, :push]
   # @param block [Proc]
+  # @param handler [Proc, :set, :push]
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/flag.rb#134
@@ -3052,25 +3037,18 @@ class Toys::DSL::FlagGroup
   #                 ["    toys say --shout hello"]
   #     end
   #
-  # @param key [String, Symbol] The key to use to retrieve the value from
-  #   the execution context.
-  # @param flags [String...] The flags in OptionParser format.
   # @param accept [Object] An acceptor that validates and/or converts the
   #   value. You may provide either the name of an acceptor you have
   #   defined, or one of the default acceptors provided by OptionParser.
   #   Optional. If not specified, accepts any value as a string.
-  # @param default [Object] The default value. This is the value that will
-  #   be set in the context if this flag is not provided on the command
-  #   line. Defaults to `nil`.
-  # @param handler [Proc, nil, :set, :push] An optional handler for
-  #   setting/updating the value. A handler is a proc taking two
-  #   arguments, the given value and the previous value, returning the
-  #   new value that should be set. You may also specify a predefined
-  #   named handler. The `:set` handler (the default) replaces the
-  #   previous value (effectively `-> (val, _prev) { val }`). The
-  #   `:push` handler expects the previous value to be an array and
-  #   pushes the given value onto it; it should be combined with setting
-  #   `default: []` and is intended for "multi-valued" flags.
+  # @param add_method [true, false, nil] Whether to add a method for this
+  #   flag. If omitted or set to nil, uses the default behavior, which
+  #   adds the method if the key is a symbol representing a legal method
+  #   name that starts with a letter and does not override any public
+  #   method in the Ruby Object class or collide with any method directly
+  #   defined in the tool class.
+  # @param block [Proc] Configures the flag. See {Toys::DSL::Flag} for the
+  #   directives that can be called in this block.
   # @param complete_flags [Object] A specifier for shell tab completion
   #   for flag names associated with this flag. By default, a
   #   {Toys::Flag::DefaultCompletion} is used, which provides the flag's
@@ -3083,26 +3061,33 @@ class Toys::DSL::FlagGroup
   #   completion by default. To customize completion, set this to the
   #   name of a previously defined completion, or any spec recognized by
   #   {Toys::Completion.create}.
-  # @param report_collisions [Boolean] Raise an exception if a flag is
-  #   requested that is already in use or marked as unusable. Default is
-  #   true.
+  # @param default [Object] The default value. This is the value that will
+  #   be set in the context if this flag is not provided on the command
+  #   line. Defaults to `nil`.
   # @param desc [String, Array<String>, Toys::WrappableString] Short
   #   description for the flag. See {Toys::DSL::Tool#desc} for a
   #   description of the allowed formats. Defaults to the empty string.
+  # @param display_name [String] A display name for this flag, used in help
+  #   text and error messages.
+  # @param flags [String...] The flags in OptionParser format.
+  # @param handler [Proc, nil, :set, :push] An optional handler for
+  #   setting/updating the value. A handler is a proc taking two
+  #   arguments, the given value and the previous value, returning the
+  #   new value that should be set. You may also specify a predefined
+  #   named handler. The `:set` handler (the default) replaces the
+  #   previous value (effectively `-> (val, _prev) { val }`). The
+  #   `:push` handler expects the previous value to be an array and
+  #   pushes the given value onto it; it should be combined with setting
+  #   `default: []` and is intended for "multi-valued" flags.
+  # @param key [String, Symbol] The key to use to retrieve the value from
+  #   the execution context.
   # @param long_desc [Array<String,Array<String>,Toys::WrappableString>] Long description for the flag. See {Toys::DSL::Tool#long_desc} for
   #   a description of the allowed formats. (But note that this param
   #   takes an Array of description lines, rather than a series of
   #   arguments.) Defaults to the empty array.
-  # @param display_name [String] A display name for this flag, used in help
-  #   text and error messages.
-  # @param add_method [true, false, nil] Whether to add a method for this
-  #   flag. If omitted or set to nil, uses the default behavior, which
-  #   adds the method if the key is a symbol representing a legal method
-  #   name that starts with a letter and does not override any public
-  #   method in the Ruby Object class or collide with any method directly
-  #   defined in the tool class.
-  # @param block [Proc] Configures the flag. See {Toys::DSL::Flag} for the
-  #   directives that can be called in this block.
+  # @param report_collisions [Boolean] Raise an exception if a flag is
+  #   requested that is already in use or marked as unusable. Default is
+  #   true.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/flag_group.rb#194
@@ -3153,7 +3138,7 @@ module Toys::DSL::Internal
     #
     # @private
     #
-    # source://toys-core//lib/toys/dsl/internal.rb#166
+    # source://toys-core//lib/toys/dsl/internal.rb#167
     def configure_class(tool_class, given_name = T.unsafe(nil)); end
 
     # Called by the DSL implementation to get, and optionally activate, the
@@ -3169,7 +3154,7 @@ module Toys::DSL::Internal
     #
     # @private
     #
-    # source://toys-core//lib/toys/dsl/internal.rb#146
+    # source://toys-core//lib/toys/dsl/internal.rb#147
     def load_long_desc_file(path); end
 
     # Called by the DSL implementation to add a getter to the tool class.
@@ -3192,25 +3177,25 @@ module Toys::DSL::Internal
     # @private
     # @raise [ToolDefinitionError]
     #
-    # source://toys-core//lib/toys/dsl/internal.rb#126
+    # source://toys-core//lib/toys/dsl/internal.rb#127
     def resolve_mixin(mixin, cur_tool, loader); end
 
     # Called by the Tool base class to add the DSL to a subclass.
     #
     # @private
     #
-    # source://toys-core//lib/toys/dsl/internal.rb#197
+    # source://toys-core//lib/toys/dsl/internal.rb#198
     def setup_class_dsl(tool_class); end
 
     private
 
-    # source://toys-core//lib/toys/dsl/internal.rb#207
+    # source://toys-core//lib/toys/dsl/internal.rb#208
     def class_name_to_tool_name(class_name); end
 
-    # source://toys-core//lib/toys/dsl/internal.rb#226
+    # source://toys-core//lib/toys/dsl/internal.rb#227
     def current_source_from_context; end
 
-    # source://toys-core//lib/toys/dsl/internal.rb#213
+    # source://toys-core//lib/toys/dsl/internal.rb#214
     def parent_from_mod_name_segments(mod_names); end
   end
 end
@@ -3273,9 +3258,9 @@ class Toys::DSL::PositionalArg
   # or any of its ancestors, or any other specification recognized by
   # {Toys::Acceptor.create}.
   #
-  # @param spec [Object]
-  # @param options [Hash]
   # @param block [Proc]
+  # @param options [Hash]
+  # @param spec [Object]
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/positional_arg.rb#36
@@ -3300,9 +3285,9 @@ class Toys::DSL::PositionalArg
   # tool or any of its ancestors, or any other specification recognized by
   # {Toys::Completion.create}.
   #
-  # @param spec [Object]
-  # @param options [Hash]
   # @param block [Proc]
+  # @param options [Hash]
+  # @param spec [Object]
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/positional_arg.rb#63
@@ -3476,11 +3461,11 @@ module Toys::DSL::Tool
   #       end
   #     end
   #
+  # @param block [Proc] See the description for recognized forms.
   # @param name [String] The acceptor name.
   # @param spec [Object] See the description for recognized values.
   # @param type_desc [String] Type description string, shown in help.
   #   Defaults to the acceptor name.
-  # @param block [Proc] See the description for recognized forms.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#105
@@ -3507,10 +3492,10 @@ module Toys::DSL::Tool
   #     # tool "t", delegate_relative: "test"
   #
   # @deprecated Use {#tool} and pass `:delegate_relative` instead
-  # @param word [String] The name of the alias
   # @param target [String, Array<String>] Relative path to the target of the
   #   alias. This path may be given as an array of strings, or a single
   #   string possibly delimited by path separators.
+  # @param word [String] The name of the alias
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#368
@@ -3532,6 +3517,8 @@ module Toys::DSL::Tool
   #       # ...
   #     end
   #
+  # @param block [Proc] Adds flags to the group. See {Toys::DSL::FlagGroup}
+  #   for the directives that can be called in this block.
   # @param desc [String, Array<String>, Toys::WrappableString] Short
   #   description for the group. See {Toys::DSL::Tool#desc} for a
   #   description of allowed formats. Defaults to `"Flags"`.
@@ -3540,13 +3527,11 @@ module Toys::DSL::Tool
   #   Defaults to the empty array.
   # @param name [String, Symbol, nil] The name of the group, or nil for no
   #   name.
+  # @param prepend [Boolean] If `true`, prepend rather than append the
+  #   group to the list. Default is `false`.
   # @param report_collisions [Boolean] If `true`, raise an exception if a
   #   the given name is already taken. If `false`, ignore. Default is
   #   `true`.
-  # @param prepend [Boolean] If `true`, prepend rather than append the
-  #   group to the list. Default is `false`.
-  # @param block [Proc] Adds flags to the group. See {Toys::DSL::FlagGroup}
-  #   for the directives that can be called in this block.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#685
@@ -3570,6 +3555,8 @@ module Toys::DSL::Tool
   #       # ...
   #     end
   #
+  # @param block [Proc] Adds flags to the group. See {Toys::DSL::FlagGroup}
+  #   for the directives that can be called in this block.
   # @param desc [String, Array<String>, Toys::WrappableString] Short
   #   description for the group. See {Toys::DSL::Tool#desc} for a
   #   description of allowed formats. Defaults to `"Flags"`.
@@ -3578,13 +3565,11 @@ module Toys::DSL::Tool
   #   Defaults to the empty array.
   # @param name [String, Symbol, nil] The name of the group, or nil for no
   #   name.
+  # @param prepend [Boolean] If `true`, prepend rather than append the
+  #   group to the list. Default is `false`.
   # @param report_collisions [Boolean] If `true`, raise an exception if a
   #   the given name is already taken. If `false`, ignore. Default is
   #   `true`.
-  # @param prepend [Boolean] If `true`, prepend rather than append the
-  #   group to the list. Default is `false`.
-  # @param block [Proc] Adds flags to the group. See {Toys::DSL::FlagGroup}
-  #   for the directives that can be called in this block.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#772
@@ -3608,6 +3593,8 @@ module Toys::DSL::Tool
   #       # ...
   #     end
   #
+  # @param block [Proc] Adds flags to the group. See {Toys::DSL::FlagGroup}
+  #   for the directives that can be called in this block.
   # @param desc [String, Array<String>, Toys::WrappableString] Short
   #   description for the group. See {Toys::DSL::Tool#desc} for a
   #   description of allowed formats. Defaults to `"Flags"`.
@@ -3616,13 +3603,11 @@ module Toys::DSL::Tool
   #   Defaults to the empty array.
   # @param name [String, Symbol, nil] The name of the group, or nil for no
   #   name.
+  # @param prepend [Boolean] If `true`, prepend rather than append the
+  #   group to the list. Default is `false`.
   # @param report_collisions [Boolean] If `true`, raise an exception if a
   #   the given name is already taken. If `false`, ignore. Default is
   #   `true`.
-  # @param prepend [Boolean] If `true`, prepend rather than append the
-  #   group to the list. Default is `false`.
-  # @param block [Proc] Adds flags to the group. See {Toys::DSL::FlagGroup}
-  #   for the directives that can be called in this block.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#777
@@ -3646,6 +3631,8 @@ module Toys::DSL::Tool
   #       # ...
   #     end
   #
+  # @param block [Proc] Adds flags to the group. See {Toys::DSL::FlagGroup}
+  #   for the directives that can be called in this block.
   # @param desc [String, Array<String>, Toys::WrappableString] Short
   #   description for the group. See {Toys::DSL::Tool#desc} for a
   #   description of allowed formats. Defaults to `"Flags"`.
@@ -3654,13 +3641,11 @@ module Toys::DSL::Tool
   #   Defaults to the empty array.
   # @param name [String, Symbol, nil] The name of the group, or nil for no
   #   name.
+  # @param prepend [Boolean] If `true`, prepend rather than append the
+  #   group to the list. Default is `false`.
   # @param report_collisions [Boolean] If `true`, raise an exception if a
   #   the given name is already taken. If `false`, ignore. Default is
   #   `true`.
-  # @param prepend [Boolean] If `true`, prepend rather than append the
-  #   group to the list. Default is `false`.
-  # @param block [Proc] Adds flags to the group. See {Toys::DSL::FlagGroup}
-  #   for the directives that can be called in this block.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#728
@@ -3684,6 +3669,8 @@ module Toys::DSL::Tool
   #       # ...
   #     end
   #
+  # @param block [Proc] Adds flags to the group. See {Toys::DSL::FlagGroup}
+  #   for the directives that can be called in this block.
   # @param desc [String, Array<String>, Toys::WrappableString] Short
   #   description for the group. See {Toys::DSL::Tool#desc} for a
   #   description of allowed formats. Defaults to `"Flags"`.
@@ -3692,13 +3679,11 @@ module Toys::DSL::Tool
   #   Defaults to the empty array.
   # @param name [String, Symbol, nil] The name of the group, or nil for no
   #   name.
+  # @param prepend [Boolean] If `true`, prepend rather than append the
+  #   group to the list. Default is `false`.
   # @param report_collisions [Boolean] If `true`, raise an exception if a
   #   the given name is already taken. If `false`, ignore. Default is
   #   `true`.
-  # @param prepend [Boolean] If `true`, prepend rather than append the
-  #   group to the list. Default is `false`.
-  # @param block [Proc] Adds flags to the group. See {Toys::DSL::FlagGroup}
-  #   for the directives that can be called in this block.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#733
@@ -3731,9 +3716,9 @@ module Toys::DSL::Tool
   #       end
   #     end
   #
-  # @param spec [Object]
-  # @param options [Hash]
   # @param block [Proc]
+  # @param options [Hash]
+  # @param spec [Object]
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#1444
@@ -3773,10 +3758,10 @@ module Toys::DSL::Tool
   #       end
   #     end
   #
-  # @param name [String] Name of the completion
-  # @param spec [Object] See the description for recognized values.
-  # @param options [Hash] Additional options to pass to the completion.
   # @param block [Proc] See the description for recognized forms.
+  # @param name [String] Name of the completion
+  # @param options [Hash] Additional options to pass to the completion.
+  # @param spec [Object] See the description for recognized values.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#259
@@ -3939,6 +3924,8 @@ module Toys::DSL::Tool
   #       # ...
   #     end
   #
+  # @param block [Proc] Adds flags to the group. See {Toys::DSL::FlagGroup}
+  #   for the directives that can be called in this block.
   # @param desc [String, Array<String>, Toys::WrappableString] Short
   #   description for the group. See {Toys::DSL::Tool#desc} for a
   #   description of allowed formats. Defaults to `"Flags"`.
@@ -3947,13 +3934,11 @@ module Toys::DSL::Tool
   #   Defaults to the empty array.
   # @param name [String, Symbol, nil] The name of the group, or nil for no
   #   name.
+  # @param prepend [Boolean] If `true`, prepend rather than append the
+  #   group to the list. Default is `false`.
   # @param report_collisions [Boolean] If `true`, raise an exception if a
   #   the given name is already taken. If `false`, ignore. Default is
   #   `true`.
-  # @param prepend [Boolean] If `true`, prepend rather than append the
-  #   group to the list. Default is `false`.
-  # @param block [Proc] Adds flags to the group. See {Toys::DSL::FlagGroup}
-  #   for the directives that can be called in this block.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#816
@@ -3977,6 +3962,8 @@ module Toys::DSL::Tool
   #       # ...
   #     end
   #
+  # @param block [Proc] Adds flags to the group. See {Toys::DSL::FlagGroup}
+  #   for the directives that can be called in this block.
   # @param desc [String, Array<String>, Toys::WrappableString] Short
   #   description for the group. See {Toys::DSL::Tool#desc} for a
   #   description of allowed formats. Defaults to `"Flags"`.
@@ -3985,13 +3972,11 @@ module Toys::DSL::Tool
   #   Defaults to the empty array.
   # @param name [String, Symbol, nil] The name of the group, or nil for no
   #   name.
+  # @param prepend [Boolean] If `true`, prepend rather than append the
+  #   group to the list. Default is `false`.
   # @param report_collisions [Boolean] If `true`, raise an exception if a
   #   the given name is already taken. If `false`, ignore. Default is
   #   `true`.
-  # @param prepend [Boolean] If `true`, prepend rather than append the
-  #   group to the list. Default is `false`.
-  # @param block [Proc] Adds flags to the group. See {Toys::DSL::FlagGroup}
-  #   for the directives that can be called in this block.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#821
@@ -4023,9 +4008,9 @@ module Toys::DSL::Tool
   #
   #     expand "hello-generator", "mytool", "mytool is running!"
   #
+  # @param args [Object...] Template arguments
   # @param template_class [Class, String, Symbol] The template, either as a
   #   class or a well-known name.
-  # @param args [Object...] Template arguments
   # @return [self]
   # @yield [template]
   #
@@ -4175,26 +4160,19 @@ module Toys::DSL::Tool
   #                 ["    toys say --shout hello"]
   #     end
   #
-  # @param key [String, Symbol] The key to use to retrieve the value from
-  #   the execution context.
-  # @param flags [String...] The flags in OptionParser format.
   # @param accept [Object] An acceptor that validates and/or converts the
   #   value. You may provide either the name of an acceptor you have
   #   defined, one of the default acceptors provided by OptionParser, or
   #   any other specification recognized by {Toys::Acceptor.create}.
   #   Optional. If not specified, accepts any value as a string.
-  # @param default [Object] The default value. This is the value that will
-  #   be set in the context if this flag is not provided on the command
-  #   line. Defaults to `nil`.
-  # @param handler [Proc, nil, :set, :push] An optional handler for
-  #   setting/updating the value. A handler is a proc taking two
-  #   arguments, the given value and the previous value, returning the
-  #   new value that should be set. You may also specify a predefined
-  #   named handler. The `:set` handler (the default) replaces the
-  #   previous value (effectively `-> (val, _prev) { val }`). The
-  #   `:push` handler expects the previous value to be an array and
-  #   pushes the given value onto it; it should be combined with setting
-  #   `default: []` and is intended for "multi-valued" flags.
+  # @param add_method [true, false, nil] Whether to add a method for this
+  #   flag. If omitted or set to nil, uses the default behavior, which
+  #   adds the method if the key is a symbol representing a legal method
+  #   name that starts with a letter and does not override any public
+  #   method in the Ruby Object class or collide with any method directly
+  #   defined in the tool class.
+  # @param block [Proc] Configures the flag. See {Toys::DSL::Flag} for the
+  #   directives that can be called in this block.
   # @param complete_flags [Object] A specifier for shell tab completion
   #   for flag names associated with this flag. By default, a
   #   {Toys::Flag::DefaultCompletion} is used, which provides the flag's
@@ -4207,29 +4185,36 @@ module Toys::DSL::Tool
   #   completion by default. To customize completion, set this to the
   #   name of a previously defined completion, or any spec recognized by
   #   {Toys::Completion.create}.
-  # @param report_collisions [Boolean] Raise an exception if a flag is
-  #   requested that is already in use or marked as unusable. Default is
-  #   true.
-  # @param group [Toys::FlagGroup, String, Symbol, nil] Group for this flag.
-  #   You may provide a group name, a FlagGroup object, or `nil` which
-  #   denotes the default group.
+  # @param default [Object] The default value. This is the value that will
+  #   be set in the context if this flag is not provided on the command
+  #   line. Defaults to `nil`.
   # @param desc [String, Array<String>, Toys::WrappableString] Short
   #   description for the flag. See {Toys::DSL::Tool#desc} for a
   #   description of the allowed formats. Defaults to the empty string.
+  # @param display_name [String] A display name for this flag, used in help
+  #   text and error messages.
+  # @param flags [String...] The flags in OptionParser format.
+  # @param group [Toys::FlagGroup, String, Symbol, nil] Group for this flag.
+  #   You may provide a group name, a FlagGroup object, or `nil` which
+  #   denotes the default group.
+  # @param handler [Proc, nil, :set, :push] An optional handler for
+  #   setting/updating the value. A handler is a proc taking two
+  #   arguments, the given value and the previous value, returning the
+  #   new value that should be set. You may also specify a predefined
+  #   named handler. The `:set` handler (the default) replaces the
+  #   previous value (effectively `-> (val, _prev) { val }`). The
+  #   `:push` handler expects the previous value to be an array and
+  #   pushes the given value onto it; it should be combined with setting
+  #   `default: []` and is intended for "multi-valued" flags.
+  # @param key [String, Symbol] The key to use to retrieve the value from
+  #   the execution context.
   # @param long_desc [Array<String,Array<String>,Toys::WrappableString>] Long description for the flag. See {Toys::DSL::Tool#long_desc} for
   #   a description of the allowed formats. (But note that this param
   #   takes an Array of description lines, rather than a series of
   #   arguments.) Defaults to the empty array.
-  # @param display_name [String] A display name for this flag, used in help
-  #   text and error messages.
-  # @param add_method [true, false, nil] Whether to add a method for this
-  #   flag. If omitted or set to nil, uses the default behavior, which
-  #   adds the method if the key is a symbol representing a legal method
-  #   name that starts with a letter and does not override any public
-  #   method in the Ruby Object class or collide with any method directly
-  #   defined in the tool class.
-  # @param block [Proc] Configures the flag. See {Toys::DSL::Flag} for the
-  #   directives that can be called in this block.
+  # @param report_collisions [Boolean] Raise an exception if a flag is
+  #   requested that is already in use or marked as unusable. Default is
+  #   true.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#996
@@ -4252,9 +4237,8 @@ module Toys::DSL::Tool
   #       # ...
   #     end
   #
-  # @param type [Symbol] The type of group. Allowed values: `:required`,
-  #   `:optional`, `:exactly_one`, `:at_most_one`, `:at_least_one`.
-  #   Default is `:optional`.
+  # @param block [Proc] Adds flags to the group. See {Toys::DSL::FlagGroup}
+  #   for the directives that can be called in this block.
   # @param desc [String, Array<String>, Toys::WrappableString] Short
   #   description for the group. See {Toys::DSL::Tool#desc} for a
   #   description of allowed formats. Defaults to `"Flags"`.
@@ -4263,13 +4247,14 @@ module Toys::DSL::Tool
   #   Defaults to the empty array.
   # @param name [String, Symbol, nil] The name of the group, or nil for no
   #   name.
+  # @param prepend [Boolean] If `true`, prepend rather than append the
+  #   group to the list. Default is `false`.
   # @param report_collisions [Boolean] If `true`, raise an exception if a
   #   the given name is already taken. If `false`, ignore. Default is
   #   `true`.
-  # @param prepend [Boolean] If `true`, prepend rather than append the
-  #   group to the list. Default is `false`.
-  # @param block [Proc] Adds flags to the group. See {Toys::DSL::FlagGroup}
-  #   for the directives that can be called in this block.
+  # @param type [Symbol] The type of group. Allowed values: `:required`,
+  #   `:optional`, `:exactly_one`, `:at_most_one`, `:at_least_one`.
+  #   Default is `:optional`.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#638
@@ -4297,9 +4282,9 @@ module Toys::DSL::Tool
   #       end
   #     end
   #
-  # @param mixin [Module, Symbol, String] Module or module name.
   # @param args [Object...] Arguments to pass to the initializer
   # @param kwargs [keywords] Keyword arguments to pass to the initializer
+  # @param mixin [Module, Symbol, String] Module or module name.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#1627
@@ -4328,9 +4313,9 @@ module Toys::DSL::Tool
   # Load another config file or directory, as if its contents were inserted
   # at the current location.
   #
-  # @param path [String] The file or directory to load.
   # @param as [String] Load into the given tool/namespace. If omitted,
   #   configuration will be loaded into the current namespace.
+  # @param path [String] The file or directory to load.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#416
@@ -4339,14 +4324,14 @@ module Toys::DSL::Tool
   # Load configuration from a public git repository, as if its contents
   # were inserted at the current location.
   #
-  # @param remote [String] The URL of the git repository. Defaults to the
-  #   current repository if already loading from git.
-  # @param path [String] The path within the repo to the file or directory
-  #   to load. Defaults to the root of the repo.
-  # @param commit [String] The commit branch, tag, or sha. Defaults to the
-  #   current commit if already loading from git, or to `HEAD`.
   # @param as [String] Load into the given tool/namespace. If omitted,
   #   configuration will be loaded into the current namespace.
+  # @param commit [String] The commit branch, tag, or sha. Defaults to the
+  #   current commit if already loading from git, or to `HEAD`.
+  # @param path [String] The path within the repo to the file or directory
+  #   to load. Defaults to the root of the repo.
+  # @param remote [String] The URL of the git repository. Defaults to the
+  #   current repository if already loading from git.
   # @param update [Boolean] Force-fetch from the remote (unless the commit
   #   is a SHA). This will ensure that symbolic commits, such as branch
   #   names, are up to date. Default is false.
@@ -4375,12 +4360,12 @@ module Toys::DSL::Tool
   #               ["    This indent is preserved."]
   #     long_desc "This line is appended to the description."
   #
-  # @param strs [Toys::WrappableString, String, Array<String>...]
+  # @param data [String] Optional. Read the description from the given data
+  #   file. The file must be a plain text file whose suffix is `.txt`.
   # @param file [String] Optional. Read the description from the given file
   #   provided relative to the current toys file. The file must be a
   #   plain text file whose suffix is `.txt`.
-  # @param data [String] Optional. Read the description from the given data
-  #   file. The file must be a plain text file whose suffix is `.txt`.
+  # @param strs [Toys::WrappableString, String, Array<String>...]
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#582
@@ -4423,11 +4408,11 @@ module Toys::DSL::Tool
   #       end
   #     end
   #
-  # @param name [String] Name of the mixin
+  # @param block [Proc] Defines the mixin module.
   # @param mixin_module [Module] Module to use as the mixin. Optional.
   #   Either pass a module here, *or* provide a block and define the
   #   mixin within the block.
-  # @param block [Proc] Defines the mixin module.
+  # @param name [String] Name of the mixin
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#149
@@ -4453,9 +4438,9 @@ module Toys::DSL::Tool
   #       end
   #     end
   #
+  # @param block [Proc] The interrupt callback as a block.
   # @param handler [Proc, Symbol, nil] The interrupt callback proc or method
   #   name. Pass nil to disable interrupt handling.
-  # @param block [Proc] The interrupt callback as a block.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#1531
@@ -4502,9 +4487,9 @@ module Toys::DSL::Tool
   #       end
   #     end
   #
+  # @param block [Proc] The run handler as a block.
   # @param handler [Proc, Symbol, nil] The run handler as a method name
   #   symbol or a proc, or nil to explicitly set as non-runnable.
-  # @param block [Proc] The run handler as a block.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#1503
@@ -4528,10 +4513,10 @@ module Toys::DSL::Tool
   #       end
   #     end
   #
-  # @param signal [Integer, String, Symbol] The signal name or number
+  # @param block [Proc] The signal callback as a block.
   # @param handler [Proc, Symbol, nil] The signal callback proc or method
   #   name. Pass nil to disable signal handling.
-  # @param block [Proc] The signal callback as a block.
+  # @param signal [Integer, String, Symbol] The signal name or number
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#1562
@@ -4556,9 +4541,9 @@ module Toys::DSL::Tool
   #       on_usage_error :run
   #     end
   #
+  # @param block [Proc] The interrupt callback as a block.
   # @param handler [Proc, Symbol, nil] The interrupt callback proc or method
   #   name. Pass nil to disable interrupt handling.
-  # @param block [Proc] The interrupt callback as a block.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#1593
@@ -4592,29 +4577,11 @@ module Toys::DSL::Tool
   #       end
   #     end
   #
-  # @param key [String, Symbol] The key to use to retrieve the value from
-  #   the execution context.
-  # @param default [Object] The default value. This is the value that will
-  #   be set in the context if this argument is not provided on the
-  #   command line. Defaults to `nil`.
   # @param accept [Object] An acceptor that validates and/or converts the
   #   value. You may provide either the name of an acceptor you have
   #   defined, one of the default acceptors provided by OptionParser, or
   #   any other specification recognized by {Toys::Acceptor.create}.
   #   Optional. If not specified, accepts any value as a string.
-  # @param complete [Object] A specifier for shell tab completion for
-  #   values of this arg. This is the empty completion by default. To
-  #   customize completion, set this to the name of a previously defined
-  #   completion, or any spec recognized by {Toys::Completion.create}.
-  # @param display_name [String] A name to use for display (in help text
-  #   and error reports). Defaults to the key in upper case.
-  # @param desc [String, Array<String>, Toys::WrappableString] Short
-  #   description for the flag. See {Toys::DSL::Tool#desc} for a
-  #   description of the allowed formats. Defaults to the empty string.
-  # @param long_desc [Array<String,Array<String>,Toys::WrappableString>] Long description for the flag. See {Toys::DSL::Tool#long_desc} for
-  #   a description of the allowed formats. (But note that this param
-  #   takes an Array of description lines, rather than a series of
-  #   arguments.) Defaults to the empty array.
   # @param add_method [true, false, nil] Whether to add a method for this
   #   argument. If omitted or set to nil, uses the default behavior,
   #   which adds the method if the key is a symbol representing a legal
@@ -4624,6 +4591,24 @@ module Toys::DSL::Tool
   # @param block [Proc] Configures the positional argument. See
   #   {Toys::DSL::PositionalArg} for the directives that can be called in
   #   this block.
+  # @param complete [Object] A specifier for shell tab completion for
+  #   values of this arg. This is the empty completion by default. To
+  #   customize completion, set this to the name of a previously defined
+  #   completion, or any spec recognized by {Toys::Completion.create}.
+  # @param default [Object] The default value. This is the value that will
+  #   be set in the context if this argument is not provided on the
+  #   command line. Defaults to `nil`.
+  # @param desc [String, Array<String>, Toys::WrappableString] Short
+  #   description for the flag. See {Toys::DSL::Tool#desc} for a
+  #   description of the allowed formats. Defaults to the empty string.
+  # @param display_name [String] A name to use for display (in help text
+  #   and error reports). Defaults to the key in upper case.
+  # @param key [String, Symbol] The key to use to retrieve the value from
+  #   the execution context.
+  # @param long_desc [Array<String,Array<String>,Toys::WrappableString>] Long description for the flag. See {Toys::DSL::Tool#long_desc} for
+  #   a description of the allowed formats. (But note that this param
+  #   takes an Array of description lines, rather than a series of
+  #   arguments.) Defaults to the empty array.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#1165
@@ -4657,29 +4642,11 @@ module Toys::DSL::Tool
   #       end
   #     end
   #
-  # @param key [String, Symbol] The key to use to retrieve the value from
-  #   the execution context.
-  # @param default [Object] The default value. This is the value that will
-  #   be set in the context if this argument is not provided on the
-  #   command line. Defaults to `nil`.
   # @param accept [Object] An acceptor that validates and/or converts the
   #   value. You may provide either the name of an acceptor you have
   #   defined, one of the default acceptors provided by OptionParser, or
   #   any other specification recognized by {Toys::Acceptor.create}.
   #   Optional. If not specified, accepts any value as a string.
-  # @param complete [Object] A specifier for shell tab completion for
-  #   values of this arg. This is the empty completion by default. To
-  #   customize completion, set this to the name of a previously defined
-  #   completion, or any spec recognized by {Toys::Completion.create}.
-  # @param display_name [String] A name to use for display (in help text
-  #   and error reports). Defaults to the key in upper case.
-  # @param desc [String, Array<String>, Toys::WrappableString] Short
-  #   description for the flag. See {Toys::DSL::Tool#desc} for a
-  #   description of the allowed formats. Defaults to the empty string.
-  # @param long_desc [Array<String,Array<String>,Toys::WrappableString>] Long description for the flag. See {Toys::DSL::Tool#long_desc} for
-  #   a description of the allowed formats. (But note that this param
-  #   takes an Array of description lines, rather than a series of
-  #   arguments.) Defaults to the empty array.
   # @param add_method [true, false, nil] Whether to add a method for this
   #   argument. If omitted or set to nil, uses the default behavior,
   #   which adds the method if the key is a symbol representing a legal
@@ -4689,6 +4656,24 @@ module Toys::DSL::Tool
   # @param block [Proc] Configures the positional argument. See
   #   {Toys::DSL::PositionalArg} for the directives that can be called in
   #   this block.
+  # @param complete [Object] A specifier for shell tab completion for
+  #   values of this arg. This is the empty completion by default. To
+  #   customize completion, set this to the name of a previously defined
+  #   completion, or any spec recognized by {Toys::Completion.create}.
+  # @param default [Object] The default value. This is the value that will
+  #   be set in the context if this argument is not provided on the
+  #   command line. Defaults to `nil`.
+  # @param desc [String, Array<String>, Toys::WrappableString] Short
+  #   description for the flag. See {Toys::DSL::Tool#desc} for a
+  #   description of the allowed formats. Defaults to the empty string.
+  # @param display_name [String] A name to use for display (in help text
+  #   and error reports). Defaults to the key in upper case.
+  # @param key [String, Symbol] The key to use to retrieve the value from
+  #   the execution context.
+  # @param long_desc [Array<String,Array<String>,Toys::WrappableString>] Long description for the flag. See {Toys::DSL::Tool#long_desc} for
+  #   a description of the allowed formats. (But note that this param
+  #   takes an Array of description lines, rather than a series of
+  #   arguments.) Defaults to the empty array.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#1152
@@ -4722,29 +4707,11 @@ module Toys::DSL::Tool
   #       end
   #     end
   #
-  # @param key [String, Symbol] The key to use to retrieve the value from
-  #   the execution context.
-  # @param default [Object] The default value. This is the value that will
-  #   be set in the context if no unmatched arguments are provided on the
-  #   command line. Defaults to the empty array `[]`.
   # @param accept [Object] An acceptor that validates and/or converts the
   #   value. You may provide either the name of an acceptor you have
   #   defined, one of the default acceptors provided by OptionParser, or
   #   any other specification recognized by {Toys::Acceptor.create}.
   #   Optional. If not specified, accepts any value as a string.
-  # @param complete [Object] A specifier for shell tab completion for
-  #   values of this arg. This is the empty completion by default. To
-  #   customize completion, set this to the name of a previously defined
-  #   completion, or any spec recognized by {Toys::Completion.create}.
-  # @param display_name [String] A name to use for display (in help text
-  #   and error reports). Defaults to the key in upper case.
-  # @param desc [String, Array<String>, Toys::WrappableString] Short
-  #   description for the flag. See {Toys::DSL::Tool#desc} for a
-  #   description of the allowed formats. Defaults to the empty string.
-  # @param long_desc [Array<String,Array<String>,Toys::WrappableString>] Long description for the flag. See {Toys::DSL::Tool#long_desc} for
-  #   a description of the allowed formats. (But note that this param
-  #   takes an Array of description lines, rather than a series of
-  #   arguments.) Defaults to the empty array.
   # @param add_method [true, false, nil] Whether to add a method for these
   #   arguments. If omitted or set to nil, uses the default behavior,
   #   which adds the method if the key is a symbol representing a legal
@@ -4754,6 +4721,24 @@ module Toys::DSL::Tool
   # @param block [Proc] Configures the positional argument. See
   #   {Toys::DSL::PositionalArg} for the directives that can be called in
   #   this block.
+  # @param complete [Object] A specifier for shell tab completion for
+  #   values of this arg. This is the empty completion by default. To
+  #   customize completion, set this to the name of a previously defined
+  #   completion, or any spec recognized by {Toys::Completion.create}.
+  # @param default [Object] The default value. This is the value that will
+  #   be set in the context if no unmatched arguments are provided on the
+  #   command line. Defaults to the empty array `[]`.
+  # @param desc [String, Array<String>, Toys::WrappableString] Short
+  #   description for the flag. See {Toys::DSL::Tool#desc} for a
+  #   description of the allowed formats. Defaults to the empty string.
+  # @param display_name [String] A name to use for display (in help text
+  #   and error reports). Defaults to the key in upper case.
+  # @param key [String, Symbol] The key to use to retrieve the value from
+  #   the execution context.
+  # @param long_desc [Array<String,Array<String>,Toys::WrappableString>] Long description for the flag. See {Toys::DSL::Tool#long_desc} for
+  #   a description of the allowed formats. (But note that this param
+  #   takes an Array of description lines, rather than a series of
+  #   arguments.) Defaults to the empty array.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#1244
@@ -4787,29 +4772,11 @@ module Toys::DSL::Tool
   #       end
   #     end
   #
-  # @param key [String, Symbol] The key to use to retrieve the value from
-  #   the execution context.
-  # @param default [Object] The default value. This is the value that will
-  #   be set in the context if no unmatched arguments are provided on the
-  #   command line. Defaults to the empty array `[]`.
   # @param accept [Object] An acceptor that validates and/or converts the
   #   value. You may provide either the name of an acceptor you have
   #   defined, one of the default acceptors provided by OptionParser, or
   #   any other specification recognized by {Toys::Acceptor.create}.
   #   Optional. If not specified, accepts any value as a string.
-  # @param complete [Object] A specifier for shell tab completion for
-  #   values of this arg. This is the empty completion by default. To
-  #   customize completion, set this to the name of a previously defined
-  #   completion, or any spec recognized by {Toys::Completion.create}.
-  # @param display_name [String] A name to use for display (in help text
-  #   and error reports). Defaults to the key in upper case.
-  # @param desc [String, Array<String>, Toys::WrappableString] Short
-  #   description for the flag. See {Toys::DSL::Tool#desc} for a
-  #   description of the allowed formats. Defaults to the empty string.
-  # @param long_desc [Array<String,Array<String>,Toys::WrappableString>] Long description for the flag. See {Toys::DSL::Tool#long_desc} for
-  #   a description of the allowed formats. (But note that this param
-  #   takes an Array of description lines, rather than a series of
-  #   arguments.) Defaults to the empty array.
   # @param add_method [true, false, nil] Whether to add a method for these
   #   arguments. If omitted or set to nil, uses the default behavior,
   #   which adds the method if the key is a symbol representing a legal
@@ -4819,6 +4786,24 @@ module Toys::DSL::Tool
   # @param block [Proc] Configures the positional argument. See
   #   {Toys::DSL::PositionalArg} for the directives that can be called in
   #   this block.
+  # @param complete [Object] A specifier for shell tab completion for
+  #   values of this arg. This is the empty completion by default. To
+  #   customize completion, set this to the name of a previously defined
+  #   completion, or any spec recognized by {Toys::Completion.create}.
+  # @param default [Object] The default value. This is the value that will
+  #   be set in the context if no unmatched arguments are provided on the
+  #   command line. Defaults to the empty array `[]`.
+  # @param desc [String, Array<String>, Toys::WrappableString] Short
+  #   description for the flag. See {Toys::DSL::Tool#desc} for a
+  #   description of the allowed formats. Defaults to the empty string.
+  # @param display_name [String] A name to use for display (in help text
+  #   and error reports). Defaults to the key in upper case.
+  # @param key [String, Symbol] The key to use to retrieve the value from
+  #   the execution context.
+  # @param long_desc [Array<String,Array<String>,Toys::WrappableString>] Long description for the flag. See {Toys::DSL::Tool#long_desc} for
+  #   a description of the allowed formats. (But note that this param
+  #   takes an Array of description lines, rather than a series of
+  #   arguments.) Defaults to the empty array.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#1231
@@ -4863,26 +4848,11 @@ module Toys::DSL::Tool
   #       end
   #     end
   #
-  # @param key [String, Symbol] The key to use to retrieve the value from
-  #   the execution context.
   # @param accept [Object] An acceptor that validates and/or converts the
   #   value. You may provide either the name of an acceptor you have
   #   defined, one of the default acceptors provided by OptionParser, or
   #   any other specification recognized by {Toys::Acceptor.create}.
   #   Optional. If not specified, accepts any value as a string.
-  # @param complete [Object] A specifier for shell tab completion for
-  #   values of this arg. This is the empty completion by default. To
-  #   customize completion, set this to the name of a previously defined
-  #   completion, or any spec recognized by {Toys::Completion.create}.
-  # @param display_name [String] A name to use for display (in help text
-  #   and error reports). Defaults to the key in upper case.
-  # @param desc [String, Array<String>, Toys::WrappableString] Short
-  #   description for the flag. See {Toys::DSL::Tool#desc} for a
-  #   description of the allowed formats. Defaults to the empty string.
-  # @param long_desc [Array<String,Array<String>,Toys::WrappableString>] Long description for the flag. See {Toys::DSL::Tool#long_desc} for
-  #   a description of the allowed formats. (But note that this param
-  #   takes an Array of description lines, rather than a series of
-  #   arguments.) Defaults to the empty array.
   # @param add_method [true, false, nil] Whether to add a method for this
   #   argument. If omitted or set to nil, uses the default behavior,
   #   which adds the method if the key is a symbol representing a legal
@@ -4892,6 +4862,21 @@ module Toys::DSL::Tool
   # @param block [Proc] Configures the positional argument. See
   #   {Toys::DSL::PositionalArg} for the directives that can be called in
   #   this block.
+  # @param complete [Object] A specifier for shell tab completion for
+  #   values of this arg. This is the empty completion by default. To
+  #   customize completion, set this to the name of a previously defined
+  #   completion, or any spec recognized by {Toys::Completion.create}.
+  # @param desc [String, Array<String>, Toys::WrappableString] Short
+  #   description for the flag. See {Toys::DSL::Tool#desc} for a
+  #   description of the allowed formats. Defaults to the empty string.
+  # @param display_name [String] A name to use for display (in help text
+  #   and error reports). Defaults to the key in upper case.
+  # @param key [String, Symbol] The key to use to retrieve the value from
+  #   the execution context.
+  # @param long_desc [Array<String,Array<String>,Toys::WrappableString>] Long description for the flag. See {Toys::DSL::Tool#long_desc} for
+  #   a description of the allowed formats. (But note that this param
+  #   takes an Array of description lines, rather than a series of
+  #   arguments.) Defaults to the empty array.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#1086
@@ -4923,26 +4908,11 @@ module Toys::DSL::Tool
   #       end
   #     end
   #
-  # @param key [String, Symbol] The key to use to retrieve the value from
-  #   the execution context.
   # @param accept [Object] An acceptor that validates and/or converts the
   #   value. You may provide either the name of an acceptor you have
   #   defined, one of the default acceptors provided by OptionParser, or
   #   any other specification recognized by {Toys::Acceptor.create}.
   #   Optional. If not specified, accepts any value as a string.
-  # @param complete [Object] A specifier for shell tab completion for
-  #   values of this arg. This is the empty completion by default. To
-  #   customize completion, set this to the name of a previously defined
-  #   completion, or any spec recognized by {Toys::Completion.create}.
-  # @param display_name [String] A name to use for display (in help text
-  #   and error reports). Defaults to the key in upper case.
-  # @param desc [String, Array<String>, Toys::WrappableString] Short
-  #   description for the flag. See {Toys::DSL::Tool#desc} for a
-  #   description of the allowed formats. Defaults to the empty string.
-  # @param long_desc [Array<String,Array<String>,Toys::WrappableString>] Long description for the flag. See {Toys::DSL::Tool#long_desc} for
-  #   a description of the allowed formats. (But note that this param
-  #   takes an Array of description lines, rather than a series of
-  #   arguments.) Defaults to the empty array.
   # @param add_method [true, false, nil] Whether to add a method for this
   #   argument. If omitted or set to nil, uses the default behavior,
   #   which adds the method if the key is a symbol representing a legal
@@ -4952,6 +4922,21 @@ module Toys::DSL::Tool
   # @param block [Proc] Configures the positional argument. See
   #   {Toys::DSL::PositionalArg} for the directives that can be called in
   #   this block.
+  # @param complete [Object] A specifier for shell tab completion for
+  #   values of this arg. This is the empty completion by default. To
+  #   customize completion, set this to the name of a previously defined
+  #   completion, or any spec recognized by {Toys::Completion.create}.
+  # @param desc [String, Array<String>, Toys::WrappableString] Short
+  #   description for the flag. See {Toys::DSL::Tool#desc} for a
+  #   description of the allowed formats. Defaults to the empty string.
+  # @param display_name [String] A name to use for display (in help text
+  #   and error reports). Defaults to the key in upper case.
+  # @param key [String, Symbol] The key to use to retrieve the value from
+  #   the execution context.
+  # @param long_desc [Array<String,Array<String>,Toys::WrappableString>] Long description for the flag. See {Toys::DSL::Tool#long_desc} for
+  #   a description of the allowed formats. (But note that this param
+  #   takes an Array of description lines, rather than a series of
+  #   arguments.) Defaults to the empty array.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#1073
@@ -5135,11 +5120,11 @@ module Toys::DSL::Tool
   #
   #     expand "hello-generator", "mytool", "mytool is running!"
   #
+  # @param block [Proc] Defines the template class.
   # @param name [String] Name of the template
   # @param template_class [Class] Module to use as the mixin. Optional.
   #   Either pass a module here, *or* provide a block and define the
   #   mixin within the block.
-  # @param block [Proc] Defines the template class.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#211
@@ -5186,9 +5171,9 @@ module Toys::DSL::Tool
   #       end
   #     end
   #
+  # @param block [Proc] The run handler as a block.
   # @param handler [Proc, Symbol, nil] The run handler as a method name
   #   symbol or a proc, or nil to explicitly set as non-runnable.
-  # @param block [Proc] The run handler as a block.
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#1498
@@ -5224,21 +5209,21 @@ module Toys::DSL::Tool
   #       end
   #     end
   #
-  # @param words [String, Array<String>] The name of the subtool
+  # @param block [Proc] Defines the subtool.
+  # @param delegate_relative [String, Array<String>] Optional. Similar to
+  #   delegate_to, but takes a delegate name relative to the context in
+  #   which this tool is being defined.
+  # @param delegate_to [String, Array<String>] Optional. This tool should
+  #   delegate to another tool, specified by the full path. This path may
+  #   be given as an array of strings, or a single string possibly
+  #   delimited by path separators.
   # @param if_defined [:combine, :reset, :ignore] What to do if a definition
   #   already exists for this tool. Possible values are `:combine` (the
   #   default) indicating the definition should be combined with the
   #   existing definition, `:reset` indicating the earlier definition
   #   should be reset and the new definition applied instead, or
   #   `:ignore` indicating the new definition should be ignored.
-  # @param delegate_to [String, Array<String>] Optional. This tool should
-  #   delegate to another tool, specified by the full path. This path may
-  #   be given as an array of strings, or a single string possibly
-  #   delimited by path separators.
-  # @param delegate_relative [String, Array<String>] Optional. Similar to
-  #   delegate_to, but takes a delegate name relative to the context in
-  #   which this tool is being defined.
-  # @param block [Proc] Defines the subtool.
+  # @param words [String, Array<String>] The name of the subtool
   # @return [self]
   #
   # source://toys-core//lib/toys/dsl/tool.rb#314
@@ -5531,24 +5516,9 @@ class Toys::Flag
   class << self
     # Create a flag definition.
     #
-    # @param used_flags [Array<String>] An array of flags already in use.
-    # @param flags [Array<String>] The flags in OptionParser format. If empty,
-    #   a flag will be inferred from the key.
     # @param accept [Object] An acceptor that validates and/or converts the
     #   value. See {Toys::Acceptor.create} for recognized formats. Optional.
     #   If not specified, defaults to {Toys::Acceptor::DEFAULT}.
-    # @param default [Object] The default value. This is the value that will
-    #   be set in the context if this flag is not provided on the command
-    #   line. Defaults to `nil`.
-    # @param handler [Proc, nil, :set, :push] An optional handler for
-    #   setting/updating the value. A handler is a proc taking two
-    #   arguments, the given value and the previous value, returning the
-    #   new value that should be set. You may also specify a predefined
-    #   named handler. The `:set` handler (the default) replaces the
-    #   previous value (effectively `-> (val, _prev) { val }`). The
-    #   `:push` handler expects the previous value to be an array and
-    #   pushes the given value onto it; it should be combined with setting
-    #   `default: []` and is intended for "multi-valued" flags.
     # @param complete_flags [Object] A specifier for shell tab completion for
     #   flag names associated with this flag. By default, a
     #   {Toys::Flag::DefaultCompletion} is used, which provides the flag's
@@ -5559,19 +5529,34 @@ class Toys::Flag
     # @param complete_values [Object] A specifier for shell tab completion for
     #   flag values associated with this flag. Pass any spec recognized by
     #   {Toys::Completion.create}.
-    # @param report_collisions [Boolean] Raise an exception if a flag is
-    #   requested that is already in use or marked as disabled. Default is
-    #   true.
-    # @param group [Toys::FlagGroup] Group containing this flag.
+    # @param default [Object] The default value. This is the value that will
+    #   be set in the context if this flag is not provided on the command
+    #   line. Defaults to `nil`.
     # @param desc [String, Array<String>, Toys::WrappableString] Short
     #   description for the flag. See {Toys::ToolDefinition#desc} for a
     #   description of allowed formats. Defaults to the empty string.
-    # @param long_desc [Array<String,Array<String>,Toys::WrappableString>] Long description for the flag. See {Toys::ToolDefinition#long_desc}
-    #   for a description of allowed formats. Defaults to the empty array.
     # @param display_name [String] A display name for this flag, used in help
     #   text and error messages.
+    # @param flags [Array<String>] The flags in OptionParser format. If empty,
+    #   a flag will be inferred from the key.
+    # @param group [Toys::FlagGroup] Group containing this flag.
+    # @param handler [Proc, nil, :set, :push] An optional handler for
+    #   setting/updating the value. A handler is a proc taking two
+    #   arguments, the given value and the previous value, returning the
+    #   new value that should be set. You may also specify a predefined
+    #   named handler. The `:set` handler (the default) replaces the
+    #   previous value (effectively `-> (val, _prev) { val }`). The
+    #   `:push` handler expects the previous value to be an array and
+    #   pushes the given value onto it; it should be combined with setting
+    #   `default: []` and is intended for "multi-valued" flags.
     # @param key [String, Symbol] The key to use to retrieve the value from
     #   the execution context.
+    # @param long_desc [Array<String,Array<String>,Toys::WrappableString>] Long description for the flag. See {Toys::ToolDefinition#long_desc}
+    #   for a description of allowed formats. Defaults to the empty array.
+    # @param report_collisions [Boolean] Raise an exception if a flag is
+    #   requested that is already in use or marked as disabled. Default is
+    #   true.
+    # @param used_flags [Array<String>] An array of flags already in use.
     #
     # source://toys-core//lib/toys/flag.rb#437
     def create(key, flags = T.unsafe(nil), used_flags: T.unsafe(nil), report_collisions: T.unsafe(nil), accept: T.unsafe(nil), handler: T.unsafe(nil), default: T.unsafe(nil), complete_flags: T.unsafe(nil), complete_values: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), group: T.unsafe(nil)); end
@@ -5593,9 +5578,9 @@ class Toys::Flag::DefaultCompletion < ::Toys::Completion::Base
   # Create a completion given configuration options.
   #
   # @param flag [Toys::Flag] The flag definition.
-  # @param include_short [Boolean] Whether to include short flags.
   # @param include_long [Boolean] Whether to include long flags.
   # @param include_negative [Boolean] Whether to include `--no-*` forms.
+  # @param include_short [Boolean] Whether to include short flags.
   # @return [DefaultCompletion] a new instance of DefaultCompletion
   #
   # source://toys-core//lib/toys/flag.rb#303
@@ -5885,7 +5870,6 @@ module Toys::FlagGroup
     #  *  `:at_least_one` At least one flag in the group must be provided
     #  *  `:at_most_one` At most one flag in the group must be provided
     #
-    # @param type [Symbol] The type of group. Default is `:optional`.
     # @param desc [String, Array<String>, Toys::WrappableString] Short
     #   description for the group. See {Toys::ToolDefinition#desc} for a
     #   description of allowed formats. Defaults to `"Flags"`.
@@ -5894,6 +5878,7 @@ module Toys::FlagGroup
     #   formats. Defaults to the empty array.
     # @param name [String, Symbol, nil] The name of the group, or nil for no
     #   name.
+    # @param type [Symbol] The type of group. Default is `:optional`.
     # @return [Toys::FlagGroup::Base] A flag group of the correct subclass.
     #
     # source://toys-core//lib/toys/flag_group.rb#30
@@ -6081,12 +6066,12 @@ module Toys::InputFile
   class << self
     # @private
     #
-    # source://toys-core//lib/toys/input_file.rb#39
+    # source://toys-core//lib/toys/input_file.rb#37
     def __binding; end
 
     # @private
     #
-    # source://toys-core//lib/toys/input_file.rb#46
+    # source://toys-core//lib/toys/input_file.rb#44
     def build_eval_string(module_name, string); end
 
     # @private This interface is internal and subject to change without warning.
@@ -6103,33 +6088,33 @@ end
 class Toys::Loader
   # Create a Loader
   #
+  # @param data_dir_name [String, nil] A directory with this name that appears
+  #   in any configuration directory is added to the data directory search
+  #   path for any tool file in that directory.
+  # @param extra_delimiters [String] A string containing characters that can
+  #   function as delimiters in a tool name. Defaults to empty. Allowed
+  #   characters are period, colon, and slash.
   # @param index_file_name [String, nil] A file with this name that appears
   #   in any configuration directory (not just a toplevel directory) is
   #   loaded first as a standalone configuration file. If not provided,
   #   standalone configuration files are disabled.
-  # @param preload_file_name [String, nil] A file with this name that appears
-  #   in any configuration directory is preloaded before any tools in that
-  #   configuration directory are defined.
+  # @param lib_dir_name [String, nil] A directory with this name that appears
+  #   in any configuration directory is added to the Ruby load path for any
+  #   tool file in that directory.
+  # @param middleware_lookup [Toys::ModuleLookup] A lookup for
+  #   well-known middleware classes. Defaults to an empty lookup.
+  # @param middleware_stack [Array<Toys::Middleware::Spec>] An array of
+  #   middleware that will be used by default for all tools loaded by this
+  #   loader.
+  # @param mixin_lookup [Toys::ModuleLookup] A lookup for well-known
+  #   mixin modules. Defaults to an empty lookup.
   # @param preload_dir_name [String, nil] A directory with this name that
   #   appears in any configuration directory is searched for Ruby files,
   #   which are preloaded before any tools in that configuration directory
   #   are defined.
-  # @param data_dir_name [String, nil] A directory with this name that appears
-  #   in any configuration directory is added to the data directory search
-  #   path for any tool file in that directory.
-  # @param lib_dir_name [String, nil] A directory with this name that appears
-  #   in any configuration directory is added to the Ruby load path for any
-  #   tool file in that directory.
-  # @param middleware_stack [Array<Toys::Middleware::Spec>] An array of
-  #   middleware that will be used by default for all tools loaded by this
-  #   loader.
-  # @param extra_delimiters [String] A string containing characters that can
-  #   function as delimiters in a tool name. Defaults to empty. Allowed
-  #   characters are period, colon, and slash.
-  # @param mixin_lookup [Toys::ModuleLookup] A lookup for well-known
-  #   mixin modules. Defaults to an empty lookup.
-  # @param middleware_lookup [Toys::ModuleLookup] A lookup for
-  #   well-known middleware classes. Defaults to an empty lookup.
+  # @param preload_file_name [String, nil] A file with this name that appears
+  #   in any configuration directory is preloaded before any tools in that
+  #   configuration directory are defined.
   # @param template_lookup [Toys::ModuleLookup] A lookup for
   #   well-known template classes. Defaults to an empty lookup.
   # @return [Loader] a new instance of Loader
@@ -6150,17 +6135,17 @@ class Toys::Loader
 
   # Add a configuration block to the loader.
   #
+  # @param block [Proc] The block of configuration, executed in the context
+  #   of the tool DSL {Toys::DSL::Tool}.
+  # @param context_directory [String, nil] The context directory for tools
+  #   loaded from this block. You can pass a directory path as a string, or
+  #   `nil` to denote no context. Defaults to `nil`.
   # @param high_priority [Boolean] If true, add this block at the top of the
   #   priority list. Defaults to false, indicating the block should be at
   #   the bottom of the priority list.
   # @param source_name [String] The source name that will be shown in
   #   documentation for tools defined in this block. If omitted, a default
   #   unique string will be generated.
-  # @param block [Proc] The block of configuration, executed in the context
-  #   of the tool DSL {Toys::DSL::Tool}.
-  # @param context_directory [String, nil] The context directory for tools
-  #   loaded from this block. You can pass a directory path as a string, or
-  #   `nil` to denote no context. Defaults to `nil`.
   # @return [self]
   #
   # source://toys-core//lib/toys/loader.rb#167
@@ -6168,19 +6153,19 @@ class Toys::Loader
 
   # Add a configuration git source to the loader.
   #
-  # @param git_remote [String] The git repo URL
+  # @param context_directory [String, nil] The context directory for tools
+  #   loaded from this source. You can pass a directory path as a string,
+  #   or `nil` to denote no context. Defaults to `nil`.
+  # @param git_commit [String] The git ref (i.e. SHA, tag, or branch name)
   # @param git_path [String] The path to the relevant file or directory in
   #   the repo. Specify the empty string to use the entire repo.
-  # @param git_commit [String] The git ref (i.e. SHA, tag, or branch name)
+  # @param git_remote [String] The git repo URL
   # @param high_priority [Boolean] If true, add this path at the top of the
   #   priority list. Defaults to false, indicating the new path should be
   #   at the bottom of the priority list.
   # @param update [Boolean] If the commit is not a SHA, pulls any updates
   #   from the remote. Defaults to false, which uses a local cache and does
   #   not update if the commit has been fetched previously.
-  # @param context_directory [String, nil] The context directory for tools
-  #   loaded from this source. You can pass a directory path as a string,
-  #   or `nil` to denote no context. Defaults to `nil`.
   # @return [self]
   #
   # source://toys-core//lib/toys/loader.rb#203
@@ -6188,16 +6173,16 @@ class Toys::Loader
 
   # Add a configuration file/directory to the loader.
   #
-  # @param path [String] A single path to add.
-  # @param high_priority [Boolean] If true, add this path at the top of the
-  #   priority list. Defaults to false, indicating the new path should be
-  #   at the bottom of the priority list.
-  # @param source_name [String] A custom name for the root source. Optional.
   # @param context_directory [String, nil, :path, :parent] The context directory
   #   for tools loaded from this path. You can pass a directory path as a
   #   string, `:path` to denote the given path, `:parent` to denote the
   #   given path's parent directory, or `nil` to denote no context.
   #   Defaults to `:parent`.
+  # @param high_priority [Boolean] If true, add this path at the top of the
+  #   priority list. Defaults to false, indicating the new path should be
+  #   at the bottom of the priority list.
+  # @param path [String] A single path to add.
+  # @param source_name [String] A custom name for the root source. Optional.
   # @return [self]
   #
   # source://toys-core//lib/toys/loader.rb#94
@@ -6207,18 +6192,18 @@ class Toys::Loader
   # the loader. The set of paths will be added at the same priority level and
   # will share a root.
   #
-  # @param root_path [String] A root path to be seen as the root source. This
-  #   should generally be a directory containing the paths to add.
-  # @param relative_paths [String, Array<String>] One or more paths to add, as
-  #   relative paths from the common root.
-  # @param high_priority [Boolean] If true, add the paths at the top of the
-  #   priority list. Defaults to false, indicating the new paths should be
-  #   at the bottom of the priority list.
   # @param context_directory [String, nil, :path, :parent] The context directory
   #   for tools loaded from this path. You can pass a directory path as a
   #   string, `:path` to denote the given root path, `:parent` to denote
   #   the given root path's parent directory, or `nil` to denote no context.
   #   Defaults to `:path`.
+  # @param high_priority [Boolean] If true, add the paths at the top of the
+  #   priority list. Defaults to false, indicating the new paths should be
+  #   at the bottom of the priority list.
+  # @param relative_paths [String, Array<String>] One or more paths to add, as
+  #   relative paths from the common root.
+  # @param root_path [String] A root path to be seen as the root source. This
+  #   should generally be a directory containing the paths to add.
   # @return [self]
   #
   # source://toys-core//lib/toys/loader.rb#131
@@ -6251,9 +6236,6 @@ class Toys::Loader
   # Returns a list of subtools for the given path, loading from the
   # configuration if necessary. The list will be sorted by name.
   #
-  # @param words [Array<String>] The name of the parent tool
-  # @param recursive [Boolean] If true, return all subtools recursively
-  #   rather than just the immediate children (the default)
   # @param include_hidden [Boolean] If true, include hidden subtools,
   #   i.e. names beginning with underscores. Defaults to false.
   # @param include_namespaces [Boolean] If true, include namespaces,
@@ -6261,6 +6243,9 @@ class Toys::Loader
   #   been listed by the current filters. Defaults to false.
   # @param include_non_runnable [Boolean] If true, include tools that have
   #   no children and are not runnable. Defaults to false.
+  # @param recursive [Boolean] If true, return all subtools recursively
+  #   rather than just the immediate children (the default)
+  # @param words [Array<String>] The name of the parent tool
   # @return [Array<Toys::ToolDefinition>] An array of subtools.
   #
   # source://toys-core//lib/toys/loader.rb#281
@@ -6590,8 +6575,8 @@ module Toys::Middleware
   # This basic implementation does nothing and simply yields to the next
   # middleware.
   #
-  # @param tool [Toys::ToolDefinition] The tool definition to modify.
   # @param loader [Toys::Loader] The loader that loaded this tool.
+  # @param tool [Toys::ToolDefinition] The tool definition to modify.
   # @return [void]
   #
   # source://toys-core//lib/toys/middleware.rb#45
@@ -7020,11 +7005,11 @@ class Toys::ModuleLookup
 
   # Add a lookup path for modules.
   #
-  # @param path_base [String] The base require path
-  # @param module_base [Module] The base module, or `nil` (the default) to
-  #   infer a default from the path base.
   # @param high_priority [Boolean] If true, add to the head of the lookup
   #   path, otherwise add to the end.
+  # @param module_base [Module] The base module, or `nil` (the default) to
+  #   infer a default from the path base.
+  # @param path_base [String] The base require path
   # @return [self]
   #
   # source://toys-core//lib/toys/module_lookup.rb#73
@@ -7210,24 +7195,24 @@ class Toys::PositionalArg
   class << self
     # Create a PositionalArg definition.
     #
-    # @param key [String, Symbol] The key to use to retrieve the value from
-    #   the execution context.
-    # @param type [Symbol] The type of arg. Valid values are `:required`,
-    #   `:optional`, and `:remaining`.
     # @param accept [Object] An acceptor that validates and/or converts the
     #   value. See {Toys::Acceptor.create} for recognized formats. Optional.
     #   If not specified, defaults to {Toys::Acceptor::DEFAULT}.
     # @param complete [Object] A specifier for shell tab completion. See
     #   {Toys::Completion.create} for recognized formats.
-    # @param display_name [String] A name to use for display (in help text and
-    #   error reports). Defaults to the key in upper case.
     # @param desc [String, Array<String>, Toys::WrappableString] Short
     #   description for the flag. See {Toys::ToolDefintion#desc} for a
     #   description of the allowed formats. Defaults to the empty string.
+    # @param display_name [String] A name to use for display (in help text and
+    #   error reports). Defaults to the key in upper case.
+    # @param key [String, Symbol] The key to use to retrieve the value from
+    #   the execution context.
     # @param long_desc [Array<String,Array<String>,Toys::WrappableString>] Long description for the flag. See {Toys::ToolDefintion#long_desc}
     #   for a description of the allowed formats. (But note that this param
     #   takes an Array of description lines, rather than a series of
     #   arguments.) Defaults to the empty array.
+    # @param type [Symbol] The type of arg. Valid values are `:required`,
+    #   `:optional`, and `:remaining`.
     # @return [Toys::PositionalArg]
     #
     # source://toys-core//lib/toys/positional_arg.rb#32
@@ -7559,10 +7544,10 @@ class Toys::Settings
 
   # Parse the given JSON string and load the data into this settings object.
   #
-  # @param str [String] The JSON-formatted string.
   # @param raise_on_failure [boolean] If `true`, raises an exception on the
   #   first error encountered. If `false`, continues parsing and returns an
   #   array of the errors raised.
+  # @param str [String] The JSON-formatted string.
   # @return [Array<FieldError>] An array of errors.
   #
   # source://toys-core//lib/toys/settings.rb#656
@@ -7581,10 +7566,10 @@ class Toys::Settings
 
   # Parse the given YAML string and load the data into this settings object.
   #
-  # @param str [String] The YAML-formatted string.
   # @param raise_on_failure [boolean] If `true`, raises an exception on the
   #   first error encountered. If `false`, continues parsing and returns an
   #   array of the errors raised.
+  # @param str [String] The YAML-formatted string.
   # @return [Array<FieldError>] An array of errors.
   #
   # source://toys-core//lib/toys/settings.rb#629
@@ -7629,7 +7614,7 @@ class Toys::Settings
     #
     # @private This interface is internal and subject to change without warning.
     #
-    # source://toys-core//lib/toys/settings.rb#841
+    # source://toys-core//lib/toys/settings.rb#850
     def fields; end
 
     # When this base class is inherited, if its enclosing module is also a
@@ -7637,19 +7622,19 @@ class Toys::Settings
     #
     # @private
     #
-    # source://toys-core//lib/toys/settings.rb#851
+    # source://toys-core//lib/toys/settings.rb#860
     def inherited(subclass); end
 
     # Add an attribute field.
     #
-    # @param name [Symbol, String] The name of the attribute.
     # @param default [Object] Optional. The final default value if the field
     #   is not set in this settings object or any of its ancestors. If not
     #   provided, `nil` is used.
+    # @param name [Symbol, String] The name of the attribute.
     # @param type [Object] Optional. The type specification. If not provided,
     #   one is inferred from the default value.
     #
-    # source://toys-core//lib/toys/settings.rb#796
+    # source://toys-core//lib/toys/settings.rb#805
     def settings_attr(name, default: T.unsafe(nil), type: T.unsafe(nil), &block); end
 
     # Add a group field.
@@ -7658,35 +7643,35 @@ class Toys::Settings
     # subclass Settings) or a block (which will be called on the group's
     # class.)
     #
-    # @param name [Symbol, String] The name of the group.
     # @param klass [Class] Optional. The class of the group (which must
     #   subclass Settings). If not present, an anonymous subclass will be
     #   created, and you must provide a block to configure it.
+    # @param name [Symbol, String] The name of the group.
     #
-    # source://toys-core//lib/toys/settings.rb#819
+    # source://toys-core//lib/toys/settings.rb#828
     def settings_group(name, klass = T.unsafe(nil), &block); end
 
     private
 
-    # source://toys-core//lib/toys/settings.rb#887
+    # source://toys-core//lib/toys/settings.rb#896
     def create_getter(field); end
 
-    # source://toys-core//lib/toys/settings.rb#899
+    # source://toys-core//lib/toys/settings.rb#908
     def create_set_detect(field); end
 
-    # source://toys-core//lib/toys/settings.rb#893
+    # source://toys-core//lib/toys/settings.rb#902
     def create_setter(field); end
 
-    # source://toys-core//lib/toys/settings.rb#905
+    # source://toys-core//lib/toys/settings.rb#914
     def create_unsetter(field); end
 
-    # source://toys-core//lib/toys/settings.rb#874
+    # source://toys-core//lib/toys/settings.rb#883
     def interpret_name(name); end
 
-    # source://toys-core//lib/toys/settings.rb#870
+    # source://toys-core//lib/toys/settings.rb#879
     def to_class_name(str); end
 
-    # source://toys-core//lib/toys/settings.rb#864
+    # source://toys-core//lib/toys/settings.rb#873
     def to_field_name(str); end
   end
 end
@@ -7715,9 +7700,9 @@ class Toys::Settings::Field
   # source://toys-core//lib/toys/settings.rb#769
   def default; end
 
-  # @return [Boolean]
+  # @return [boolean] Whether the field is a group
   #
-  # source://toys-core//lib/toys/settings.rb#772
+  # source://toys-core//lib/toys/settings.rb#775
   def group?; end
 
   # Returns the value of attribute group_class.
@@ -7735,7 +7720,12 @@ class Toys::Settings::Field
   # source://toys-core//lib/toys/settings.rb#768
   def type; end
 
-  # source://toys-core//lib/toys/settings.rb#776
+  # Validate the given value.
+  #
+  # @raise [FieldError] If the value cannot be validated
+  # @return [Object] The validated value
+  #
+  # source://toys-core//lib/toys/settings.rb#785
   def validate(value); end
 end
 
@@ -7799,8 +7789,8 @@ Toys::Settings::SETTINGS_TYPE = T.let(T.unsafe(nil), Toys::Settings::Type)
 class Toys::Settings::Type
   # Create a new Type.
   #
-  # @param description [String] Name of the type.
   # @param block [Proc] A testing function.
+  # @param description [String] Name of the type.
   # @return [Type] a new instance of Type
   #
   # source://toys-core//lib/toys/settings.rb#368
@@ -8328,17 +8318,17 @@ class Toys::ToolDefinition
   # name when adding a flag or an arg. See {Toys::Acceptor.create} for
   # detailed information on how to specify an acceptor.
   #
-  # @param name [String] The name of the acceptor.
   # @param acceptor [Toys::Acceptor::Base, Object] The acceptor to add. You
   #   can provide either an acceptor object, or a spec understood by
   #   {Toys::Acceptor.create}.
-  # @param type_desc [String] Type description string, shown in help.
-  #   Defaults to the acceptor name.
   # @param block [Proc] Optional block used to create an acceptor. See
   #   {Toys::Acceptor.create}.
+  # @param name [String] The name of the acceptor.
+  # @param type_desc [String] Type description string, shown in help.
+  #   Defaults to the acceptor name.
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#827
+  # source://toys-core//lib/toys/tool_definition.rb#825
   def add_acceptor(name, acceptor = T.unsafe(nil), type_desc: T.unsafe(nil), &block); end
 
   # Add a named completion proc to this tool. The completion may be
@@ -8346,42 +8336,26 @@ class Toys::ToolDefinition
   # {Toys::Completion.create} for detailed information on how to specify a
   # completion.
   #
-  # @param name [String] The name of the completion.
+  # @param block [Proc] Optional block used to create a completion. See
+  #   {Toys::Completion.create}.
   # @param completion [Proc, Toys::Completion::Base, Object] The completion to
   #   add. You can provide either a completion object, or a spec understood
   #   by {Toys::Completion.create}.
+  # @param name [String] The name of the completion.
   # @param options [Hash] Additional options to pass to the completion.
-  # @param block [Proc] Optional block used to create a completion. See
-  #   {Toys::Completion.create}.
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#874
+  # source://toys-core//lib/toys/tool_definition.rb#872
   def add_completion(name, completion = T.unsafe(nil), **options, &block); end
 
   # Add a flag to the current tool. Each flag must specify a key which
   # the script may use to obtain the flag value from the context.
   # You may then provide the flags themselves in `OptionParser` form.
   #
-  # @param key [String, Symbol] The key to use to retrieve the value from
-  #   the execution context.
-  # @param flags [Array<String>] The flags in OptionParser format. If empty,
-  #   a flag will be inferred from the key.
   # @param accept [Object] An acceptor that validates and/or converts the
   #   value. You may provide either the name of an acceptor you have
   #   defined, or one of the default acceptors provided by OptionParser.
   #   Optional. If not specified, accepts any value as a string.
-  # @param default [Object] The default value. This is the value that will
-  #   be set in the context if this flag is not provided on the command
-  #   line. Defaults to `nil`.
-  # @param handler [Proc, nil, :set, :push] An optional handler for
-  #   setting/updating the value. A handler is a proc taking two
-  #   arguments, the given value and the previous value, returning the
-  #   new value that should be set. You may also specify a predefined
-  #   named handler. The `:set` handler (the default) replaces the
-  #   previous value (effectively `-> (val, _prev) { val }`). The
-  #   `:push` handler expects the previous value to be an array and
-  #   pushes the given value onto it; it should be combined with setting
-  #   `default: []` and is intended for "multi-valued" flags.
   # @param complete_flags [Object] A specifier for shell tab completion
   #   for flag names associated with this flag. By default, a
   #   {Toys::Flag::DefaultCompletion} is used, which provides the flag's
@@ -8392,22 +8366,38 @@ class Toys::ToolDefinition
   # @param complete_values [Object] A specifier for shell tab completion
   #   for flag values associated with this flag. Pass any spec
   #   recognized by {Toys::Completion.create}.
-  # @param report_collisions [true, false] Raise an exception if a flag is
-  #   requested that is already in use or marked as disabled. Default is
-  #   true.
-  # @param group [Toys::FlagGroup, String, Symbol, nil] Group for
-  #   this flag. You may provide a group name, a FlagGroup object, or
-  #   `nil` which denotes the default group.
+  # @param default [Object] The default value. This is the value that will
+  #   be set in the context if this flag is not provided on the command
+  #   line. Defaults to `nil`.
   # @param desc [String, Array<String>, Toys::WrappableString] Short
   #   description for the flag. See {Toys::ToolDefinition#desc} for a
   #   description of allowed formats. Defaults to the empty string.
-  # @param long_desc [Array<String,Array<String>,Toys::WrappableString>] Long description for the flag. See {Toys::ToolDefinition#long_desc}
-  #   for a description of allowed formats. Defaults to the empty array.
   # @param display_name [String] A display name for this flag, used in help
   #   text and error messages.
+  # @param flags [Array<String>] The flags in OptionParser format. If empty,
+  #   a flag will be inferred from the key.
+  # @param group [Toys::FlagGroup, String, Symbol, nil] Group for
+  #   this flag. You may provide a group name, a FlagGroup object, or
+  #   `nil` which denotes the default group.
+  # @param handler [Proc, nil, :set, :push] An optional handler for
+  #   setting/updating the value. A handler is a proc taking two
+  #   arguments, the given value and the previous value, returning the
+  #   new value that should be set. You may also specify a predefined
+  #   named handler. The `:set` handler (the default) replaces the
+  #   previous value (effectively `-> (val, _prev) { val }`). The
+  #   `:push` handler expects the previous value to be an array and
+  #   pushes the given value onto it; it should be combined with setting
+  #   `default: []` and is intended for "multi-valued" flags.
+  # @param key [String, Symbol] The key to use to retrieve the value from
+  #   the execution context.
+  # @param long_desc [Array<String,Array<String>,Toys::WrappableString>] Long description for the flag. See {Toys::ToolDefinition#long_desc}
+  #   for a description of allowed formats. Defaults to the empty array.
+  # @param report_collisions [true, false] Raise an exception if a flag is
+  #   requested that is already in use or marked as disabled. Default is
+  #   true.
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1052
+  # source://toys-core//lib/toys/tool_definition.rb#1050
   def add_flag(key, flags = T.unsafe(nil), accept: T.unsafe(nil), default: T.unsafe(nil), handler: T.unsafe(nil), complete_flags: T.unsafe(nil), complete_values: T.unsafe(nil), report_collisions: T.unsafe(nil), group: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), display_name: T.unsafe(nil)); end
 
   # Add a flag group to the group list.
@@ -8419,7 +8409,6 @@ class Toys::ToolDefinition
   #  *  `:at_least_one` At least one flag in the group must be provided
   #  *  `:at_most_one` At most one flag in the group must be provided
   #
-  # @param type [Symbol] The type of group. Default is `:optional`.
   # @param desc [String, Array<String>, Toys::WrappableString] Short
   #   description for the group. See {Toys::ToolDefinition#desc} for a
   #   description of allowed formats. Defaults to `"Flags"`.
@@ -8428,36 +8417,37 @@ class Toys::ToolDefinition
   #   formats. Defaults to the empty array.
   # @param name [String, Symbol, nil] The name of the group, or nil for no
   #   name.
+  # @param prepend [true, false] If `true`, prepend rather than append the
+  #   group to the list. Default is `false`.
   # @param report_collisions [true, false] If `true`, raise an exception if a
   #   the given name is already taken. If `false`, ignore. Default is
   #   `true`.
-  # @param prepend [true, false] If `true`, prepend rather than append the
-  #   group to the list. Default is `false`.
+  # @param type [Symbol] The type of group. Default is `:optional`.
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#985
+  # source://toys-core//lib/toys/tool_definition.rb#983
   def add_flag_group(type: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), name: T.unsafe(nil), report_collisions: T.unsafe(nil), prepend: T.unsafe(nil)); end
 
   # Add an initializer.
   #
-  # @param proc [Proc] The initializer block
   # @param args [Object...] Arguments to pass to the initializer
   # @param kwargs [keywords] Keyword arguments to pass to the initializer
+  # @param proc [Proc] The initializer block
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1283
+  # source://toys-core//lib/toys/tool_definition.rb#1281
   def add_initializer(proc, *args, **kwargs); end
 
   # Add a named mixin module to this tool.
   # You may provide a mixin module or a block that configures one.
   #
-  # @param name [String] The name of the mixin.
-  # @param mixin_module [Module] The mixin module.
   # @param block [Proc] Define the mixin module here if a `mixin_module` is
   #   not provided directly.
+  # @param mixin_module [Module] The mixin module.
+  # @param name [String] The name of the mixin.
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#848
+  # source://toys-core//lib/toys/tool_definition.rb#846
   def add_mixin(name, mixin_module = T.unsafe(nil), &block); end
 
   # Add an optional positional argument to the current tool. You must specify
@@ -8465,63 +8455,63 @@ class Toys::ToolDefinition
   # context. If an optional argument is not given on the command line, the
   # value is set to the given default.
   #
-  # @param key [String, Symbol] The key to use to retrieve the value from
-  #   the execution context.
-  # @param default [Object] The default value. This is the value that will
-  #   be set in the context if this argument is not provided on the command
-  #   line. Defaults to `nil`.
   # @param accept [Object] An acceptor that validates and/or converts the
   #   value. You may provide either the name of an acceptor you have
   #   defined, or one of the default acceptors provided by OptionParser.
   #   Optional. If not specified, accepts any value as a string.
   # @param complete [Object] A specifier for shell tab completion. See
   #   {Toys::Completion.create} for recognized formats.
-  # @param display_name [String] A name to use for display (in help text and
-  #   error reports). Defaults to the key in upper case.
+  # @param default [Object] The default value. This is the value that will
+  #   be set in the context if this argument is not provided on the command
+  #   line. Defaults to `nil`.
   # @param desc [String, Array<String>, Toys::WrappableString] Short
   #   description for the arg. See {Toys::ToolDefinition#desc} for a
   #   description of allowed formats. Defaults to the empty string.
+  # @param display_name [String] A name to use for display (in help text and
+  #   error reports). Defaults to the key in upper case.
+  # @param key [String, Symbol] The key to use to retrieve the value from
+  #   the execution context.
   # @param long_desc [Array<String,Array<String>,Toys::WrappableString>] Long description for the arg. See {Toys::ToolDefinition#long_desc}
   #   for a description of allowed formats. Defaults to the empty array.
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1155
+  # source://toys-core//lib/toys/tool_definition.rb#1153
   def add_optional_arg(key, default: T.unsafe(nil), accept: T.unsafe(nil), complete: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil)); end
 
   # Add a required positional argument to the current tool. You must specify
   # a key which the script may use to obtain the argument value from the
   # context.
   #
-  # @param key [String, Symbol] The key to use to retrieve the value from
-  #   the execution context.
   # @param accept [Object] An acceptor that validates and/or converts the
   #   value. You may provide either the name of an acceptor you have
   #   defined, or one of the default acceptors provided by OptionParser.
   #   Optional. If not specified, accepts any value as a string.
   # @param complete [Object] A specifier for shell tab completion. See
   #   {Toys::Completion.create} for recognized formats.
-  # @param display_name [String] A name to use for display (in help text and
-  #   error reports). Defaults to the key in upper case.
   # @param desc [String, Array<String>, Toys::WrappableString] Short
   #   description for the arg. See {Toys::ToolDefinition#desc} for a
   #   description of allowed formats. Defaults to the empty string.
+  # @param display_name [String] A name to use for display (in help text and
+  #   error reports). Defaults to the key in upper case.
+  # @param key [String, Symbol] The key to use to retrieve the value from
+  #   the execution context.
   # @param long_desc [Array<String,Array<String>,Toys::WrappableString>] Long description for the arg. See {Toys::ToolDefinition#long_desc}
   #   for a description of allowed formats. Defaults to the empty array.
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1117
+  # source://toys-core//lib/toys/tool_definition.rb#1115
   def add_required_arg(key, accept: T.unsafe(nil), complete: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil)); end
 
   # Add a named template class to this tool.
   # You may provide a template class or a block that configures one.
   #
-  # @param name [String] The name of the template.
-  # @param template_class [Class] The template class.
   # @param block [Proc] Define the template class here if a `template_class`
   #   is not provided directly.
+  # @param name [String] The name of the template.
+  # @param template_class [Class] The template class.
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#895
+  # source://toys-core//lib/toys/tool_definition.rb#893
   def add_template(name, template_class = T.unsafe(nil), &block); end
 
   # Append long description strings.
@@ -8532,14 +8522,14 @@ class Toys::ToolDefinition
   # @param long_desc [Array<Toys::WrappableString,String,Array<String>>]
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#806
+  # source://toys-core//lib/toys/tool_definition.rb#804
   def append_long_desc(long_desc); end
 
   # Returns true if this tool has disabled argument parsing.
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#637
+  # source://toys-core//lib/toys/tool_definition.rb#635
   def argument_parsing_disabled?; end
 
   # The stack of built middleware specs for this tool.
@@ -8554,7 +8544,7 @@ class Toys::ToolDefinition
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1427
+  # source://toys-core//lib/toys/tool_definition.rb#1420
   def check_definition_state(is_arg: T.unsafe(nil), is_method: T.unsafe(nil)); end
 
   # The completion strategy for this tool.
@@ -8582,7 +8572,7 @@ class Toys::ToolDefinition
   #
   # @param spec [Object]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1308
+  # source://toys-core//lib/toys/tool_definition.rb#1306
   def completion=(spec); end
 
   # Return the effective context directory.
@@ -8595,7 +8585,7 @@ class Toys::ToolDefinition
   # @return [String] The effective context directory path.
   # @return [nil] if there is no effective context directory.
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1333
+  # source://toys-core//lib/toys/tool_definition.rb#1331
   def context_directory; end
 
   # The custom context directory set for this tool.
@@ -8612,7 +8602,7 @@ class Toys::ToolDefinition
   #
   # @param dir [String]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1296
+  # source://toys-core//lib/toys/tool_definition.rb#1294
   def custom_context_directory=(dir); end
 
   # The default context data set by arguments.
@@ -8626,7 +8616,7 @@ class Toys::ToolDefinition
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#629
+  # source://toys-core//lib/toys/tool_definition.rb#627
   def definition_finished?; end
 
   # The full name of the delegate target, if any.
@@ -8642,7 +8632,7 @@ class Toys::ToolDefinition
   # @param target [Array<String>] The full path to the delegate tool.
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1343
+  # source://toys-core//lib/toys/tool_definition.rb#1341
   def delegate_to(target); end
 
   # The short description string.
@@ -8668,14 +8658,14 @@ class Toys::ToolDefinition
   #
   # @param desc [Toys::WrappableString, String, Array<String>]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#780
+  # source://toys-core//lib/toys/tool_definition.rb#778
   def desc=(desc); end
 
   # Disable argument parsing for this tool.
   #
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#911
+  # source://toys-core//lib/toys/tool_definition.rb#909
   def disable_argument_parsing; end
 
   # Mark one or more flags as disabled, preventing their use by any
@@ -8685,7 +8675,7 @@ class Toys::ToolDefinition
   # @param flags [String...] The flags to disable
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1083
+  # source://toys-core//lib/toys/tool_definition.rb#1081
   def disable_flag(*flags); end
 
   # A displayable name of this tool, generally the full name delimited by
@@ -8702,14 +8692,14 @@ class Toys::ToolDefinition
   # @param state [true, false]
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#929
+  # source://toys-core//lib/toys/tool_definition.rb#927
   def enforce_flags_before_args(state = T.unsafe(nil)); end
 
   # Returns true if this tool requires exact flag matches.
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#653
+  # source://toys-core//lib/toys/tool_definition.rb#651
   def exact_flag_match_required?; end
 
   # Complete definition and run middleware configs. Should be called from
@@ -8717,7 +8707,7 @@ class Toys::ToolDefinition
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1393
+  # source://toys-core//lib/toys/tool_definition.rb#1386
   def finish_definition(loader); end
 
   # A list of all defined flag groups, in order.
@@ -8738,7 +8728,7 @@ class Toys::ToolDefinition
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#645
+  # source://toys-core//lib/toys/tool_definition.rb#643
   def flags_before_args_enforced?; end
 
   # The name of the tool as an array of strings.
@@ -8754,7 +8744,7 @@ class Toys::ToolDefinition
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#566
+  # source://toys-core//lib/toys/tool_definition.rb#565
   def handles_interrupts?; end
 
   # Returns true if this tool handles the given signal.
@@ -8762,14 +8752,14 @@ class Toys::ToolDefinition
   # @param signal [Integer, String, Symbol] The signal number or name
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#576
+  # source://toys-core//lib/toys/tool_definition.rb#575
   def handles_signal?(signal); end
 
   # Returns true if this tool handles usage errors.
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#585
+  # source://toys-core//lib/toys/tool_definition.rb#584
   def handles_usage_errors?; end
 
   # Include the given mixin in the tool class.
@@ -8780,7 +8770,7 @@ class Toys::ToolDefinition
   # @param mod [Module] The mixin module
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#738
+  # source://toys-core//lib/toys/tool_definition.rb#736
   def include_mixin(mod, *args, **kwargs); end
 
   # Returns true if at least one flag or positional argument is defined
@@ -8788,28 +8778,28 @@ class Toys::ToolDefinition
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#610
+  # source://toys-core//lib/toys/tool_definition.rb#609
   def includes_arguments?; end
 
   # Returns true if this tool has any definition information.
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#620
+  # source://toys-core//lib/toys/tool_definition.rb#618
   def includes_definition?; end
 
   # Returns true if there is a specific description set for this tool.
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#601
+  # source://toys-core//lib/toys/tool_definition.rb#600
   def includes_description?; end
 
   # Returns true if this tool has at least one included module.
   #
   # @return [true, false]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#593
+  # source://toys-core//lib/toys/tool_definition.rb#592
   def includes_modules?; end
 
   # Return the interrupt handler. This is equivalent to `signal_handler(2)`.
@@ -8826,7 +8816,7 @@ class Toys::ToolDefinition
   #
   # @param handler [Proc, Symbol] The interrupt signal handler
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1232
+  # source://toys-core//lib/toys/tool_definition.rb#1230
   def interrupt_handler=(handler); end
 
   # Sets the path to the file that defines this tool.
@@ -8836,7 +8826,7 @@ class Toys::ToolDefinition
   # @param source [Toys::SourceInfo] Source info
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#768
+  # source://toys-core//lib/toys/tool_definition.rb#766
   def lock_source(source); end
 
   # The long description strings.
@@ -8864,7 +8854,7 @@ class Toys::ToolDefinition
   #
   # @param long_desc [Array<Toys::WrappableString,String,Array<String>>]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#792
+  # source://toys-core//lib/toys/tool_definition.rb#790
   def long_desc=(long_desc); end
 
   # Get the named acceptor from this tool or its ancestors.
@@ -8873,7 +8863,7 @@ class Toys::ToolDefinition
   # @return [Toys::Acceptor::Base] The acceptor.
   # @return [nil] if no acceptor of the given name is found.
   #
-  # source://toys-core//lib/toys/tool_definition.rb#692
+  # source://toys-core//lib/toys/tool_definition.rb#690
   def lookup_acceptor(name); end
 
   # Get the named completion from this tool or its ancestors.
@@ -8882,14 +8872,14 @@ class Toys::ToolDefinition
   # @return [Toys::Completion::Base, Proc] The completion proc.
   # @return [nil] if no completion of the given name is found.
   #
-  # source://toys-core//lib/toys/tool_definition.rb#725
+  # source://toys-core//lib/toys/tool_definition.rb#723
   def lookup_completion(name); end
 
   # Lookup the custom context directory in this tool and its ancestors.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1372
+  # source://toys-core//lib/toys/tool_definition.rb#1365
   def lookup_custom_context_directory; end
 
   # Get the named mixin from this tool or its ancestors.
@@ -8898,7 +8888,7 @@ class Toys::ToolDefinition
   # @return [Module] The mixin module.
   # @return [nil] if no mixin of the given name is found.
   #
-  # source://toys-core//lib/toys/tool_definition.rb#714
+  # source://toys-core//lib/toys/tool_definition.rb#712
   def lookup_mixin(name); end
 
   # Get the named template from this tool or its ancestors.
@@ -8907,14 +8897,14 @@ class Toys::ToolDefinition
   # @return [Class, nil] The template class.
   # @return [nil] if no template of the given name is found.
   #
-  # source://toys-core//lib/toys/tool_definition.rb#703
+  # source://toys-core//lib/toys/tool_definition.rb#701
   def lookup_template(name); end
 
   # Mark this tool as having at least one module included.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1381
+  # source://toys-core//lib/toys/tool_definition.rb#1374
   def mark_includes_modules; end
 
   # A list of all defined optional positional arguments.
@@ -8928,7 +8918,7 @@ class Toys::ToolDefinition
   #
   # @return [Array<Toys::PositionalArg>]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#662
+  # source://toys-core//lib/toys/tool_definition.rb#660
   def positional_args; end
 
   # The priority of this tool definition.
@@ -8952,7 +8942,7 @@ class Toys::ToolDefinition
   # @param state [true, false]
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#947
+  # source://toys-core//lib/toys/tool_definition.rb#945
   def require_exact_flag_match(state = T.unsafe(nil)); end
 
   # A list of all defined required positional arguments.
@@ -8979,7 +8969,7 @@ class Toys::ToolDefinition
   # @param str [String] Flag string
   # @return [Toys::Flag::Resolution]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#677
+  # source://toys-core//lib/toys/tool_definition.rb#675
   def resolve_flag(str); end
 
   # Returns true if this tool is a root tool.
@@ -9018,14 +9008,14 @@ class Toys::ToolDefinition
   #
   # @param handler [Proc, Symbol, nil] the run handler
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1218
+  # source://toys-core//lib/toys/tool_definition.rb#1216
   def run_handler=(handler); end
 
   # Run all initializers against a context. Called from the Runner.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1415
+  # source://toys-core//lib/toys/tool_definition.rb#1408
   def run_initializers(context); end
 
   # Returns true if this tool is marked as runnable.
@@ -9039,27 +9029,27 @@ class Toys::ToolDefinition
   # specify a key which the script may use to obtain the remaining args
   # from the context.
   #
-  # @param key [String, Symbol] The key to use to retrieve the value from
-  #   the execution context.
-  # @param default [Object] The default value. This is the value that will
-  #   be set in the context if no unmatched arguments are provided on the
-  #   command line. Defaults to the empty array `[]`.
   # @param accept [Object] An acceptor that validates and/or converts the
   #   value. You may provide either the name of an acceptor you have
   #   defined, or one of the default acceptors provided by OptionParser.
   #   Optional. If not specified, accepts any value as a string.
   # @param complete [Object] A specifier for shell tab completion. See
   #   {Toys::Completion.create} for recognized formats.
-  # @param display_name [String] A name to use for display (in help text and
-  #   error reports). Defaults to the key in upper case.
+  # @param default [Object] The default value. This is the value that will
+  #   be set in the context if no unmatched arguments are provided on the
+  #   command line. Defaults to the empty array `[]`.
   # @param desc [String, Array<String>, Toys::WrappableString] Short
   #   description for the arg. See {Toys::ToolDefinition#desc} for a
   #   description of allowed formats. Defaults to the empty string.
+  # @param display_name [String] A name to use for display (in help text and
+  #   error reports). Defaults to the key in upper case.
+  # @param key [String, Symbol] The key to use to retrieve the value from
+  #   the execution context.
   # @param long_desc [Array<String,Array<String>,Toys::WrappableString>] Long description for the arg. See {Toys::ToolDefinition#long_desc}
   #   for a description of allowed formats. Defaults to the empty array.
   # @return [self]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1193
+  # source://toys-core//lib/toys/tool_definition.rb#1191
   def set_remaining_args(key, default: T.unsafe(nil), accept: T.unsafe(nil), complete: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil)); end
 
   # Set the handler for the given signal.
@@ -9069,10 +9059,10 @@ class Toys::ToolDefinition
   # handler can be specified as a Proc, or a Symbol indicating a method to
   # call. It optionally takes the `SignalException` as the sole argument.
   #
-  # @param signal [Integer, String, Symbol] The signal number or name
   # @param handler [Proc, Symbol] The signal handler
+  # @param signal [Integer, String, Symbol] The signal number or name
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1247
+  # source://toys-core//lib/toys/tool_definition.rb#1245
   def set_signal_handler(signal, handler); end
 
   # Settings for this tool
@@ -9160,7 +9150,7 @@ class Toys::ToolDefinition
   #
   # @param handler [Proc, Symbol] The usage error handler
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1267
+  # source://toys-core//lib/toys/tool_definition.rb#1265
   def usage_error_handler=(handler); end
 
   # A list of flags that have been used in the flag definitions.
@@ -9174,26 +9164,26 @@ class Toys::ToolDefinition
 
   # @raise [::ArgumentError]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1492
+  # source://toys-core//lib/toys/tool_definition.rb#1485
   def canonicalize_signal(signal); end
 
-  # source://toys-core//lib/toys/tool_definition.rb#1445
+  # source://toys-core//lib/toys/tool_definition.rb#1438
   def create_class; end
 
-  # source://toys-core//lib/toys/tool_definition.rb#1449
+  # source://toys-core//lib/toys/tool_definition.rb#1442
   def make_config_proc(middleware, loader, next_config); end
 
-  # source://toys-core//lib/toys/tool_definition.rb#1457
+  # source://toys-core//lib/toys/tool_definition.rb#1450
   def make_delegation_run_handler(target); end
 
   # @raise [ToolDefinitionError]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1478
+  # source://toys-core//lib/toys/tool_definition.rb#1471
   def resolve_acceptor_name(name); end
 
   # @raise [ToolDefinitionError]
   #
-  # source://toys-core//lib/toys/tool_definition.rb#1485
+  # source://toys-core//lib/toys/tool_definition.rb#1478
   def resolve_completion_name(name); end
 end
 
@@ -9203,14 +9193,14 @@ end
 class Toys::ToolDefinition::DefaultCompletion < ::Toys::Completion::Base
   # Create a completion given configuration options.
   #
-  # @param complete_subtools [true, false] Whether to complete subtool names
-  # @param include_hidden_subtools [true, false] Whether to include hidden
-  #   subtools (i.e. those beginning with an underscore)
   # @param complete_args [true, false] Whether to complete positional args
-  # @param complete_flags [true, false] Whether to complete flag names
   # @param complete_flag_values [true, false] Whether to complete flag values
+  # @param complete_flags [true, false] Whether to complete flag names
+  # @param complete_subtools [true, false] Whether to complete subtool names
   # @param delegation_target [Array<String>, nil] Delegation target, or
   #   `nil` if none.
+  # @param include_hidden_subtools [true, false] Whether to include hidden
+  #   subtools (i.e. those beginning with an underscore)
   # @return [DefaultCompletion] a new instance of DefaultCompletion
   #
   # source://toys-core//lib/toys/tool_definition.rb#28
