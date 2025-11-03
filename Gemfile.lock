@@ -85,7 +85,7 @@ GEM
       uri
     netrc (0.11.0)
     parallel (1.27.0)
-    parser (3.3.9.0)
+    parser (3.3.10.0)
       ast (~> 2.4.1)
       racc
     prism (1.6.0)
@@ -103,7 +103,7 @@ GEM
     regexp_parser (2.11.3)
     require-hooks (0.2.2)
     rexml (3.4.4)
-    rubocop (1.81.1)
+    rubocop (1.81.7)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.1.0)
@@ -127,7 +127,7 @@ GEM
       rack (>= 1.1)
       rubocop (>= 1.75.0, < 2.0)
       rubocop-ast (>= 1.44.0, < 2.0)
-    rubocop-shopify (2.17.1)
+    rubocop-shopify (2.18.0)
       rubocop (~> 1.62)
     rubocop-sorbet (0.11.0)
       lint_roller
@@ -170,9 +170,9 @@ GEM
       yard-sorbet
     thor (1.4.0)
     tomlrb (2.0.3)
-    toys (0.15.6)
-      toys-core (= 0.15.6)
-    toys-core (0.15.6)
+    toys (0.16.0)
+      toys-core (= 0.16.0)
+    toys-core (0.16.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (3.2.0)
