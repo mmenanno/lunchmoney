@@ -28,10 +28,11 @@ class Hash
 end
 
 class Minitest::Test < ::Minitest::Runnable
-  include ::Mocha::ParameterMatchers
+  include ::Mocha::ParameterMatchers::Methods
   include ::Mocha::Hooks
   include ::Mocha::API
   include ::Mocha::Integration::Minitest::Adapter
+  extend ::Mocha::ParameterMatchers::Deprecations
 end
 
 # source://mocha//lib/mocha/version.rb#1
@@ -87,7 +88,7 @@ end
 #
 # source://mocha//lib/mocha/api.rb#34
 module Mocha::API
-  include ::Mocha::ParameterMatchers
+  include ::Mocha::ParameterMatchers::Methods
   include ::Mocha::Hooks
 
   # Builds a new mock object
@@ -112,13 +113,6 @@ module Mocha::API
   # Specify that an expected invocation must occur within a named {Sequence} by calling {Expectation#in_sequence}
   # on each expectation or by passing a block within which all expectations should be constrained by the {Sequence}.
   #
-  # @example Ensure methods on egg are invoked in correct order.
-  #   breakfast = sequence('breakfast')
-  #
-  #   egg = mock('egg')
-  #   egg.expects(:crack).in_sequence(breakfast)
-  #   egg.expects(:fry).in_sequence(breakfast)
-  #   egg.expects(:eat).in_sequence(breakfast)
   # @example Ensure methods across multiple objects are invoked in correct order.
   #   sequence = sequence(:task_order)
   #
@@ -130,6 +124,13 @@ module Mocha::API
   #
   #   task_one.execute
   #   task_two.execute
+  # @example Ensure methods on egg are invoked in correct order.
+  #   breakfast = sequence('breakfast')
+  #
+  #   egg = mock('egg')
+  #   egg.expects(:crack).in_sequence(breakfast)
+  #   egg.expects(:fry).in_sequence(breakfast)
+  #   egg.expects(:eat).in_sequence(breakfast)
   # @example Ensure methods on egg are invoked in the correct order using a block.
   #   egg = mock('egg')
   #   sequence('breakfast') do
@@ -579,7 +580,7 @@ class Mocha::Configuration
   #
   # For more details on keyword arguments in Ruby v3, refer to {https://www.ruby-lang.org/en/news/2019/12/12/separation-of-positional-and-keyword-arguments-in-ruby-3-0 this article}.
   #
-  # Note that +Hash+-related matchers such as {ParameterMatchers#has_value} or {ParameterMatchers#has_key} will still treat a positional +Hash+ and a set of keyword arguments the same, so misleading passing tests are still possible when they are used.
+  # Note that +Hash+-related matchers such as {ParameterMatchers::Methods#has_value} or {ParameterMatchers::Methods#has_key} will still treat a positional +Hash+ and a set of keyword arguments the same, so misleading passing tests are still possible when they are used.
   #
   # This configuration option is +false+ by default to enable gradual adoption, but will be +true+ by default in the future.
   #
@@ -1175,6 +1176,12 @@ class Mocha::Expectation
 
   # Modifies expectation so that when the expected method is called, it raises the specified +exception+ with the specified +message+ i.e. calls +Kernel#raise(exception, message)+.
   #
+  # @example Raise an exception on first invocation of expected method and then return values on subsequent invocations.
+  #   object = stub()
+  #   object.stubs(:expected_method).raises(Exception).then.returns(2, 3)
+  #   object.expected_method # => raises exception of class Exception1
+  #   object.expected_method # => 2
+  #   object.expected_method # => 3
   # @example Raise custom exception with extra constructor parameters by passing in an instance of the exception.
   #   object = stub()
   #   object.stubs(:expected_method).raises(MyException.new('message', 1, 2, 3))
@@ -1188,36 +1195,20 @@ class Mocha::Expectation
   #   object = stub()
   #   object.stubs(:expected_method).raises(Exception, 'message')
   #   object.expected_method # => raises exception of class Exception and with message 'message'
-  # @example Raise an exception on first invocation of expected method and then return values on subsequent invocations.
-  #   object = stub()
-  #   object.stubs(:expected_method).raises(Exception).then.returns(2, 3)
-  #   object.expected_method # => raises exception of class Exception1
-  #   object.expected_method # => 2
-  #   object.expected_method # => 3
   # @overload raises
   # @overload raises
   # @overload raises
   # @param exception [Class, Exception, String, #exception] exception to be raised or message to be passed to RuntimeError.
   # @param message [String] exception message.
   # @return [Expectation] the same expectation, thereby allowing invocations of other {Expectation} methods to be chained.
-  # @see Kernel#raise
   # @see #then
+  # @see Kernel#raise
   #
   # source://mocha//lib/mocha/expectation.rb#483
   def raises(exception = T.unsafe(nil), message = T.unsafe(nil)); end
 
   # Modifies expectation so that when the expected method is called, it returns the specified +value+.
   #
-  # @example Return the same value on every invocation.
-  #   object = mock()
-  #   object.stubs(:stubbed_method).returns('result')
-  #   object.stubbed_method # => 'result'
-  #   object.stubbed_method # => 'result'
-  # @example Return a different value on consecutive invocations.
-  #   object = mock()
-  #   object.stubs(:stubbed_method).returns(1, 2)
-  #   object.stubbed_method # => 1
-  #   object.stubbed_method # => 2
   # @example Alternative way to return a different value on consecutive invocations.
   #   object = mock()
   #   object.stubs(:expected_method).returns(1, 2).then.returns(3)
@@ -1236,6 +1227,16 @@ class Mocha::Expectation
   #   x, y = object.expected_method
   #   x # => 1
   #   y # => 2
+  # @example Return a different value on consecutive invocations.
+  #   object = mock()
+  #   object.stubs(:stubbed_method).returns(1, 2)
+  #   object.stubbed_method # => 1
+  #   object.stubbed_method # => 2
+  # @example Return the same value on every invocation.
+  #   object = mock()
+  #   object.stubs(:stubbed_method).returns('result')
+  #   object.stubbed_method # => 'result'
+  #   object.stubbed_method # => 'result'
   # @overload returns
   # @overload returns
   # @return [Expectation] the same expectation, thereby allowing invocations of other {Expectation} methods to be chained.
@@ -1276,14 +1277,6 @@ class Mocha::Expectation
 
   # Modifies expectation so that when the expected method is called, it throws the specified +tag+ with the specific return value +object+ i.e. calls +Kernel#throw(tag, object)+.
   #
-  # @example Throw tag with return value +object+ c.f. +Kernel#throw+.
-  #   object = stub()
-  #   object.stubs(:expected_method).throws(:done, 'result')
-  #   object.expected_method # => throws tag :done and causes catch block to return 'result'
-  # @example Throw tag when expected method is invoked.
-  #   object = stub()
-  #   object.stubs(:expected_method).throws(:done)
-  #   object.expected_method # => throws tag :done
   # @example Throw different tags on consecutive invocations of the expected method.
   #   object = stub()
   #   object.stubs(:expected_method).throws(:done).then.throws(:continue)
@@ -1295,29 +1288,27 @@ class Mocha::Expectation
   #   object.expected_method # => throws :done
   #   object.expected_method # => 2
   #   object.expected_method # => 3
+  # @example Throw tag when expected method is invoked.
+  #   object = stub()
+  #   object.stubs(:expected_method).throws(:done)
+  #   object.expected_method # => throws tag :done
+  # @example Throw tag with return value +object+ c.f. +Kernel#throw+.
+  #   object = stub()
+  #   object.stubs(:expected_method).throws(:done, 'result')
+  #   object.expected_method # => throws tag :done and causes catch block to return 'result'
   # @overload throw
   # @overload throw
-  # @param tag [Symbol, String] tag to throw to transfer control to the active catch block.
   # @param object [Object] return value for the catch block.
+  # @param tag [Symbol, String] tag to throw to transfer control to the active catch block.
   # @return [Expectation] the same expectation, thereby allowing invocations of other {Expectation} methods to be chained.
-  # @see Kernel#throw
   # @see #then
+  # @see Kernel#throw
   #
   # source://mocha//lib/mocha/expectation.rb#522
   def throws(tag, object = T.unsafe(nil)); end
 
   # Modifies expectation so that the number of calls to the expected method must be within a specific +range+.
   #
-  # @example Specifying a specific number of expected invocations.
-  #   object = mock()
-  #   object.expects(:expected_method).times(3)
-  #   3.times { object.expected_method }
-  #   # => verify succeeds
-  #
-  #   object = mock()
-  #   object.expects(:expected_method).times(3)
-  #   2.times { object.expected_method }
-  #   # => verify fails
   # @example Specifying a range in the number of expected invocations.
   #   object = mock()
   #   object.expects(:expected_method).times(2..4)
@@ -1327,6 +1318,16 @@ class Mocha::Expectation
   #   object = mock()
   #   object.expects(:expected_method).times(2..4)
   #   object.expected_method
+  #   # => verify fails
+  # @example Specifying a specific number of expected invocations.
+  #   object = mock()
+  #   object.expects(:expected_method).times(3)
+  #   3.times { object.expected_method }
+  #   # => verify succeeds
+  #
+  #   object = mock()
+  #   object.expects(:expected_method).times(3)
+  #   2.times { object.expected_method }
   #   # => verify fails
   # @param range [Range, Integer] specifies the allowable range in the number of expected invocations.
   # @return [Expectation] the same expectation, thereby allowing invocations of other {Expectation} methods to be chained.
@@ -1384,16 +1385,16 @@ class Mocha::Expectation
   #   radio.expects(:switch_off).then(power.is('off'))
   # @param state_predicate [StateMachine::StatePredicate] +state_machine.is(state_name)+ provides a mechanism to determine whether the +state_machine+ is in the state specified by +state_predicate+ when the expected method is invoked.
   # @return [Expectation] the same expectation, thereby allowing invocations of other {Expectation} methods to be chained.
+  # @see #then
   # @see API#states
   # @see StateMachine
-  # @see #then
   #
   # source://mocha//lib/mocha/expectation.rb#581
   def when(state_predicate); end
 
   # Modifies expectation so that the expected method must be called with +expected_parameters_or_matchers+.
   #
-  # May be used with Ruby literals or variables for exact matching or with parameter matchers for less-specific matching, e.g. {ParameterMatchers#includes}, {ParameterMatchers#has_key}, etc. See {ParameterMatchers} for a list of all available parameter matchers.
+  # May be used with Ruby literals or variables for exact matching or with parameter matchers for less-specific matching, e.g. {ParameterMatchers::Methods#includes}, {ParameterMatchers::Methods#has_key}, etc. See {ParameterMatchers} for a list of all available parameter matchers.
   #
   # Alternatively a block argument can be passed to {#with} to implement custom parameter matching. The block receives the +*actual_parameters+ as its arguments and should return +true+ if they are acceptable or +false+ otherwise. See the example below where a method is expected to be called with a value divisible by 4.
   # The block argument takes precedence over +expected_parameters_or_matchers+. The block may be called multiple times per invocation of the expected method and so it should be idempotent.
@@ -1426,6 +1427,21 @@ class Mocha::Expectation
   #   object.expects(:expected_method).with(includes('string2'), anything)
   #   object.expected_method(['string1'], 'any-old-value')
   #   # => verify fails
+  # @example Extracting a custom matcher into an instance method on the test class.
+  #   class MyTest < Minitest::Test
+  #   def test_expected_method_is_called_with_a_value_divisible_by_4
+  #   object = mock()
+  #   object.expects(:expected_method).with(&method(:divisible_by_4))
+  #   object.expected_method(16)
+  #   # => verify succeeds
+  #   end
+  #
+  #   private
+  #
+  #   def divisible_by_4(value)
+  #   value % 4 == 0
+  #   end
+  #   end
   # @example Loose keyword argument matching (default)
   #
   #   class Example
@@ -1460,25 +1476,10 @@ class Mocha::Expectation
   #   object.expects(:expected_method).with() { |value| value % 4 == 0 }
   #   object.expected_method(17)
   #   # => verify fails
-  # @example Extracting a custom matcher into an instance method on the test class.
-  #   class MyTest < Minitest::Test
-  #   def test_expected_method_is_called_with_a_value_divisible_by_4
-  #   object = mock()
-  #   object.expects(:expected_method).with(&method(:divisible_by_4))
-  #   object.expected_method(16)
-  #   # => verify succeeds
-  #   end
-  #
-  #   private
-  #
-  #   def divisible_by_4(value)
-  #   value % 4 == 0
-  #   end
-  #   end
-  # @param expected_parameters_or_matchers [Array<Object,ParameterMatchers::Base>] expected parameter values or parameter matchers.
+  # @param expected_parameters_or_matchers [Array<Object,ParameterMatchers::BaseMethods>] expected parameter values or parameter matchers.
   # @return [Expectation] the same expectation, thereby allowing invocations of other {Expectation} methods to be chained.
-  # @see ParameterMatchers
   # @see Configuration#strict_keyword_argument_matching=
+  # @see ParameterMatchers
   # @yield optional block specifying custom matching.
   # @yieldparam actual_parameters [Array<Object>] parameters with which expected method was invoked.
   # @yieldreturn [Boolean] +true+ if +actual_parameters+ are acceptable; +false+ otherwise.
@@ -1528,18 +1529,6 @@ class Mocha::Expectation
   #
   # May be called multiple times on the same expectation for consecutive invocations.
   #
-  # @example Yield when expected method is invoked.
-  #   benchmark = mock()
-  #   benchmark.expects(:measure).yields
-  #   yielded = false
-  #   benchmark.measure { yielded = true }
-  #   yielded # => true
-  # @example Yield parameters when expected method is invoked.
-  #   fibonacci = mock()
-  #   fibonacci.expects(:next_pair).yields(0, 1)
-  #   sum = 0
-  #   fibonacci.next_pair { |first, second| sum = first + second }
-  #   sum # => 1
   # @example Yield different parameters on different invocations of the expected method.
   #   fibonacci = mock()
   #   fibonacci.expects(:next_pair).yields(0, 1).then.yields(1, 1)
@@ -1548,6 +1537,18 @@ class Mocha::Expectation
   #   sum # => 1
   #   fibonacci.next_pair { |first, second| sum = first + second }
   #   sum # => 2
+  # @example Yield parameters when expected method is invoked.
+  #   fibonacci = mock()
+  #   fibonacci.expects(:next_pair).yields(0, 1)
+  #   sum = 0
+  #   fibonacci.next_pair { |first, second| sum = first + second }
+  #   sum # => 1
+  # @example Yield when expected method is invoked.
+  #   benchmark = mock()
+  #   benchmark.expects(:measure).yields
+  #   yielded = false
+  #   benchmark.measure { yielded = true }
+  #   yielded # => true
   # @param parameters [*Array] parameters to be yielded.
   # @return [Expectation] the same expectation, thereby allowing invocations of other {Expectation} methods to be chained.
   # @see #then
@@ -1665,10 +1666,10 @@ end
 #
 # See the code in the +Adapter+ modules for examples of how to use the methods in this module. +Mocha::ExpectationErrorFactory+ may be used if you want +Mocha+ to raise a different type of exception.
 #
-# @see Mocha::Integration::TestUnit::Adapter
-# @see Mocha::Integration::Minitest::Adapter
-# @see Mocha::ExpectationErrorFactory
 # @see Mocha::API
+# @see Mocha::ExpectationErrorFactory
+# @see Mocha::Integration::Minitest::Adapter
+# @see Mocha::Integration::TestUnit::Adapter
 #
 # source://mocha//lib/mocha/hooks.rb#18
 module Mocha::Hooks
@@ -1801,7 +1802,7 @@ class Mocha::Integration::AssertionCounter
   def increment; end
 end
 
-# source://mocha//lib/mocha/integration/minitest/adapter.rb#7
+# source://mocha//lib/mocha/integration/minitest/adapter.rb#8
 module Mocha::Integration::Minitest
   class << self
     # source://mocha//lib/mocha/integration/minitest.rb#8
@@ -1813,49 +1814,51 @@ end
 #
 # See the source code for an example of how to integrate Mocha into a test library.
 #
-# source://mocha//lib/mocha/integration/minitest/adapter.rb#11
+# source://mocha//lib/mocha/integration/minitest/adapter.rb#12
 module Mocha::Integration::Minitest::Adapter
-  include ::Mocha::ParameterMatchers
+  include ::Mocha::ParameterMatchers::Methods
   include ::Mocha::Hooks
   include ::Mocha::API
 
+  mixes_in_class_methods ::Mocha::ParameterMatchers::Deprecations
+
   # @private
   #
-  # source://mocha//lib/mocha/integration/minitest/adapter.rb#45
+  # source://mocha//lib/mocha/integration/minitest/adapter.rb#47
   def after_teardown; end
 
   # @private
   #
-  # source://mocha//lib/mocha/integration/minitest/adapter.rb#30
+  # source://mocha//lib/mocha/integration/minitest/adapter.rb#32
   def before_setup; end
 
   # @private
   #
-  # source://mocha//lib/mocha/integration/minitest/adapter.rb#36
+  # source://mocha//lib/mocha/integration/minitest/adapter.rb#38
   def before_teardown; end
 
   # @private
   #
-  # source://mocha//lib/mocha/integration/minitest/adapter.rb#51
+  # source://mocha//lib/mocha/integration/minitest/adapter.rb#53
   def mocha_test_name; end
 
   class << self
     # @private
     # @return [Boolean]
     #
-    # source://mocha//lib/mocha/integration/minitest/adapter.rb#15
+    # source://mocha//lib/mocha/integration/minitest/adapter.rb#16
     def applicable_to?(minitest_version); end
 
     # @private
     #
-    # source://mocha//lib/mocha/integration/minitest/adapter.rb#20
+    # source://mocha//lib/mocha/integration/minitest/adapter.rb#21
     def description; end
 
     # @private
     # @private
     #
-    # source://mocha//lib/mocha/integration/minitest/adapter.rb#25
-    def included(_mod); end
+    # source://mocha//lib/mocha/integration/minitest/adapter.rb#26
+    def included(mod); end
   end
 end
 
@@ -2026,15 +2029,15 @@ class Mocha::Mock
   #   object = mock()
   #   object.expects(:expected_method)
   #   object.expected_method
-  # @example Expected method not invoked so error raised
-  #   object = mock()
-  #   object.expects(:expected_method)
-  #   # error raised when test completes, because expected_method not called exactly once
   # @example Expected method invoked twice so error raised
   #   object = mock()
   #   object.expects(:expected_method)
   #   object.expected_method
   #   object.expected_method # => error raised when expected method invoked second time
+  # @example Expected method not invoked so error raised
+  #   object = mock()
+  #   object.expects(:expected_method)
+  #   # error raised when test completes, because expected_method not called exactly once
   # @example Setup multiple expectations using +expected_methods_vs_return_values+.
   #   object = mock()
   #   object.expects(expected_method_one: :result_one, expected_method_two: :result_two)
@@ -2116,15 +2119,15 @@ class Mocha::Mock
   #   object = mock()
   #   object.expects(:expected_method)
   #   object.expected_method
-  # @example Expected method not invoked so error raised
-  #   object = mock()
-  #   object.expects(:expected_method)
-  #   # error raised when test completes, because expected_method not called exactly once
   # @example Expected method invoked twice so error raised
   #   object = mock()
   #   object.expects(:expected_method)
   #   object.expected_method
   #   object.expected_method # => error raised when expected method invoked second time
+  # @example Expected method not invoked so error raised
+  #   object = mock()
+  #   object.expects(:expected_method)
+  #   # error raised when test completes, because expected_method not called exactly once
   # @example Setup multiple expectations using +expected_methods_vs_return_values+.
   #   object = mock()
   #   object.expects(expected_method_one: :result_one, expected_method_two: :result_two)
@@ -2178,19 +2181,6 @@ class Mocha::Mock
   #   sheep.chew
   #   sheep.foo
   #   # no error raised
-  # @example Using {#responds_like} with an instance method
-  #   class Sheep
-  #   def chew(grass); end
-  #   end
-  #
-  #   sheep = mock('sheep')
-  #   sheep.responds_like(Sheep.new)
-  #   sheep.expects(:chew)
-  #   sheep.expects(:foo)
-  #   sheep.respond_to?(:chew) # => true
-  #   sheep.respond_to?(:foo) # => false
-  #   sheep.chew
-  #   sheep.foo # => raises NoMethodError exception
   # @example Using {#responds_like} with a class method
   #   class Sheep
   #   def self.number_of_legs; end
@@ -2204,6 +2194,19 @@ class Mocha::Mock
   #   sheep_class.respond_to?(:foo) # => false
   #   sheep_class.number_of_legs # => 4
   #   sheep_class.foo # => raises NoMethodError exception
+  # @example Using {#responds_like} with an instance method
+  #   class Sheep
+  #   def chew(grass); end
+  #   end
+  #
+  #   sheep = mock('sheep')
+  #   sheep.responds_like(Sheep.new)
+  #   sheep.expects(:chew)
+  #   sheep.expects(:foo)
+  #   sheep.respond_to?(:chew) # => true
+  #   sheep.respond_to?(:foo) # => false
+  #   sheep.chew
+  #   sheep.foo # => raises NoMethodError exception
   # @param responder [Object, #respond_to?] an object used to determine whether {Mock} instance should +#respond_to?+ to an invocation.
   # @return [Mock] the same {Mock} instance, thereby allowing invocations of other {Mock} methods to be chained.
   # @see #responds_like_instance_of
@@ -2259,19 +2262,6 @@ class Mocha::Mock
   #   sheep.chew
   #   sheep.foo
   #   # no error raised
-  # @example Using {#responds_like} with an instance method
-  #   class Sheep
-  #   def chew(grass); end
-  #   end
-  #
-  #   sheep = mock('sheep')
-  #   sheep.responds_like(Sheep.new)
-  #   sheep.expects(:chew)
-  #   sheep.expects(:foo)
-  #   sheep.respond_to?(:chew) # => true
-  #   sheep.respond_to?(:foo) # => false
-  #   sheep.chew
-  #   sheep.foo # => raises NoMethodError exception
   # @example Using {#responds_like} with a class method
   #   class Sheep
   #   def self.number_of_legs; end
@@ -2285,6 +2275,19 @@ class Mocha::Mock
   #   sheep_class.respond_to?(:foo) # => false
   #   sheep_class.number_of_legs # => 4
   #   sheep_class.foo # => raises NoMethodError exception
+  # @example Using {#responds_like} with an instance method
+  #   class Sheep
+  #   def chew(grass); end
+  #   end
+  #
+  #   sheep = mock('sheep')
+  #   sheep.responds_like(Sheep.new)
+  #   sheep.expects(:chew)
+  #   sheep.expects(:foo)
+  #   sheep.respond_to?(:chew) # => true
+  #   sheep.respond_to?(:foo) # => false
+  #   sheep.chew
+  #   sheep.foo # => raises NoMethodError exception
   # @param responder [Object, #respond_to?] an object used to determine whether {Mock} instance should +#respond_to?+ to an invocation.
   # @return [Mock] the same {Mock} instance, thereby allowing invocations of other {Mock} methods to be chained.
   # @see #responds_like_instance_of
@@ -2644,540 +2647,192 @@ class Mocha::ObjectReceiver
   def mocks; end
 end
 
-# Used as parameters for {Expectation#with} to restrict the parameter values which will match the expectation. Can be nested.
+# Matcher classes used as parameters for {Expectation#with} to restrict the parameter values which will match the expectation. Can be nested. Build matcher instances in tests using methods in {Methods}, e.g. {Methods#includes}.
 #
 # source://mocha//lib/mocha/parameter_matchers.rb#3
 module Mocha::ParameterMatchers
-  # Matches if +matcher+ does *not* match.
-  #
-  # @example Actual parameter does not include the value +1+.
-  #   object = mock()
-  #   object.expects(:method_1).with(Not(includes(1)))
-  #   object.method_1([0, 2, 3])
-  #   # no error raised
-  # @example Actual parameter does include the value +1+.
-  #   object = mock()
-  #   object.expects(:method_1).with(Not(includes(1)))
-  #   object.method_1([0, 1, 2, 3])
-  #   # error raised, because method_1 was not called with object not including 1
-  # @param matcher [Base] matcher whose logic to invert.
-  # @return [Not] parameter matcher.
-  # @see Expectation#with
-  #
-  # source://mocha//lib/mocha/parameter_matchers/not.rb#24
-  def Not(matcher); end
+  # source://mocha//lib/mocha/parameter_matchers/not.rb#31
+  def Not(*args); end
 
-  # Matches if all +matchers+ match.
-  #
-  # @example All parameter matchers match.
-  #   object = mock()
-  #   object.expects(:method_1).with(all_of(includes(1), includes(3)))
-  #   object.method_1([1, 3])
-  #   # no error raised
-  # @example One of the parameter matchers does not match.
-  #   object = mock()
-  #   object.expects(:method_1).with(all_of(includes(1), includes(3)))
-  #   object.method_1([1, 2])
-  #   # error raised, because method_1 was not called with object including 1 and 3
-  # @param matchers [*Array<Base>] parameter matchers.
-  # @return [AllOf] parameter matcher.
-  # @see Expectation#with
-  #
-  # source://mocha//lib/mocha/parameter_matchers/all_of.rb#23
-  def all_of(*matchers); end
+  # source://mocha//lib/mocha/parameter_matchers/all_of.rb#30
+  def all_of(*args); end
 
-  # Matches if any +matchers+ match.
-  #
-  # @example One parameter matcher matches.
-  #   object = mock()
-  #   object.expects(:method_1).with(any_of(1, 3))
-  #   object.method_1(1)
-  #   # no error raised
-  # @example The other parameter matcher matches.
-  #   object = mock()
-  #   object.expects(:method_1).with(any_of(1, 3))
-  #   object.method_1(3)
-  #   # no error raised
-  # @example Neither parameter matcher matches.
-  #   object = mock()
-  #   object.expects(:method_1).with(any_of(1, 3))
-  #   object.method_1(2)
-  #   # error raised, because method_1 was not called with 1 or 3
-  # @param matchers [*Array<Base>] parameter matchers.
-  # @return [AnyOf] parameter matcher.
-  # @see Expectation#with
-  #
-  # source://mocha//lib/mocha/parameter_matchers/any_of.rb#29
-  def any_of(*matchers); end
+  # source://mocha//lib/mocha/parameter_matchers/any_of.rb#36
+  def any_of(*args); end
 
-  # Matches any parameters. This is used as the default for a newly built expectation.
-  #
-  # @example Any parameters will match.
-  #   object = mock()
-  #   object.expects(:method_1).with(any_parameters)
-  #   object.method_1(1, 2, 3, 4)
-  #   # no error raised
-  #
-  #   object = mock()
-  #   object.expects(:method_1).with(any_parameters)
-  #   object.method_1(5, 6, 7, 8, 9, 0)
-  #   # no error raised
-  # @return [AnyParameters] parameter matcher.
-  # @see Expectation#with
-  #
-  # source://mocha//lib/mocha/parameter_matchers/any_parameters.rb#21
-  def any_parameters; end
+  # source://mocha//lib/mocha/parameter_matchers/any_parameters.rb#28
+  def any_parameters(*args); end
 
-  # Matches any object.
-  #
-  # @example Any object will match.
-  #   object = mock()
-  #   object.expects(:method_1).with(anything)
-  #   object.method_1('foo')
-  #   object.method_1(789)
-  #   object.method_1(:bar)
-  #   # no error raised
-  # @return [Anything] parameter matcher.
-  # @see Expectation#with
-  #
-  # source://mocha//lib/mocha/parameter_matchers/anything.rb#18
-  def anything; end
+  # source://mocha//lib/mocha/parameter_matchers/anything.rb#25
+  def anything(*args); end
 
-  # Matches any +Object+ equalling +value+.
-  #
-  # @example Actual parameter equals expected parameter.
-  #   object = mock()
-  #   object.expects(:method_1).with(equals(2))
-  #   object.method_1(2)
-  #   # no error raised
-  # @example Actual parameter does not equal expected parameter.
-  #   object = mock()
-  #   object.expects(:method_1).with(equals(2))
-  #   object.method_1(3)
-  #   # error raised, because method_1 was not called with an +Object+ that equals 2
-  # @param value [Object] expected value.
-  # @return [Equals] parameter matcher.
-  # @see Expectation#with
-  # @see Object#==
-  #
-  # source://mocha//lib/mocha/parameter_matchers/equals.rb#24
-  def equals(value); end
+  # source://mocha//lib/mocha/parameter_matchers/equals.rb#31
+  def equals(*args); end
 
-  # Matches a URI without regard to the ordering of parameters in the query string.
-  #
-  # @example Actual URI is equivalent.
-  #   object = mock()
-  #   object.expects(:method_1).with(equivalent_uri('http://example.com/foo?a=1&b=2))
-  #   object.method_1('http://example.com/foo?b=2&a=1')
-  #   # no error raised
-  # @example Actual URI is not equivalent.
-  #   object = mock()
-  #   object.expects(:method_1).with(equivalent_uri('http://example.com/foo?a=1&b=2))
-  #   object.method_1('http://example.com/foo?a=1&b=3')
-  #   # error raised, because the query parameters were different
-  # @param uri [String] URI to match.
-  # @return [EquivalentUri] parameter matcher.
-  # @see Expectation#with
-  #
-  # source://mocha//lib/mocha/parameter_matchers/equivalent_uri.rb#25
-  def equivalent_uri(uri); end
+  # source://mocha//lib/mocha/parameter_matchers/equivalent_uri.rb#32
+  def equivalent_uri(*args); end
 
-  # Matches +Hash+ containing all +entries+.
-  #
-  # @example Actual parameter contains all expected entries.
-  #   object = mock()
-  #   object.expects(:method_1).with(has_entries('key_1' => 1, 'key_2' => 2))
-  #   object.method_1('key_1' => 1, 'key_2' => 2, 'key_3' => 3)
-  #   # no error raised
-  # @example Actual parameter does not contain all expected entries.
-  #   object = mock()
-  #   object.expects(:method_1).with(has_entries('key_1' => 1, 'key_2' => 2))
-  #   object.method_1('key_1' => 1, 'key_2' => 99)
-  #   # error raised, because method_1 was not called with Hash containing entries: 'key_1' => 1, 'key_2' => 2
-  # @param entries [Hash] expected +Hash+ entries.
-  # @return [HasEntries] parameter matcher.
-  # @see Expectation#with
-  #
-  # source://mocha//lib/mocha/parameter_matchers/has_entries.rb#26
-  def has_entries(entries); end
+  # source://mocha//lib/mocha/parameter_matchers/has_entries.rb#33
+  def has_entries(*args); end
 
-  # Matches +Hash+ containing entry with +key+ and +value+.
-  #
-  # @example Actual parameter contains expected entry supplied as key and value.
-  #   object = mock()
-  #   object.expects(:method_1).with(has_entry('key_1', 1))
-  #   object.method_1('key_1' => 1, 'key_2' => 2)
-  #   # no error raised
-  # @example Actual parameter contains expected entry supplied as +Hash+ entry.
-  #   object = mock()
-  #   object.expects(:method_1).with(has_entry('key_1' => 1))
-  #   object.method_1('key_1' => 1, 'key_2' => 2)
-  #   # no error raised
-  # @example Actual parameter does not contain expected entry supplied as key and value.
-  #   object = mock()
-  #   object.expects(:method_1).with(has_entry('key_1', 1))
-  #   object.method_1('key_1' => 2, 'key_2' => 1)
-  #   # error raised, because method_1 was not called with Hash containing entry: 'key_1' => 1
-  # @example Actual parameter does not contain expected entry supplied as +Hash+ entry.
-  #
-  #   object = mock()
-  #   object.expects(:method_1).with(has_entry('key_1' => 1))
-  #   object.method_1('key_1' => 2, 'key_2' => 1)
-  #   # error raised, because method_1 was not called with Hash containing entry: 'key_1' => 1
-  # @overload has_entry
-  # @overload has_entry
-  # @return [HasEntry] parameter matcher.
-  # @see Expectation#with
-  #
-  # source://mocha//lib/mocha/parameter_matchers/has_entry.rb#43
-  def has_entry(*options); end
+  # source://mocha//lib/mocha/parameter_matchers/has_entry.rb#60
+  def has_entry(*args); end
 
-  # Matches +Hash+ containing +key+.
-  #
-  # @example Actual parameter contains entry with expected key.
-  #   object = mock()
-  #   object.expects(:method_1).with(has_key('key_1'))
-  #   object.method_1('key_1' => 1, 'key_2' => 2)
-  #   # no error raised
-  # @example Actual parameter does not contain entry with expected key.
-  #   object = mock()
-  #   object.expects(:method_1).with(has_key('key_1'))
-  #   object.method_1('key_2' => 2)
-  #   # error raised, because method_1 was not called with Hash containing key: 'key_1'
-  # @param key [Object] expected key.
-  # @return [HasKey] parameter matcher.
-  # @see Expectation#with
-  #
-  # source://mocha//lib/mocha/parameter_matchers/has_key.rb#24
-  def has_key(key); end
+  # source://mocha//lib/mocha/parameter_matchers/has_key.rb#31
+  def has_key(*args); end
 
-  # Matches +Hash+ containing +keys+.
-  #
-  # @example Actual parameter contains entry with expected keys.
-  #   object = mock()
-  #   object.expects(:method_1).with(has_keys(:key_1, :key_2))
-  #   object.method_1(:key_1 => 1, :key_2 => 2, :key_3 => 3)
-  #   # no error raised
-  # @example Actual parameter does not contain all expected keys.
-  #   object = mock()
-  #   object.expects(:method_1).with(has_keys(:key_1, :key_2))
-  #   object.method_1(:key_2 => 2)
-  #   # error raised, because method_1 was not called with Hash containing key: :key_1
-  # @param keys [*Array<Object>] expected keys.
-  # @return [HasKeys] parameter matcher.
-  # @see Expectation#with
-  #
-  # source://mocha//lib/mocha/parameter_matchers/has_keys.rb#24
-  def has_keys(*keys); end
+  # source://mocha//lib/mocha/parameter_matchers/has_keys.rb#31
+  def has_keys(*args); end
 
-  # Matches +Hash+ containing +value+.
-  #
-  # @example Actual parameter contains entry with expected value.
-  #   object = mock()
-  #   object.expects(:method_1).with(has_value(1))
-  #   object.method_1('key_1' => 1, 'key_2' => 2)
-  #   # no error raised
-  # @example Actual parameter does not contain entry with expected value.
-  #   object = mock()
-  #   object.expects(:method_1).with(has_value(1))
-  #   object.method_1('key_2' => 2)
-  #   # error raised, because method_1 was not called with Hash containing value: 1
-  # @param value [Object] expected value.
-  # @return [HasValue] parameter matcher.
-  # @see Expectation#with
-  #
-  # source://mocha//lib/mocha/parameter_matchers/has_value.rb#24
-  def has_value(value); end
+  # source://mocha//lib/mocha/parameter_matchers/has_value.rb#31
+  def has_value(*args); end
 
-  # Matches any object that responds with +true+ to +include?(item)+
-  # for all items.
-  #
-  # @example Actual parameter includes all items.
-  #   object = mock()
-  #   object.expects(:method_1).with(includes('foo', 'bar'))
-  #   object.method_1(['foo', 'bar', 'baz'])
-  #   # no error raised
-  # @example Actual parameter does not include all items.
-  #   object.method_1(['foo', 'baz'])
-  #   # error raised, because ['foo', 'baz'] does not include 'bar'.
-  # @example Actual parameter includes item which matches nested matcher.
-  #   object = mock()
-  #   object.expects(:method_1).with(includes(has_key(:key)))
-  #   object.method_1(['foo', 'bar', {key: 'baz'}])
-  #   # no error raised
-  # @example Actual parameter does not include item matching nested matcher.
-  #   object.method_1(['foo', 'bar', {:other_key => 'baz'}])
-  #   # error raised, because no element matches `has_key(:key)` matcher
-  # @example Actual parameter is a String including substring.
-  #   object = mock()
-  #   object.expects(:method_1).with(includes('bar'))
-  #   object.method_1('foobarbaz')
-  #   # no error raised
-  # @example Actual parameter is a String not including substring.
-  #   object.method_1('foobaz')
-  #   # error raised, because 'foobaz' does not include 'bar'
-  # @example Actual parameter is a Hash including the given key.
-  #   object = mock()
-  #   object.expects(:method_1).with(includes(:bar))
-  #   object.method_1({foo: 1, bar: 2})
-  #   # no error raised
-  # @example Actual parameter is a Hash without the given key.
-  #   object.method_1({foo: 1, baz: 2})
-  #   # error raised, because hash does not include key 'bar'
-  # @example Actual parameter is a Hash with a key matching the given matcher.
-  #   object = mock()
-  #   object.expects(:method_1).with(includes(regexp_matches(/ar/)))
-  #   object.method_1({'foo' => 1, 'bar' => 2})
-  #   # no error raised
-  # @example Actual parameter is a Hash no key matching the given matcher.
-  #   object.method_1({'foo' => 1, 'baz' => 3})
-  #   # error raised, because hash does not include a key matching /ar/
-  # @param items [*Array] expected items.
-  # @return [Includes] parameter matcher.
-  # @see Expectation#with
-  #
-  # source://mocha//lib/mocha/parameter_matchers/includes.rb#63
-  def includes(*items); end
+  # source://mocha//lib/mocha/parameter_matchers/includes.rb#70
+  def includes(*args); end
 
-  # Matches any object that is an instance of +klass+
-  #
-  # @example Actual parameter is an instance of +String+.
-  #   object = mock()
-  #   object.expects(:method_1).with(instance_of(String))
-  #   object.method_1('string')
-  #   # no error raised
-  # @example Actual parameter is not an instance of +String+.
-  #   object = mock()
-  #   object.expects(:method_1).with(instance_of(String))
-  #   object.method_1(99)
-  #   # error raised, because method_1 was not called with an instance of String
-  # @param klass [Class] expected class.
-  # @return [InstanceOf] parameter matcher.
-  # @see Expectation#with
-  # @see Kernel#instance_of?
-  #
-  # source://mocha//lib/mocha/parameter_matchers/instance_of.rb#24
-  def instance_of(klass); end
+  # source://mocha//lib/mocha/parameter_matchers/instance_of.rb#31
+  def instance_of(*args); end
 
-  # Matches any object that is a +klass+.
-  #
-  # @example Actual parameter is a +Integer+.
-  #   object = mock()
-  #   object.expects(:method_1).with(is_a(Integer))
-  #   object.method_1(99)
-  #   # no error raised
-  # @example Actual parameter is not a +Integer+.
-  #   object = mock()
-  #   object.expects(:method_1).with(is_a(Integer))
-  #   object.method_1('string')
-  #   # error raised, because method_1 was not called with an Integer
-  # @param klass [Class] expected class.
-  # @return [IsA] parameter matcher.
-  # @see Expectation#with
-  # @see Kernel#is_a?
-  #
-  # source://mocha//lib/mocha/parameter_matchers/is_a.rb#25
-  def is_a(klass); end
+  # source://mocha//lib/mocha/parameter_matchers/is_a.rb#32
+  def is_a(*args); end
 
-  # Matches any +Object+ that is a kind of +klass+.
-  #
-  # @example Actual parameter is a kind of +Integer+.
-  #   object = mock()
-  #   object.expects(:method_1).with(kind_of(Integer))
-  #   object.method_1(99)
-  #   # no error raised
-  # @example Actual parameter is not a kind of +Integer+.
-  #   object = mock()
-  #   object.expects(:method_1).with(kind_of(Integer))
-  #   object.method_1('string')
-  #   # error raised, because method_1 was not called with a kind of Integer
-  # @param klass [Class] expected class.
-  # @return [KindOf] parameter matcher.
-  # @see Expectation#with
-  # @see Kernel#kind_of?
-  #
-  # source://mocha//lib/mocha/parameter_matchers/kind_of.rb#24
-  def kind_of(klass); end
+  # source://mocha//lib/mocha/parameter_matchers/kind_of.rb#31
+  def kind_of(*args); end
 
-  # Matches optional parameters if available.
-  #
-  # @example Only the two required parameters are supplied and they both match their expected value.
-  #   object = mock()
-  #   object.expects(:method_1).with(1, 2, optionally(3, 4))
-  #   object.method_1(1, 2)
-  #   # no error raised
-  # @example Both required parameters and one of the optional parameters are supplied and they all match their expected value.
-  #   object = mock()
-  #   object.expects(:method_1).with(1, 2, optionally(3, 4))
-  #   object.method_1(1, 2, 3)
-  #   # no error raised
-  # @example Both required parameters and both of the optional parameters are supplied and they all match their expected value.
-  #   object = mock()
-  #   object.expects(:method_1).with(1, 2, optionally(3, 4))
-  #   object.method_1(1, 2, 3, 4)
-  #   # no error raised
-  # @example One of the actual optional parameters does not match the expected value.
-  #   object = mock()
-  #   object.expects(:method_1).with(1, 2, optionally(3, 4))
-  #   object.method_1(1, 2, 3, 5)
-  #   # error raised, because optional parameters did not match
-  # @param matchers [*Array<Base>] matchers for optional parameters.
-  # @return [Optionally] parameter matcher.
-  # @see Expectation#with
-  #
-  # source://mocha//lib/mocha/parameter_matchers/optionally.rb#33
-  def optionally(*matchers); end
+  # source://mocha//lib/mocha/parameter_matchers/optionally.rb#41
+  def optionally(*args); end
 
-  # Matches any object that matches +regexp+.
-  #
-  # @example Actual parameter is matched by specified regular expression.
-  #   object = mock()
-  #   object.expects(:method_1).with(regexp_matches(/e/))
-  #   object.method_1('hello')
-  #   # no error raised
-  # @example Actual parameter is not matched by specified regular expression.
-  #   object = mock()
-  #   object.expects(:method_1).with(regexp_matches(/a/))
-  #   object.method_1('hello')
-  #   # error raised, because method_1 was not called with a parameter that matched the
-  #   # regular expression
-  # @param regexp [Regexp] regular expression to match.
-  # @return [RegexpMatches] parameter matcher.
-  # @see Expectation#with
-  #
-  # source://mocha//lib/mocha/parameter_matchers/regexp_matches.rb#24
-  def regexp_matches(regexp); end
+  # source://mocha//lib/mocha/parameter_matchers/regexp_matches.rb#31
+  def regexp_matches(*args); end
 
-  # @example Actual parameter responds with "FOO" when :upcase is invoked.
-  #   object = mock()
-  #   object.expects(:method_1).with(responds_with(:upcase, "FOO"))
-  #   object.method_1("foo")
-  #   # no error raised, because "foo".upcase == "FOO"
-  # @example Actual parameter does not respond with "FOO" when :upcase is invoked.
-  #   object = mock()
-  #   object.expects(:method_1).with(responds_with(:upcase, "BAR"))
-  #   object.method_1("foo")
-  #   # error raised, because "foo".upcase != "BAR"
-  # @example Actual parameter responds with "FOO" when :upcase is invoked and "oof" when :reverse is invoked.
-  #   object = mock()
-  #   object.expects(:method_1).with(responds_with(upcase: "FOO", reverse: "oof"))
-  #   object.method_1("foo")
-  #   # no error raised, because "foo".upcase == "FOO" and "foo".reverse == "oof"
-  # @overload responds_with
-  # @overload responds_with
-  # @return [RespondsWith] parameter matcher.
-  # @see Expectation#with
-  #
-  # source://mocha//lib/mocha/parameter_matchers/responds_with.rb#37
-  def responds_with(*options); end
+  # source://mocha//lib/mocha/parameter_matchers/responds_with.rb#59
+  def responds_with(*args); end
 
-  # Matches any YAML that represents the specified +object+
-  #
-  # @example Actual parameter is YAML equivalent of specified +object+.
-  #   object = mock()
-  #   object.expects(:method_1).with(yaml_equivalent(1, 2, 3))
-  #   object.method_1("--- \n- 1\n- 2\n- 3\n")
-  #   # no error raised
-  # @example Actual parameter is not YAML equivalent of specified +object+.
-  #   object = mock()
-  #   object.expects(:method_1).with(yaml_equivalent(1, 2, 3))
-  #   object.method_1("--- \n- 1\n- 2\n")
-  #   # error raised, because method_1 was not called with YAML representing the specified Array
-  # @param object [Object] object whose YAML to compare.
-  # @return [YamlEquivalent] parameter matcher.
-  # @see Expectation#with
-  #
-  # source://mocha//lib/mocha/parameter_matchers/yaml_equivalent.rb#24
-  def yaml_equivalent(object); end
+  # source://mocha//lib/mocha/parameter_matchers/yaml_equivalent.rb#31
+  def yaml_equivalent(*args); end
 
-  private
+  class << self
+    # @private
+    # @return [Boolean]
+    #
+    # source://mocha//lib/mocha/parameter_matchers/deprecations.rb#30
+    def access_deprecated?(name); end
 
-  # @private
-  #
-  # source://mocha//lib/mocha/parameter_matchers/has_entry.rb#82
-  def parse_option(option); end
+    # @private
+    #
+    # source://mocha//lib/mocha/parameter_matchers/deprecations.rb#35
+    def define_deprecated_matcher_method(name); end
+
+    # @private
+    #
+    # source://mocha//lib/mocha/parameter_matchers/deprecations.rb#25
+    def provide_deprecated_access_to(name); end
+  end
 end
 
 # Parameter matcher which combines a number of other matchers using a logical AND.
 #
-# source://mocha//lib/mocha/parameter_matchers/all_of.rb#28
-class Mocha::ParameterMatchers::AllOf < ::Mocha::ParameterMatchers::Base
+# source://mocha//lib/mocha/parameter_matchers/all_of.rb#33
+class Mocha::ParameterMatchers::AllOf
+  include ::Mocha::ParameterMatchers::BaseMethods
+
   # @private
   # @return [AllOf] a new instance of AllOf
   #
-  # source://mocha//lib/mocha/parameter_matchers/all_of.rb#30
+  # source://mocha//lib/mocha/parameter_matchers/all_of.rb#37
   def initialize(*matchers); end
 
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/all_of.rb#35
+  # source://mocha//lib/mocha/parameter_matchers/all_of.rb#42
   def matches?(available_parameters); end
 
   # @private
   #
-  # source://mocha//lib/mocha/parameter_matchers/all_of.rb#41
+  # source://mocha//lib/mocha/parameter_matchers/all_of.rb#48
   def mocha_inspect; end
 end
 
 # Parameter matcher which combines a number of other matchers using a logical OR.
 #
-# source://mocha//lib/mocha/parameter_matchers/any_of.rb#34
-class Mocha::ParameterMatchers::AnyOf < ::Mocha::ParameterMatchers::Base
+# source://mocha//lib/mocha/parameter_matchers/any_of.rb#39
+class Mocha::ParameterMatchers::AnyOf
+  include ::Mocha::ParameterMatchers::BaseMethods
+
   # @private
   # @return [AnyOf] a new instance of AnyOf
   #
-  # source://mocha//lib/mocha/parameter_matchers/any_of.rb#36
+  # source://mocha//lib/mocha/parameter_matchers/any_of.rb#43
   def initialize(*matchers); end
 
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/any_of.rb#41
+  # source://mocha//lib/mocha/parameter_matchers/any_of.rb#48
   def matches?(available_parameters); end
 
   # @private
   #
-  # source://mocha//lib/mocha/parameter_matchers/any_of.rb#47
+  # source://mocha//lib/mocha/parameter_matchers/any_of.rb#54
   def mocha_inspect; end
 end
 
 # Parameter matcher which always matches whatever the parameters.
 #
-# source://mocha//lib/mocha/parameter_matchers/any_parameters.rb#26
-class Mocha::ParameterMatchers::AnyParameters < ::Mocha::ParameterMatchers::Base
+# source://mocha//lib/mocha/parameter_matchers/any_parameters.rb#31
+class Mocha::ParameterMatchers::AnyParameters
+  include ::Mocha::ParameterMatchers::BaseMethods
+
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/any_parameters.rb#28
+  # source://mocha//lib/mocha/parameter_matchers/any_parameters.rb#35
   def matches?(available_parameters); end
 
   # @private
   #
-  # source://mocha//lib/mocha/parameter_matchers/any_parameters.rb#36
+  # source://mocha//lib/mocha/parameter_matchers/any_parameters.rb#43
   def mocha_inspect; end
 end
 
 # Parameter matcher which always matches a single parameter.
 #
-# source://mocha//lib/mocha/parameter_matchers/anything.rb#23
-class Mocha::ParameterMatchers::Anything < ::Mocha::ParameterMatchers::Base
+# source://mocha//lib/mocha/parameter_matchers/anything.rb#28
+class Mocha::ParameterMatchers::Anything
+  include ::Mocha::ParameterMatchers::BaseMethods
+
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/anything.rb#25
+  # source://mocha//lib/mocha/parameter_matchers/anything.rb#32
   def matches?(available_parameters); end
 
   # @private
   #
-  # source://mocha//lib/mocha/parameter_matchers/anything.rb#31
+  # source://mocha//lib/mocha/parameter_matchers/anything.rb#38
   def mocha_inspect; end
 end
 
-# @abstract Subclass and implement +#matches?+ and +#mocha_inspect+ to define a custom matcher. Also add a suitably named instance method to {ParameterMatchers} to build an instance of the new matcher c.f. {#equals}.
+# @deprecated Include +BaseMethods+ module instead.
 #
-# source://mocha//lib/mocha/parameter_matchers/base.rb#4
+# source://mocha//lib/mocha/parameter_matchers/base.rb#66
 class Mocha::ParameterMatchers::Base
+  include ::Mocha::ParameterMatchers::BaseMethods
+
+  class << self
+    # @private
+    # @private
+    #
+    # source://mocha//lib/mocha/parameter_matchers/base.rb#70
+    def inherited(subclass); end
+  end
+end
+
+# @abstract Include and implement +#matches?+ and +#mocha_inspect+ to define a custom matcher. Also add a suitably named instance method to {Methods} to build an instance of the new matcher c.f. {Methods#equals}.
+#
+# source://mocha//lib/mocha/parameter_matchers/base.rb#7
+module Mocha::ParameterMatchers::BaseMethods
   # A shorthand way of combining two matchers when both must match.
   #
   # Returns a new {AllOf} parameter matcher combining two matchers using a logical AND.
@@ -3193,11 +2848,11 @@ class Mocha::ParameterMatchers::Base
   #
   #   object.expects(:run).with(has_key(:foo) & has_key(:bar))
   #   object.run(foo: 'foovalue', bar: 'barvalue)
-  # @param other [Base] parameter matcher.
+  # @param other [BaseMethods] parameter matcher.
   # @return [AllOf] parameter matcher.
   # @see Expectation#with
   #
-  # source://mocha//lib/mocha/parameter_matchers/base.rb#25
+  # source://mocha//lib/mocha/parameter_matchers/base.rb#28
   def &(other); end
 
   # A shorthand way of combining two matchers when at least one must match.
@@ -3220,195 +2875,226 @@ class Mocha::ParameterMatchers::Base
   #   object.run(1) # passes
   #   object.run(2) # passes
   #   object.run(3) # fails
-  # @param other [Base] parameter matcher.
+  # @param other [BaseMethods] parameter matcher.
   # @return [AnyOf] parameter matcher.
   # @see Expectation#with
   #
-  # source://mocha//lib/mocha/parameter_matchers/base.rb#55
+  # source://mocha//lib/mocha/parameter_matchers/base.rb#58
   def |(other); end
+end
+
+# source://mocha//lib/mocha/parameter_matchers/deprecations.rb#6
+module Mocha::ParameterMatchers::Deprecations
+  # @private
+  #
+  # source://mocha//lib/mocha/parameter_matchers/deprecations.rb#8
+  def const_missing(name); end
 end
 
 # Parameter matcher which matches when actual parameter equals expected value.
 #
-# source://mocha//lib/mocha/parameter_matchers/equals.rb#29
-class Mocha::ParameterMatchers::Equals < ::Mocha::ParameterMatchers::Base
+# source://mocha//lib/mocha/parameter_matchers/equals.rb#34
+class Mocha::ParameterMatchers::Equals
+  include ::Mocha::ParameterMatchers::BaseMethods
+
   # @private
   # @return [Equals] a new instance of Equals
   #
-  # source://mocha//lib/mocha/parameter_matchers/equals.rb#31
+  # source://mocha//lib/mocha/parameter_matchers/equals.rb#38
   def initialize(value); end
 
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/equals.rb#36
+  # source://mocha//lib/mocha/parameter_matchers/equals.rb#43
   def matches?(available_parameters); end
 
   # @private
   #
-  # source://mocha//lib/mocha/parameter_matchers/equals.rb#42
+  # source://mocha//lib/mocha/parameter_matchers/equals.rb#49
   def mocha_inspect; end
 end
 
 # Parameter matcher which matches URIs with equivalent query strings.
 #
-# source://mocha//lib/mocha/parameter_matchers/equivalent_uri.rb#30
-class Mocha::ParameterMatchers::EquivalentUri < ::Mocha::ParameterMatchers::Base
+# source://mocha//lib/mocha/parameter_matchers/equivalent_uri.rb#35
+class Mocha::ParameterMatchers::EquivalentUri
+  include ::Mocha::ParameterMatchers::BaseMethods
+
   # @private
   # @return [EquivalentUri] a new instance of EquivalentUri
   #
-  # source://mocha//lib/mocha/parameter_matchers/equivalent_uri.rb#32
+  # source://mocha//lib/mocha/parameter_matchers/equivalent_uri.rb#39
   def initialize(uri); end
 
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/equivalent_uri.rb#37
+  # source://mocha//lib/mocha/parameter_matchers/equivalent_uri.rb#44
   def matches?(available_parameters); end
 
   # @private
   #
-  # source://mocha//lib/mocha/parameter_matchers/equivalent_uri.rb#44
+  # source://mocha//lib/mocha/parameter_matchers/equivalent_uri.rb#51
   def mocha_inspect; end
 
   private
 
   # @private
   #
-  # source://mocha//lib/mocha/parameter_matchers/equivalent_uri.rb#51
+  # source://mocha//lib/mocha/parameter_matchers/equivalent_uri.rb#58
   def explode(uri); end
 end
 
 # Parameter matcher which matches when actual parameter contains all expected +Hash+ entries.
 #
-# source://mocha//lib/mocha/parameter_matchers/has_entries.rb#31
-class Mocha::ParameterMatchers::HasEntries < ::Mocha::ParameterMatchers::Base
+# source://mocha//lib/mocha/parameter_matchers/has_entries.rb#36
+class Mocha::ParameterMatchers::HasEntries
+  include ::Mocha::ParameterMatchers::BaseMethods
+
   # @private
   # @return [HasEntries] a new instance of HasEntries
   #
-  # source://mocha//lib/mocha/parameter_matchers/has_entries.rb#33
+  # source://mocha//lib/mocha/parameter_matchers/has_entries.rb#40
   def initialize(entries, exact: T.unsafe(nil)); end
 
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/has_entries.rb#39
+  # source://mocha//lib/mocha/parameter_matchers/has_entries.rb#46
   def matches?(available_parameters); end
 
   # @private
   #
-  # source://mocha//lib/mocha/parameter_matchers/has_entries.rb#50
+  # source://mocha//lib/mocha/parameter_matchers/has_entries.rb#57
   def mocha_inspect; end
 end
 
 # Parameter matcher which matches when actual parameter contains expected +Hash+ entry.
 #
-# source://mocha//lib/mocha/parameter_matchers/has_entry.rb#58
-class Mocha::ParameterMatchers::HasEntry < ::Mocha::ParameterMatchers::Base
+# source://mocha//lib/mocha/parameter_matchers/has_entry.rb#63
+class Mocha::ParameterMatchers::HasEntry
+  include ::Mocha::ParameterMatchers::BaseMethods
+
   # @private
   # @return [HasEntry] a new instance of HasEntry
   #
-  # source://mocha//lib/mocha/parameter_matchers/has_entry.rb#60
+  # source://mocha//lib/mocha/parameter_matchers/has_entry.rb#67
   def initialize(key, value); end
 
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/has_entry.rb#66
+  # source://mocha//lib/mocha/parameter_matchers/has_entry.rb#73
   def matches?(available_parameters); end
 
   # @private
   #
-  # source://mocha//lib/mocha/parameter_matchers/has_entry.rb#74
+  # source://mocha//lib/mocha/parameter_matchers/has_entry.rb#81
   def mocha_inspect; end
+
+  class << self
+    # @private
+    #
+    # source://mocha//lib/mocha/parameter_matchers/has_entry.rb#86
+    def parse_option(option); end
+  end
 end
 
 # Parameter matcher which matches when actual parameter contains +Hash+ entry with expected key.
 #
-# source://mocha//lib/mocha/parameter_matchers/has_key.rb#29
-class Mocha::ParameterMatchers::HasKey < ::Mocha::ParameterMatchers::Base
+# source://mocha//lib/mocha/parameter_matchers/has_key.rb#34
+class Mocha::ParameterMatchers::HasKey
+  include ::Mocha::ParameterMatchers::BaseMethods
+
   # @private
   # @return [HasKey] a new instance of HasKey
   #
-  # source://mocha//lib/mocha/parameter_matchers/has_key.rb#31
+  # source://mocha//lib/mocha/parameter_matchers/has_key.rb#38
   def initialize(key); end
 
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/has_key.rb#36
+  # source://mocha//lib/mocha/parameter_matchers/has_key.rb#43
   def matches?(available_parameters); end
 
   # @private
   #
-  # source://mocha//lib/mocha/parameter_matchers/has_key.rb#43
+  # source://mocha//lib/mocha/parameter_matchers/has_key.rb#50
   def mocha_inspect; end
 end
 
 # Parameter matcher which matches when actual parameter contains +Hash+ with all expected keys.
 #
-# source://mocha//lib/mocha/parameter_matchers/has_keys.rb#29
-class Mocha::ParameterMatchers::HasKeys < ::Mocha::ParameterMatchers::Base
+# source://mocha//lib/mocha/parameter_matchers/has_keys.rb#34
+class Mocha::ParameterMatchers::HasKeys
+  include ::Mocha::ParameterMatchers::BaseMethods
+
   # @private
   # @raise [ArgumentError]
   # @return [HasKeys] a new instance of HasKeys
   #
-  # source://mocha//lib/mocha/parameter_matchers/has_keys.rb#31
+  # source://mocha//lib/mocha/parameter_matchers/has_keys.rb#38
   def initialize(*keys); end
 
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/has_keys.rb#38
+  # source://mocha//lib/mocha/parameter_matchers/has_keys.rb#45
   def matches?(available_parameters); end
 
   # @private
   #
-  # source://mocha//lib/mocha/parameter_matchers/has_keys.rb#48
+  # source://mocha//lib/mocha/parameter_matchers/has_keys.rb#55
   def mocha_inspect; end
 end
 
 # Parameter matcher which matches when actual parameter contains +Hash+ entry with expected value.
 #
-# source://mocha//lib/mocha/parameter_matchers/has_value.rb#29
-class Mocha::ParameterMatchers::HasValue < ::Mocha::ParameterMatchers::Base
+# source://mocha//lib/mocha/parameter_matchers/has_value.rb#34
+class Mocha::ParameterMatchers::HasValue
+  include ::Mocha::ParameterMatchers::BaseMethods
+
   # @private
   # @return [HasValue] a new instance of HasValue
   #
-  # source://mocha//lib/mocha/parameter_matchers/has_value.rb#31
+  # source://mocha//lib/mocha/parameter_matchers/has_value.rb#38
   def initialize(value); end
 
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/has_value.rb#36
+  # source://mocha//lib/mocha/parameter_matchers/has_value.rb#43
   def matches?(available_parameters); end
 
   # @private
   #
-  # source://mocha//lib/mocha/parameter_matchers/has_value.rb#43
+  # source://mocha//lib/mocha/parameter_matchers/has_value.rb#50
   def mocha_inspect; end
 end
 
 # Parameter matcher which matches when actual parameter includes expected values.
 #
-# source://mocha//lib/mocha/parameter_matchers/includes.rb#68
-class Mocha::ParameterMatchers::Includes < ::Mocha::ParameterMatchers::Base
+# source://mocha//lib/mocha/parameter_matchers/includes.rb#73
+class Mocha::ParameterMatchers::Includes
+  include ::Mocha::ParameterMatchers::BaseMethods
+
   # @private
   # @return [Includes] a new instance of Includes
   #
-  # source://mocha//lib/mocha/parameter_matchers/includes.rb#70
+  # source://mocha//lib/mocha/parameter_matchers/includes.rb#77
   def initialize(*items); end
 
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/includes.rb#76
+  # source://mocha//lib/mocha/parameter_matchers/includes.rb#83
   def matches?(available_parameters); end
 
   # @private
   #
-  # source://mocha//lib/mocha/parameter_matchers/includes.rb#96
+  # source://mocha//lib/mocha/parameter_matchers/includes.rb#103
   def mocha_inspect; end
 end
 
@@ -3424,219 +3110,684 @@ end
 
 # Parameter matcher which matches when actual parameter is an instance of the specified class.
 #
-# source://mocha//lib/mocha/parameter_matchers/instance_of.rb#29
-class Mocha::ParameterMatchers::InstanceOf < ::Mocha::ParameterMatchers::Base
+# source://mocha//lib/mocha/parameter_matchers/instance_of.rb#34
+class Mocha::ParameterMatchers::InstanceOf
+  include ::Mocha::ParameterMatchers::BaseMethods
+
   # @private
   # @return [InstanceOf] a new instance of InstanceOf
   #
-  # source://mocha//lib/mocha/parameter_matchers/instance_of.rb#31
+  # source://mocha//lib/mocha/parameter_matchers/instance_of.rb#38
   def initialize(klass); end
 
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/instance_of.rb#36
+  # source://mocha//lib/mocha/parameter_matchers/instance_of.rb#43
   def matches?(available_parameters); end
 
   # @private
   #
-  # source://mocha//lib/mocha/parameter_matchers/instance_of.rb#42
+  # source://mocha//lib/mocha/parameter_matchers/instance_of.rb#49
   def mocha_inspect; end
 end
 
 # Parameter matcher which matches when actual parameter is a specific class.
 #
-# source://mocha//lib/mocha/parameter_matchers/is_a.rb#30
-class Mocha::ParameterMatchers::IsA < ::Mocha::ParameterMatchers::Base
+# source://mocha//lib/mocha/parameter_matchers/is_a.rb#35
+class Mocha::ParameterMatchers::IsA
+  include ::Mocha::ParameterMatchers::BaseMethods
+
   # @private
   # @return [IsA] a new instance of IsA
   #
-  # source://mocha//lib/mocha/parameter_matchers/is_a.rb#32
+  # source://mocha//lib/mocha/parameter_matchers/is_a.rb#39
   def initialize(klass); end
 
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/is_a.rb#37
+  # source://mocha//lib/mocha/parameter_matchers/is_a.rb#44
   def matches?(available_parameters); end
 
   # @private
   #
-  # source://mocha//lib/mocha/parameter_matchers/is_a.rb#43
+  # source://mocha//lib/mocha/parameter_matchers/is_a.rb#50
   def mocha_inspect; end
 end
 
 # Parameter matcher which matches when actual parameter is a kind of specified class.
 #
-# source://mocha//lib/mocha/parameter_matchers/kind_of.rb#29
-class Mocha::ParameterMatchers::KindOf < ::Mocha::ParameterMatchers::Base
+# source://mocha//lib/mocha/parameter_matchers/kind_of.rb#34
+class Mocha::ParameterMatchers::KindOf
+  include ::Mocha::ParameterMatchers::BaseMethods
+
   # @private
   # @return [KindOf] a new instance of KindOf
   #
-  # source://mocha//lib/mocha/parameter_matchers/kind_of.rb#31
+  # source://mocha//lib/mocha/parameter_matchers/kind_of.rb#38
   def initialize(klass); end
 
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/kind_of.rb#36
+  # source://mocha//lib/mocha/parameter_matchers/kind_of.rb#43
   def matches?(available_parameters); end
 
   # @private
   #
-  # source://mocha//lib/mocha/parameter_matchers/kind_of.rb#44
+  # source://mocha//lib/mocha/parameter_matchers/kind_of.rb#51
   def mocha_inspect; end
+end
+
+# These methods build instances of the {ParameterMatchers} classes which are used with {Expectation#with} to restrict the parameter values. Can be nested, e.g. see {Methods#all_of} examples.
+#
+# source://mocha//lib/mocha/parameter_matchers.rb#5
+module Mocha::ParameterMatchers::Methods
+  # Matches if +matcher+ does *not* match.
+  #
+  # @example Actual parameter does include the value +1+.
+  #   object = mock()
+  #   object.expects(:method_1).with(Not(includes(1)))
+  #   object.method_1([0, 1, 2, 3])
+  #   # error raised, because method_1 was not called with object not including 1
+  # @example Actual parameter does not include the value +1+.
+  #   object = mock()
+  #   object.expects(:method_1).with(Not(includes(1)))
+  #   object.method_1([0, 2, 3])
+  #   # no error raised
+  # @param matcher [BaseMethods] matcher whose logic to invert.
+  # @return [Not] parameter matcher.
+  # @see Expectation#with
+  #
+  # source://mocha//lib/mocha/parameter_matchers/not.rb#26
+  def Not(matcher); end
+
+  # Matches if all +matchers+ match.
+  #
+  # @example All parameter matchers match.
+  #   object = mock()
+  #   object.expects(:method_1).with(all_of(includes(1), includes(3)))
+  #   object.method_1([1, 3])
+  #   # no error raised
+  # @example One of the parameter matchers does not match.
+  #   object = mock()
+  #   object.expects(:method_1).with(all_of(includes(1), includes(3)))
+  #   object.method_1([1, 2])
+  #   # error raised, because method_1 was not called with object including 1 and 3
+  # @param matchers [*Array<BaseMethods>] parameter matchers.
+  # @return [AllOf] parameter matcher.
+  # @see Expectation#with
+  #
+  # source://mocha//lib/mocha/parameter_matchers/all_of.rb#25
+  def all_of(*matchers); end
+
+  # Matches if any +matchers+ match.
+  #
+  # @example Neither parameter matcher matches.
+  #   object = mock()
+  #   object.expects(:method_1).with(any_of(1, 3))
+  #   object.method_1(2)
+  #   # error raised, because method_1 was not called with 1 or 3
+  # @example One parameter matcher matches.
+  #   object = mock()
+  #   object.expects(:method_1).with(any_of(1, 3))
+  #   object.method_1(1)
+  #   # no error raised
+  # @example The other parameter matcher matches.
+  #   object = mock()
+  #   object.expects(:method_1).with(any_of(1, 3))
+  #   object.method_1(3)
+  #   # no error raised
+  # @param matchers [*Array<BaseMethods>] parameter matchers.
+  # @return [AnyOf] parameter matcher.
+  # @see Expectation#with
+  #
+  # source://mocha//lib/mocha/parameter_matchers/any_of.rb#31
+  def any_of(*matchers); end
+
+  # Matches any parameters. This is used as the default for a newly built expectation.
+  #
+  # @example Any parameters will match.
+  #   object = mock()
+  #   object.expects(:method_1).with(any_parameters)
+  #   object.method_1(1, 2, 3, 4)
+  #   # no error raised
+  #
+  #   object = mock()
+  #   object.expects(:method_1).with(any_parameters)
+  #   object.method_1(5, 6, 7, 8, 9, 0)
+  #   # no error raised
+  # @return [AnyParameters] parameter matcher.
+  # @see Expectation#with
+  #
+  # source://mocha//lib/mocha/parameter_matchers/any_parameters.rb#23
+  def any_parameters; end
+
+  # Matches any object.
+  #
+  # @example Any object will match.
+  #   object = mock()
+  #   object.expects(:method_1).with(anything)
+  #   object.method_1('foo')
+  #   object.method_1(789)
+  #   object.method_1(:bar)
+  #   # no error raised
+  # @return [Anything] parameter matcher.
+  # @see Expectation#with
+  #
+  # source://mocha//lib/mocha/parameter_matchers/anything.rb#20
+  def anything; end
+
+  # Matches any +Object+ equalling +value+.
+  #
+  # @example Actual parameter does not equal expected parameter.
+  #   object = mock()
+  #   object.expects(:method_1).with(equals(2))
+  #   object.method_1(3)
+  #   # error raised, because method_1 was not called with an +Object+ that equals 2
+  # @example Actual parameter equals expected parameter.
+  #   object = mock()
+  #   object.expects(:method_1).with(equals(2))
+  #   object.method_1(2)
+  #   # no error raised
+  # @param value [Object] expected value.
+  # @return [Equals] parameter matcher.
+  # @see Expectation#with
+  # @see Object#==
+  #
+  # source://mocha//lib/mocha/parameter_matchers/equals.rb#26
+  def equals(value); end
+
+  # Matches a URI without regard to the ordering of parameters in the query string.
+  #
+  # @example Actual URI is equivalent.
+  #   object = mock()
+  #   object.expects(:method_1).with(equivalent_uri('http://example.com/foo?a=1&b=2))
+  #   object.method_1('http://example.com/foo?b=2&a=1')
+  #   # no error raised
+  # @example Actual URI is not equivalent.
+  #   object = mock()
+  #   object.expects(:method_1).with(equivalent_uri('http://example.com/foo?a=1&b=2))
+  #   object.method_1('http://example.com/foo?a=1&b=3')
+  #   # error raised, because the query parameters were different
+  # @param uri [String] URI to match.
+  # @return [EquivalentUri] parameter matcher.
+  # @see Expectation#with
+  #
+  # source://mocha//lib/mocha/parameter_matchers/equivalent_uri.rb#27
+  def equivalent_uri(uri); end
+
+  # Matches +Hash+ containing all +entries+.
+  #
+  # @example Actual parameter contains all expected entries.
+  #   object = mock()
+  #   object.expects(:method_1).with(has_entries('key_1' => 1, 'key_2' => 2))
+  #   object.method_1('key_1' => 1, 'key_2' => 2, 'key_3' => 3)
+  #   # no error raised
+  # @example Actual parameter does not contain all expected entries.
+  #   object = mock()
+  #   object.expects(:method_1).with(has_entries('key_1' => 1, 'key_2' => 2))
+  #   object.method_1('key_1' => 1, 'key_2' => 99)
+  #   # error raised, because method_1 was not called with Hash containing entries: 'key_1' => 1, 'key_2' => 2
+  # @param entries [Hash] expected +Hash+ entries.
+  # @return [HasEntries] parameter matcher.
+  # @see Expectation#with
+  #
+  # source://mocha//lib/mocha/parameter_matchers/has_entries.rb#28
+  def has_entries(entries); end
+
+  # Matches +Hash+ containing entry with +key+ and +value+.
+  #
+  # @example Actual parameter contains expected entry supplied as +Hash+ entry.
+  #   object = mock()
+  #   object.expects(:method_1).with(has_entry('key_1' => 1))
+  #   object.method_1('key_1' => 1, 'key_2' => 2)
+  #   # no error raised
+  # @example Actual parameter contains expected entry supplied as key and value.
+  #   object = mock()
+  #   object.expects(:method_1).with(has_entry('key_1', 1))
+  #   object.method_1('key_1' => 1, 'key_2' => 2)
+  #   # no error raised
+  # @example Actual parameter does not contain expected entry supplied as +Hash+ entry.
+  #
+  #   object = mock()
+  #   object.expects(:method_1).with(has_entry('key_1' => 1))
+  #   object.method_1('key_1' => 2, 'key_2' => 1)
+  #   # error raised, because method_1 was not called with Hash containing entry: 'key_1' => 1
+  # @example Actual parameter does not contain expected entry supplied as key and value.
+  #   object = mock()
+  #   object.expects(:method_1).with(has_entry('key_1', 1))
+  #   object.method_1('key_1' => 2, 'key_2' => 1)
+  #   # error raised, because method_1 was not called with Hash containing entry: 'key_1' => 1
+  # @overload has_entry
+  # @overload has_entry
+  # @return [HasEntry] parameter matcher.
+  # @see Expectation#with
+  #
+  # source://mocha//lib/mocha/parameter_matchers/has_entry.rb#45
+  def has_entry(*options); end
+
+  # Matches +Hash+ containing +key+.
+  #
+  # @example Actual parameter contains entry with expected key.
+  #   object = mock()
+  #   object.expects(:method_1).with(has_key('key_1'))
+  #   object.method_1('key_1' => 1, 'key_2' => 2)
+  #   # no error raised
+  # @example Actual parameter does not contain entry with expected key.
+  #   object = mock()
+  #   object.expects(:method_1).with(has_key('key_1'))
+  #   object.method_1('key_2' => 2)
+  #   # error raised, because method_1 was not called with Hash containing key: 'key_1'
+  # @param key [Object] expected key.
+  # @return [HasKey] parameter matcher.
+  # @see Expectation#with
+  #
+  # source://mocha//lib/mocha/parameter_matchers/has_key.rb#26
+  def has_key(key); end
+
+  # Matches +Hash+ containing +keys+.
+  #
+  # @example Actual parameter contains entry with expected keys.
+  #   object = mock()
+  #   object.expects(:method_1).with(has_keys(:key_1, :key_2))
+  #   object.method_1(:key_1 => 1, :key_2 => 2, :key_3 => 3)
+  #   # no error raised
+  # @example Actual parameter does not contain all expected keys.
+  #   object = mock()
+  #   object.expects(:method_1).with(has_keys(:key_1, :key_2))
+  #   object.method_1(:key_2 => 2)
+  #   # error raised, because method_1 was not called with Hash containing key: :key_1
+  # @param keys [*Array<Object>] expected keys.
+  # @return [HasKeys] parameter matcher.
+  # @see Expectation#with
+  #
+  # source://mocha//lib/mocha/parameter_matchers/has_keys.rb#26
+  def has_keys(*keys); end
+
+  # Matches +Hash+ containing +value+.
+  #
+  # @example Actual parameter contains entry with expected value.
+  #   object = mock()
+  #   object.expects(:method_1).with(has_value(1))
+  #   object.method_1('key_1' => 1, 'key_2' => 2)
+  #   # no error raised
+  # @example Actual parameter does not contain entry with expected value.
+  #   object = mock()
+  #   object.expects(:method_1).with(has_value(1))
+  #   object.method_1('key_2' => 2)
+  #   # error raised, because method_1 was not called with Hash containing value: 1
+  # @param value [Object] expected value.
+  # @return [HasValue] parameter matcher.
+  # @see Expectation#with
+  #
+  # source://mocha//lib/mocha/parameter_matchers/has_value.rb#26
+  def has_value(value); end
+
+  # Matches any object that responds with +true+ to +include?(item)+
+  # for all items.
+  #
+  # @example Actual parameter does not include all items.
+  #   object.method_1(['foo', 'baz'])
+  #   # error raised, because ['foo', 'baz'] does not include 'bar'.
+  # @example Actual parameter does not include item matching nested matcher.
+  #   object.method_1(['foo', 'bar', {:other_key => 'baz'}])
+  #   # error raised, because no element matches `has_key(:key)` matcher
+  # @example Actual parameter includes all items.
+  #   object = mock()
+  #   object.expects(:method_1).with(includes('foo', 'bar'))
+  #   object.method_1(['foo', 'bar', 'baz'])
+  #   # no error raised
+  # @example Actual parameter includes item which matches nested matcher.
+  #   object = mock()
+  #   object.expects(:method_1).with(includes(has_key(:key)))
+  #   object.method_1(['foo', 'bar', {key: 'baz'}])
+  #   # no error raised
+  # @example Actual parameter is a Hash including the given key.
+  #   object = mock()
+  #   object.expects(:method_1).with(includes(:bar))
+  #   object.method_1({foo: 1, bar: 2})
+  #   # no error raised
+  # @example Actual parameter is a Hash no key matching the given matcher.
+  #   object.method_1({'foo' => 1, 'baz' => 3})
+  #   # error raised, because hash does not include a key matching /ar/
+  # @example Actual parameter is a Hash with a key matching the given matcher.
+  #   object = mock()
+  #   object.expects(:method_1).with(includes(regexp_matches(/ar/)))
+  #   object.method_1({'foo' => 1, 'bar' => 2})
+  #   # no error raised
+  # @example Actual parameter is a Hash without the given key.
+  #   object.method_1({foo: 1, baz: 2})
+  #   # error raised, because hash does not include key 'bar'
+  # @example Actual parameter is a String including substring.
+  #   object = mock()
+  #   object.expects(:method_1).with(includes('bar'))
+  #   object.method_1('foobarbaz')
+  #   # no error raised
+  # @example Actual parameter is a String not including substring.
+  #   object.method_1('foobaz')
+  #   # error raised, because 'foobaz' does not include 'bar'
+  # @param items [*Array] expected items.
+  # @return [Includes] parameter matcher.
+  # @see Expectation#with
+  #
+  # source://mocha//lib/mocha/parameter_matchers/includes.rb#65
+  def includes(*items); end
+
+  # Matches any object that is an instance of +klass+
+  #
+  # @example Actual parameter is an instance of +String+.
+  #   object = mock()
+  #   object.expects(:method_1).with(instance_of(String))
+  #   object.method_1('string')
+  #   # no error raised
+  # @example Actual parameter is not an instance of +String+.
+  #   object = mock()
+  #   object.expects(:method_1).with(instance_of(String))
+  #   object.method_1(99)
+  #   # error raised, because method_1 was not called with an instance of String
+  # @param klass [Class] expected class.
+  # @return [InstanceOf] parameter matcher.
+  # @see Expectation#with
+  # @see Kernel#instance_of?
+  #
+  # source://mocha//lib/mocha/parameter_matchers/instance_of.rb#26
+  def instance_of(klass); end
+
+  # Matches any object that is a +klass+.
+  #
+  # @example Actual parameter is a +Integer+.
+  #   object = mock()
+  #   object.expects(:method_1).with(is_a(Integer))
+  #   object.method_1(99)
+  #   # no error raised
+  # @example Actual parameter is not a +Integer+.
+  #   object = mock()
+  #   object.expects(:method_1).with(is_a(Integer))
+  #   object.method_1('string')
+  #   # error raised, because method_1 was not called with an Integer
+  # @param klass [Class] expected class.
+  # @return [IsA] parameter matcher.
+  # @see Expectation#with
+  # @see Kernel#is_a?
+  #
+  # source://mocha//lib/mocha/parameter_matchers/is_a.rb#27
+  def is_a(klass); end
+
+  # Matches any +Object+ that is a kind of +klass+.
+  #
+  # @example Actual parameter is a kind of +Integer+.
+  #   object = mock()
+  #   object.expects(:method_1).with(kind_of(Integer))
+  #   object.method_1(99)
+  #   # no error raised
+  # @example Actual parameter is not a kind of +Integer+.
+  #   object = mock()
+  #   object.expects(:method_1).with(kind_of(Integer))
+  #   object.method_1('string')
+  #   # error raised, because method_1 was not called with a kind of Integer
+  # @param klass [Class] expected class.
+  # @return [KindOf] parameter matcher.
+  # @see Expectation#with
+  # @see Kernel#kind_of?
+  #
+  # source://mocha//lib/mocha/parameter_matchers/kind_of.rb#26
+  def kind_of(klass); end
+
+  # Matches optional parameters if available.
+  #
+  # @example Both required parameters and both of the optional parameters are supplied and they all match their expected value.
+  #   object = mock()
+  #   object.expects(:method_1).with(1, 2, optionally(3, 4))
+  #   object.method_1(1, 2, 3, 4)
+  #   # no error raised
+  # @example Both required parameters and one of the optional parameters are supplied and they all match their expected value.
+  #   object = mock()
+  #   object.expects(:method_1).with(1, 2, optionally(3, 4))
+  #   object.method_1(1, 2, 3)
+  #   # no error raised
+  # @example One of the actual optional parameters does not match the expected value.
+  #   object = mock()
+  #   object.expects(:method_1).with(1, 2, optionally(3, 4))
+  #   object.method_1(1, 2, 3, 5)
+  #   # error raised, because optional parameters did not match
+  # @example Only the two required parameters are supplied and they both match their expected value.
+  #   object = mock()
+  #   object.expects(:method_1).with(1, 2, optionally(3, 4))
+  #   object.method_1(1, 2)
+  #   # no error raised
+  # @param matchers [*Array<BaseMethods>] matchers for optional parameters.
+  # @return [Optionally] parameter matcher.
+  # @see Expectation#with
+  #
+  # source://mocha//lib/mocha/parameter_matchers/optionally.rb#36
+  def optionally(*matchers); end
+
+  # Matches any object that matches +regexp+.
+  #
+  # @example Actual parameter is matched by specified regular expression.
+  #   object = mock()
+  #   object.expects(:method_1).with(regexp_matches(/e/))
+  #   object.method_1('hello')
+  #   # no error raised
+  # @example Actual parameter is not matched by specified regular expression.
+  #   object = mock()
+  #   object.expects(:method_1).with(regexp_matches(/a/))
+  #   object.method_1('hello')
+  #   # error raised, because method_1 was not called with a parameter that matched the
+  #   # regular expression
+  # @param regexp [Regexp] regular expression to match.
+  # @return [RegexpMatches] parameter matcher.
+  # @see Expectation#with
+  #
+  # source://mocha//lib/mocha/parameter_matchers/regexp_matches.rb#26
+  def regexp_matches(regexp); end
+
+  # @example Actual parameter does not respond with "FOO" when :upcase is invoked.
+  #   object = mock()
+  #   object.expects(:method_1).with(responds_with(:upcase, "BAR"))
+  #   object.method_1("foo")
+  #   # error raised, because "foo".upcase != "BAR"
+  # @example Actual parameter responds with "FOO" when :upcase is invoked and "oof" when :reverse is invoked.
+  #   object = mock()
+  #   object.expects(:method_1).with(responds_with(upcase: "FOO", reverse: "oof"))
+  #   object.method_1("foo")
+  #   # no error raised, because "foo".upcase == "FOO" and "foo".reverse == "oof"
+  # @example Actual parameter responds with "FOO" when :upcase is invoked.
+  #   object = mock()
+  #   object.expects(:method_1).with(responds_with(:upcase, "FOO"))
+  #   object.method_1("foo")
+  #   # no error raised, because "foo".upcase == "FOO"
+  # @overload responds_with
+  # @overload responds_with
+  # @return [RespondsWith] parameter matcher.
+  # @see Expectation#with
+  #
+  # source://mocha//lib/mocha/parameter_matchers/responds_with.rb#39
+  def responds_with(*options); end
+
+  # Matches any YAML that represents the specified +object+
+  #
+  # @example Actual parameter is YAML equivalent of specified +object+.
+  #   object = mock()
+  #   object.expects(:method_1).with(yaml_equivalent(1, 2, 3))
+  #   object.method_1("--- \n- 1\n- 2\n- 3\n")
+  #   # no error raised
+  # @example Actual parameter is not YAML equivalent of specified +object+.
+  #   object = mock()
+  #   object.expects(:method_1).with(yaml_equivalent(1, 2, 3))
+  #   object.method_1("--- \n- 1\n- 2\n")
+  #   # error raised, because method_1 was not called with YAML representing the specified Array
+  # @param object [Object] object whose YAML to compare.
+  # @return [YamlEquivalent] parameter matcher.
+  # @see Expectation#with
+  #
+  # source://mocha//lib/mocha/parameter_matchers/yaml_equivalent.rb#26
+  def yaml_equivalent(object); end
 end
 
 # Parameter matcher which inverts the logic of the specified matcher using a logical NOT operation.
 #
-# source://mocha//lib/mocha/parameter_matchers/not.rb#29
-class Mocha::ParameterMatchers::Not < ::Mocha::ParameterMatchers::Base
+# source://mocha//lib/mocha/parameter_matchers/not.rb#34
+class Mocha::ParameterMatchers::Not
+  include ::Mocha::ParameterMatchers::BaseMethods
+
   # @private
   # @return [Not] a new instance of Not
   #
-  # source://mocha//lib/mocha/parameter_matchers/not.rb#31
+  # source://mocha//lib/mocha/parameter_matchers/not.rb#38
   def initialize(matcher); end
 
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/not.rb#36
+  # source://mocha//lib/mocha/parameter_matchers/not.rb#43
   def matches?(available_parameters); end
 
   # @private
   #
-  # source://mocha//lib/mocha/parameter_matchers/not.rb#42
+  # source://mocha//lib/mocha/parameter_matchers/not.rb#49
   def mocha_inspect; end
 end
 
 # Parameter matcher which allows optional parameters to be specified.
 #
-# source://mocha//lib/mocha/parameter_matchers/optionally.rb#38
-class Mocha::ParameterMatchers::Optionally < ::Mocha::ParameterMatchers::Base
+# source://mocha//lib/mocha/parameter_matchers/optionally.rb#44
+class Mocha::ParameterMatchers::Optionally
+  include ::Mocha::ParameterMatchers::BaseMethods
+
   # @private
   # @return [Optionally] a new instance of Optionally
   #
-  # source://mocha//lib/mocha/parameter_matchers/optionally.rb#40
+  # source://mocha//lib/mocha/parameter_matchers/optionally.rb#48
   def initialize(*parameters); end
 
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/optionally.rb#45
+  # source://mocha//lib/mocha/parameter_matchers/optionally.rb#53
   def matches?(available_parameters); end
 
   # @private
   #
-  # source://mocha//lib/mocha/parameter_matchers/optionally.rb#56
+  # source://mocha//lib/mocha/parameter_matchers/optionally.rb#64
   def mocha_inspect; end
 end
 
 # @private
 #
-# source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#9
-class Mocha::ParameterMatchers::PositionalOrKeywordHash < ::Mocha::ParameterMatchers::Base
+# source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#10
+class Mocha::ParameterMatchers::PositionalOrKeywordHash
+  include ::Mocha::ParameterMatchers::BaseMethods
+
   # @return [PositionalOrKeywordHash] a new instance of PositionalOrKeywordHash
   #
-  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#10
+  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#13
   def initialize(value, expectation); end
 
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#15
+  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#18
   def matches?(available_parameters); end
 
-  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#29
+  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#32
   def mocha_inspect; end
 
   private
 
-  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#43
+  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#46
   def deprecation_warning(actual, expected); end
 
-  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#59
+  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#62
   def expectation_definition; end
 
-  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#35
+  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#38
   def extract_parameter(available_parameters); end
 
-  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#51
+  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#54
   def hash_type(hash); end
 
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#55
+  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#58
   def ruby2_keywords_hash?(hash); end
 
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#39
+  # source://mocha//lib/mocha/parameter_matchers/positional_or_keyword_hash.rb#42
   def same_type_of_hash?(actual, expected); end
 end
 
 # Parameter matcher which matches if specified regular expression matches actual paramter.
 #
-# source://mocha//lib/mocha/parameter_matchers/regexp_matches.rb#29
-class Mocha::ParameterMatchers::RegexpMatches < ::Mocha::ParameterMatchers::Base
+# source://mocha//lib/mocha/parameter_matchers/regexp_matches.rb#34
+class Mocha::ParameterMatchers::RegexpMatches
+  include ::Mocha::ParameterMatchers::BaseMethods
+
   # @private
   # @return [RegexpMatches] a new instance of RegexpMatches
   #
-  # source://mocha//lib/mocha/parameter_matchers/regexp_matches.rb#31
+  # source://mocha//lib/mocha/parameter_matchers/regexp_matches.rb#38
   def initialize(regexp); end
 
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/regexp_matches.rb#36
+  # source://mocha//lib/mocha/parameter_matchers/regexp_matches.rb#43
   def matches?(available_parameters); end
 
   # @private
   #
-  # source://mocha//lib/mocha/parameter_matchers/regexp_matches.rb#43
+  # source://mocha//lib/mocha/parameter_matchers/regexp_matches.rb#50
   def mocha_inspect; end
 end
 
 # Parameter matcher which matches if actual parameter returns expected result when specified method is invoked.
 #
-# source://mocha//lib/mocha/parameter_matchers/responds_with.rb#57
-class Mocha::ParameterMatchers::RespondsWith < ::Mocha::ParameterMatchers::Base
+# source://mocha//lib/mocha/parameter_matchers/responds_with.rb#62
+class Mocha::ParameterMatchers::RespondsWith
+  include ::Mocha::ParameterMatchers::BaseMethods
+
   # @private
   # @return [RespondsWith] a new instance of RespondsWith
   #
-  # source://mocha//lib/mocha/parameter_matchers/responds_with.rb#59
+  # source://mocha//lib/mocha/parameter_matchers/responds_with.rb#66
   def initialize(message, result); end
 
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/responds_with.rb#65
+  # source://mocha//lib/mocha/parameter_matchers/responds_with.rb#72
   def matches?(available_parameters); end
 
   # @private
   #
-  # source://mocha//lib/mocha/parameter_matchers/responds_with.rb#71
+  # source://mocha//lib/mocha/parameter_matchers/responds_with.rb#78
   def mocha_inspect; end
 end
 
 # Parameter matcher which matches if actual parameter is YAML equivalent of specified object.
 #
-# source://mocha//lib/mocha/parameter_matchers/yaml_equivalent.rb#29
-class Mocha::ParameterMatchers::YamlEquivalent < ::Mocha::ParameterMatchers::Base
+# source://mocha//lib/mocha/parameter_matchers/yaml_equivalent.rb#34
+class Mocha::ParameterMatchers::YamlEquivalent
+  include ::Mocha::ParameterMatchers::BaseMethods
+
   # @private
   # @return [YamlEquivalent] a new instance of YamlEquivalent
   #
-  # source://mocha//lib/mocha/parameter_matchers/yaml_equivalent.rb#31
+  # source://mocha//lib/mocha/parameter_matchers/yaml_equivalent.rb#38
   def initialize(object); end
 
   # @private
   # @return [Boolean]
   #
-  # source://mocha//lib/mocha/parameter_matchers/yaml_equivalent.rb#36
+  # source://mocha//lib/mocha/parameter_matchers/yaml_equivalent.rb#43
   def matches?(available_parameters); end
 
   # @private
   #
-  # source://mocha//lib/mocha/parameter_matchers/yaml_equivalent.rb#44
+  # source://mocha//lib/mocha/parameter_matchers/yaml_equivalent.rb#51
   def mocha_inspect; end
 end
 
