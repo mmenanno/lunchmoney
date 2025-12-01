@@ -291,7 +291,7 @@ class MarkdownLint::Rule
   # @return [Rule] a new instance of Rule
   #
   # source://mdl//lib/mdl/ruleset.rb#6
-  def initialize(id, description, fallback_docs: T.unsafe(nil), &block); end
+  def initialize(id, description, fallback_docs: T.unsafe(nil), &_arg3); end
 
   # source://mdl//lib/mdl/ruleset.rb#27
   def aliases(*aliases); end
@@ -317,15 +317,6 @@ class MarkdownLint::Rule
   # source://mdl//lib/mdl/ruleset.rb#48
   def docs_url; end
 
-  # This method returns all the rows of a table
-  #
-  # @param lines [Array<String>] Lines of a doc as an array
-  # @param pos [Numeric] Position/index of the table in the array
-  # @return [Array<String>] Rows of the table in an array
-  #
-  # source://mdl//lib/mdl/ruleset.rb#89
-  def get_table_rows(lines, pos); end
-
   # Returns the value of attribute id.
   #
   # source://mdl//lib/mdl/ruleset.rb#4
@@ -338,14 +329,6 @@ class MarkdownLint::Rule
   # source://mdl//lib/mdl/ruleset.rb#4
   def id=(_arg0); end
 
-  # This method calculates the number of columns in a table row
-  #
-  # @param table_row [String] A row of the table in question.
-  # @return [Numeric] Number of columns in the row
-  #
-  # source://mdl//lib/mdl/ruleset.rb#56
-  def number_of_columns_in_a_table_row(table_row); end
-
   # source://mdl//lib/mdl/ruleset.rb#32
   def params(params = T.unsafe(nil)); end
 
@@ -355,28 +338,28 @@ end
 
 # defines a ruleset
 #
-# source://mdl//lib/mdl/ruleset.rb#115
+# source://mdl//lib/mdl/ruleset.rb#54
 class MarkdownLint::RuleSet
   # @return [RuleSet] a new instance of RuleSet
   #
-  # source://mdl//lib/mdl/ruleset.rb#118
+  # source://mdl//lib/mdl/ruleset.rb#57
   def initialize; end
 
-  # source://mdl//lib/mdl/ruleset.rb#132
+  # source://mdl//lib/mdl/ruleset.rb#71
   def docs(url = T.unsafe(nil), &block); end
 
-  # source://mdl//lib/mdl/ruleset.rb#127
+  # source://mdl//lib/mdl/ruleset.rb#66
   def load(rules_file); end
 
-  # source://mdl//lib/mdl/ruleset.rb#140
+  # source://mdl//lib/mdl/ruleset.rb#79
   def load_default; end
 
-  # source://mdl//lib/mdl/ruleset.rb#122
-  def rule(id, description, &block); end
+  # source://mdl//lib/mdl/ruleset.rb#61
+  def rule(id, description, &_arg2); end
 
   # Returns the value of attribute rules.
   #
-  # source://mdl//lib/mdl/ruleset.rb#116
+  # source://mdl//lib/mdl/ruleset.rb#55
   def rules; end
 end
 
@@ -403,35 +386,35 @@ end
 
 # defines a style
 #
-# source://mdl//lib/mdl/style.rb#5
+# source://mdl//lib/mdl/style.rb#3
 class MarkdownLint::Style
   # @return [Style] a new instance of Style
   #
-  # source://mdl//lib/mdl/style.rb#8
+  # source://mdl//lib/mdl/style.rb#6
   def initialize(all_rules); end
 
-  # source://mdl//lib/mdl/style.rb#24
+  # source://mdl//lib/mdl/style.rb#22
   def all; end
 
-  # source://mdl//lib/mdl/style.rb#41
+  # source://mdl//lib/mdl/style.rb#39
   def exclude_rule(id); end
 
-  # source://mdl//lib/mdl/style.rb#50
+  # source://mdl//lib/mdl/style.rb#48
   def exclude_tag(tag); end
 
-  # source://mdl//lib/mdl/style.rb#28
+  # source://mdl//lib/mdl/style.rb#26
   def rule(id, params = T.unsafe(nil)); end
 
   # Returns the value of attribute rules.
   #
-  # source://mdl//lib/mdl/style.rb#6
+  # source://mdl//lib/mdl/style.rb#4
   def rules; end
 
-  # source://mdl//lib/mdl/style.rb#46
+  # source://mdl//lib/mdl/style.rb#44
   def tag(tag); end
 
   class << self
-    # source://mdl//lib/mdl/style.rb#54
+    # source://mdl//lib/mdl/style.rb#52
     def load(style_file, rules); end
   end
 end
