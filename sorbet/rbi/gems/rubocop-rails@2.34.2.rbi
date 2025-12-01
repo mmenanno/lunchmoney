@@ -7421,64 +7421,82 @@ RuboCop::Cop::Rails::PluralizationGrammar::SINGULAR_METHODS = T.let(T.unsafe(nil
 #   # good
 #   a.presence&.foo
 #
-# source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#56
+#   # good
+#   a.present? ? a[1] : nil
+#
+#   # good
+#   a[:key] = value if a.present?
+#
+#   # good
+#   a.present? ? a > 1 : nil
+#   a <= 0 if a.present?
+#
+# source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#66
 class RuboCop::Cop::Rails::Presence < ::RuboCop::Cop::Base
   include ::RuboCop::Rails::MigrationFileSkippable
   include ::RuboCop::Cop::RangeHelp
   extend ::RuboCop::Cop::AutoCorrector
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#92
+  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#103
   def on_if(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#77
+  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#88
   def redundant_receiver_and_chain(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#62
+  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#73
   def redundant_receiver_and_other(param0 = T.unsafe(nil)); end
 
   private
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#163
+  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#174
   def build_source_for_or_method(other); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#178
+  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#189
   def chain_replacement(receiver, chain, left_sibling); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#142
+  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#153
   def current(node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#132
+  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#143
   def ignore_chain_node?(node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#124
+  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#135
   def ignore_if_node?(node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#128
+  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#139
   def ignore_other_node?(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#136
+  # @return [Boolean]
+  #
+  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#195
+  def index_access_method?(node); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#147
   def message(node, replacement); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#174
+  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#185
   def method_range(node); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#117
+  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#128
   def register_chain_offense(node, receiver, chain); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#110
+  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#121
   def register_offense(node, receiver, other); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#150
+  # source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#161
   def replacement(receiver, other, left_sibling); end
 end
 
-# source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#60
+# source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#71
+RuboCop::Cop::Rails::Presence::INDEX_ACCESS_METHODS = T.let(T.unsafe(nil), Array)
+
+# source://rubocop-rails//lib/rubocop/cop/rails/presence.rb#70
 RuboCop::Cop::Rails::Presence::MSG = T.let(T.unsafe(nil), String)
 
 # Checks for code that can be written with simpler conditionals
@@ -7743,17 +7761,20 @@ class RuboCop::Cop::Rails::RedirectBackOrTo < ::RuboCop::Cop::Base
 
   private
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/redirect_back_or_to.rb#50
-  def correct_redirect_back(corrector, node, fallback_pair, fallback_value); end
+  # source://rubocop-rails//lib/rubocop/cop/rails/redirect_back_or_to.rb#51
+  def correct_redirect_back(corrector, node, fallback_pair, fallback_value, options); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/redirect_back_or_to.rb#64
+  # source://rubocop-rails//lib/rubocop/cop/rails/redirect_back_or_to.rb#69
   def remove_fallback_location_pair(corrector, hash_node, fallback_pair); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/redirect_back_or_to.rb#77
+  # source://rubocop-rails//lib/rubocop/cop/rails/redirect_back_or_to.rb#87
   def remove_first_pair(corrector, fallback_pair, next_pair); end
 
-  # source://rubocop-rails//lib/rubocop/cop/rails/redirect_back_or_to.rb#82
+  # source://rubocop-rails//lib/rubocop/cop/rails/redirect_back_or_to.rb#92
   def remove_non_first_pair(corrector, fallback_pair, prev_pair); end
+
+  # source://rubocop-rails//lib/rubocop/cop/rails/redirect_back_or_to.rb#82
+  def wrap_with_parentheses(node, corrector); end
 end
 
 # source://rubocop-rails//lib/rubocop/cop/rails/redirect_back_or_to.rb#31
