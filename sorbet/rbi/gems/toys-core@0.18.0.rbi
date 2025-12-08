@@ -3540,7 +3540,7 @@ module Toys::DSL::Tool
   #   `true`.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#714
+  # source://toys-core//lib/toys/dsl/tool.rb#717
   def all_required(desc: T.unsafe(nil), long_desc: T.unsafe(nil), name: T.unsafe(nil), report_collisions: T.unsafe(nil), prepend: T.unsafe(nil), &block); end
 
   # Create a flag group of type `:at_least_one`. If a block is given, flags
@@ -3578,7 +3578,7 @@ module Toys::DSL::Tool
   #   `true`.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#801
+  # source://toys-core//lib/toys/dsl/tool.rb#804
   def at_least_one(desc: T.unsafe(nil), long_desc: T.unsafe(nil), name: T.unsafe(nil), report_collisions: T.unsafe(nil), prepend: T.unsafe(nil), &block); end
 
   # Create a flag group of type `:at_least_one`. If a block is given, flags
@@ -3616,7 +3616,7 @@ module Toys::DSL::Tool
   #   `true`.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#806
+  # source://toys-core//lib/toys/dsl/tool.rb#809
   def at_least_one_required(desc: T.unsafe(nil), long_desc: T.unsafe(nil), name: T.unsafe(nil), report_collisions: T.unsafe(nil), prepend: T.unsafe(nil), &block); end
 
   # Create a flag group of type `:at_most_one`. If a block is given, flags
@@ -3654,7 +3654,7 @@ module Toys::DSL::Tool
   #   `true`.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#757
+  # source://toys-core//lib/toys/dsl/tool.rb#760
   def at_most_one(desc: T.unsafe(nil), long_desc: T.unsafe(nil), name: T.unsafe(nil), report_collisions: T.unsafe(nil), prepend: T.unsafe(nil), &block); end
 
   # Create a flag group of type `:at_most_one`. If a block is given, flags
@@ -3692,7 +3692,7 @@ module Toys::DSL::Tool
   #   `true`.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#762
+  # source://toys-core//lib/toys/dsl/tool.rb#765
   def at_most_one_required(desc: T.unsafe(nil), long_desc: T.unsafe(nil), name: T.unsafe(nil), report_collisions: T.unsafe(nil), prepend: T.unsafe(nil), &block); end
 
   # Set the shell completion strategy for this tool's arguments.
@@ -3727,7 +3727,7 @@ module Toys::DSL::Tool
   # @param spec [Object]
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1476
+  # source://toys-core//lib/toys/dsl/tool.rb#1479
   def complete_tool_args(spec = T.unsafe(nil), **options, &block); end
 
   # Create a named completion procedure that may be used by name by any
@@ -3781,7 +3781,7 @@ module Toys::DSL::Tool
   # @return [String] Context directory path
   # @return [nil] if there is no context.
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1735
+  # source://toys-core//lib/toys/dsl/tool.rb#1738
   def context_directory; end
 
   # Return the current tool config. This object can be queried to determine
@@ -3789,7 +3789,7 @@ module Toys::DSL::Tool
   #
   # @return [Toys::ToolDefinition]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1746
+  # source://toys-core//lib/toys/dsl/tool.rb#1749
   def current_tool; end
 
   # Causes the current tool to delegate to another tool, specified by the
@@ -3852,7 +3852,7 @@ module Toys::DSL::Tool
   # @param str [Toys::WrappableString, String, Array<String>]
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#575
+  # source://toys-core//lib/toys/dsl/tool.rb#578
   def desc(str); end
 
   # Disable argument parsing for this tool. Arguments will not be parsed
@@ -3873,7 +3873,7 @@ module Toys::DSL::Tool
   #
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1410
+  # source://toys-core//lib/toys/dsl/tool.rb#1413
   def disable_argument_parsing; end
 
   # Mark one or more flags as disabled, preventing their use by any
@@ -3896,7 +3896,7 @@ module Toys::DSL::Tool
   # @param flags [String...] The flags to disable
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1437
+  # source://toys-core//lib/toys/dsl/tool.rb#1440
   def disable_flag(*flags); end
 
   # Enforce that all flags must be provided before any positional args.
@@ -3909,7 +3909,7 @@ module Toys::DSL::Tool
   # @param state [Boolean]
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1368
+  # source://toys-core//lib/toys/dsl/tool.rb#1371
   def enforce_flags_before_args(state = T.unsafe(nil)); end
 
   # Create a flag group of type `:exactly_one`. If a block is given, flags
@@ -3947,7 +3947,7 @@ module Toys::DSL::Tool
   #   `true`.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#845
+  # source://toys-core//lib/toys/dsl/tool.rb#848
   def exactly_one(desc: T.unsafe(nil), long_desc: T.unsafe(nil), name: T.unsafe(nil), report_collisions: T.unsafe(nil), prepend: T.unsafe(nil), &block); end
 
   # Create a flag group of type `:exactly_one`. If a block is given, flags
@@ -3985,7 +3985,7 @@ module Toys::DSL::Tool
   #   `true`.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#850
+  # source://toys-core//lib/toys/dsl/tool.rb#853
   def exactly_one_required(desc: T.unsafe(nil), long_desc: T.unsafe(nil), name: T.unsafe(nil), report_collisions: T.unsafe(nil), prepend: T.unsafe(nil), &block); end
 
   # Expand the given template in the current location.
@@ -4020,7 +4020,7 @@ module Toys::DSL::Tool
   # @return [self]
   # @yield [template]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#523
+  # source://toys-core//lib/toys/dsl/tool.rb#526
   def expand(template_class, *args, **kwargs); end
 
   # Find the given data path (file or directory).
@@ -4049,7 +4049,7 @@ module Toys::DSL::Tool
   # @return [String] Absolute path of the data.
   # @return [nil] if the given data path is not found.
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1722
+  # source://toys-core//lib/toys/dsl/tool.rb#1725
   def find_data(path, type: T.unsafe(nil)); end
 
   # Add a flag to the current tool. Each flag must specify a key which
@@ -4226,7 +4226,7 @@ module Toys::DSL::Tool
   #   true.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1028
+  # source://toys-core//lib/toys/dsl/tool.rb#1031
   def flag(key, *flags, accept: T.unsafe(nil), default: T.unsafe(nil), handler: T.unsafe(nil), complete_flags: T.unsafe(nil), complete_values: T.unsafe(nil), report_collisions: T.unsafe(nil), group: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), display_name: T.unsafe(nil), add_method: T.unsafe(nil), &block); end
 
   # Create a flag group. If a block is given, flags defined in the block
@@ -4266,7 +4266,7 @@ module Toys::DSL::Tool
   #   Default is `:optional`.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#667
+  # source://toys-core//lib/toys/dsl/tool.rb#670
   def flag_group(type: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), name: T.unsafe(nil), report_collisions: T.unsafe(nil), prepend: T.unsafe(nil), &block); end
 
   # Specify that the given module should be mixed into this tool, and its
@@ -4296,7 +4296,7 @@ module Toys::DSL::Tool
   # @param mixin [Module, Symbol, String] Module or module name.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1659
+  # source://toys-core//lib/toys/dsl/tool.rb#1662
   def include(mixin, *args, **kwargs); end
 
   # Determine if the given module/mixin has already been included.
@@ -4309,14 +4309,14 @@ module Toys::DSL::Tool
   # @return [Boolean] Whether the mixin is included
   # @return [nil] if the current tool is not active.
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1679
+  # source://toys-core//lib/toys/dsl/tool.rb#1682
   def include?(mod); end
 
   # Include the tool name in the class inspection dump.
   #
   # @private
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1875
+  # source://toys-core//lib/toys/dsl/tool.rb#1878
   def inspect; end
 
   # Load another config file or directory, as if its contents were inserted
@@ -4341,10 +4341,12 @@ module Toys::DSL::Tool
   # @param toys_dir [String] Optional override for the gem's toys
   #   directory name. If not specified, the default specified by the gem
   #   will be used.
-  # @param version [String, Array<String>] Version requirements for the gem.
+  # @param version [String, Array<String>] An alternate way to specify
+  #   version requirements for the gem.
+  # @param versions [Array<String>] Version requirements for the gem.
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#478
-  def load_gem(name, version: T.unsafe(nil), path: T.unsafe(nil), toys_dir: T.unsafe(nil), as: T.unsafe(nil)); end
+  # source://toys-core//lib/toys/dsl/tool.rb#480
+  def load_gem(name, *versions, version: T.unsafe(nil), path: T.unsafe(nil), toys_dir: T.unsafe(nil), as: T.unsafe(nil)); end
 
   # Load configuration from a public git repository, as if its contents
   # were inserted at the current location.
@@ -4396,14 +4398,14 @@ module Toys::DSL::Tool
   # @param strs [Toys::WrappableString, String, Array<String>...]
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#611
+  # source://toys-core//lib/toys/dsl/tool.rb#614
   def long_desc(*strs, file: T.unsafe(nil), data: T.unsafe(nil)); end
 
   # Notify the tool definition when a method is defined in this tool class.
   #
   # @private
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1865
+  # source://toys-core//lib/toys/dsl/tool.rb#1868
   def method_added(_meth); end
 
   # Create a named mixin module that can be included by name from this tool
@@ -4471,7 +4473,7 @@ module Toys::DSL::Tool
   #   name. Pass nil to disable interrupt handling.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1563
+  # source://toys-core//lib/toys/dsl/tool.rb#1566
   def on_interrupt(handler = T.unsafe(nil), &block); end
 
   # Specify how to run this tool.
@@ -4520,7 +4522,7 @@ module Toys::DSL::Tool
   #   symbol or a proc, or nil to explicitly set as non-runnable.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1535
+  # source://toys-core//lib/toys/dsl/tool.rb#1538
   def on_run(handler = T.unsafe(nil), &block); end
 
   # Specify how to handle the given signal.
@@ -4547,7 +4549,7 @@ module Toys::DSL::Tool
   # @param signal [Integer, String, Symbol] The signal name or number
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1594
+  # source://toys-core//lib/toys/dsl/tool.rb#1597
   def on_signal(signal, handler = T.unsafe(nil), &block); end
 
   # Specify how to handle usage errors.
@@ -4574,7 +4576,7 @@ module Toys::DSL::Tool
   #   name. Pass nil to disable interrupt handling.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1625
+  # source://toys-core//lib/toys/dsl/tool.rb#1628
   def on_usage_error(handler = T.unsafe(nil), &block); end
 
   # Add an optional positional argument to the current tool. You must
@@ -4639,7 +4641,7 @@ module Toys::DSL::Tool
   #   arguments.) Defaults to the empty array.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1197
+  # source://toys-core//lib/toys/dsl/tool.rb#1200
   def optional(key, default: T.unsafe(nil), accept: T.unsafe(nil), complete: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), add_method: T.unsafe(nil), &block); end
 
   # Add an optional positional argument to the current tool. You must
@@ -4704,7 +4706,7 @@ module Toys::DSL::Tool
   #   arguments.) Defaults to the empty array.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1184
+  # source://toys-core//lib/toys/dsl/tool.rb#1187
   def optional_arg(key, default: T.unsafe(nil), accept: T.unsafe(nil), complete: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), add_method: T.unsafe(nil), &block); end
 
   # Specify what should be done with unmatched positional arguments. You
@@ -4769,7 +4771,7 @@ module Toys::DSL::Tool
   #   arguments.) Defaults to the empty array.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1276
+  # source://toys-core//lib/toys/dsl/tool.rb#1279
   def remaining(key, default: T.unsafe(nil), accept: T.unsafe(nil), complete: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), add_method: T.unsafe(nil), &block); end
 
   # Specify what should be done with unmatched positional arguments. You
@@ -4834,7 +4836,7 @@ module Toys::DSL::Tool
   #   arguments.) Defaults to the empty array.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1263
+  # source://toys-core//lib/toys/dsl/tool.rb#1266
   def remaining_args(key, default: T.unsafe(nil), accept: T.unsafe(nil), complete: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), add_method: T.unsafe(nil), &block); end
 
   # Require that flags must match exactly. That is, flags must appear in
@@ -4847,7 +4849,7 @@ module Toys::DSL::Tool
   # @param state [Boolean]
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1385
+  # source://toys-core//lib/toys/dsl/tool.rb#1388
   def require_exact_flag_match(state = T.unsafe(nil)); end
 
   # Add a required positional argument to the current tool. You must
@@ -4907,7 +4909,7 @@ module Toys::DSL::Tool
   #   arguments.) Defaults to the empty array.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1118
+  # source://toys-core//lib/toys/dsl/tool.rb#1121
   def required(key, accept: T.unsafe(nil), complete: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), add_method: T.unsafe(nil), &block); end
 
   # Add a required positional argument to the current tool. You must
@@ -4967,7 +4969,7 @@ module Toys::DSL::Tool
   #   arguments.) Defaults to the empty array.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1105
+  # source://toys-core//lib/toys/dsl/tool.rb#1108
   def required_arg(key, accept: T.unsafe(nil), complete: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), add_method: T.unsafe(nil), &block); end
 
   # Set option values statically without creating helper methods.
@@ -4984,7 +4986,7 @@ module Toys::DSL::Tool
   # @overload set
   # @overload set
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1346
+  # source://toys-core//lib/toys/dsl/tool.rb#1349
   def set(key, value = T.unsafe(nil)); end
 
   # Set a custom context directory for this tool.
@@ -4992,14 +4994,14 @@ module Toys::DSL::Tool
   # @param dir [String] Context directory
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1756
+  # source://toys-core//lib/toys/dsl/tool.rb#1759
   def set_context_directory(dir); end
 
   # Get the settings for this tool.
   #
   # @return [Toys::ToolDefinition::Settings] Tool-specific settings.
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1823
+  # source://toys-core//lib/toys/dsl/tool.rb#1826
   def settings; end
 
   # Set the short description for the current tool. The short description
@@ -5034,14 +5036,14 @@ module Toys::DSL::Tool
   # @param str [Toys::WrappableString, String, Array<String>]
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#581
+  # source://toys-core//lib/toys/dsl/tool.rb#584
   def short_desc(str); end
 
   # Return the current source info object.
   #
   # @return [Toys::SourceInfo] Source info.
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1690
+  # source://toys-core//lib/toys/dsl/tool.rb#1693
   def source_info; end
 
   # Set option values statically and create helper methods.
@@ -5063,7 +5065,7 @@ module Toys::DSL::Tool
   # @overload static
   # @overload static
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1307
+  # source://toys-core//lib/toys/dsl/tool.rb#1310
   def static(key, value = T.unsafe(nil)); end
 
   # Applies the given block to all subtools, recursively. Effectively, the
@@ -5097,7 +5099,7 @@ module Toys::DSL::Tool
   #       end
   #     end
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1794
+  # source://toys-core//lib/toys/dsl/tool.rb#1797
   def subtool_apply(&block); end
 
   # Create a named template that can be expanded by name from this tool
@@ -5204,7 +5206,7 @@ module Toys::DSL::Tool
   #   symbol or a proc, or nil to explicitly set as non-runnable.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1530
+  # source://toys-core//lib/toys/dsl/tool.rb#1533
   def to_run(handler = T.unsafe(nil), &block); end
 
   # Create a subtool. You must provide a block defining the subtool.
@@ -5264,7 +5266,7 @@ module Toys::DSL::Tool
   #   satisfy the requirements.
   # @return [self]
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1849
+  # source://toys-core//lib/toys/dsl/tool.rb#1852
   def toys_version!(*requirements); end
 
   # Determines whether the current Toys version satisfies the given
@@ -5272,7 +5274,7 @@ module Toys::DSL::Tool
   #
   # @return [Boolean] whether or not the requirements are satisfied
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1833
+  # source://toys-core//lib/toys/dsl/tool.rb#1836
   def toys_version?(*requirements); end
 
   # Remove lower-priority sources from the load path. This prevents lower-
@@ -5284,7 +5286,7 @@ module Toys::DSL::Tool
   # @raise [Toys::ToolDefinitionError] if any lower-priority tools have
   #   already been loaded.
   #
-  # source://toys-core//lib/toys/dsl/tool.rb#1811
+  # source://toys-core//lib/toys/dsl/tool.rb#1814
   def truncate_load_path!; end
 end
 

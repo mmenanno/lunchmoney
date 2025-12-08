@@ -47,7 +47,7 @@ GEM
       bigdecimal
       rexml
     docile (1.4.1)
-    dotenv (3.1.8)
+    dotenv (3.2.0)
     drb (2.2.3)
     erubi (1.13.1)
     faraday (2.14.0)
@@ -170,9 +170,9 @@ GEM
       yard-sorbet
     thor (1.4.0)
     tomlrb (2.0.3)
-    toys (0.17.2)
-      toys-core (= 0.17.2)
-    toys-core (0.17.2)
+    toys (0.18.0)
+      toys-core (= 0.18.0)
+    toys-core (0.18.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (3.2.0)
