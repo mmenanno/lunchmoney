@@ -73,7 +73,7 @@ GEM
       mixlib-cli
       mixlib-config
       mixlib-shellout
-    minitest (5.26.2)
+    minitest (5.27.0)
     mixlib-cli (2.1.8)
     mixlib-config (3.0.27)
       tomlrb
@@ -200,7 +200,7 @@ DEPENDENCIES
   dotenv
   lunchmoney!
   mdl
-  minitest (~> 5.26)
+  minitest (~> 5.27)
   mocha (~> 2.8.2)
   rubocop-minitest
   rubocop-rails
