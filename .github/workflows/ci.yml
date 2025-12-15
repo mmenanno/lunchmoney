@@ -96,7 +96,7 @@ jobs:
 
       - name: Upload Coverage Report
         if: matrix.ruby-version == '3.4'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: coverage-report
           path: coverage/
