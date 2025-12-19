@@ -10,7 +10,7 @@ module Mocha
     requires_ancestor { Mocha::API }
 
     # Instance doubles may only define methods that the caller responds to.
-    sig { params(type: T.any(Module, T::Class[T.anything])).returns(T.untyped) }
+    sig { params(type: T.any(T::Module[T.anything], T::Class[T.anything])).returns(T.untyped) }
     def instance_double(type)
       mock = typed_mock(type)
 
@@ -23,7 +23,7 @@ module Mocha
       mock
     end
 
-    sig { params(type: T.any(Module, T::Class[T.anything])).returns(T.untyped) }
+    sig { params(type: T.any(T::Module[T.anything], T::Class[T.anything])).returns(T.untyped) }
     def double(type)
       m = typed_mock(type)
       m.responds_like(type)
@@ -31,7 +31,7 @@ module Mocha
     end
 
     # A mock that will satisfy a sorbet verification check.
-    sig { params(type: T.any(Module, T::Class[T.anything])).returns(T.untyped) }
+    sig { params(type: T.any(T::Module[T.anything], T::Class[T.anything])).returns(T.untyped) }
     def typed_mock(type)
       m = mock(type.to_s)
       m.define_singleton_method(:is_a?) { |k| type <= k }
