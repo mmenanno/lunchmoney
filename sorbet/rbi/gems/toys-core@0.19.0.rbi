@@ -1096,7 +1096,7 @@ end
 #       end
 #     end
 #
-# source://toys-core//lib/toys/cli.rb#41
+# source://toys-core//lib/toys/cli.rb#43
 class Toys::CLI
   # Create a CLI.
   #
@@ -1225,10 +1225,10 @@ class Toys::CLI
   #   Optional. If not provided, defaults to the set of standard template
   #   classes provided by toys core, as defined by
   #   {Toys::CLI.default_template_lookup}. If you explicitly want no
-  #   standard tenokates, pass an empty instance of {Toys::ModuleLookup}.
+  #   standard templates, pass an empty instance of {Toys::ModuleLookup}.
   # @return [CLI] a new instance of CLI
   #
-  # source://toys-core//lib/toys/cli.rb#175
+  # source://toys-core//lib/toys/cli.rb#177
   def initialize(executable_name: T.unsafe(nil), middleware_stack: T.unsafe(nil), extra_delimiters: T.unsafe(nil), config_dir_name: T.unsafe(nil), config_file_name: T.unsafe(nil), index_file_name: T.unsafe(nil), preload_file_name: T.unsafe(nil), preload_dir_name: T.unsafe(nil), data_dir_name: T.unsafe(nil), lib_dir_name: T.unsafe(nil), mixin_lookup: T.unsafe(nil), middleware_lookup: T.unsafe(nil), template_lookup: T.unsafe(nil), logger_factory: T.unsafe(nil), logger: T.unsafe(nil), base_level: T.unsafe(nil), error_handler: T.unsafe(nil), completion: T.unsafe(nil)); end
 
   # Add a configuration block to the loader.
@@ -1248,7 +1248,7 @@ class Toys::CLI
   #   unique string will be generated.
   # @return [self]
   #
-  # source://toys-core//lib/toys/cli.rb#356
+  # source://toys-core//lib/toys/cli.rb#358
   def add_config_block(high_priority: T.unsafe(nil), source_name: T.unsafe(nil), context_directory: T.unsafe(nil), &block); end
 
   # Add a specific configuration file or directory to the loader.
@@ -1271,7 +1271,7 @@ class Toys::CLI
   # @param source_name [String] A custom name for the root source. Optional.
   # @return [self]
   #
-  # source://toys-core//lib/toys/cli.rb#327
+  # source://toys-core//lib/toys/cli.rb#329
   def add_config_path(path, high_priority: T.unsafe(nil), source_name: T.unsafe(nil), context_directory: T.unsafe(nil)); end
 
   # Checks the given directory path. If it contains a config file and/or
@@ -1290,7 +1290,7 @@ class Toys::CLI
   # @param search_path [String] A path to search for configs.
   # @return [self]
   #
-  # source://toys-core//lib/toys/cli.rb#384
+  # source://toys-core//lib/toys/cli.rb#386
   def add_search_path(search_path, high_priority: T.unsafe(nil), context_directory: T.unsafe(nil)); end
 
   # Walk up the directory hierarchy from the given start location, and add to
@@ -1309,7 +1309,7 @@ class Toys::CLI
   #   terminating directory.
   # @return [self]
   #
-  # source://toys-core//lib/toys/cli.rb#419
+  # source://toys-core//lib/toys/cli.rb#421
   def add_search_path_hierarchy(start: T.unsafe(nil), terminate: T.unsafe(nil), high_priority: T.unsafe(nil)); end
 
   # The initial logger level in this CLI, used as the level for verbosity 0.
@@ -1317,7 +1317,7 @@ class Toys::CLI
   #
   # @return [Integer, nil]
   #
-  # source://toys-core//lib/toys/cli.rb#298
+  # source://toys-core//lib/toys/cli.rb#300
   def base_level; end
 
   # Make a clone with the same settings but no config blocks and no paths in
@@ -1331,28 +1331,28 @@ class Toys::CLI
   # @yieldparam cli [Toys::CLI] If you pass a block, the new CLI is yielded
   #   to it so you can add paths and make other modifications.
   #
-  # source://toys-core//lib/toys/cli.rb#237
+  # source://toys-core//lib/toys/cli.rb#239
   def child(**opts); end
 
   # The overall completion strategy for this CLI.
   #
   # @return [Toys::Completion::Base, Proc]
   #
-  # source://toys-core//lib/toys/cli.rb#304
+  # source://toys-core//lib/toys/cli.rb#306
   def completion; end
 
   # The effective executable name used for usage text in this CLI.
   #
   # @return [String]
   #
-  # source://toys-core//lib/toys/cli.rb#273
+  # source://toys-core//lib/toys/cli.rb#275
   def executable_name; end
 
   # The string of tool name delimiter characters (besides space).
   #
   # @return [String]
   #
-  # source://toys-core//lib/toys/cli.rb#279
+  # source://toys-core//lib/toys/cli.rb#281
   def extra_delimiters; end
 
   # Prepare a tool to be run, but just execute the given block rather than
@@ -1365,28 +1365,28 @@ class Toys::CLI
   # @return [Object] The value returned from the block.
   # @yieldparam context [Toys::Context] Yields the tool context.
   #
-  # source://toys-core//lib/toys/cli.rb#480
+  # source://toys-core//lib/toys/cli.rb#482
   def load_tool(*args); end
 
   # The current loader for this CLI.
   #
   # @return [Toys::Loader]
   #
-  # source://toys-core//lib/toys/cli.rb#267
+  # source://toys-core//lib/toys/cli.rb#269
   def loader; end
 
   # The global logger, if any.
   #
   # @return [Logger, nil]
   #
-  # source://toys-core//lib/toys/cli.rb#285
+  # source://toys-core//lib/toys/cli.rb#287
   def logger; end
 
   # The logger factory.
   #
   # @return [Proc]
   #
-  # source://toys-core//lib/toys/cli.rb#291
+  # source://toys-core//lib/toys/cli.rb#293
   def logger_factory; end
 
   # Run the CLI with the given command line arguments.
@@ -1401,41 +1401,41 @@ class Toys::CLI
   # @param verbosity [Integer] Initial verbosity. Default is 0.
   # @return [Integer] The resulting process status code (i.e. 0 for success).
   #
-  # source://toys-core//lib/toys/cli.rb#450
+  # source://toys-core//lib/toys/cli.rb#452
   def run(*args, verbosity: T.unsafe(nil), delegated_from: T.unsafe(nil)); end
 
   private
 
-  # source://toys-core//lib/toys/cli.rb#585
+  # source://toys-core//lib/toys/cli.rb#586
   def build_context(tool, args, verbosity: T.unsafe(nil), delegated_from: T.unsafe(nil)); end
 
-  # source://toys-core//lib/toys/cli.rb#629
+  # source://toys-core//lib/toys/cli.rb#630
   def build_executor(tool, context); end
 
-  # source://toys-core//lib/toys/cli.rb#663
+  # source://toys-core//lib/toys/cli.rb#664
   def call_handler(context, handler, argument); end
 
-  # source://toys-core//lib/toys/cli.rb#610
+  # source://toys-core//lib/toys/cli.rb#611
   def execute_tool(tool, context, &block); end
 
-  # source://toys-core//lib/toys/cli.rb#654
+  # source://toys-core//lib/toys/cli.rb#655
   def handle_signal_by_tool(context, tool, exception); end
 
   # @raise [ArgParsingError]
   #
-  # source://toys-core//lib/toys/cli.rb#647
+  # source://toys-core//lib/toys/cli.rb#648
   def handle_usage_errors(context, tool); end
 
-  # source://toys-core//lib/toys/cli.rb#672
+  # source://toys-core//lib/toys/cli.rb#673
   def make_executor(middleware, context, next_executor); end
 
-  # source://toys-core//lib/toys/cli.rb#597
+  # source://toys-core//lib/toys/cli.rb#598
   def make_run_handler(tool); end
 
   class << self
     # Returns a default Completion that simply uses the tool's completion.
     #
-    # source://toys-core//lib/toys/cli.rb#576
+    # source://toys-core//lib/toys/cli.rb#577
     def default_completion; end
 
     # Returns a bare-bones error handler that takes simply reraises the
@@ -1447,7 +1447,7 @@ class Toys::CLI
     #
     # @return [Proc]
     #
-    # source://toys-core//lib/toys/cli.rb#551
+    # source://toys-core//lib/toys/cli.rb#553
     def default_error_handler; end
 
     # Returns a default logger factory that generates simple loggers that
@@ -1455,7 +1455,7 @@ class Toys::CLI
     #
     # @return [Proc]
     #
-    # source://toys-core//lib/toys/cli.rb#564
+    # source://toys-core//lib/toys/cli.rb#566
     def default_logger_factory; end
 
     # Returns a default ModuleLookup for middleware that points at the
@@ -1463,7 +1463,7 @@ class Toys::CLI
     #
     # @return [Toys::ModuleLookup]
     #
-    # source://toys-core//lib/toys/cli.rb#528
+    # source://toys-core//lib/toys/cli.rb#530
     def default_middleware_lookup; end
 
     # Returns a default set of middleware that may be used as a starting
@@ -1479,7 +1479,7 @@ class Toys::CLI
     #
     # @return [Array<Toys::Middleware::Spec>]
     #
-    # source://toys-core//lib/toys/cli.rb#503
+    # source://toys-core//lib/toys/cli.rb#505
     def default_middleware_stack; end
 
     # Returns a default ModuleLookup for mixins that points at the
@@ -1487,14 +1487,14 @@ class Toys::CLI
     #
     # @return [Toys::ModuleLookup]
     #
-    # source://toys-core//lib/toys/cli.rb#518
+    # source://toys-core//lib/toys/cli.rb#520
     def default_mixin_lookup; end
 
     # Returns a default empty ModuleLookup for templates.
     #
     # @return [Toys::ModuleLookup]
     #
-    # source://toys-core//lib/toys/cli.rb#537
+    # source://toys-core//lib/toys/cli.rb#539
     def default_template_lookup; end
   end
 end
