@@ -24,11 +24,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          ruby-version: '3.4'
-
-      - name: Check for newer VCR version
-        run: bin/toys check-vcr-version
-
+          ruby-version: .ruby-version
       - name: RuboCop
         run: bin/rubocop
 
@@ -59,6 +55,8 @@ jobs:
             experimental: false
           - ruby-version: '3.4'
             experimental: false
+          - ruby-version: '4.0'
+            experimental: false
           - ruby-version: 'head'
             experimental: true
       fail-fast: false
@@ -83,11 +81,11 @@ jobs:
           restore-keys: vcr-cassettes-
 
       - name: Run Tests (Using Cassettes)
-        if: matrix.ruby-version != '3.4'
+        if: matrix.ruby-version != '4.0'
         run: bin/toys test
 
       - name: Run Tests (With Remote Calls & Coverage Report)
-        if: matrix.ruby-version == '3.4'
+        if: matrix.ruby-version == '4.0'
         continue-on-error: true
         env:
           REMOTE_TESTS_ENABLED: ${{ vars.REMOTE_TESTS_ENABLED }}
@@ -95,7 +93,7 @@ jobs:
         run: bin/toys test
 
       - name: Upload Coverage Report
-        if: matrix.ruby-version == '3.4'
+        if: matrix.ruby-version == '4.0'
         uses: actions/upload-artifact@v6
         with:
           name: coverage-report
