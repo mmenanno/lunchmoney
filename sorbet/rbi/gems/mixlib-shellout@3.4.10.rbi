@@ -67,66 +67,66 @@ class Mixlib::ShellOut
   #
   # @return [ShellOut] a new instance of ShellOut
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#172
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#173
   def initialize(*command_args); end
 
   # Path to cgroupv2 that the process should run on
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#118
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#119
   def cgroup; end
 
   # Path to cgroupv2 that the process should run on
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#118
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#119
   def cgroup=(_arg0); end
 
   # The command to be executed.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#84
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#85
   def command; end
 
   # Working directory for the subprocess. Normally set via options to new
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#54
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#55
   def cwd; end
 
   # Working directory for the subprocess. Normally set via options to new
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#54
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#55
   def cwd=(_arg0); end
 
   # Returns the value of attribute domain.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#41
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#42
   def domain; end
 
   # Sets the attribute domain
   #
   # @param value the value to set the attribute domain to.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#41
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#42
   def domain=(_arg0); end
 
   # Runs windows process with elevated privileges. Required for Powershell commands which need elevated privileges
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#113
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#114
   def elevated; end
 
   # Runs windows process with elevated privileges. Required for Powershell commands which need elevated privileges
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#113
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#114
   def elevated=(_arg0); end
 
   # Environment variables that will be set for the subcommand. Refer to the
   # documentation of new to understand how ShellOut interprets this.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#91
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#92
   def environment; end
 
   # Environment variables that will be set for the subcommand. Refer to the
   # documentation of new to understand how ShellOut interprets this.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#91
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#92
   def environment=(_arg0); end
 
   # If #error? is true, calls +invalid!+, which raises an Exception.
@@ -135,7 +135,7 @@ class Mixlib::ShellOut
   # === Raises
   # ::ShellCommandFailed::: via +invalid!+
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#290
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#294
   def error!; end
 
   # Checks the +exitstatus+ against the set of +valid_exit_codes+.
@@ -145,60 +145,60 @@ class Mixlib::ShellOut
   #
   # @return [Boolean]
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#281
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#285
   def error?; end
 
   # The amount of time the subcommand took to execute
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#98
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#99
   def execution_time; end
 
   # The exit status of the subprocess. Will be nil if the command is still
   # running or died without setting an exit status (e.g., terminated by
   # `kill -9`).
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#254
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#256
   def exitstatus; end
 
   # Creates a String showing the output of the command, including a banner
   # showing the exact command executed. Used by +invalid!+ to show command
   # results when the command exited with an unexpected status.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#238
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#240
   def format_for_exception; end
 
   # The gid that the subprocess will switch to. If the group attribute is
   # given as a group name, it is converted to a gid by Etc.getgrnam
   # TODO migrate to shellout/unix.rb
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#224
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#226
   def gid; end
 
   # Group the command will run as. Normally set via options passed to new
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#51
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#52
   def group; end
 
   # Group the command will run as. Normally set via options passed to new
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#51
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#52
   def group=(_arg0); end
 
   # ShellOut will push data from :input down the stdin of the subprocess.
   # Normally set via options passed to new.
   # Default: nil
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#71
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#72
   def input; end
 
   # ShellOut will push data from :input down the stdin of the subprocess.
   # Normally set via options passed to new.
   # Default: nil
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#71
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#72
   def input=(_arg0); end
 
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#307
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#311
   def inspect; end
 
   # Raises a ShellCommandFailed exception, appending the
@@ -212,104 +212,104 @@ class Mixlib::ShellOut
   #
   # @raise [ShellCommandFailed]
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#302
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#306
   def invalid!(msg = T.unsafe(nil)); end
 
   # When live_stderr is set, the stderr of the subprocess will be copied to it
   # as the subprocess is running.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#66
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#67
   def live_stderr; end
 
   # When live_stderr is set, the stderr of the subprocess will be copied to it
   # as the subprocess is running.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#66
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#67
   def live_stderr=(_arg0); end
 
   # When live_stdout is set, the stdout of the subprocess will be copied to it
   # as the subprocess is running.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#62
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#63
   def live_stdout; end
 
   # When live_stdout is set, the stdout of the subprocess will be copied to it
   # as the subprocess is running.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#62
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#63
   def live_stdout=(_arg0); end
 
   # Returns the stream that both is being used by both live_stdout and live_stderr, or nil
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#195
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#197
   def live_stream; end
 
   # A shortcut for setting both live_stdout and live_stderr, so that both the
   # stdout and stderr from the subprocess will be copied to the same stream as
   # the subprocess is running.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#202
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#204
   def live_stream=(stream); end
 
   # The log level at which ShellOut should log.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#78
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#79
   def log_level; end
 
   # The log level at which ShellOut should log.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#78
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#79
   def log_level=(_arg0); end
 
   # A string which will be prepended to the log message.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#81
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#82
   def log_tag; end
 
   # A string which will be prepended to the log message.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#81
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#82
   def log_tag=(_arg0); end
 
   # If a logger is set, ShellOut will log a message before it executes the
   # command.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#75
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#76
   def logger; end
 
   # If a logger is set, ShellOut will log a message before it executes the
   # command.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#75
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#76
   def logger=(_arg0); end
 
   # Whether to simulate logon as the user. Normally set via options passed to new
   # Always enabled on windows
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#48
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#49
   def login; end
 
   # Whether to simulate logon as the user. Normally set via options passed to new
   # Always enabled on windows
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#48
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#49
   def login=(_arg0); end
 
   # Returns the value of attribute password.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#42
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#43
   def password; end
 
   # Sets the attribute password
   #
   # @param value the value to set the attribute password to.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#42
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#43
   def password=(_arg0); end
 
   # Returns the value of attribute process_status_pipe.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#110
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#111
   def process_status_pipe; end
 
   # Run the command, writing the command's standard out and standard error
@@ -324,124 +324,124 @@ class Mixlib::ShellOut
   # * CommandTimeout  when the command does not complete
   #   within +timeout+ seconds (default: 600s)
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#269
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#271
   def run_command; end
 
   # Returns the value of attribute sensitive.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#115
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#116
   def sensitive; end
 
   # Sets the attribute sensitive
   #
   # @param value the value to set the attribute sensitive to.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#115
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#116
   def sensitive=(_arg0); end
 
   # A Process::Status (or ducktype) object collected when the subprocess is
   # reaped.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#108
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#109
   def status; end
 
   # Data written to stderr by the subprocess
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#104
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#105
   def stderr; end
 
   # Returns the value of attribute stderr_pipe.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#110
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#111
   def stderr_pipe; end
 
   # Returns the value of attribute stdin_pipe.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#110
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#111
   def stdin_pipe; end
 
   # Data written to stdout by the subprocess
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#101
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#102
   def stdout; end
 
   # Returns the value of attribute stdout_pipe.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#110
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#111
   def stdout_pipe; end
 
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#231
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#233
   def timeout; end
 
   # The maximum time this command is allowed to run. Usually set via options
   # to new
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#95
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#96
   def timeout=(_arg0); end
 
   # The uid that the subprocess will switch to. If the user attribute was
   # given as a username, it is converted to a uid by Etc.getpwnam
   # TODO migrate to shellout/unix.rb
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#215
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#217
   def uid; end
 
   # The umask that will be set for the subcommand.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#87
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#88
   def umask; end
 
   # Set the umask that the subprocess will have. If given as a string, it
   # will be converted to an integer by String#oct.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#208
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#210
   def umask=(new_umask); end
 
   # User the command will run as. Normally set via options passed to new
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#40
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#41
   def user; end
 
   # User the command will run as. Normally set via options passed to new
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#40
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#41
   def user=(_arg0); end
 
   # An Array of acceptable exit codes. #error? (and #error!) use this list
   # to determine if the command was successful. Normally set via options to new
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#58
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#59
   def valid_exit_codes; end
 
   # An Array of acceptable exit codes. #error? (and #error!) use this list
   # to determine if the command was successful. Normally set via options to new
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#58
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#59
   def valid_exit_codes=(_arg0); end
 
   # TODO remove
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#44
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#45
   def with_logon; end
 
   # TODO remove
   #
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#44
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#45
   def with_logon=(_arg0); end
 
   private
 
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#316
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#320
   def parse_options(opts); end
 
-  # source://mixlib-shellout//lib/mixlib/shellout.rb#372
+  # source://mixlib-shellout//lib/mixlib/shellout.rb#376
   def validate_options(opts); end
 end
 
 # source://mixlib-shellout//lib/mixlib/shellout/exceptions.rb#5
 class Mixlib::ShellOut::CommandTimeout < ::Mixlib::ShellOut::Error; end
 
-# source://mixlib-shellout//lib/mixlib/shellout.rb#29
+# source://mixlib-shellout//lib/mixlib/shellout.rb#30
 Mixlib::ShellOut::DEFAULT_READ_TIMEOUT = T.let(T.unsafe(nil), Integer)
 
 # source://mixlib-shellout//lib/mixlib/shellout/exceptions.rb#7
@@ -453,31 +453,31 @@ class Mixlib::ShellOut::Error < ::RuntimeError; end
 # source://mixlib-shellout//lib/mixlib/shellout/exceptions.rb#6
 class Mixlib::ShellOut::InvalidCommandOption < ::Mixlib::ShellOut::Error; end
 
-# source://mixlib-shellout//lib/mixlib/shellout.rb#28
+# source://mixlib-shellout//lib/mixlib/shellout.rb#29
 Mixlib::ShellOut::READ_SIZE = T.let(T.unsafe(nil), Integer)
 
-# source://mixlib-shellout//lib/mixlib/shellout.rb#27
+# source://mixlib-shellout//lib/mixlib/shellout.rb#28
 Mixlib::ShellOut::READ_WAIT_TIME = T.let(T.unsafe(nil), Float)
 
 # source://mixlib-shellout//lib/mixlib/shellout/exceptions.rb#4
 class Mixlib::ShellOut::ShellCommandFailed < ::Mixlib::ShellOut::Error; end
 
-# source://mixlib-shellout//lib/mixlib/shellout/unix.rb#23
+# source://mixlib-shellout//lib/mixlib/shellout/unix.rb#24
 module Mixlib::ShellOut::Unix
   # Helper method for sgids
   #
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#38
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#39
   def all_seconderies; end
 
   # The environment variables that are deduced from simulating logon
   # Only valid if login is used
   #
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#60
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#61
   def logon_environment; end
 
   # Merges the two environments for the process
   #
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#71
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#72
   def process_environment; end
 
   # Run the command, writing the command's standard out and standard error
@@ -499,65 +499,65 @@ module Mixlib::ShellOut::Unix
   #   contain the correct exit code of the process (of course there is no
   #   exit code if the command is killed by SIGKILL, also).
   #
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#93
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#94
   def run_command; end
 
   # The secondary groups that the subprocess will switch to.
   # Currently valid only if login is used, and is set
   # to the user's secondary groups
   #
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#51
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#52
   def sgids; end
 
   # Whether we're simulating a login shell
   #
   # @return [Boolean]
   #
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#33
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#34
   def using_login?; end
 
   # Option validation that is unix specific
   #
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#26
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#27
   def validate_options(opts); end
 
   private
 
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#280
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#281
   def attempt_buffer_read(timeout = T.unsafe(nil)); end
 
   # Try to reap the child process but don't block if it isn't dead yet.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#417
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#418
   def attempt_reap; end
 
   # @return [Boolean]
   #
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#319
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#320
   def cgroupv2_available?; end
 
   # Since we call setsid the child_pgid will be the child_pid, set to negative here
   # so it can be directly used in arguments to kill, wait, etc.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#193
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#194
   def child_pgid; end
 
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#214
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#215
   def child_process_status; end
 
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#210
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#211
   def child_stderr; end
 
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#202
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#203
   def child_stdin; end
 
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#206
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#207
   def child_stdout; end
 
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#218
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#219
   def close_all_pipes; end
 
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#251
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#252
   def configure_parent_process_file_descriptors; end
 
   # Replace stdout, and stderr with pipes to the parent, and close the
@@ -566,75 +566,75 @@ module Mixlib::ShellOut::Unix
   # If there is no input, close STDIN so when we exec,
   # the new program will know it's never getting input ever.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#230
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#231
   def configure_subprocess_file_descriptors; end
 
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#323
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#324
   def fork_subprocess; end
 
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#197
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#198
   def initialize_ipc; end
 
   # Some patch levels of ruby in wide use (in particular the ruby 1.8.6 on OSX)
   # segfault when you IO.select a pipe that's reached eof. Weak sauce.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#268
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#269
   def open_pipes; end
 
   # Attempt to get a Marshaled error from the side-channel.
   # If it's there, un-marshal it and raise. If it's not there,
   # assume everything went well.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#367
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#368
   def propagate_pre_exec_failure; end
 
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#310
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#311
   def read_process_status_to_buffer; end
 
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#300
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#301
   def read_stderr_to_buffer; end
 
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#290
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#291
   def read_stdout_to_buffer; end
 
   # Unconditionally reap the child process. This is used in scenarios where
   # we can be confident the child will exit quickly, and has not spawned
   # and grandchild processes.
   #
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#404
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#405
   def reap; end
 
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#378
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#379
   def reap_errant_child; end
 
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#181
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#182
   def set_cgroup; end
 
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#177
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#178
   def set_cwd; end
 
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#166
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#167
   def set_environment; end
 
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#153
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#154
   def set_group; end
 
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#160
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#161
   def set_secondarygroups; end
 
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#173
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#174
   def set_umask; end
 
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#146
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#147
   def set_user; end
 
   # @return [Boolean]
   #
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#396
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#397
   def should_reap?; end
 
   # Keep this unbuffered for now
   #
-  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#273
+  # source://mixlib-shellout//lib/mixlib/shellout/unix.rb#274
   def write_to_child_stdin; end
 end
