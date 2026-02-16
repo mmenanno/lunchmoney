@@ -115,6 +115,17 @@ module LunchMoney
         file_name = camel_to_snake(module_name)
         values = schema["enum"]
 
+        # Use %w[] for simple values, array literals for values with spaces
+        has_spaces = values.any? { |v| v.to_s.include?(" ") }
+
+        if has_spaces
+          values_str = values.map { |v| "            #{v.inspect}," }.join("\n")
+          values_block = "VALUES = [\n#{values_str}\n          ].freeze"
+        else
+          values_str = values.map { |v| "            #{v}" }.join("\n")
+          values_block = "VALUES = %w[\n#{values_str}\n          ].freeze"
+        end
+
         code = <<~RUBY
           #{header.strip}
 
@@ -122,9 +133,7 @@ module LunchMoney
             module Objects
               module Enums
                 module #{module_name}
-                  VALUES = %w[
-          #{values.map { |v| "            #{v}" }.join("\n")}
-                  ].freeze
+                  #{values_block}
                 end
               end
             end

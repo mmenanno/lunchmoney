@@ -5,9 +5,8 @@
 
 module LunchMoney
   module Objects
-    class Tag < Base
-      attr_accessor :id, :name, :description, :text_color, :background_color, :updated_at,
-                    :created_at, :archived, :archived_at
+    class ErrorResponse < Base
+      attr_accessor :message, :errors
     end
   end
 end
