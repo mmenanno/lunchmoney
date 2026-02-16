@@ -1,0 +1,55 @@
+{
+  "transactions": [
+    {
+      "id": 123456789,
+      "date": "2024-12-01",
+      "amount": "19.99",
+      "currency": "usd",
+      "to_base": 19.99,
+      "recurring_id": null,
+      "payee": "Test Payee 3",
+      "category_id": null,
+      "notes": "API Test created Transaction",
+      "status": "unreviewed",
+      "is_pending": false,
+      "created_at": "2025-07-18T14:05:29.253Z",
+      "updated_at": "2025-07-18T14:05:29.253Z",
+      "split_parent_id": null,
+      "is_group_parent": false,
+      "group_parent_id": null,
+      "manual_account_id": 219807,
+      "plaid_account_id": null,
+      "tag_ids": [],
+      "source": "api",
+      "external_id": "A658214"
+    }
+  ],
+  "skipped_duplicates": [
+    {
+      "reason": "duplicate_payee_amount_date",
+      "request_transactions_index": 0,
+      "existing_transaction_id": 2112150654,
+      "request_transaction": {
+        "date": "2025-06-24",
+        "amount": "21.9800",
+        "payee": "Noodle House",
+        "notes": "Duplicate date, payee and amount. Note date may need to be changed in \"Try It\" mode.",
+        "plaid_account_id": 119805
+      }
+    },
+    {
+      "reason": "duplicate_external_id",
+      "request_transactions_index": 1,
+      "existing_transaction_id": 2112150651,
+      "request_transaction": {
+        "date": "2025-04-20",
+        "amount": "250.0000",
+        "payee": "Fidelity",
+        "category_id": 82,
+        "notes": "Duplicate external ID",
+        "external_id": "12345",
+        "manual_account_id": 219807
+      }
+    }
+  ]
+}

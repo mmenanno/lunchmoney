@@ -1,0 +1,59 @@
+{
+  "transactions": [
+    {
+      "id": 2112150655,
+      "date": "2024-07-28",
+      "amount": "1250.8400",
+      "currency": "usd",
+      "to_base": 1250.84,
+      "recurring_id": 994069,
+      "payee": "Paycheck",
+      "original_name": "DIRECT DEPOSIT PAYROLL",
+      "category_id": 88,
+      "notes": null,
+      "status": "reviewed",
+      "is_pending": false,
+      "created_at": "2024-07-28T17:00:06.192Z",
+      "updated_at": "2024-07-28T17:00:06.733Z",
+      "is_split_parent": false,
+      "split_parent_id": null,
+      "is_group_parent": false,
+      "group_parent_id": null,
+      "manual_account_id": null,
+      "plaid_account_id": 119806,
+      "tag_ids": [
+        94317
+      ],
+      "source": "plaid",
+      "external_id": null
+    },
+    {
+      "id": 2112150653,
+      "date": "2024-07-14",
+      "amount": "1250.8400",
+      "currency": "usd",
+      "to_base": 1250.84,
+      "recurring_id": 994069,
+      "payee": "Paycheck",
+      "original_name": "DIRECT DEPOSIT PAYROLL",
+      "category_id": 88,
+      "notes": null,
+      "status": "reviewed",
+      "is_pending": false,
+      "created_at": "2024-07-14T17:00:06.192Z",
+      "updated_at": "2024-07-14T17:00:06.733Z",
+      "is_split_parent": false,
+      "split_parent_id": null,
+      "is_group_parent": true,
+      "group_parent_id": null,
+      "manual_account_id": null,
+      "plaid_account_id": 119806,
+      "tag_ids": [
+        94317
+      ],
+      "source": "plaid",
+      "external_id": null
+    }
+  ],
+  "has_more": false
+}
