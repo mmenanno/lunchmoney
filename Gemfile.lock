@@ -3,7 +3,8 @@ PATH
   specs:
     lunchmoney (1.5.0)
       activesupport (>= 6.1)
-      faraday (>= 1.0.0)
+      faraday (>= 2.0)
+      faraday-multipart (~> 1.0)
 
 GEM
   remote: https://rubygems.org/
@@ -44,6 +45,8 @@ GEM
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
+    faraday-multipart (1.2.0)
+      multipart-post (~> 2.0)
     faraday-net_http (3.4.2)
       net-http (~> 0.5)
     hashdiff (1.2.1)
@@ -72,6 +75,7 @@ GEM
       chef-utils
     mocha (3.0.1)
       ruby2_keywords (>= 0.0.5)
+    multipart-post (2.4.1)
     net-http (0.9.1)
       uri (>= 0.11.1)
     parallel (1.27.0)
@@ -137,6 +141,7 @@ GEM
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
+    yaml (0.4.0)
     yard (0.9.38)
 
 PLATFORMS
@@ -154,9 +159,9 @@ DEPENDENCIES
   rubocop-rails
   rubocop-shopify
   simplecov
-  simplecov_json_formatter
   toys
   webmock
+  yaml
   yard
 
 BUNDLED WITH

@@ -17,5 +17,5 @@ gem "dotenv"
 gem "yard", require: false
 gem "appraisal", require: false
 gem "simplecov", require: false
-gem "simplecov_json_formatter", require: false
+gem "yaml", require: false
 gem "mdl", require: false
