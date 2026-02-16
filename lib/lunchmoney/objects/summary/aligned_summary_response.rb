@@ -5,9 +5,14 @@
 
 module LunchMoney
   module Objects
-    class Tag < Base
-      attr_accessor :id, :name, :description, :text_color, :background_color, :updated_at,
-                    :created_at, :archived, :archived_at
+    module Summary
+      class AlignedSummaryResponse < Base
+        attr_accessor :totals, :aligned, :categories
+
+        def aligned?
+          true
+        end
+      end
     end
   end
 end

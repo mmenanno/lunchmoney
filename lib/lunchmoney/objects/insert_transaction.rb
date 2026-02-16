@@ -7,19 +7,18 @@ require "json"
 
 module LunchMoney
   module Objects
-    class UpdateTransaction < Base
-      attr_accessor :id, :date, :amount, :currency, :recurring_id, :payee, :original_name,
-                    :category_id, :notes, :manual_account_id, :plaid_account_id,
-                    :tag_ids, :additional_tag_ids, :external_id,
-                    :custom_metadata, :status, :to_base, :is_pending,
-                    :plaid_metadata, :created_at, :updated_at, :is_split_parent,
-                    :children, :split_parent_id, :is_group_parent,
-                    :group_parent_id, :source
+    class InsertTransaction < Base
+      attr_accessor :date, :amount, :currency, :payee, :original_name, :category_id, :notes,
+                    :manual_account_id, :plaid_account_id, :recurring_id,
+                    :status, :tag_ids, :external_id, :custom_metadata
 
       def validate!
+        raise ArgumentError, "date is required" if date.nil?
+        raise ArgumentError, "amount is required" if amount.nil?
         raise ArgumentError, "payee must be at most 140 characters" if payee && payee.to_s.length > 140
         raise ArgumentError, "original_name must be at most 140 characters" if original_name && original_name.to_s.length > 140
         raise ArgumentError, "notes must be at most 350 characters" if notes && notes.to_s.length > 350
+        raise ArgumentError, "status must be one of: reviewed, unreviewed" if status && !["reviewed", "unreviewed"].include?(status)
         raise ArgumentError, "external_id must be at most 75 characters" if external_id && external_id.to_s.length > 75
         if custom_metadata && !custom_metadata.is_a?(Hash)
           raise ArgumentError, "custom_metadata must be a Hash"
@@ -27,8 +26,6 @@ module LunchMoney
         if custom_metadata && JSON.generate(custom_metadata).length > 4096
           raise ArgumentError, "custom_metadata exceeds 4096 character limit"
         end
-        raise ArgumentError, "status must be one of: reviewed, unreviewed" if status && !["reviewed", "unreviewed"].include?(status)
-        raise ArgumentError, "source must be one of: api, csv, manual, merge, plaid, recurring, rule, split, user" if source && !["api", "csv", "manual", "merge", "plaid", "recurring", "rule", "split", "user"].include?(source)
       end
     end
   end

@@ -5,9 +5,10 @@
 
 module LunchMoney
   module Objects
-    class Tag < Base
-      attr_accessor :id, :name, :description, :text_color, :background_color, :updated_at,
-                    :created_at, :archived, :archived_at
+    module Summary
+      class SummaryRecurringTransaction < Base
+        attr_accessor :date, :category_id, :payee, :to_base, :amount, :currency
+      end
     end
   end
 end

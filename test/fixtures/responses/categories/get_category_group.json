@@ -1,0 +1,50 @@
+{
+  "id": 86,
+  "name": "Automobile",
+  "description": "Auto related categories",
+  "is_income": false,
+  "exclude_from_budget": false,
+  "exclude_from_totals": false,
+  "updated_at": "2025-02-28T09:49:03.238Z",
+  "created_at": "2025-01-28T09:49:03.238Z",
+  "is_group": true,
+  "order": 2,
+  "collapsed": false,
+  "archived": false,
+  "group_id": null,
+  "archived_at": null,
+  "children": [
+    {
+      "id": 315174,
+      "name": "Fuel",
+      "description": "Fuel and gas expenses",
+      "is_income": false,
+      "exclude_from_budget": false,
+      "exclude_from_totals": false,
+      "updated_at": "2025-02-28T09:49:03.238Z",
+      "created_at": "2025-01-28T09:49:03.238Z",
+      "group_id": 86,
+      "is_group": false,
+      "archived": false,
+      "archived_at": null,
+      "order": 1,
+      "collapsed": false
+    },
+    {
+      "id": 315175,
+      "name": "Maintenance",
+      "description": "Car maintenance and repairs",
+      "is_income": false,
+      "exclude_from_budget": false,
+      "exclude_from_totals": false,
+      "updated_at": "2025-02-28T09:49:03.238Z",
+      "created_at": "2025-01-28T09:49:03.238Z",
+      "group_id": 86,
+      "is_group": false,
+      "archived": false,
+      "archived_at": null,
+      "order": 2,
+      "collapsed": false
+    }
+  ]
+}

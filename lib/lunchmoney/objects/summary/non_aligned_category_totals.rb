@@ -5,9 +5,11 @@
 
 module LunchMoney
   module Objects
-    class Tag < Base
-      attr_accessor :id, :name, :description, :text_color, :background_color, :updated_at,
-                    :created_at, :archived, :archived_at
+    module Summary
+      class NonAlignedCategoryTotals < Base
+        attr_accessor :other_activity, :recurring_activity, :recurring_remaining,
+                      :recurring_expected
+      end
     end
   end
 end

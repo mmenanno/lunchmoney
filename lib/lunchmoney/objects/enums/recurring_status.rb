@@ -5,9 +5,13 @@
 
 module LunchMoney
   module Objects
-    class Tag < Base
-      attr_accessor :id, :name, :description, :text_color, :background_color, :updated_at,
-                    :created_at, :archived, :archived_at
+    module Enums
+      module RecurringStatus
+        VALUES = %w[
+          suggested
+          reviewed
+        ].freeze
+      end
     end
   end
 end

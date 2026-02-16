@@ -5,9 +5,10 @@
 
 module LunchMoney
   module Objects
-    class Tag < Base
-      attr_accessor :id, :name, :description, :text_color, :background_color, :updated_at,
-                    :created_at, :archived, :archived_at
+    module Summary
+      class SummaryRolloverPool < Base
+        attr_accessor :budgeted_to_base, :all_adjustments
+      end
     end
   end
 end

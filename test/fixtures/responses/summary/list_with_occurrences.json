@@ -1,0 +1,110 @@
+{
+  "aligned": true,
+  "categories": [
+    {
+      "category_id": 315177,
+      "totals": {
+        "other_activity": 156.64,
+        "recurring_activity": 0,
+        "budgeted": 500,
+        "available": 343.36,
+        "recurring_remaining": 0,
+        "recurring_expected": 0
+      },
+      "occurrences": [
+        {
+          "in_range": true,
+          "start_date": "2025-07-01",
+          "end_date": "2025-07-31",
+          "other_activity": 156.64,
+          "recurring_activity": 0,
+          "budgeted": 500,
+          "budgeted_amount": "500.0000",
+          "budgeted_currency": "usd",
+          "notes": "Monthly budget allocation"
+        },
+        {
+          "in_range": true,
+          "start_date": "2025-08-01",
+          "end_date": "2025-08-31",
+          "other_activity": 0,
+          "recurring_activity": 0,
+          "budgeted": 500,
+          "budgeted_amount": "500.0000",
+          "budgeted_currency": "usd",
+          "notes": "Adjusted for seasonal spending"
+        }
+      ]
+    },
+    {
+      "category_id": 315628,
+      "totals": {
+        "other_activity": 424.8,
+        "recurring_activity": 0,
+        "budgeted": 200,
+        "available": -224.8,
+        "recurring_remaining": 0,
+        "recurring_expected": 0
+      },
+      "occurrences": [
+        {
+          "in_range": true,
+          "start_date": "2025-07-01",
+          "end_date": "2025-07-31",
+          "other_activity": 424.8,
+          "recurring_activity": 0,
+          "budgeted": 200,
+          "budgeted_amount": "200.0000",
+          "budgeted_currency": "usd",
+          "notes": "Based on previous month's activity"
+        },
+        {
+          "in_range": true,
+          "start_date": "2025-08-01",
+          "end_date": "2025-08-31",
+          "other_activity": 0,
+          "recurring_activity": 0,
+          "budgeted": 200,
+          "budgeted_amount": "200.0000",
+          "budgeted_currency": "usd",
+          "notes": "Emergency fund contribution"
+        }
+      ]
+    },
+    {
+      "category_id": 86,
+      "totals": {
+        "other_activity": 25.69,
+        "recurring_activity": 0,
+        "budgeted": 200,
+        "available": 174.31,
+        "recurring_remaining": 0,
+        "recurring_expected": 0
+      },
+      "occurrences": [
+        {
+          "in_range": true,
+          "start_date": "2025-07-01",
+          "end_date": "2025-07-31",
+          "other_activity": 25.69,
+          "recurring_activity": 0,
+          "budgeted": 200,
+          "budgeted_amount": "200.0000",
+          "budgeted_currency": "usd",
+          "notes": "Holiday spending budget"
+        },
+        {
+          "in_range": true,
+          "start_date": "2025-08-01",
+          "end_date": "2025-08-31",
+          "other_activity": 0,
+          "recurring_activity": 0,
+          "budgeted": 200,
+          "budgeted_amount": "200.0000",
+          "budgeted_currency": "usd",
+          "notes": "Summer vacation savings"
+        }
+      ]
+    }
+  ]
+}

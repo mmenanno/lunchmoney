@@ -5,9 +5,8 @@
 
 module LunchMoney
   module Objects
-    class Tag < Base
-      attr_accessor :id, :name, :description, :text_color, :background_color, :updated_at,
-                    :created_at, :archived, :archived_at
+    class TransactionAttachment < Base
+      attr_accessor :id, :uploaded_by, :name, :type, :size, :notes, :created_at
     end
   end
 end
