@@ -31,4 +31,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency("activesupport", ">= 6.1")
   spec.add_dependency("faraday", ">= 2.0")
   spec.add_dependency("faraday-multipart", "~> 1.0")
+  spec.add_dependency("faraday-retry", "~> 2.0")
 end

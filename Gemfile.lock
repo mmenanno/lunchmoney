@@ -1,10 +1,11 @@
 PATH
   remote: .
   specs:
-    lunchmoney (1.5.0)
+    lunchmoney (2.0.0.rc1)
       activesupport (>= 6.1)
       faraday (>= 2.0)
       faraday-multipart (~> 1.0)
+      faraday-retry (~> 2.0)
 
 GEM
   remote: https://rubygems.org/
@@ -49,6 +50,8 @@ GEM
       multipart-post (~> 2.0)
     faraday-net_http (3.4.2)
       net-http (~> 0.5)
+    faraday-retry (2.4.0)
+      faraday (~> 2.0)
     hashdiff (1.2.1)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
