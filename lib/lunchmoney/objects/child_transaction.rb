@@ -1,18 +1,36 @@
 # frozen_string_literal: true
 
-require_relative "transaction_base"
+# AUTO-GENERATED from LunchMoney OpenAPI spec v2.8.5
+# Do not edit manually. Run `toys generate models` to regenerate.
 
 module LunchMoney
   module Objects
-    # Slimmed down version of https://lunchmoney.dev/#transaction-object used in the
-    # `children` field of a transaction object with an additional `formatted_date`` field
-    class ChildTransaction < TransactionBase
-      attr_accessor :formatted_date
+    class ChildTransaction < Base
+      attr_accessor :id, :date, :amount, :currency, :to_base, :recurring_id, :payee, :original_name,
+                    :category_id, :notes, :status, :is_pending, :created_at,
+                    :updated_at, :is_split_parent, :split_parent_id,
+                    :is_group_parent, :group_parent_id, :manual_account_id,
+                    :plaid_account_id, :tag_ids, :source, :external_id,
+                    :plaid_metadata, :custom_metadata, :files
 
-      def initialize(id:, date:, amount:, currency:, to_base:, payee:, formatted_date:, notes: nil, asset_id: nil,
-        plaid_account_id: nil)
-        super(id:, date:, amount:, currency:, to_base:, payee:, notes:, asset_id:, plaid_account_id:)
-        @formatted_date = formatted_date
+      def category(client:)
+        return nil unless category_id
+        hydrate(:category, client: client) { |c| c.category(category_id) }
+      end
+
+      def manual_account(client:)
+        return nil unless manual_account_id
+        hydrate(:manual_account, client: client) { |c| c.manual_account(manual_account_id) }
+      end
+
+      def plaid_account(client:)
+        return nil unless plaid_account_id
+        hydrate(:plaid_account, client: client) { |c| c.plaid_account(plaid_account_id) }
+      end
+
+      def tags(client:)
+        return [] if tag_ids.nil? || tag_ids.empty?
+        hydrate(:tags, client: client) { |c| tag_ids.map { |id| c.tag(id) } }
       end
     end
   end
