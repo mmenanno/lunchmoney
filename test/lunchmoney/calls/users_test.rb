@@ -6,16 +6,11 @@ module LunchMoney
   module Calls
     class UsersTest < ActiveSupport::TestCase
       include MockResponseHelper
-      include VcrHelper
 
       test "me returns a User objects on success response" do
-        with_real_ci_connections do
-          VCR.use_cassette("user/me_success") do
-            api_call = LunchMoney::Calls::Users.new.me
+        api_call = LunchMoney::Calls::Users.new.me
 
-            assert_kind_of(LunchMoney::Objects::User, api_call)
-          end
-        end
+        assert_kind_of(LunchMoney::Objects::User, api_call)
       end
 
       test "me returns an array of Error objects on error response" do
