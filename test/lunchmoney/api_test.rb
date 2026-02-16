@@ -1,4 +1,3 @@
-# typed: strict
 # frozen_string_literal: true
 
 require "test_helper"
@@ -85,7 +84,7 @@ class ApiTest < ActiveSupport::TestCase
     :user_calls,
   ].each do |call|
     test "error is raised if api_key is nil for #{call}" do
-      T.bind(self, ApiTest)
+
       LunchMoney::Configuration.any_instance.stubs(:api_key).returns(nil)
 
       error = assert_raises(LunchMoney::InvalidApiKey) do
@@ -96,7 +95,7 @@ class ApiTest < ActiveSupport::TestCase
     end
 
     test "error is raised if api_key is empty string for #{call}" do
-      T.bind(self, ApiTest)
+
       LunchMoney::Configuration.any_instance.stubs(:api_key).returns("")
 
       error = assert_raises(LunchMoney::InvalidApiKey) do
@@ -107,7 +106,7 @@ class ApiTest < ActiveSupport::TestCase
     end
 
     test "error is not raised if api_key is not empty or nil for #{call}" do
-      T.bind(self, ApiTest)
+
       LunchMoney::Configuration.any_instance.stubs(:api_key).returns("this_could_maybe_be_a_token")
 
       assert_nothing_raised do
@@ -126,7 +125,6 @@ class ApiTest < ActiveSupport::TestCase
 
   private
 
-  sig { returns(T::Array[Symbol]) }
   def api_instance_methods
     LunchMoney::Api.instance_methods(false)
   end

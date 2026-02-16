@@ -1,4 +1,3 @@
-# typed: strict
 # frozen_string_literal: true
 
 require "test_helper"
@@ -6,7 +5,7 @@ require "test_helper"
 module LunchMoney
   class ErrorsTest < ActiveSupport::TestCase
     setup do
-      @error = T.let(LunchMoney::Errors.new, LunchMoney::Errors)
+      @error = LunchMoney::Errors.new
     end
 
     test "initializes error with message" do

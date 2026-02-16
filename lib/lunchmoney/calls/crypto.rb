@@ -1,4 +1,3 @@
-# typed: strict
 # frozen_string_literal: true
 
 require_relative "../objects/crypto"
@@ -7,7 +6,6 @@ module LunchMoney
   module Calls
     # https://lunchmoney.dev/#crypto
     class Crypto < LunchMoney::Calls::Base
-      sig { returns(T.any(T::Array[LunchMoney::Objects::Crypto], LunchMoney::Errors)) }
       def crypto
         response = get("crypto")
 
@@ -18,16 +16,6 @@ module LunchMoney
         end
       end
 
-      sig do
-        params(
-          crypto_id: Integer,
-          name: T.nilable(String),
-          display_name: T.nilable(String),
-          institution_name: T.nilable(String),
-          balance: T.nilable(String),
-          currency: T.nilable(String),
-        ).returns(T.any(LunchMoney::Objects::CryptoBase, LunchMoney::Errors))
-      end
       def update_crypto(crypto_id, name: nil, display_name: nil, institution_name: nil, balance: nil, currency: nil)
         params = clean_params({
           name:,

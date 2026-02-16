@@ -1,4 +1,3 @@
-# typed: strict
 # frozen_string_literal: true
 
 require_relative "exceptions"
@@ -26,12 +25,10 @@ module LunchMoney
   #   api = LunchMoney::Api.new
   #   api.categories # This will be delegated to LunchMoney::Calls::Categories#categories
   class Api
-    sig { returns(T.nilable(String)) }
     attr_reader :api_key
 
-    sig { params(api_key: T.nilable(String)).void }
     def initialize(api_key: nil)
-      @api_key = T.let(api_key || LunchMoney.configuration.api_key, T.nilable(String))
+      @api_key = api_key || LunchMoney.configuration.api_key
     end
 
     delegate :me, to: :user_calls
@@ -40,7 +37,6 @@ module LunchMoney
     # @example [Get User](https://lunchmoney.dev/#get-user)
     #   api = LunchMoney::Api.new
     #   api.me
-    sig { returns(LunchMoney::Calls::Base) }
     def user_calls
       memoized_call_instance(:@user_calls, LunchMoney::Calls::Users)
     end
@@ -81,7 +77,6 @@ module LunchMoney
     # @example [Force Delete Category](https://lunchmoney.dev/#force-delete-category)
     #   api = LunchMoney::Api.new
     #   api.force_delete_category(1234567)
-    sig { returns(LunchMoney::Calls::Base) }
     def category_calls
       memoized_call_instance(:@category_calls, LunchMoney::Calls::Categories)
     end
@@ -92,7 +87,6 @@ module LunchMoney
     # @example [Get All Tags](https://lunchmoney.dev/#get-all-tags)
     #   api = LunchMoney::Api.new
     #   api.tags
-    sig { returns(LunchMoney::Calls::Base) }
     def tag_calls
       memoized_call_instance(:@tag_calls, LunchMoney::Calls::Tags)
     end
@@ -153,7 +147,6 @@ module LunchMoney
     # @example [Delete Transaction Group](https://lunchmoney.dev/#delete-transaction-group)
     #   api = LunchMoney::Api.new
     #   api.delete_transaction_group(905483362)
-    sig { returns(LunchMoney::Calls::Base) }
     def transaction_calls
       memoized_call_instance(:@transaction_calls, LunchMoney::Calls::Transactions)
     end
@@ -164,7 +157,6 @@ module LunchMoney
     # @example [Get Recurring Expenses](https://lunchmoney.dev/#get-recurring-expenses)
     #   api = LunchMoney::Api.new
     #   api.recurring_expenses
-    sig { returns(LunchMoney::Calls::Base) }
     def recurring_expense_calls
       memoized_call_instance(:@recurring_expense_calls, LunchMoney::Calls::RecurringExpenses)
     end
@@ -181,7 +173,6 @@ module LunchMoney
     # @example [Remove Budget](https://lunchmoney.dev/#remove-budget)
     #   api = LunchMoney::Api.new
     #   api.remove_budget(start_date: "2023-01-01", category_id: 777052)
-    sig { returns(LunchMoney::Calls::Base) }
     def budget_calls
       memoized_call_instance(:@budget_calls, LunchMoney::Calls::Budgets)
     end
@@ -202,7 +193,6 @@ module LunchMoney
     # @example [Update Asset](https://lunchmoney.dev/#update-asset)
     #   api = LunchMoney::Api.new
     #   api.update_asset(93746, balance: "99.99")
-    sig { returns(LunchMoney::Calls::Base) }
     def asset_calls
       memoized_call_instance(:@asset_calls, LunchMoney::Calls::Assets)
     end
@@ -216,7 +206,6 @@ module LunchMoney
     # @example [Trigger Fetch from Plaid](https://lunchmoney.dev/#trigger-fetch-from-plaid)
     #   api = LunchMoney::Api.new
     #   api.plaid_accounts_fetch
-    sig { returns(LunchMoney::Calls::Base) }
     def plaid_account_calls
       memoized_call_instance(:@plaid_account_calls, LunchMoney::Calls::PlaidAccounts)
     end
@@ -230,28 +219,18 @@ module LunchMoney
     # @example [Update Manual Crypto Asset](https://lunchmoney.dev/#update-manual-crypto-asset)
     #   api = LunchMoney::Api.new
     #   api.update_crypto(1234567, name: "New Crypto Name")
-    sig { returns(LunchMoney::Calls::Base) }
     def crypto_calls
       memoized_call_instance(:@crypto_calls, LunchMoney::Calls::Crypto)
     end
 
     private
 
-    sig { params(block: T.proc.returns(LunchMoney::Calls::Base)).returns(LunchMoney::Calls::Base) }
     def with_valid_api_key(&block)
       raise(InvalidApiKey, "API key is missing or invalid") if api_key.blank?
 
       yield
     end
 
-    sig do
-      type_parameters(:T)
-        .params(
-          ivar_name: Symbol,
-          klass: T.class_of(LunchMoney::Calls::Base),
-        )
-        .returns(LunchMoney::Calls::Base)
-    end
     def memoized_call_instance(ivar_name, klass)
       with_valid_api_key do
         instance_variable_get(ivar_name) || instance_variable_set(ivar_name, klass.new(api_key:))

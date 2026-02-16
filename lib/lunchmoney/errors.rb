@@ -1,4 +1,3 @@
-# typed: strict
 # frozen_string_literal: true
 
 module LunchMoney
@@ -20,12 +19,10 @@ module LunchMoney
   #   response[0]
   #   => "Some error returned by the API"
   class Errors
-    sig { returns(T::Array[String]) }
     attr_accessor :messages
 
-    sig { params(message: T.nilable(String)).void }
     def initialize(message: nil)
-      @messages = T.let([], T::Array[String])
+      @messages = []
 
       @messages << message unless message.nil?
     end

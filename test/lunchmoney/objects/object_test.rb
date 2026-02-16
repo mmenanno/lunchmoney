@@ -1,4 +1,3 @@
-# typed: strict
 # frozen_string_literal: true
 
 require "test_helper"
@@ -36,7 +35,6 @@ module LunchMoney
 
       private
 
-      sig { returns(LunchMoney::Objects::Object) }
       def create_test_object
         object = LunchMoney::Objects::Object.new
         object.instance_variable_set(:@name, "Test Name")

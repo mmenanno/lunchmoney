@@ -1,8 +1,6 @@
-# typed: strict
 # frozen_string_literal: true
 
 module VcrHelper
-  sig { params(block: T.proc.void).void }
   def with_real_ci_connections(&block)
     if ENV.fetch("REMOTE_TESTS_ENABLED", nil)
       VCR.turned_off(ignore_cassettes: true) do

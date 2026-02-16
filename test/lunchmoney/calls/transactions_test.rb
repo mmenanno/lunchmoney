@@ -1,4 +1,3 @@
-# typed: strict
 # frozen_string_literal: true
 
 require "test_helper"
@@ -204,7 +203,6 @@ module LunchMoney
 
       private
 
-      sig { params(status: String).returns(LunchMoney::Objects::UpdateTransaction) }
       def random_update_transaction(status: "uncleared")
         date = Time.now.utc.strftime("%F")
         amount = rand(0.1..99.9).to_s

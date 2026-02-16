@@ -1,14 +1,10 @@
-# typed: strict
 # frozen_string_literal: true
 
 require "test_helper"
 
 class DeprecateTest < ActiveSupport::TestCase
   setup do
-    @deprecate_test_klass = T.let(
-      LunchMoney::Calls::DeprecateTestCalls,
-      T.class_of(LunchMoney::Calls::DeprecateTestCalls),
-    )
+    @deprecate_test_klass = LunchMoney::Calls::DeprecateTestCalls
   end
 
   test "deprecate_endpoint does not warn when endpoint_deprecation_warnings is false" do

@@ -1,4 +1,3 @@
-# typed: strict
 # frozen_string_literal: true
 
 require "test_helper"
@@ -6,20 +5,17 @@ require "active_support/core_ext/numeric/time.rb"
 
 class VcrTest < ActiveSupport::TestCase
   class << self
-    sig { returns(T::Array[String]) }
     def all_cassette_files
       Dir.glob("#{__dir__}/cassettes/**/*.yml")
     end
 
-    sig { params(cassette: String).returns(String) }
     def extract_cassette_name(cassette)
       match = cassette.match(%r{^.+/cassettes/(?<name>.+)\.yml})
 
-      T.must(match)[:name] || "unknown_cassette_name"
+      match[:name] || "unknown_cassette_name"
     end
   end
 
-  sig { params(cassette: String).returns(Time) }
   def extract_recorded_at_from_cassette(cassette)
     serializer = VCR.cassette_serializers[:yaml]
     deserialized_hash = serializer.deserialize(File.read(cassette))["http_interactions"]

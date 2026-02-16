@@ -1,4 +1,3 @@
-# typed: strict
 # frozen_string_literal: true
 
 module LunchMoney
@@ -11,19 +10,15 @@ module LunchMoney
   #   LunchMoney::Configuration.validate_object_attributes
   #   => true
   class Configuration
-    sig { returns(T.nilable(String)) }
     attr_accessor :api_key
 
-    sig { returns(T::Boolean) }
     attr_accessor :validate_object_attributes
 
-    sig { void }
     def initialize
       @api_key = ENV.fetch("LUNCHMONEY_TOKEN", nil)
-      @validate_object_attributes = T.let(true, T::Boolean)
+      @validate_object_attributes = true
     end
 
-    sig { returns(T::Array[String]) }
     def validation_errors
       errors = []
 
@@ -31,14 +26,13 @@ module LunchMoney
         errors << "API key cannot be empty"
       end
 
-      if api_key && T.must(api_key).length < 10
+      if api_key && api_key.length < 10
         errors << "API key appears to be too short"
       end
 
       errors
     end
 
-    sig { returns(T::Boolean) }
     def valid?
       validation_errors.empty?
     end

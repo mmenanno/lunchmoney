@@ -1,4 +1,3 @@
-# typed: strict
 # frozen_string_literal: true
 
 require "test_helper"
@@ -52,14 +51,6 @@ module LunchMoney
 
       private
 
-      sig do
-        params(
-          type_name: String,
-          subtype_name: String,
-          balance_as_of: String,
-          created_at: String,
-        ).returns(LunchMoney::Objects::Asset)
-      end
       def create_asset(type_name: "cash", subtype_name: "physical cash", balance_as_of: "2023-01-01T01:01:01.000Z",
         created_at: "2023-01-01T01:01:01.000Z")
         LunchMoney::Objects::Asset.new(

@@ -1,4 +1,3 @@
-# typed: strict
 # frozen_string_literal: true
 
 require "test_helper"
@@ -52,14 +51,6 @@ module LunchMoney
 
       private
 
-      sig do
-        params(
-          source: String,
-          balance_as_of: String,
-          status: String,
-          created_at: String,
-        ).returns(LunchMoney::Objects::Crypto)
-      end
       def create_crypto(source: "manual", balance_as_of: "2023-01-01T01:01:01.000Z", status: "active",
         created_at: "2023-01-01T01:01:01.000Z")
         LunchMoney::Objects::Crypto.new(

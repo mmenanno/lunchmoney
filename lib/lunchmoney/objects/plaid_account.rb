@@ -1,14 +1,11 @@
-# typed: strict
 # frozen_string_literal: true
 
 module LunchMoney
   module Objects
     # https://lunchmoney.dev/#plaid-accounts-object
     class PlaidAccount < LunchMoney::Objects::Object
-      sig { returns(Integer) }
       attr_accessor :id
 
-      sig { returns(String) }
       attr_accessor :date_linked,
         :name,
         :type,
@@ -21,37 +18,12 @@ module LunchMoney
         :display_name,
         :plaid_last_successful_update
 
-      sig { returns(T.nilable(String)) }
       attr_accessor :subtype, :import_start_date, :last_fetch, :last_import
 
-      sig { returns(T.nilable(Integer)) }
       attr_accessor :limit
 
-      sig { returns(T.nilable(Number)) }
       attr_accessor :to_base
 
-      sig do
-        params(
-          date_linked: String,
-          name: String,
-          type: String,
-          mask: String,
-          institution_name: String,
-          status: String,
-          balance: String,
-          currency: String,
-          balance_last_update: String,
-          display_name: String,
-          id: Integer,
-          plaid_last_successful_update: String,
-          last_import: T.nilable(String),
-          limit: T.nilable(Integer),
-          subtype: T.nilable(String),
-          import_start_date: T.nilable(String),
-          last_fetch: T.nilable(String),
-          to_base: T.nilable(Number),
-        ).void
-      end
       def initialize(date_linked:, name:, type:, mask:, institution_name:, status:, balance:, currency:,
         balance_last_update:, display_name:, id:, plaid_last_successful_update:, last_import: nil, limit: nil,
         subtype: nil, import_start_date: nil, last_fetch: nil, to_base: nil)

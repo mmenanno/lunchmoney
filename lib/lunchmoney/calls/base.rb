@@ -1,4 +1,3 @@
-# typed: strict
 # frozen_string_literal: true
 
 require_relative "../errors"
@@ -17,18 +16,15 @@ module LunchMoney
       # Base URL used for API calls
       BASE_URL = "https://dev.lunchmoney.app/v1/"
 
-      sig { returns(T.nilable(String)) }
       attr_reader :api_key
 
-      sig { params(api_key: T.nilable(String)).void }
       def initialize(api_key: nil)
-        @api_key = T.let(api_key || LunchMoney.configuration.api_key, T.nilable(String))
-        @connections = T.let({}, T::Hash[Symbol, Faraday::Connection])
+        @api_key = api_key || LunchMoney.configuration.api_key
+        @connections = {}
       end
 
       private
 
-      sig { params(endpoint: String, query_params: T.nilable(T::Hash[Symbol, T.untyped])).returns(Faraday::Response) }
       def get(endpoint, query_params: nil)
         connection = connection_for(:flat_params)
 
@@ -39,19 +35,16 @@ module LunchMoney
         end
       end
 
-      sig { params(endpoint: String, params: T.nilable(T::Hash[Symbol, T.untyped])).returns(Faraday::Response) }
       def post(endpoint, params)
         connection_for(:json).post(BASE_URL + endpoint, params)
       end
 
-      sig { params(endpoint: String, body: T::Hash[Symbol, T.untyped]).returns(Faraday::Response) }
       def put(endpoint, body)
         connection_for(:json).put(BASE_URL + endpoint) do |req|
           req.body = body
         end
       end
 
-      sig { params(endpoint: String, query_params: T.nilable(T::Hash[Symbol, T.untyped])).returns(Faraday::Response) }
       def delete(endpoint, query_params: nil)
         connection = connection_for(:flat_params)
 
@@ -62,7 +55,6 @@ module LunchMoney
         end
       end
 
-      sig { params(connection_type: Symbol).returns(Faraday::Connection) }
       def connection_for(connection_type)
         @connections[connection_type] ||= case connection_type
         when :json
@@ -74,7 +66,6 @@ module LunchMoney
         end
       end
 
-      sig { params(json_request: T::Boolean, flat_params: T::Boolean).returns(Faraday::Connection) }
       def build_connection(json_request: false, flat_params: false)
         Faraday.new do |conn|
           conn.request(:authorization, "Bearer", @api_key)
@@ -84,7 +75,6 @@ module LunchMoney
         end
       end
 
-      sig { params(response: Faraday::Response).returns(LunchMoney::Errors) }
       def errors(response)
         body = response.body
 
@@ -93,7 +83,6 @@ module LunchMoney
         LunchMoney::Errors.new
       end
 
-      sig { params(body: T::Hash[Symbol, T.any(String, T::Array[String])]).returns(LunchMoney::Errors) }
       def parse_errors(body)
         errors = error_hash(body)
         api_errors = LunchMoney::Errors.new
@@ -109,7 +98,6 @@ module LunchMoney
         api_errors
       end
 
-      sig { params(body: T.untyped).returns(T.untyped) }
       def error_hash(body)
         return unless body.is_a?(Hash)
 
@@ -122,19 +110,10 @@ module LunchMoney
         end
       end
 
-      sig { params(params: T::Hash[Symbol, T.untyped]).returns(T::Hash[Symbol, T.untyped]) }
       def clean_params(params)
         params.reject { |_key, value| value.nil? }
       end
 
-      sig do
-        type_parameters(:T)
-          .params(
-            response: Faraday::Response,
-            block: T.proc.params(body: T.untyped).returns(T.type_parameter(:T)),
-          )
-          .returns(T.any(T.type_parameter(:T), LunchMoney::Errors))
-      end
       def handle_api_response(response, &block)
         api_errors = errors(response)
         return api_errors if api_errors.present?
@@ -142,16 +121,6 @@ module LunchMoney
         yield(response.body)
       end
 
-      sig do
-        type_parameters(:T)
-          .params(
-            response: Faraday::Response,
-            collection_key: Symbol,
-            lazy: T::Boolean,
-            block: T.proc.params(item: T.untyped).returns(T.type_parameter(:T)),
-          )
-          .returns(T.any(T::Enumerable[T.type_parameter(:T)], T::Array[T.type_parameter(:T)], LunchMoney::Errors))
-      end
       def handle_collection_response(response, collection_key, lazy: false, &block)
         api_errors = errors(response)
         return api_errors if api_errors.present?

@@ -1,4 +1,3 @@
-# typed: strict
 # frozen_string_literal: true
 
 require_relative "transaction_base"
@@ -7,7 +6,6 @@ module LunchMoney
   module Objects
     # https://lunchmoney.dev/#transaction-object
     class Transaction < TransactionBase
-      sig { returns(T.nilable(Integer)) }
       attr_accessor :category_id,
         :category_group_id,
         :recurring_id,
@@ -15,7 +13,6 @@ module LunchMoney
         :group_id,
         :external_id
 
-      sig { returns(String) }
       attr_accessor :created_at,
         :updated_at,
         :status,
@@ -23,7 +20,6 @@ module LunchMoney
         :display_name,
         :account_display_name
 
-      sig { returns(T.nilable(String)) }
       attr_accessor :category_name,
         :category_group_name,
         :original_name,
@@ -44,73 +40,15 @@ module LunchMoney
         :plaid_metadata,
         :display_notes
 
-      sig { returns(T::Boolean) }
       attr_accessor :is_income, :exclude_from_budget, :exclude_from_totals, :is_pending, :has_children, :is_group
 
-      sig { returns(T::Array[LunchMoney::Objects::TagBase]) }
       attr_accessor :tags
 
-      sig { returns(T.nilable(T::Array[LunchMoney::Objects::ChildTransaction])) }
       attr_accessor :children
 
       # TODO: Fix types when I have a response on what they should be https://github.com/mmenanno/lunchmoney/issues/329
-      sig { returns(T.untyped) }
       attr_accessor :recurring_granularity, :recurring_quantity
 
-      sig do
-        params(
-          id: Integer,
-          date: String,
-          amount: String,
-          currency: String,
-          to_base: Number,
-          payee: String,
-          is_income: T::Boolean,
-          exclude_from_budget: T::Boolean,
-          exclude_from_totals: T::Boolean,
-          created_at: String,
-          updated_at: String,
-          status: String,
-          is_pending: T::Boolean,
-          has_children: T::Boolean,
-          is_group: T::Boolean,
-          source: String,
-          display_name: String,
-          account_display_name: String,
-          tags: T::Array[LunchMoney::Objects::TagBase],
-          category_id: T.nilable(Integer),
-          category_name: T.nilable(String),
-          category_group_id: T.nilable(Integer),
-          category_group_name: T.nilable(String),
-          notes: T.nilable(String),
-          original_name: T.nilable(String),
-          recurring_id: T.nilable(Integer),
-          recurring_payee: T.nilable(String),
-          recurring_description: T.nilable(String),
-          recurring_cadence: T.nilable(String),
-          recurring_type: T.nilable(String),
-          recurring_amount: T.nilable(String),
-          recurring_currency: T.nilable(String),
-          parent_id: T.nilable(Integer),
-          group_id: T.nilable(Integer),
-          asset_id: T.nilable(Integer),
-          asset_institution_name: T.nilable(String),
-          asset_name: T.nilable(String),
-          asset_display_name: T.nilable(String),
-          asset_status: T.nilable(String),
-          plaid_account_id: T.nilable(Integer),
-          plaid_account_name: T.nilable(String),
-          plaid_account_mask: T.nilable(String),
-          institution_name: T.nilable(String),
-          plaid_account_display_name: T.nilable(String),
-          plaid_metadata: T.nilable(String),
-          display_notes: T.nilable(String),
-          external_id: T.nilable(Integer),
-          children: T.nilable(T::Array[LunchMoney::Objects::ChildTransaction]),
-          recurring_granularity: T.untyped,
-          recurring_quantity: T.untyped,
-        ).void
-      end
       def initialize(id:, date:, amount:, currency:, to_base:, payee:, is_income:, exclude_from_budget:,
         exclude_from_totals:, created_at:, updated_at:, status:, is_pending:, has_children:, is_group:, source:,
         display_name:, account_display_name:, tags:, category_id: nil, category_name: nil, category_group_id: nil,
