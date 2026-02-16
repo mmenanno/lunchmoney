@@ -7,17 +7,12 @@ module LunchMoney
   module Calls
     class CryptoTest < ActiveSupport::TestCase
       include MockResponseHelper
-      include VcrHelper
 
       test "crypto returns an array of Crypto objects on success response" do
-        with_real_ci_connections do
-          VCR.use_cassette("crypto/crypto_success") do
-            api_call = LunchMoney::Calls::Crypto.new.crypto
+        api_call = LunchMoney::Calls::Crypto.new.crypto
 
-            api_call.each do |crypto|
-              assert_kind_of(LunchMoney::Objects::Crypto, crypto)
-            end
-          end
+        api_call.each do |crypto|
+          assert_kind_of(LunchMoney::Objects::Crypto, crypto)
         end
       end
 
@@ -31,11 +26,9 @@ module LunchMoney
       end
 
       test "update_crypto returns a Crypto objects on success response" do
-        VCR.use_cassette("crypto/update_crypto_success") do
-          api_call = LunchMoney::Calls::Crypto.new.update_crypto(7638, balance: "2.000000000000000000")
+        api_call = LunchMoney::Calls::Crypto.new.update_crypto(7638, balance: "2.000000000000000000")
 
-          assert_kind_of(LunchMoney::Objects::CryptoBase, api_call)
-        end
+        assert_kind_of(LunchMoney::Objects::CryptoBase, api_call)
       end
 
       test "update_crypto returns an array of Error objects on error response" do

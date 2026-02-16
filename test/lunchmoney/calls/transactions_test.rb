@@ -7,20 +7,15 @@ module LunchMoney
   module Calls
     class TransactionsTest < ActiveSupport::TestCase
       include MockResponseHelper
-      include VcrHelper
 
       test "transactions returns an array of Transaction objects on success response" do
-        with_real_ci_connections do
-          VCR.use_cassette("transactions/transactions_success") do
-            api_call = LunchMoney::Calls::Transactions.new.transactions(
-              start_date: "2019-01-01",
-              end_date: "2025-01-01",
-            )
+        api_call = LunchMoney::Calls::Transactions.new.transactions(
+          start_date: "2019-01-01",
+          end_date: "2025-01-01",
+        )
 
-            api_call.each do |transaction|
-              assert_kind_of(LunchMoney::Objects::Transaction, transaction)
-            end
-          end
+        api_call.each do |transaction|
+          assert_kind_of(LunchMoney::Objects::Transaction, transaction)
         end
       end
 
@@ -34,13 +29,9 @@ module LunchMoney
       end
 
       test "transaction returns a Transaction objects on success response" do
-        with_real_ci_connections do
-          VCR.use_cassette("transactions/transaction_success") do
-            api_call = LunchMoney::Calls::Transactions.new.transaction(893631800)
+        api_call = LunchMoney::Calls::Transactions.new.transaction(893631800)
 
-            assert_kind_of(LunchMoney::Objects::Transaction, api_call)
-          end
-        end
+        assert_kind_of(LunchMoney::Objects::Transaction, api_call)
       end
 
       test "transaction returns an array of Error objects on error response" do
@@ -53,13 +44,9 @@ module LunchMoney
       end
 
       test "transaction_group returns a Transaction objects on success response" do
-        with_real_ci_connections do
-          VCR.use_cassette("transactions/transaction_group_success") do
-            api_call = LunchMoney::Calls::Transactions.new.transaction_group(894063595)
+        api_call = LunchMoney::Calls::Transactions.new.transaction_group(894063595)
 
-            assert_kind_of(LunchMoney::Objects::Transaction, api_call)
-          end
-        end
+        assert_kind_of(LunchMoney::Objects::Transaction, api_call)
       end
 
       test "transaction_group returns an array of Error objects on error response" do
@@ -72,14 +59,12 @@ module LunchMoney
       end
 
       test "insert_transactions returns a hash containing an array of ids on success response" do
-        VCR.use_cassette("transactions/insert_transactions_success") do
-          api_call = LunchMoney::Calls::Transactions.new.insert_transactions([random_update_transaction])
+        api_call = LunchMoney::Calls::Transactions.new.insert_transactions([random_update_transaction])
 
-          refute_nil(api_call[:ids])
+        refute_nil(api_call[:ids])
 
-          api_call[:ids].each do |id|
-            assert_kind_of(Integer, id)
-          end
+        api_call[:ids].each do |id|
+          assert_kind_of(Integer, id)
         end
       end
 
@@ -93,29 +78,25 @@ module LunchMoney
       end
 
       test "update_transaction returns a hash containing an updated boolean on success response" do
-        VCR.use_cassette("transactions/update_transactions_success") do
-          api_call = LunchMoney::Calls::Transactions.new.update_transaction(
-            897349559,
-            transaction: random_update_transaction(status: "cleared"),
-          )
+        api_call = LunchMoney::Calls::Transactions.new.update_transaction(
+          897349559,
+          transaction: random_update_transaction(status: "cleared"),
+        )
 
-          assert(api_call[:updated])
-        end
+        assert(api_call[:updated])
       end
 
       test "update_transaction returns a hash containing an updated boolean and split ids on success split response" do
-        VCR.use_cassette("transactions/update_transactions_split_success") do
-          split = [
-            LunchMoney::Objects::Split.new(amount: "10.00"),
-            LunchMoney::Objects::Split.new(amount: "47.54"),
-          ]
-          api_call = LunchMoney::Calls::Transactions.new.update_transaction(904778058, split:)
+        split = [
+          LunchMoney::Objects::Split.new(amount: "10.00"),
+          LunchMoney::Objects::Split.new(amount: "47.54"),
+        ]
+        api_call = LunchMoney::Calls::Transactions.new.update_transaction(904778058, split:)
 
-          assert(api_call[:updated])
+        assert(api_call[:updated])
 
-          api_call[:split].each do |split_id|
-            assert_kind_of(Integer, split_id)
-          end
+        api_call[:split].each do |split_id|
+          assert_kind_of(Integer, split_id)
         end
       end
 
@@ -138,12 +119,10 @@ module LunchMoney
       end
 
       test "unsplit_transaction returns an array of unsplit transaction ids on success response" do
-        VCR.use_cassette("transactions/unsplit_transaction_success") do
-          api_call = LunchMoney::Calls::Transactions.new.unsplit_transaction([904778058])
+        api_call = LunchMoney::Calls::Transactions.new.unsplit_transaction([904778058])
 
-          api_call.each do |transaction_id|
-            assert_kind_of(Integer, transaction_id)
-          end
+        api_call.each do |transaction_id|
+          assert_kind_of(Integer, transaction_id)
         end
       end
 
@@ -157,16 +136,14 @@ module LunchMoney
       end
 
       test "create_transaction_group returns a transaction id of the created group on success response" do
-        VCR.use_cassette("transactions/create_transaction_group_success") do
-          arguments = {
-            date: "2024-01-30",
-            payee: "Group Transaction",
-            transactions: [898357857, 898359936],
-          }
-          api_call = LunchMoney::Calls::Transactions.new.create_transaction_group(**arguments)
+        arguments = {
+          date: "2024-01-30",
+          payee: "Group Transaction",
+          transactions: [898357857, 898359936],
+        }
+        api_call = LunchMoney::Calls::Transactions.new.create_transaction_group(**arguments)
 
-          assert_kind_of(Integer, api_call)
-        end
+        assert_kind_of(Integer, api_call)
       end
 
       test "create_transaction_group returns an array of Error objects on error response" do
@@ -184,12 +161,10 @@ module LunchMoney
       end
 
       test "delete_transaction_group returns an array of transaction ids from the deleted group on success response" do
-        VCR.use_cassette("transactions/delete_transaction_group_success") do
-          api_call = LunchMoney::Calls::Transactions.new.delete_transaction_group(2266193461)
+        api_call = LunchMoney::Calls::Transactions.new.delete_transaction_group(2266193461)
 
-          api_call[:transactions].each do |transaction_id|
-            assert_kind_of(Integer, transaction_id)
-          end
+        api_call[:transactions].each do |transaction_id|
+          assert_kind_of(Integer, transaction_id)
         end
       end
 

@@ -7,17 +7,12 @@ module LunchMoney
   module Calls
     class TagsTest < ActiveSupport::TestCase
       include MockResponseHelper
-      include VcrHelper
 
       test "tags returns an array of Tag objects on success response" do
-        with_real_ci_connections do
-          VCR.use_cassette("tags/tags_success") do
-            api_call = LunchMoney::Calls::Tags.new.tags
+        api_call = LunchMoney::Calls::Tags.new.tags
 
-            api_call.each do |tag|
-              assert_kind_of(LunchMoney::Objects::Tag, tag)
-            end
-          end
+        api_call.each do |tag|
+          assert_kind_of(LunchMoney::Objects::Tag, tag)
         end
       end
 

@@ -176,7 +176,6 @@ GEM
       unicode-emoji (~> 4.1)
     unicode-emoji (4.2.0)
     uri (1.1.1)
-    vcr (6.4.0)
     webmock (3.26.1)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
@@ -207,7 +206,6 @@ DEPENDENCIES
   spoom
   tapioca
   toys
-  vcr
   webmock
   yard
   yard-sorbet
