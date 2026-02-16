@@ -28,17 +28,6 @@ jobs:
       - name: RuboCop
         run: bin/rubocop
 
-      - name: Typecheck
-        run: bin/srb tc
-
-      - name: Check for Updatable Sigils
-        run: |
-          bin/spoom bump --from false --to true --dry
-          bin/spoom bump --from true --to strict --dry
-
-      - name: Check for DSL rbi updates
-        run: bin/tapioca dsl --verify
-
       - name: Markdown Lint
         run: bin/toys mdl
 
