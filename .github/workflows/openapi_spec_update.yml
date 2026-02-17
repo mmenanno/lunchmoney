@@ -1,0 +1,51 @@
+name: Check OpenAPI Spec Updates
+on:
+  schedule:
+    - cron: "0 9 * * 1"  # Every Monday at 9am UTC
+  workflow_dispatch:       # Manual trigger
+
+jobs:
+  check-spec:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get current spec version
+        id: current
+        run: |
+          version=$(grep 'version:' openapi/v2.yaml | head -1 | awk '{print $2}')
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Get latest npm spec version
+        id: latest
+        run: |
+          version=$(curl -s https://registry.npmjs.org/@lunch-money/v2-api-spec/latest | jq -r '.version')
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Download and update spec
+        if: steps.current.outputs.version != steps.latest.outputs.version
+        run: |
+          npm pack @lunch-money/v2-api-spec@latest --pack-destination /tmp
+          tar -xzf /tmp/lunch-money-v2-api-spec-*.tgz -C /tmp
+          cp /tmp/package/api-1.yaml openapi/v2.yaml
+
+      - name: Regenerate models
+        if: steps.current.outputs.version != steps.latest.outputs.version
+        run: |
+          bundle install
+          bundle exec toys generate models
+
+      - name: Create PR
+        if: steps.current.outputs.version != steps.latest.outputs.version
+        uses: peter-evans/create-pull-request@v6
+        with:
+          title: "chore(openapi): update spec to v${{ steps.latest.outputs.version }}"
+          body: |
+            Automated update of OpenAPI spec from `${{ steps.current.outputs.version }}` to `${{ steps.latest.outputs.version }}`.
+
+            - Updated `openapi/v2.yaml`
+            - Regenerated model objects and test fixtures
+
+            Review the diff carefully for breaking changes.
+          branch: openapi-spec-update
+          labels: dependencies, automated

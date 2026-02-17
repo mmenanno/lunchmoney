@@ -5,6 +5,7 @@ SimpleCov.start do
   enable_coverage :branch
 
   add_filter "/test/"
+  add_filter "/generators/"
 
   add_group "Calls", "lib/lunchmoney/calls"
   add_group "Objects", "lib/lunchmoney/objects"
