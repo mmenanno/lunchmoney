@@ -12,6 +12,7 @@ require_relative "lunchmoney/errors"
 require_relative "lunchmoney/configuration"
 require_relative "lunchmoney/client/rate_limit"
 require_relative "lunchmoney/client/base"
+require_relative "lunchmoney/api"
 
 module LunchMoney
   LOCK = Mutex.new
