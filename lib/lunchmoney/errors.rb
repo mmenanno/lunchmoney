@@ -31,6 +31,7 @@ module LunchMoney
 
   class ServerError < ApiError; end
 
+  class ClientValidationError < Error; end
   class ConfigurationError < Error; end
   class InvalidApiKey < ConfigurationError; end
 end

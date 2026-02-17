@@ -11,6 +11,7 @@ require_relative "lunchmoney/version"
 require_relative "lunchmoney/errors"
 require_relative "lunchmoney/configuration"
 require_relative "lunchmoney/client/rate_limit"
+require_relative "lunchmoney/client/pagination"
 require_relative "lunchmoney/client/base"
 require_relative "lunchmoney/api"
 

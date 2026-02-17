@@ -9,9 +9,9 @@ module LunchMoney
       attr_accessor :amount, :payee, :date, :category_id, :notes
 
       def validate!
-        raise ArgumentError, "amount is required" if amount.nil?
-        raise ArgumentError, "payee must be at most 140 characters" if payee && payee.to_s.length > 140
-        raise ArgumentError, "notes must be at most 350 characters" if notes && notes.to_s.length > 350
+        raise LunchMoney::ClientValidationError, "amount is required" if amount.nil?
+        raise LunchMoney::ClientValidationError, "payee must be at most 140 characters" if payee && payee.to_s.length > 140
+        raise LunchMoney::ClientValidationError, "notes must be at most 350 characters" if notes && notes.to_s.length > 350
       end
     end
   end

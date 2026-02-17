@@ -41,7 +41,9 @@ module LunchMoney
       # @param attrs [Hash] attributes to update
       # @return [LunchMoney::Objects::ManualAccount]
       def update_manual_account(id, **attrs)
-        data = put("/manual_accounts/#{id}", body: attrs)
+        account = Objects::UpdateManualAccount.new(**attrs)
+        account.validate!
+        data = put("/manual_accounts/#{id}", body: account.serialize)
         build_object(Objects::ManualAccount, data)
       end
 

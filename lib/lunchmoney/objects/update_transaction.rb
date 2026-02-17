@@ -17,18 +17,18 @@ module LunchMoney
                     :group_parent_id, :source
 
       def validate!
-        raise ArgumentError, "payee must be at most 140 characters" if payee && payee.to_s.length > 140
-        raise ArgumentError, "original_name must be at most 140 characters" if original_name && original_name.to_s.length > 140
-        raise ArgumentError, "notes must be at most 350 characters" if notes && notes.to_s.length > 350
-        raise ArgumentError, "external_id must be at most 75 characters" if external_id && external_id.to_s.length > 75
+        raise LunchMoney::ClientValidationError, "payee must be at most 140 characters" if payee && payee.to_s.length > 140
+        raise LunchMoney::ClientValidationError, "original_name must be at most 140 characters" if original_name && original_name.to_s.length > 140
+        raise LunchMoney::ClientValidationError, "notes must be at most 350 characters" if notes && notes.to_s.length > 350
+        raise LunchMoney::ClientValidationError, "external_id must be at most 75 characters" if external_id && external_id.to_s.length > 75
         if custom_metadata && !custom_metadata.is_a?(Hash)
-          raise ArgumentError, "custom_metadata must be a Hash"
+          raise LunchMoney::ClientValidationError, "custom_metadata must be a Hash"
         end
         if custom_metadata && JSON.generate(custom_metadata).length > 4096
-          raise ArgumentError, "custom_metadata exceeds 4096 character limit"
+          raise LunchMoney::ClientValidationError, "custom_metadata exceeds 4096 character limit"
         end
-        raise ArgumentError, "status must be one of: reviewed, unreviewed" if status && !["reviewed", "unreviewed"].include?(status)
-        raise ArgumentError, "source must be one of: api, csv, manual, merge, plaid, recurring, rule, split, user" if source && !["api", "csv", "manual", "merge", "plaid", "recurring", "rule", "split", "user"].include?(source)
+        raise LunchMoney::ClientValidationError, "status must be one of: reviewed, unreviewed" if status && !["reviewed", "unreviewed"].include?(status)
+        raise LunchMoney::ClientValidationError, "source must be one of: api, csv, manual, merge, plaid, recurring, rule, split, user" if source && !["api", "csv", "manual", "merge", "plaid", "recurring", "rule", "split", "user"].include?(source)
       end
     end
   end

@@ -8,10 +8,15 @@ module LunchMoney
 
         # Bulk update multiple transactions.
         #
-        # @param transactions [Array<Hash>] each Hash must include :id and fields to update
+        # @param transactions [Array<Hash, UpdateTransaction>] each must include :id and fields to update
         # @return [Array<LunchMoney::Objects::Transaction>]
         def update_transactions(transactions)
-          data = put("/transactions", body: { transactions: transactions })
+          txns = transactions.map do |t|
+            txn = t.is_a?(Objects::UpdateTransaction) ? t : Objects::UpdateTransaction.new(**t)
+            txn.validate!
+            txn
+          end
+          data = put("/transactions", body: { transactions: txns.map(&:serialize) })
           build_collection(Objects::Transaction, data, key: :transactions)
         end
 

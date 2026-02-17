@@ -25,27 +25,15 @@ module LunchMoney
 
       # List transactions with auto-pagination.
       #
-      # Returns all transactions by fetching pages automatically. When Client::Pagination
-      # is available (Phase 04), this will return a lazy Enumerable instead.
+      # Returns a lazy Enumerable that fetches pages on demand as you iterate.
+      # Supports `.lazy`, `.first(n)`, `.take(n)`, etc.
       #
       # @param start_date [String] ISO 8601 date
       # @param end_date [String] ISO 8601 date
       # @param filters [Hash] optional filters
-      # @return [Array<LunchMoney::Objects::Transaction>]
+      # @return [LunchMoney::Client::Pagination]
       def transactions(start_date:, end_date:, **filters)
-        all_transactions = []
-        offset = 0
-        limit = 1000
-
-        loop do
-          page = transactions_page(start_date:, end_date:, limit:, offset:, **filters)
-          all_transactions.concat(page[:transactions])
-          break unless page[:has_more]
-
-          offset += limit
-        end
-
-        all_transactions
+        Client::Pagination.new(client: self, params: { start_date:, end_date:, **filters })
       end
 
       # Get a single transaction by ID.
@@ -91,7 +79,9 @@ module LunchMoney
       # @param attrs [Hash] attributes to update
       # @return [LunchMoney::Objects::Transaction]
       def update_transaction(id, **attrs)
-        data = put("/transactions/#{id}", body: attrs)
+        txn = Objects::UpdateTransaction.new(**attrs)
+        txn.validate!
+        data = put("/transactions/#{id}", body: txn.serialize)
         build_object(Objects::Transaction, data)
       end
 
