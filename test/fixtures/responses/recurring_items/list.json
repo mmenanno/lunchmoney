@@ -1,6 +1,5 @@
 {
-  "recurring_items": {
-    "recurring_items": [
+  "recurring_items": [
       {
         "id": 994069,
         "description": "Income",
@@ -85,6 +84,5 @@
         "updated_at": "2025-06-28T01:01:38.195Z",
         "source": "manual"
       }
-    ]
-  }
+  ]
 }
