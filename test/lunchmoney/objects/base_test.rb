@@ -1,33 +1,32 @@
 # frozen_string_literal: true
 
-require "minitest/autorun"
-require_relative "../../../lib/lunchmoney/objects/base"
+require "test_helper"
 
-class TestBase < Minitest::Test
+class TestObjectsBase < ActiveSupport::TestCase
   class SampleObject < LunchMoney::Objects::Base
     attr_accessor :name, :value, :count
   end
 
-  def test_initialize_sets_known_attributes
+  test "initialize sets known attributes" do
     obj = SampleObject.new(name: "test", value: 42, count: 3)
     assert_equal "test", obj.name
     assert_equal 42, obj.value
     assert_equal 3, obj.count
   end
 
-  def test_initialize_ignores_unknown_attributes
+  test "initialize ignores unknown attributes" do
     obj = SampleObject.new(name: "test", unknown_key: "ignored")
     assert_equal "test", obj.name
     refute obj.instance_variable_defined?(:@unknown_key)
   end
 
-  def test_serialize_returns_hash_of_instance_variables
+  test "serialize returns hash of instance variables" do
     obj = SampleObject.new(name: "test", value: 42)
     result = obj.serialize
     assert_equal({ "name" => "test", "value" => 42 }, result)
   end
 
-  def test_serialize_excludes_hydrated_ivars
+  test "serialize excludes hydrated ivars" do
     obj = SampleObject.new(name: "test")
     obj.instance_variable_set(:@_hydrated_category, "cached_category")
     result = obj.serialize
@@ -35,7 +34,7 @@ class TestBase < Minitest::Test
     refute result.key?("_hydrated_category")
   end
 
-  def test_hydrate_calls_block_once_and_caches
+  test "hydrate calls block once and caches" do
     obj = SampleObject.new(name: "test")
     call_count = 0
     mock_client = Object.new
@@ -51,7 +50,7 @@ class TestBase < Minitest::Test
     assert_equal "fetched_result", obj.instance_variable_get(:@_hydrated_related)
   end
 
-  def test_hydrate_returns_result
+  test "hydrate returns result" do
     obj = SampleObject.new(name: "test")
     mock_client = Object.new
 

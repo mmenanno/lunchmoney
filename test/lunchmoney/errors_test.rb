@@ -1,46 +1,49 @@
 # frozen_string_literal: true
 
-require "minitest/autorun"
-require_relative "../../lib/lunchmoney/errors"
+require "test_helper"
 
-class LunchMoneyErrorsTest < Minitest::Test
-  def test_error_inherits_from_standard_error
+class LunchMoneyErrorsTest < ActiveSupport::TestCase
+  test "Error inherits from StandardError" do
     assert LunchMoney::Error < StandardError
   end
 
-  def test_api_error_inherits_from_error
+  test "ApiError inherits from Error" do
     assert LunchMoney::ApiError < LunchMoney::Error
   end
 
-  def test_authentication_error_inherits_from_api_error
+  test "AuthenticationError inherits from ApiError" do
     assert LunchMoney::AuthenticationError < LunchMoney::ApiError
   end
 
-  def test_not_found_error_inherits_from_api_error
+  test "NotFoundError inherits from ApiError" do
     assert LunchMoney::NotFoundError < LunchMoney::ApiError
   end
 
-  def test_validation_error_inherits_from_api_error
+  test "ValidationError inherits from ApiError" do
     assert LunchMoney::ValidationError < LunchMoney::ApiError
   end
 
-  def test_rate_limit_error_inherits_from_api_error
+  test "RateLimitError inherits from ApiError" do
     assert LunchMoney::RateLimitError < LunchMoney::ApiError
   end
 
-  def test_server_error_inherits_from_api_error
+  test "ServerError inherits from ApiError" do
     assert LunchMoney::ServerError < LunchMoney::ApiError
   end
 
-  def test_configuration_error_inherits_from_error
+  test "ClientValidationError inherits from Error" do
+    assert LunchMoney::ClientValidationError < LunchMoney::Error
+  end
+
+  test "ConfigurationError inherits from Error" do
     assert LunchMoney::ConfigurationError < LunchMoney::Error
   end
 
-  def test_invalid_api_key_inherits_from_configuration_error
+  test "InvalidApiKey inherits from ConfigurationError" do
     assert LunchMoney::InvalidApiKey < LunchMoney::ConfigurationError
   end
 
-  def test_api_error_attributes
+  test "ApiError attributes" do
     error = LunchMoney::ApiError.new(
       status_code: 400,
       message: "Bad request",
@@ -56,7 +59,7 @@ class LunchMoneyErrorsTest < Minitest::Test
     assert_equal "rate_limit_obj", error.rate_limit
   end
 
-  def test_api_error_default_values
+  test "ApiError default values" do
     error = LunchMoney::ApiError.new(status_code: 500, message: "Server error")
 
     assert_equal [], error.errors
@@ -64,7 +67,7 @@ class LunchMoneyErrorsTest < Minitest::Test
     assert_nil error.rate_limit
   end
 
-  def test_rate_limit_error_retry_after
+  test "RateLimitError retry_after" do
     error = LunchMoney::RateLimitError.new(
       retry_after: 30,
       status_code: 429,
@@ -76,13 +79,12 @@ class LunchMoneyErrorsTest < Minitest::Test
     assert_equal "Rate limited", error.message
   end
 
-  def test_rate_limit_error_retry_after_defaults_to_nil
+  test "RateLimitError retry_after defaults to nil" do
     error = LunchMoney::RateLimitError.new(status_code: 429, message: "Rate limited")
-
     assert_nil error.retry_after
   end
 
-  def test_rescue_api_error_catches_http_subclasses
+  test "rescue ApiError catches HTTP subclasses" do
     [
       LunchMoney::AuthenticationError,
       LunchMoney::NotFoundError,
@@ -96,9 +98,13 @@ class LunchMoneyErrorsTest < Minitest::Test
     end
   end
 
-  def test_rescue_error_catches_all_subclasses
+  test "rescue Error catches all subclasses" do
     assert_raises(LunchMoney::Error) do
       raise LunchMoney::ApiError.new(status_code: 500, message: "test")
+    end
+
+    assert_raises(LunchMoney::Error) do
+      raise LunchMoney::ClientValidationError, "test"
     end
 
     assert_raises(LunchMoney::Error) do
@@ -110,7 +116,7 @@ class LunchMoneyErrorsTest < Minitest::Test
     end
   end
 
-  def test_each_error_class_can_be_instantiated
+  test "each error class can be instantiated" do
     api_error = LunchMoney::ApiError.new(status_code: 400, message: "test")
     assert_instance_of LunchMoney::ApiError, api_error
 
@@ -128,6 +134,9 @@ class LunchMoneyErrorsTest < Minitest::Test
 
     server = LunchMoney::ServerError.new(status_code: 500, message: "test")
     assert_instance_of LunchMoney::ServerError, server
+
+    client_validation = LunchMoney::ClientValidationError.new("test")
+    assert_instance_of LunchMoney::ClientValidationError, client_validation
 
     config = LunchMoney::ConfigurationError.new("test")
     assert_instance_of LunchMoney::ConfigurationError, config

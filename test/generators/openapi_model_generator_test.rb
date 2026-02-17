@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require "minitest/autorun"
+require "test_helper"
 require "tmpdir"
 require "yaml"
 require "json"
 require_relative "../../generators/openapi_model_generator"
 
-class TestOpenApiModelGenerator < Minitest::Test
+class TestOpenApiModelGenerator < ActiveSupport::TestCase
   MINIMAL_SPEC = {
     "info" => { "version" => "1.0.0-test" },
     "components" => {

@@ -1,34 +1,15 @@
 # frozen_string_literal: true
 
-require "minitest/autorun"
-require "webmock/minitest"
-require "faraday"
-require "faraday/multipart"
-require "faraday/retry"
-require_relative "../../../lib/lunchmoney/errors"
-require_relative "../../../lib/lunchmoney/configuration"
-require_relative "../../../lib/lunchmoney/client/rate_limit"
-require_relative "../../../lib/lunchmoney/client/base"
-
-# Provide LunchMoney.configuration for tests
-module LunchMoney
-  LOCK = Mutex.new unless defined?(LOCK)
-  class << self
-    def configuration
-      @configuration = nil unless defined?(@configuration)
-      @configuration || LOCK.synchronize { @configuration ||= Configuration.new }
-    end
-  end
-end
+require "test_helper"
 
 class TestClient < LunchMoney::Client::Base
   public :get, :post, :put, :delete
 end
 
-class LunchMoneyClientBaseTest < Minitest::Test
+class LunchMoneyClientBaseTest < ActiveSupport::TestCase
   BASE_URL = "https://api.lunchmoney.dev/v2"
 
-  def setup
+  setup do
     LunchMoney.configuration.max_retries = 0
     @client = TestClient.new(api_key: "test_api_key")
   end
@@ -41,7 +22,7 @@ class LunchMoneyClientBaseTest < Minitest::Test
     }
   end
 
-  def test_successful_get_returns_parsed_body
+  test "successful GET returns parsed body" do
     stub_request(:get, "#{BASE_URL}/categories")
       .to_return(
         status: 200,
@@ -53,7 +34,7 @@ class LunchMoneyClientBaseTest < Minitest::Test
     assert_equal({ categories: [] }, result)
   end
 
-  def test_successful_post_returns_parsed_body
+  test "successful POST returns parsed body" do
     stub_request(:post, "#{BASE_URL}/transactions")
       .to_return(
         status: 201,
@@ -65,7 +46,7 @@ class LunchMoneyClientBaseTest < Minitest::Test
     assert_equal({ id: 1 }, result)
   end
 
-  def test_successful_put_returns_parsed_body
+  test "successful PUT returns parsed body" do
     stub_request(:put, "#{BASE_URL}/transactions/1")
       .to_return(
         status: 200,
@@ -77,7 +58,7 @@ class LunchMoneyClientBaseTest < Minitest::Test
     assert_equal({ updated: true }, result)
   end
 
-  def test_delete_with_204_returns_nil
+  test "DELETE with 204 returns nil" do
     stub_request(:delete, "#{BASE_URL}/transactions/1")
       .to_return(
         status: 204,
@@ -89,7 +70,7 @@ class LunchMoneyClientBaseTest < Minitest::Test
     assert_nil result
   end
 
-  def test_delete_with_200_returns_parsed_body
+  test "DELETE with 200 returns parsed body" do
     stub_request(:delete, "#{BASE_URL}/transactions/1")
       .to_return(
         status: 200,
@@ -101,7 +82,7 @@ class LunchMoneyClientBaseTest < Minitest::Test
     assert_equal({ deleted: true }, result)
   end
 
-  def test_400_raises_validation_error
+  test "400 raises ValidationError" do
     stub_request(:get, "#{BASE_URL}/categories")
       .to_return(
         status: 400,
@@ -115,7 +96,7 @@ class LunchMoneyClientBaseTest < Minitest::Test
     assert_equal ["field required"], error.errors
   end
 
-  def test_401_raises_authentication_error
+  test "401 raises AuthenticationError" do
     stub_request(:get, "#{BASE_URL}/categories")
       .to_return(
         status: 401,
@@ -127,7 +108,7 @@ class LunchMoneyClientBaseTest < Minitest::Test
     assert_equal 401, error.status_code
   end
 
-  def test_404_raises_not_found_error
+  test "404 raises NotFoundError" do
     stub_request(:get, "#{BASE_URL}/categories/999")
       .to_return(
         status: 404,
@@ -139,7 +120,7 @@ class LunchMoneyClientBaseTest < Minitest::Test
     assert_equal 404, error.status_code
   end
 
-  def test_422_raises_validation_error
+  test "422 raises ValidationError" do
     stub_request(:post, "#{BASE_URL}/transactions")
       .to_return(
         status: 422,
@@ -152,7 +133,7 @@ class LunchMoneyClientBaseTest < Minitest::Test
     assert_equal ["invalid amount"], error.errors
   end
 
-  def test_429_raises_rate_limit_error_with_retry_after
+  test "429 raises RateLimitError with retry_after" do
     stub_request(:get, "#{BASE_URL}/categories")
       .to_return(
         status: 429,
@@ -165,7 +146,7 @@ class LunchMoneyClientBaseTest < Minitest::Test
     assert_equal 30, error.retry_after
   end
 
-  def test_500_raises_server_error
+  test "500 raises ServerError" do
     stub_request(:get, "#{BASE_URL}/categories")
       .to_return(
         status: 500,
@@ -177,7 +158,7 @@ class LunchMoneyClientBaseTest < Minitest::Test
     assert_equal 500, error.status_code
   end
 
-  def test_exception_contains_response_and_rate_limit
+  test "exception contains response and rate_limit" do
     stub_request(:get, "#{BASE_URL}/categories")
       .to_return(
         status: 400,
@@ -192,7 +173,7 @@ class LunchMoneyClientBaseTest < Minitest::Test
     refute_nil error.rate_limit
   end
 
-  def test_rate_limit_updated_after_request
+  test "rate_limit updated after request" do
     stub_request(:get, "#{BASE_URL}/categories")
       .to_return(
         status: 200,
@@ -208,7 +189,7 @@ class LunchMoneyClientBaseTest < Minitest::Test
     assert_equal 99, @client.rate_limit.remaining
   end
 
-  def test_bearer_auth_header_is_sent
+  test "Bearer auth header is sent" do
     stub_request(:get, "#{BASE_URL}/categories")
       .with(headers: { "Authorization" => "Bearer test_api_key" })
       .to_return(

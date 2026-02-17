@@ -1,20 +1,19 @@
 # frozen_string_literal: true
 
-require "minitest/autorun"
-require_relative "../../lib/lunchmoney/configuration"
+require "test_helper"
 
-class LunchMoneyConfigurationTest < Minitest::Test
-  def test_default_base_url
+class LunchMoneyConfigurationTest < ActiveSupport::TestCase
+  test "default base_url" do
     config = LunchMoney::Configuration.new
     assert_equal "https://api.lunchmoney.dev/v2", config.base_url
   end
 
-  def test_default_max_retries
+  test "default max_retries" do
     config = LunchMoney::Configuration.new
     assert_equal 3, config.max_retries
   end
 
-  def test_api_key_defaults_to_env_variable
+  test "api_key defaults to ENV variable" do
     original = ENV["LUNCHMONEY_TOKEN"]
     ENV["LUNCHMONEY_TOKEN"] = "test_token_123"
 
@@ -28,7 +27,7 @@ class LunchMoneyConfigurationTest < Minitest::Test
     end
   end
 
-  def test_api_key_nil_when_env_not_set
+  test "api_key nil when ENV not set" do
     original = ENV["LUNCHMONEY_TOKEN"]
     ENV.delete("LUNCHMONEY_TOKEN")
 
@@ -38,19 +37,19 @@ class LunchMoneyConfigurationTest < Minitest::Test
     ENV["LUNCHMONEY_TOKEN"] = original if original
   end
 
-  def test_api_key_can_be_overridden
+  test "api_key can be overridden" do
     config = LunchMoney::Configuration.new
     config.api_key = "custom_key"
     assert_equal "custom_key", config.api_key
   end
 
-  def test_base_url_can_be_overridden
+  test "base_url can be overridden" do
     config = LunchMoney::Configuration.new
     config.base_url = "https://custom.example.com/v1"
     assert_equal "https://custom.example.com/v1", config.base_url
   end
 
-  def test_max_retries_can_be_overridden
+  test "max_retries can be overridden" do
     config = LunchMoney::Configuration.new
     config.max_retries = 5
     assert_equal 5, config.max_retries
