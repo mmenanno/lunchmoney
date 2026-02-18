@@ -1,46 +1,34 @@
-# typed: strict
 # frozen_string_literal: true
 
-require_relative "transaction_modification_base"
+# AUTO-GENERATED from LunchMoney OpenAPI spec v2.8.5
+# Do not edit manually. Run `toys generate models` to regenerate.
+
+require "json"
 
 module LunchMoney
   module Objects
-    # object used when updating a transaction https://lunchmoney.dev/#update-transaction
-    class UpdateTransaction < TransactionModificationBase
-      sig { returns(T.nilable(String)) }
-      attr_accessor :amount, :currency, :status, :external_id
+    class UpdateTransaction < Base
+      attr_accessor :id, :date, :amount, :currency, :recurring_id, :payee, :original_name,
+                    :category_id, :notes, :manual_account_id, :plaid_account_id,
+                    :tag_ids, :additional_tag_ids, :external_id,
+                    :custom_metadata, :status, :to_base, :is_pending,
+                    :plaid_metadata, :created_at, :updated_at, :is_split_parent,
+                    :children, :split_parent_id, :is_group_parent,
+                    :group_parent_id, :source
 
-      sig { returns(T.nilable(Integer)) }
-      attr_accessor :asset_id, :recurring_id
-
-      sig { returns(T.nilable(T::Array[T.any(String, Integer)])) }
-      attr_accessor :tags
-
-      sig do
-        params(
-          tags: T.nilable(T::Array[T.any(String, Integer)]),
-          category_id: T.nilable(Integer),
-          payee: T.nilable(String),
-          amount: T.nilable(String),
-          currency: T.nilable(String),
-          asset_id: T.nilable(Integer),
-          recurring_id: T.nilable(Integer),
-          notes: T.nilable(String),
-          status: T.nilable(String),
-          external_id: T.nilable(String),
-          date: T.nilable(String),
-        ).void
-      end
-      def initialize(tags: nil, category_id: nil, payee: nil, amount: nil, currency: nil, asset_id: nil,
-        recurring_id: nil, notes: nil, status: nil, external_id: nil, date: nil)
-        super(payee:, date:, category_id:, notes:)
-        @amount = amount
-        @tags = tags
-        @currency = currency
-        @asset_id = asset_id
-        @recurring_id = recurring_id
-        @status = status
-        @external_id = external_id
+      def validate!
+        raise LunchMoney::ClientValidationError, "payee must be at most 140 characters" if payee && payee.to_s.length > 140
+        raise LunchMoney::ClientValidationError, "original_name must be at most 140 characters" if original_name && original_name.to_s.length > 140
+        raise LunchMoney::ClientValidationError, "notes must be at most 350 characters" if notes && notes.to_s.length > 350
+        raise LunchMoney::ClientValidationError, "external_id must be at most 75 characters" if external_id && external_id.to_s.length > 75
+        if custom_metadata && !custom_metadata.is_a?(Hash)
+          raise LunchMoney::ClientValidationError, "custom_metadata must be a Hash"
+        end
+        if custom_metadata && JSON.generate(custom_metadata).length > 4096
+          raise LunchMoney::ClientValidationError, "custom_metadata exceeds 4096 character limit"
+        end
+        raise LunchMoney::ClientValidationError, "status must be one of: reviewed, unreviewed" if status && !["reviewed", "unreviewed"].include?(status)
+        raise LunchMoney::ClientValidationError, "source must be one of: api, csv, manual, merge, plaid, recurring, rule, split, user" if source && !["api", "csv", "manual", "merge", "plaid", "recurring", "rule", "split", "user"].include?(source)
       end
     end
   end

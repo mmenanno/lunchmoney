@@ -6,6 +6,4 @@ expand :gem_build, name: "install", install_gem: true
 expand :gem_build, name: "release", push_gem: true
 
 alias_tool :style, :rubocop
-alias_tool :tapioca, :rbi
-alias_tool :tc, :typecheck
 alias_tool :cov, :coverage

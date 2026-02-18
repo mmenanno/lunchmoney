@@ -1,4 +1,3 @@
-# typed: strict
 # frozen_string_literal: true
 
 require "test_helper"
@@ -6,200 +5,73 @@ require "test_helper"
 module LunchMoney
   module Calls
     class CategoriesTest < ActiveSupport::TestCase
-      include MockResponseHelper
-      include VcrHelper
+      include LunchMoneyStubHelper
+      include FixtureHelper
 
-      test "categories returns an array of Category objects on success response" do
-        with_real_ci_connections do
-          VCR.use_cassette("categories/categories_success") do
-            api_call = LunchMoney::Calls::Categories.new.categories
-
-            api_call.each do |category|
-              assert_kind_of(LunchMoney::Objects::Category, category)
-            end
-          end
-        end
+      setup do
+        @api = LunchMoney::Api.new(api_key: "test_api_key")
       end
 
-      test "categories returns an array of Error objects on error response" do
-        response = mock_faraday_lunchmoney_error_response
-        LunchMoney::Calls::Categories.any_instance.stubs(:get).returns(response)
+      test "categories returns an array of Category objects" do
+        stub_lunchmoney(:get, "/categories", response: "categories/list_flattened_response")
 
-        api_call = LunchMoney::Calls::Categories.new.categories(format: "flattened")
+        result = @api.categories
 
-        assert_kind_of(LunchMoney::Errors, api_call)
+        assert_kind_of Array, result
+        assert result.all? { |c| c.is_a?(LunchMoney::Objects::Category) }
+        assert_equal 5, result.length
       end
 
-      test "categories does not raise an error when called with flattened format" do
-        with_real_ci_connections do
-          query_params = { format: "flattened" }
+      test "category returns a single Category" do
+        stub_lunchmoney(:get, "/categories/315174", response: "categories/get_category")
 
-          VCR.use_cassette("categories/categories_flattened_success") do
-            assert_nothing_raised do
-              LunchMoney::Calls::Categories.new.categories(**query_params)
-            end
-          end
-        end
+        result = @api.category(315174)
+
+        assert_instance_of LunchMoney::Objects::Category, result
+        assert_equal 315174, result.id
+        assert_equal "Fuel", result.name
+        assert_equal "Fuel and gas expenses", result.description
+        assert_equal false, result.is_income
+        assert_equal 86, result.group_id
       end
 
-      test "categories does not raise an error when called with nested format" do
-        with_real_ci_connections do
-          query_params = { format: "nested" }
+      test "category raises NotFoundError on 404" do
+        stub_lunchmoney_error(:get, "/categories/999999", status: 404, message: "Not found")
 
-          VCR.use_cassette("categories/categories_nested_success") do
-            assert_nothing_raised do
-              LunchMoney::Calls::Categories.new.categories(**query_params)
-            end
-          end
-        end
+        error = assert_raises(LunchMoney::NotFoundError) { @api.category(999999) }
+
+        assert_equal 404, error.status_code
+        assert_equal "Not found", error.message
       end
 
-      test "categories raises an exception when called with invalid format" do
-        query_params = { format: "not_a_valid_format" }
+      test "create_category returns created Category" do
+        stub_lunchmoney(:post, "/categories", response: "categories/create_category")
 
-        error = assert_raises(LunchMoney::InvalidQueryParameter) do
-          LunchMoney::Calls::Categories.new.categories(**query_params)
-        end
+        result = @api.create_category(name: "API Created Category", description: "Test description of created category")
 
-        assert_equal("format must be either flattened or nested", error.message)
+        assert_instance_of LunchMoney::Objects::Category, result
+        assert_equal 90, result.id
+        assert_equal "API Created Category", result.name
+        assert_equal true, result.exclude_from_budget
       end
 
-      test "category returns a Category object on success response with regular category" do
-        with_real_ci_connections do
-          VCR.use_cassette("categories/category_category_success") do
-            api_call = LunchMoney::Calls::Categories.new.category(777052)
+      test "update_category returns updated Category" do
+        stub_lunchmoney(:put, "/categories/83", response: "categories/update_category")
 
-            assert_kind_of(LunchMoney::Objects::Category, api_call)
-          end
-        end
+        result = @api.update_category(83, name: "Updated Category Name")
+
+        assert_instance_of LunchMoney::Objects::Category, result
+        assert_equal 83, result.id
+        assert_equal "Updated Category Name", result.name
+        assert_equal true, result.exclude_from_totals
       end
 
-      test "category returns a Category object on success response with category group" do
-        with_real_ci_connections do
-          VCR.use_cassette("categories/category_category_group_success") do
-            api_call = LunchMoney::Calls::Categories.new.category(777021)
+      test "delete_category returns nil on 204" do
+        stub_lunchmoney(:delete, "/categories/83", status: 204, body: nil)
 
-            assert_kind_of(LunchMoney::Objects::Category, api_call)
-          end
-        end
-      end
+        result = @api.delete_category(83)
 
-      test "category returns an array of Error objects on error response" do
-        with_real_ci_connections do
-          VCR.use_cassette("categories/category_does_not_exist_failure") do
-            api_call = LunchMoney::Calls::Categories.new.category(1)
-
-            assert_kind_of(LunchMoney::Errors, api_call)
-          end
-        end
-      end
-
-      test "create_category returns an id of created category success response" do
-        VCR.use_cassette("categories/create_category_success") do
-          api_call = LunchMoney::Calls::Categories.new.create_category(name: "Create Category Test")
-
-          assert_kind_of(Integer, api_call[:category_id])
-        end
-      end
-
-      test "create_category returns an array of Error objects on error response" do
-        response = mock_faraday_lunchmoney_error_response
-        LunchMoney::Calls::Categories.any_instance.stubs(:post).returns(response)
-
-        api_call = LunchMoney::Calls::Categories.new.create_category(name: "Create Category Test")
-
-        assert_kind_of(LunchMoney::Errors, api_call)
-      end
-
-      test "create_category_group returns anid of created category group on success response" do
-        VCR.use_cassette("categories/create_category_group_success") do
-          api_call = LunchMoney::Calls::Categories.new.create_category_group(name: "Create Category Group Test")
-
-          assert_kind_of(Integer, api_call[:category_id])
-        end
-      end
-
-      test "create_category_group returns an array of Error objects on error response" do
-        response = mock_faraday_lunchmoney_error_response
-        LunchMoney::Calls::Categories.any_instance.stubs(:post).returns(response)
-
-        api_call = LunchMoney::Calls::Categories.new.create_category_group(name: "Create Category Group Test")
-
-        assert_kind_of(LunchMoney::Errors, api_call)
-      end
-
-      test "update_category returns a boolean on success response" do
-        VCR.use_cassette("categories/update_category_success") do
-          api_call = LunchMoney::Calls::Categories.new.update_category(1445992, name: "Update Category Test")
-
-          assert_includes([TrueClass, FalseClass], api_call.class)
-        end
-      end
-
-      test "update_category returns an array of Error objects on error response" do
-        response = mock_faraday_lunchmoney_error_response
-        LunchMoney::Calls::Categories.any_instance.stubs(:put).returns(response)
-
-        api_call = LunchMoney::Calls::Categories.new.update_category(784587, name: "Update Category Test")
-
-        assert_kind_of(LunchMoney::Errors, api_call)
-      end
-
-      test "add_to_category_group returns a Category object on success response" do
-        VCR.use_cassette("categories/add_to_category_group_success") do
-          api_call = LunchMoney::Calls::Categories.new.add_to_category_group(
-            1445993,
-            new_categories: ["New Category Test"],
-          )
-
-          assert_kind_of(LunchMoney::Objects::Category, api_call)
-        end
-      end
-
-      test "add_to_category_group returns an array of Error objects on error response" do
-        response = mock_faraday_lunchmoney_error_response
-        LunchMoney::Calls::Categories.any_instance.stubs(:post).returns(response)
-
-        api_call = LunchMoney::Calls::Categories.new.add_to_category_group(
-          1445993,
-          new_categories: ["New Category Test"],
-        )
-
-        assert_kind_of(LunchMoney::Errors, api_call)
-      end
-
-      test "delete_category returns a boolean on success response" do
-        VCR.use_cassette("categories/delete_category_success") do
-          api_call = LunchMoney::Calls::Categories.new.delete_category(1445992)
-
-          assert_includes([TrueClass, FalseClass], api_call.class)
-        end
-      end
-
-      test "delete_category returns an array of Error objects on error response" do
-        response = mock_faraday_lunchmoney_error_response
-        LunchMoney::Calls::Categories.any_instance.stubs(:delete).returns(response)
-
-        api_call = LunchMoney::Calls::Categories.new.delete_category(784587)
-
-        assert_kind_of(LunchMoney::Errors, api_call)
-      end
-
-      test "force_delete_category returns a boolean on success response" do
-        VCR.use_cassette("categories/force_delete_category_success") do
-          api_call = LunchMoney::Calls::Categories.new.force_delete_category(1446014)
-
-          assert_includes([TrueClass, FalseClass], api_call.class)
-        end
-      end
-
-      test "force_delete_category returns an array of Error objects on error response" do
-        response = mock_faraday_lunchmoney_error_response
-        LunchMoney::Calls::Categories.any_instance.stubs(:delete).returns(response)
-
-        api_call = LunchMoney::Calls::Categories.new.force_delete_category(784588)
-
-        assert_kind_of(LunchMoney::Errors, api_call)
+        assert_nil result
       end
     end
   end

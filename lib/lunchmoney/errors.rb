@@ -1,35 +1,37 @@
-# typed: strict
 # frozen_string_literal: true
 
 module LunchMoney
-  # This class is used to represent errors returned directly from the LunchMoney API. This class has been set up to act
-  # like an array, delegating a lot of common array getter methods directly to messages for you.
-  # @example
-  #   api = LunchMoney::Api.new
-  #   response = api.categories
-  #
-  #   response.class
-  #   => LunchMoney::Errors
-  #
-  #   response.first
-  #   => "Some error returned by the API"
-  #
-  #   response.empty?
-  #   => false
-  #
-  #   response[0]
-  #   => "Some error returned by the API"
-  class Errors
-    sig { returns(T::Array[String]) }
-    attr_accessor :messages
+  class Error < StandardError; end
 
-    sig { params(message: T.nilable(String)).void }
-    def initialize(message: nil)
-      @messages = T.let([], T::Array[String])
+  class ApiError < Error
+    attr_reader :status_code, :message, :errors, :response, :rate_limit
 
-      @messages << message unless message.nil?
+    def initialize(status_code:, message:, errors: [], response: nil, rate_limit: nil)
+      @status_code = status_code
+      @message = message
+      @errors = errors
+      @response = response
+      @rate_limit = rate_limit
+      super(message)
     end
-
-    delegate :[], :<<, :each, :to_a, :first, :last, :empty?, :present?, to: :@messages
   end
+
+  class AuthenticationError < ApiError; end
+  class NotFoundError < ApiError; end
+  class ValidationError < ApiError; end
+
+  class RateLimitError < ApiError
+    attr_reader :retry_after
+
+    def initialize(retry_after: nil, **kwargs)
+      @retry_after = retry_after
+      super(**kwargs)
+    end
+  end
+
+  class ServerError < ApiError; end
+
+  class ClientValidationError < Error; end
+  class ConfigurationError < Error; end
+  class InvalidApiKey < ConfigurationError; end
 end

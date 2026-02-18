@@ -1,210 +1,96 @@
-# typed: strict
 # frozen_string_literal: true
-
-require_relative "../objects/child_transaction"
-require_relative "../objects/transaction"
-require_relative "../objects/split"
-require_relative "../objects/update_transaction"
 
 module LunchMoney
   module Calls
-    # https://lunchmoney.dev/#transactions
-    class Transactions < LunchMoney::Calls::Base
-      sig do
-        params(
-          tag_id: T.nilable(Integer),
-          recurring_id: T.nilable(Integer),
-          plaid_account_id: T.nilable(Integer),
-          category_id: T.nilable(Integer),
-          asset_id: T.nilable(Integer),
-          is_group: T.nilable(T::Boolean),
-          status: T.nilable(String),
-          start_date: T.nilable(String),
-          end_date: T.nilable(String),
-          debit_as_negative: T.nilable(T::Boolean),
-          pending: T.nilable(T::Boolean),
-          offset: T.nilable(Integer),
-          limit: T.nilable(Integer),
-        ).returns(T.any(T::Array[LunchMoney::Objects::Transaction], LunchMoney::Errors))
+    module Transactions
+      include Base
+
+      # Fetch a single page of transactions.
+      #
+      # @param start_date [String] ISO 8601 date
+      # @param end_date [String] ISO 8601 date
+      # @param limit [Integer] 1-2000, default 1000
+      # @param offset [Integer] default 0
+      # @param filters [Hash] optional filters (tag_id:, recurring_id:, category_id:,
+      #   plaid_account_id:, manual_account_id:, status:, is_group_parent:)
+      # @return [Hash] { transactions: Array<Transaction>, has_more: Boolean }
+      def transactions_page(start_date:, end_date:, limit: 1000, offset: 0, **filters)
+        params = { start_date:, end_date:, limit:, offset:, **filters }.compact
+        data = get("/transactions", params: params)
+        {
+          transactions: build_collection(Objects::Transaction, data, key: :transactions),
+          has_more: data[:has_more],
+        }
       end
-      def transactions(
-        tag_id: nil,
-        recurring_id: nil,
-        plaid_account_id: nil,
-        category_id: nil,
-        asset_id: nil,
-        is_group: nil,
-        status: nil,
-        start_date: nil,
-        end_date: nil,
-        debit_as_negative: nil,
-        pending: nil,
-        offset: nil,
-        limit: nil
-      )
-        params = clean_params({
-          tag_id:,
-          recurring_id:,
-          plaid_account_id:,
-          category_id:,
-          asset_id:,
-          is_group:,
-          status:,
-          start_date:,
-          end_date:,
-          debit_as_negative:,
-          pending:,
-          offset:,
-          limit:,
-        })
-        response = get("transactions", query_params: params)
 
-        handle_api_response(response) do |body|
-          body[:transactions].map do |transaction|
-            transaction[:tags].map! { |tag| LunchMoney::Objects::TagBase.new(**tag) }
+      # List transactions with auto-pagination.
+      #
+      # Returns a lazy Enumerable that fetches pages on demand as you iterate.
+      # Supports `.lazy`, `.first(n)`, `.take(n)`, etc.
+      #
+      # @param start_date [String] ISO 8601 date
+      # @param end_date [String] ISO 8601 date
+      # @param filters [Hash] optional filters
+      # @return [LunchMoney::Client::Pagination]
+      def transactions(start_date:, end_date:, **filters)
+        Client::Pagination.new(client: self, params: { start_date:, end_date:, **filters })
+      end
 
-            transaction[:children]&.map! do |child_transaction|
-              LunchMoney::Objects::ChildTransaction.new(**child_transaction)
-            end
+      # Get a single transaction by ID.
+      #
+      # @param id [Integer]
+      # @return [LunchMoney::Objects::Transaction]
+      # @raise [LunchMoney::NotFoundError]
+      def transaction(id)
+        data = get("/transactions/#{id}")
+        build_object(Objects::Transaction, data)
+      end
 
-            LunchMoney::Objects::Transaction.new(**transaction)
-          end
+      # Create a single transaction (convenience wrapper).
+      #
+      # @param attrs [Hash] transaction attributes (date:, amount:, payee:, category_id:, etc.)
+      # @return [LunchMoney::Objects::Transaction]
+      def create_transaction(**attrs)
+        txn = Objects::InsertTransaction.new(**attrs)
+        txn.validate!
+        data = post("/transactions", body: { transactions: [txn.serialize] })
+        build_collection(Objects::Transaction, data, key: :transactions).first
+      end
+
+      # Create multiple transactions.
+      #
+      # @param transactions [Array<InsertTransaction, Hash>]
+      # @param options [Hash] apply_rules:, skip_duplicates:, check_for_recurring:, skip_balance_update:
+      # @return [LunchMoney::Objects::InsertTransactionsResponse]
+      def create_transactions(transactions, **options)
+        txns = transactions.map do |t|
+          txn = t.is_a?(Objects::InsertTransaction) ? t : Objects::InsertTransaction.new(**t)
+          txn.validate!
+          txn
         end
+        body = { transactions: txns.map(&:serialize), **options }.compact
+        data = post("/transactions", body: body)
+        build_object(Objects::InsertTransactionsResponse, data)
       end
 
-      sig do
-        params(
-          transaction_id: Integer,
-          debit_as_negative: T.nilable(T::Boolean),
-        ).returns(T.any(LunchMoney::Objects::Transaction, LunchMoney::Errors))
-      end
-      def transaction(transaction_id, debit_as_negative: nil)
-        params = clean_params({ debit_as_negative: })
-        response = get("transactions/#{transaction_id}", query_params: params)
-
-        handle_api_response(response) do |body|
-          LunchMoney::Objects::Transaction.new(**body)
-        end
+      # Update a transaction.
+      #
+      # @param id [Integer]
+      # @param attrs [Hash] attributes to update
+      # @return [LunchMoney::Objects::Transaction]
+      def update_transaction(id, **attrs)
+        txn = Objects::UpdateTransaction.new(**attrs)
+        txn.validate!
+        data = put("/transactions/#{id}", body: txn.serialize)
+        build_object(Objects::Transaction, data)
       end
 
-      sig do
-        params(
-          transactions: T::Array[LunchMoney::Objects::UpdateTransaction],
-          apply_rules: T.nilable(T::Boolean),
-          skip_duplicates: T.nilable(T::Boolean),
-          check_for_recurring: T.nilable(T::Boolean),
-          debit_as_negative: T.nilable(T::Boolean),
-          skip_balance_update: T.nilable(T::Boolean),
-        ).returns(T.any(T::Hash[Symbol, T::Array[Integer]], LunchMoney::Errors))
-      end
-      def insert_transactions(transactions, apply_rules: nil, skip_duplicates: nil,
-        check_for_recurring: nil, debit_as_negative: nil, skip_balance_update: nil)
-        params = clean_params({
-          transactions: transactions.map(&:serialize),
-          apply_rules:,
-          skip_duplicates:,
-          check_for_recurring:,
-          debit_as_negative:,
-          skip_balance_update:,
-        })
-        response = post("transactions", params)
-
-        handle_api_response(response) do |body|
-          body
-        end
-      end
-
-      sig do
-        params(
-          transaction_id: Integer,
-          transaction: T.nilable(LunchMoney::Objects::UpdateTransaction),
-          split: T.nilable(T::Array[LunchMoney::Objects::Split]),
-          debit_as_negative: T.nilable(T::Boolean),
-          skip_balance_update: T.nilable(T::Boolean),
-        ).returns(T.any({ updated: T::Boolean, split: T.nilable(T::Array[Integer]) }, LunchMoney::Errors))
-      end
-      def update_transaction(transaction_id, transaction: nil, split: nil,
-        debit_as_negative: nil, skip_balance_update: nil)
-        raise(
-          LunchMoney::MissingArgument,
-          "Either a transaction or split must be provided",
-        ) if transaction.nil? && split.nil?
-
-        params = clean_params({
-          transaction: transaction&.serialize,
-          split: split&.map!(&:serialize),
-          debit_as_negative:,
-          skip_balance_update:,
-        })
-        response = put("transactions/#{transaction_id}", params)
-
-        handle_api_response(response) do |body|
-          body
-        end
-      end
-
-      sig do
-        params(
-          parent_ids: T::Array[Integer],
-          remove_parents: T.nilable(T::Boolean),
-        ).returns(T.any(T::Array[Integer], LunchMoney::Errors))
-      end
-      def unsplit_transaction(parent_ids, remove_parents: false)
-        params = { parent_ids:, remove_parents: }
-        response = post("transactions/unsplit", params)
-
-        handle_api_response(response) do |body|
-          body
-        end
-      end
-
-      sig { params(transaction_id: Integer).returns(T.any(LunchMoney::Objects::Transaction, LunchMoney::Errors)) }
-      def transaction_group(transaction_id)
-        response = get("transactions/group", query_params: { transaction_id: })
-
-        handle_api_response(response) do |body|
-          LunchMoney::Objects::Transaction.new(**body)
-        end
-      end
-
-      sig do
-        params(
-          date: String,
-          payee: String,
-          transactions: T::Array[T.any(Integer, String)],
-          category_id: T.nilable(Integer),
-          notes: T.nilable(String),
-          tags: T.nilable(T::Array[T.any(Integer, String)]),
-        ).returns(T.any(Integer, LunchMoney::Errors))
-      end
-      def create_transaction_group(date:, payee:, transactions:, category_id: nil, notes: nil, tags: nil)
-        params = clean_params({
-          date:,
-          payee:,
-          transactions:,
-          category_id:,
-          notes:,
-          tags:,
-        })
-        response = post("transactions/group", params)
-
-        handle_api_response(response) do |body|
-          body
-        end
-      end
-
-      sig do
-        params(transaction_id: T.any(
-          String,
-          Integer,
-        )).returns(T.any(T::Hash[Symbol, T::Array[Integer]], LunchMoney::Errors))
-      end
-      def delete_transaction_group(transaction_id)
-        response = delete("transactions/group/#{transaction_id}")
-
-        handle_api_response(response) do |body|
-          body
-        end
+      # Delete a transaction. New in v2.
+      #
+      # @param id [Integer]
+      # @return [nil]
+      def delete_transaction(id)
+        delete("/transactions/#{id}")
       end
     end
   end

@@ -1,0 +1,83 @@
+{
+  "transactions": [
+    {
+      "id": 2112150654,
+      "date": "2025-06-24",
+      "amount": "21.9800",
+      "currency": "usd",
+      "to_base": 21.98,
+      "recurring_id": null,
+      "payee": "Noodle House",
+      "category_id": 315162,
+      "notes": "Treat restaurants the same as groceries",
+      "status": "reviewed",
+      "is_pending": false,
+      "created_at": "2025-06-24T17:00:06.192Z",
+      "updated_at": "2025-06-24T17:00:06.192Z",
+      "is_split_parent": false,
+      "split_parent_id": null,
+      "is_group_parent": false,
+      "group_parent_id": null,
+      "manual_account_id": null,
+      "plaid_account_id": 119805,
+      "tag_ids": [
+        94317
+      ],
+      "source": "plaid",
+      "external_id": null,
+      "custom_metadata": null
+    },
+    {
+      "id": 2112150649,
+      "date": "2025-06-18",
+      "amount": "4.1300",
+      "currency": "usd",
+      "to_base": 4.13,
+      "recurring_id": 994081,
+      "payee": "Holey Donuts",
+      "category_id": 315162,
+      "notes": "Treat restaurants the same as groceries",
+      "status": "reviewed",
+      "is_pending": false,
+      "created_at": "2025-06-18T17:00:06.192Z",
+      "updated_at": "2025-06-18T17:00:06.192Z",
+      "is_split_parent": false,
+      "split_parent_id": null,
+      "is_group_parent": false,
+      "group_parent_id": null,
+      "manual_account_id": null,
+      "plaid_account_id": null,
+      "tag_ids": [
+        94317
+      ],
+      "source": "csv",
+      "external_id": null,
+      "custom_metadata": null
+    },
+    {
+      "id": 2112140372,
+      "date": "2025-06-12",
+      "amount": "50.00",
+      "currency": "usd",
+      "to_base": 50,
+      "recurring_id": null,
+      "payee": "Starbucks",
+      "category_id": 315162,
+      "notes": "Treat restaurants the same as groceries",
+      "status": "reviewed",
+      "is_pending": false,
+      "created_at": "2025-06-12T17:00:06.192Z",
+      "updated_at": "2025-06-12T17:00:06.733Z",
+      "is_split_parent": false,
+      "split_parent_id": null,
+      "is_group_parent": false,
+      "group_parent_id": null,
+      "manual_account_id": null,
+      "plaid_account_id": 119807,
+      "tag_ids": [],
+      "source": "plaid",
+      "external_id": null,
+      "custom_metadata": null
+    }
+  ]
+}
