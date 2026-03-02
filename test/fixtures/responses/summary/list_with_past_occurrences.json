@@ -1,0 +1,62 @@
+{
+  "aligned": true,
+  "categories": [
+    {
+      "category_id": 315177,
+      "totals": {
+        "other_activity": 156.64,
+        "recurring_activity": 0,
+        "budgeted": 500,
+        "available": 343.36,
+        "recurring_remaining": 0,
+        "recurring_expected": 0
+      },
+      "occurrences": [
+        {
+          "in_range": false,
+          "start_date": "2025-04-01",
+          "end_date": "2025-04-30",
+          "other_activity": 120.5,
+          "recurring_activity": 0,
+          "budgeted": 500,
+          "budgeted_amount": "500.0000",
+          "budgeted_currency": "usd",
+          "notes": "Monthly budget allocation"
+        },
+        {
+          "in_range": false,
+          "start_date": "2025-05-01",
+          "end_date": "2025-05-31",
+          "other_activity": 180.25,
+          "recurring_activity": 0,
+          "budgeted": 500,
+          "budgeted_amount": "500.0000",
+          "budgeted_currency": "usd",
+          "notes": null
+        },
+        {
+          "in_range": false,
+          "start_date": "2025-06-01",
+          "end_date": "2025-06-30",
+          "other_activity": 200.0,
+          "recurring_activity": 0,
+          "budgeted": 500,
+          "budgeted_amount": "500.0000",
+          "budgeted_currency": "usd",
+          "notes": "Adjusted for seasonal spending"
+        },
+        {
+          "in_range": true,
+          "start_date": "2025-07-01",
+          "end_date": "2025-07-31",
+          "other_activity": 156.64,
+          "recurring_activity": 0,
+          "budgeted": 500,
+          "budgeted_amount": "500.0000",
+          "budgeted_currency": "usd",
+          "notes": "Monthly budget allocation"
+        }
+      ]
+    }
+  ]
+}

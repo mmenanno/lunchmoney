@@ -1,0 +1,55 @@
+{
+  "aligned": true,
+  "categories": [
+    {
+      "category_id": 315177,
+      "totals": {
+        "other_activity": 156.64,
+        "recurring_activity": 0,
+        "budgeted": 500,
+        "available": 343.36,
+        "recurring_remaining": 0,
+        "recurring_expected": 0
+      },
+      "occurrences": [
+        {
+          "in_range": true,
+          "start_date": "2025-07-01",
+          "end_date": "2025-07-31",
+          "other_activity": 156.64,
+          "recurring_activity": 0,
+          "budgeted": 500,
+          "budgeted_amount": "500.0000",
+          "budgeted_currency": "usd",
+          "notes": "Monthly budget allocation"
+        }
+      ],
+      "rollover_pool": {
+        "budgeted_to_base": 179.5,
+        "all_adjustments": [
+          {
+            "in_range": false,
+            "date": "2025-06-30",
+            "amount": "179.5000",
+            "currency": "usd",
+            "to_base": 179.5
+          },
+          {
+            "in_range": false,
+            "date": "2025-05-31",
+            "amount": "120.2500",
+            "currency": "usd",
+            "to_base": 120.25
+          },
+          {
+            "in_range": false,
+            "date": "2025-04-30",
+            "amount": "80.0000",
+            "currency": "usd",
+            "to_base": 80.0
+          }
+        ]
+      }
+    }
+  ]
+}

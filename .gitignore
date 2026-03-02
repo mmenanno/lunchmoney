@@ -60,3 +60,7 @@ build-iPhoneSimulator/
 
 # macOS Files
 .DS_Store
+
+# Local planning docs
+/docs/plans/
+/docs/plan/

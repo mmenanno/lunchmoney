@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.version                = LunchMoney::VERSION
   spec.author                 = "@mmenanno"
 
-  spec.summary                = "LunchMoney API client library."
+  spec.summary                = "Ruby client for the LunchMoney v2 API."
   spec.homepage               = "https://github.com/mmenanno/lunchmoney"
   spec.required_ruby_version  = ">= 3.2"
   spec.license = "MIT"
@@ -15,8 +15,8 @@ Gem::Specification.new do |spec|
   spec.metadata["allowed_push_host"]  = "https://rubygems.org"
   spec.metadata["homepage_uri"]       = spec.homepage
   spec.metadata["source_code_uri"]    = spec.homepage
-  spec.metadata["documentation_uri"]  = "https://mmenanno.github.io/lunchmoney/"
-  spec.metadata["changelog_uri"]      = "#{spec.homepage}/releases"
+  spec.metadata["documentation_uri"]  = spec.homepage
+  spec.metadata["changelog_uri"]      = "#{spec.homepage}/blob/main/CHANGELOG.md"
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
@@ -29,6 +29,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency("activesupport", ">= 6.1")
-  spec.add_dependency("faraday", ">= 1.0.0")
-  spec.add_dependency("sorbet-runtime", ">= 0.5")
+  spec.add_dependency("faraday", ">= 2.0")
+  spec.add_dependency("faraday-multipart", "~> 1.0")
+  spec.add_dependency("faraday-retry", "~> 2.0")
 end

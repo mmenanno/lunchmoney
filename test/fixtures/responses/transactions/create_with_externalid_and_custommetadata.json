@@ -1,0 +1,42 @@
+{
+  "transactions": [
+    {
+      "id": 123456789,
+      "date": "2024-12-01",
+      "amount": "19.99",
+      "currency": "usd",
+      "to_base": 19.99,
+      "recurring_id": null,
+      "payee": "Test Payee 3",
+      "category_id": null,
+      "notes": "API Test created Transaction",
+      "status": "unreviewed",
+      "is_pending": false,
+      "created_at": "2024-11-20T16:15:19.475Z",
+      "updated_at": "2024-11-20T16:15:19.475Z",
+      "split_parent_id": null,
+      "is_group_parent": false,
+      "group_parent_id": null,
+      "manual_account_id": 219807,
+      "plaid_account_id": null,
+      "tag_ids": [],
+      "source": "api",
+      "external_id": "A658214",
+      "custom_metadata": {
+        "note": "API Test Added Custom MetaData",
+        "testNumber": 42,
+        "testBool": false,
+        "testArray": [
+          1,
+          "foo",
+          false,
+          42.42
+        ],
+        "testObject": {
+          "foo": "bar"
+        }
+      }
+    }
+  ],
+  "skipped_duplicates": []
+}

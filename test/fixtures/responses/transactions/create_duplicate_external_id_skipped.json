@@ -1,0 +1,56 @@
+{
+  "transactions": [
+    {
+      "id": 123456789,
+      "date": "2024-12-01",
+      "amount": "19.99",
+      "currency": "usd",
+      "to_base": 19.99,
+      "recurring_id": null,
+      "payee": "Test Payee 3",
+      "category_id": null,
+      "notes": "API Test created Transaction with new external_id",
+      "status": "unreviewed",
+      "is_pending": false,
+      "created_at": "2025-07-18T14:15:23.159Z",
+      "updated_at": "2025-07-18T14:15:23.159Z",
+      "split_parent_id": null,
+      "is_group_parent": false,
+      "group_parent_id": null,
+      "manual_account_id": 219807,
+      "plaid_account_id": null,
+      "tag_ids": [],
+      "source": "api",
+      "external_id": "A658214",
+      "custom_metadata": {
+        "note": "API Test Added Custom MetaData",
+        "testNumber": 42,
+        "testBool": false,
+        "testArray": [
+          1,
+          "foo",
+          false,
+          42.42
+        ],
+        "testObject": {
+          "foo": "bar"
+        }
+      }
+    }
+  ],
+  "skipped_duplicates": [
+    {
+      "reason": "duplicate_external_id",
+      "request_transactions_index": 1,
+      "existing_transaction_id": 2112150651,
+      "request_transaction": {
+        "date": "2025-06-20",
+        "amount": "250.0000",
+        "payee": "Fidelity",
+        "manual_account_id": 219807,
+        "external_id": "12345",
+        "notes": "API Test created Transaction with duplicate external_id"
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "id": 90,
+  "name": "API Created Category",
+  "description": "Test description of created category",
+  "is_income": false,
+  "exclude_from_budget": true,
+  "exclude_from_totals": false,
+  "updated_at": "2025-05-26T19:56:52.699Z",
+  "created_at": "2025-05-26T19:56:52.699Z",
+  "is_group": false,
+  "group_id": null,
+  "archived": false,
+  "archived_at": null,
+  "order": null,
+  "collapsed": false
+}

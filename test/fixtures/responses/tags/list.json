@@ -1,0 +1,37 @@
+{
+  "tags": [
+    {
+      "id": 94317,
+      "name": "Penny's",
+      "description": "For transactions not related to Lenny",
+      "updated_at": "2025-02-28T09:49:03.238Z",
+      "created_at": "2025-01-28T09:49:03.238Z",
+      "text_color": "333",
+      "background_color": "FFE7D4",
+      "archived": false,
+      "archived_at": null
+    },
+    {
+      "id": 94318,
+      "name": "Road Trip",
+      "description": "",
+      "updated_at": "2025-02-28T09:50:03.238Z",
+      "created_at": "2025-01-28T09:50:03.238Z",
+      "text_color": "333",
+      "background_color": "CFF4F3",
+      "archived": false,
+      "archived_at": null
+    },
+    {
+      "id": 94319,
+      "name": "Date Night",
+      "description": "",
+      "updated_at": "2025-02-28T09:59:03.238Z",
+      "created_at": "2025-01-28T10:02:03.238Z",
+      "text_color": "333",
+      "background_color": "D7F5CC",
+      "archived": false,
+      "archived_at": null
+    }
+  ]
+}

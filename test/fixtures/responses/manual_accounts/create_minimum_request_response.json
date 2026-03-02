@@ -1,0 +1,19 @@
+{
+  "id": 119999,
+  "name": "API created Account",
+  "institution_name": null,
+  "display_name": null,
+  "type": "cash",
+  "subtype": null,
+  "balance": "100",
+  "currency": "usd",
+  "to_base": 100,
+  "balance_as_of": "2024-10-06T18:55:08.599Z",
+  "status": "active",
+  "closed_on": null,
+  "external_id": null,
+  "exclude_from_transactions": false,
+  "created_by_name": "User 1",
+  "created_at": "2024-10-06T18:55:08.599Z",
+  "updated_at": "2024-10-06T18:55:08.599Z"
+}

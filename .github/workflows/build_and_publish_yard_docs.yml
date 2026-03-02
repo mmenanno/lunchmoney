@@ -48,7 +48,7 @@ jobs:
           if bundle exec yard --version >/dev/null 2>&1; then
             bundle exec yard doc -o doc --markup markdown
           else
-            gem install yard yard-sorbet
+            gem install yard
             yard doc -o doc --markup markdown
           fi
 

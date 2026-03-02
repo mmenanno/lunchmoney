@@ -1,0 +1,43 @@
+{
+  "id": 2112150655,
+  "date": "2025-05-28",
+  "amount": "1250.8400",
+  "currency": "usd",
+  "to_base": 1250.84,
+  "recurring_id": 994069,
+  "payee": "Paycheck",
+  "original_name": "DIRECT DEPOSIT PAYROLL",
+  "category_id": null,
+  "notes": null,
+  "status": "pending",
+  "is_pending": true,
+  "created_at": "2025-05-28T17:00:06.192Z",
+  "updated_at": "2025-05-28T17:00:06.733Z",
+  "is_split_parent": false,
+  "split_parent_id": null,
+  "is_group_parent": false,
+  "group_parent_id": null,
+  "manual_account_id": null,
+  "plaid_account_id": 119806,
+  "tag_ids": [
+    94317
+  ],
+  "source": "plaid",
+  "external_id": null,
+  "custom_metadata": null,
+  "plaid_metadata": {
+    "note": "This is an artificially constructed example of metadata",
+    "account_id": "9DYYMLBoaxIqRkAOKaVDuaPZrmE5qJhVxyZyv",
+    "account_owner": null,
+    "amount": "1250.8400",
+    "authorized_datetime": "2025-05-28T17:00:06.192Z",
+    "counterparties": [
+      {
+        "confidence_level": "LOW",
+        "entity_id": null,
+        "logo_url": null,
+        "name": "Employers Inc."
+      }
+    ]
+  }
+}

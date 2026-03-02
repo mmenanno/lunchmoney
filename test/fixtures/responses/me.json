@@ -1,0 +1,9 @@
+{
+  "name": "User 1",
+  "email": "user-1@lunchmoney.dev",
+  "id": 18328,
+  "account_id": 18221,
+  "budget_name": "\\U0001F3E0 Family budget",
+  "primary_currency": "usd",
+  "api_key_label": "Side project dev key"
+}

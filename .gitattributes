@@ -1,0 +1,4 @@
+# Mark auto-generated files so GitHub collapses them in diffs
+openapi/v2.yaml linguist-generated=true
+lib/lunchmoney/objects/**/*.rb linguist-generated=true
+test/fixtures/responses/**/*.json linguist-generated=true

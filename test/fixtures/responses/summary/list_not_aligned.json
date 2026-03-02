@@ -1,0 +1,82 @@
+{
+  "aligned": false,
+  "categories": [
+    {
+      "category_id": 315177,
+      "totals": {
+        "other_activity": 156.64,
+        "recurring_activity": 0,
+        "budgeted": 400,
+        "available": 243.36,
+        "recurring_remaining": 0,
+        "recurring_expected": 0
+      }
+    },
+    {
+      "category_id": 315628,
+      "totals": {
+        "other_activity": 424.8,
+        "recurring_activity": 0,
+        "budgeted": null,
+        "available": null,
+        "recurring_remaining": 0,
+        "recurring_expected": 0
+      }
+    },
+    {
+      "category_id": 78,
+      "totals": {
+        "other_activity": 0,
+        "recurring_activity": 0,
+        "budgeted": null,
+        "available": null,
+        "recurring_remaining": 0,
+        "recurring_expected": 0
+      }
+    },
+    {
+      "category_id": 83,
+      "totals": {
+        "other_activity": 0,
+        "recurring_activity": 0,
+        "budgeted": null,
+        "available": null,
+        "recurring_remaining": 1700,
+        "recurring_expected": 1700
+      }
+    },
+    {
+      "category_id": 88,
+      "totals": {
+        "other_activity": 0,
+        "recurring_activity": 2501.68,
+        "budgeted": null,
+        "available": null,
+        "recurring_remaining": 0,
+        "recurring_expected": 2501.68
+      }
+    },
+    {
+      "category_id": 86,
+      "totals": {
+        "other_activity": 25.69,
+        "recurring_activity": 0,
+        "budgeted": 200,
+        "available": 174.31,
+        "recurring_remaining": 0,
+        "recurring_expected": 0
+      }
+    },
+    {
+      "category_id": 84,
+      "totals": {
+        "other_activity": 401.12,
+        "recurring_activity": 4.13,
+        "budgeted": 150,
+        "available": -255.25,
+        "recurring_remaining": -4.13,
+        "recurring_expected": 0
+      }
+    }
+  ]
+}

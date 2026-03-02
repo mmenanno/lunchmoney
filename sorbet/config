@@ -1,5 +1,0 @@
---dir
-.
---ignore=/vendor
---ignore=/.toys
---enable-experimental-requires-ancestor

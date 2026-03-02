@@ -15,8 +15,6 @@ end
 
 def run
   run_stage("Style Checker", ["rubocop"])
-  run_stage("Typecheck", ["tc"])
-  run_stage("Verify Sigils", ["spoom", "verify"])
-  run_stage("Verify Sorbet DSL RBIs", ["rbi", "dsl", "--verify"])
+  run_stage("Markdown Lint", ["mdl"])
   run_stage("Tests", ["test"])
 end

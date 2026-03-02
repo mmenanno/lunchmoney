@@ -1,4 +1,3 @@
-# typed: strict
 # frozen_string_literal: true
 
 require "test_helper"
@@ -6,212 +5,141 @@ require "test_helper"
 module LunchMoney
   module Calls
     class TransactionsTest < ActiveSupport::TestCase
-      include MockResponseHelper
-      include VcrHelper
+      include LunchMoneyStubHelper
+      include FixtureHelper
 
-      test "transactions returns an array of Transaction objects on success response" do
-        with_real_ci_connections do
-          VCR.use_cassette("transactions/transactions_success") do
-            api_call = LunchMoney::Calls::Transactions.new.transactions(
-              start_date: "2019-01-01",
-              end_date: "2025-01-01",
-            )
+      setup do
+        @api = LunchMoney::Api.new(api_key: "test_api_key")
+      end
 
-            api_call.each do |transaction|
-              assert_kind_of(LunchMoney::Objects::Transaction, transaction)
-            end
-          end
+      # --- transactions_page ---
+
+      test "transactions_page returns hash with transactions array and has_more" do
+        stub_lunchmoney(:get, "/transactions?end_date=2024-07-31&limit=1000&offset=0&start_date=2024-07-01",
+          response: "transactions/list_default_response")
+
+        result = @api.transactions_page(start_date: "2024-07-01", end_date: "2024-07-31")
+
+        assert_kind_of Hash, result
+        assert_kind_of Array, result[:transactions]
+        assert_equal 4, result[:transactions].length
+        assert_equal false, result[:has_more]
+      end
+
+      test "transactions_page returns Transaction objects" do
+        stub_lunchmoney(:get, "/transactions?end_date=2024-07-31&limit=1000&offset=0&start_date=2024-07-01",
+          response: "transactions/list_default_response")
+
+        result = @api.transactions_page(start_date: "2024-07-01", end_date: "2024-07-31")
+
+        result[:transactions].each do |txn|
+          assert_kind_of LunchMoney::Objects::Transaction, txn
+        end
+        assert_equal 2112150655, result[:transactions].first.id
+        assert_equal "Paycheck", result[:transactions].first.payee
+      end
+
+      # --- transactions (pagination) ---
+
+      test "transactions returns a Pagination object that is Enumerable" do
+        result = @api.transactions(start_date: "2024-07-01", end_date: "2024-07-31")
+
+        assert_kind_of LunchMoney::Client::Pagination, result
+        assert_kind_of Enumerable, result
+      end
+
+      test "transactions.to_a fetches all pages and returns Transaction objects" do
+        stub_lunchmoney(:get, "/transactions?end_date=2024-07-31&limit=1000&offset=0&start_date=2024-07-01",
+          response: "transactions/list_default_response")
+
+        result = @api.transactions(start_date: "2024-07-01", end_date: "2024-07-31").to_a
+
+        assert_kind_of Array, result
+        assert_equal 4, result.length
+        result.each do |txn|
+          assert_kind_of LunchMoney::Objects::Transaction, txn
         end
       end
 
-      test "transactions returns an array of Error objects on error response" do
-        response = mock_faraday_lunchmoney_error_response
-        LunchMoney::Calls::Transactions.any_instance.stubs(:get).returns(response)
+      # --- transaction (single) ---
 
-        api_call = LunchMoney::Calls::Transactions.new.transactions(start_date: "2019-01-01", end_date: "2025-01-01")
+      test "transaction returns a single Transaction" do
+        stub_lunchmoney(:get, "/transactions/2112150654", response: "transactions/get_basic_transaction")
 
-        assert_kind_of(LunchMoney::Errors, api_call)
+        result = @api.transaction(2112150654)
+
+        assert_kind_of LunchMoney::Objects::Transaction, result
+        assert_equal 2112150654, result.id
+        assert_equal "Noodle House", result.payee
+        assert_equal "21.9800", result.amount
       end
 
-      test "transaction returns a Transaction objects on success response" do
-        with_real_ci_connections do
-          VCR.use_cassette("transactions/transaction_success") do
-            api_call = LunchMoney::Calls::Transactions.new.transaction(893631800)
+      test "transaction raises NotFoundError on 404" do
+        stub_lunchmoney_error(:get, "/transactions/999999", status: 404, message: "Transaction not found")
 
-            assert_kind_of(LunchMoney::Objects::Transaction, api_call)
-          end
+        assert_raises(LunchMoney::NotFoundError) do
+          @api.transaction(999999)
         end
       end
 
-      test "transaction returns an array of Error objects on error response" do
-        response = mock_faraday_lunchmoney_error_response
-        LunchMoney::Calls::Transactions.any_instance.stubs(:get).returns(response)
+      # --- create_transaction ---
 
-        api_call = LunchMoney::Calls::Transactions.new.transaction(893631800)
+      test "create_transaction returns created Transaction" do
+        stub_lunchmoney(:post, "/transactions", response: "transactions/create_bare_minimum_request")
 
-        assert_kind_of(LunchMoney::Errors, api_call)
+        result = @api.create_transaction(date: "2024-11-01", amount: "99.99")
+
+        assert_kind_of LunchMoney::Objects::Transaction, result
+        assert_equal 123456789, result.id
+        assert_equal "99.99", result.amount
       end
 
-      test "transaction_group returns a Transaction objects on success response" do
-        with_real_ci_connections do
-          VCR.use_cassette("transactions/transaction_group_success") do
-            api_call = LunchMoney::Calls::Transactions.new.transaction_group(894063595)
-
-            assert_kind_of(LunchMoney::Objects::Transaction, api_call)
-          end
+      test "create_transaction raises ClientValidationError for missing date" do
+        assert_raises(LunchMoney::ClientValidationError) do
+          @api.create_transaction(amount: "50.00")
         end
       end
 
-      test "transaction_group returns an array of Error objects on error response" do
-        response = mock_faraday_lunchmoney_error_response
-        LunchMoney::Calls::Transactions.any_instance.stubs(:get).returns(response)
-
-        api_call = LunchMoney::Calls::Transactions.new.transaction_group(893631800)
-
-        assert_kind_of(LunchMoney::Errors, api_call)
-      end
-
-      test "insert_transactions returns a hash containing an array of ids on success response" do
-        VCR.use_cassette("transactions/insert_transactions_success") do
-          api_call = LunchMoney::Calls::Transactions.new.insert_transactions([random_update_transaction])
-
-          refute_nil(api_call[:ids])
-
-          api_call[:ids].each do |id|
-            assert_kind_of(Integer, id)
-          end
+      test "create_transaction raises ClientValidationError for missing amount" do
+        assert_raises(LunchMoney::ClientValidationError) do
+          @api.create_transaction(date: "2024-11-01")
         end
       end
 
-      test "insert_transactions returns an array of Error objects on error response" do
-        response = mock_faraday_lunchmoney_error_response
-        LunchMoney::Calls::Transactions.any_instance.stubs(:post).returns(response)
+      # --- create_transactions ---
 
-        api_call = LunchMoney::Calls::Transactions.new.insert_transactions([random_update_transaction])
+      test "create_transactions returns InsertTransactionsResponse" do
+        stub_lunchmoney(:post, "/transactions", response: "transactions/create_two_new_cash_transactions")
 
-        assert_kind_of(LunchMoney::Errors, api_call)
+        result = @api.create_transactions([
+          { date: "2024-11-01", amount: "15.00", payee: "Lunch with James", notes: "Cash Transaction" },
+          { date: "2024-11-01", amount: "-9.99", payee: "me", notes: "Interest from Investment Account Cash" },
+        ])
+
+        assert_kind_of LunchMoney::Objects::InsertTransactionsResponse, result
       end
 
-      test "update_transaction returns a hash containing an updated boolean on success response" do
-        VCR.use_cassette("transactions/update_transactions_success") do
-          api_call = LunchMoney::Calls::Transactions.new.update_transaction(
-            897349559,
-            transaction: random_update_transaction(status: "cleared"),
-          )
+      # --- update_transaction ---
 
-          assert(api_call[:updated])
-        end
+      test "update_transaction returns updated Transaction" do
+        stub_lunchmoney(:put, "/transactions/2112140361",
+          response: "transactions/update_transaction_with_updated_category")
+
+        result = @api.update_transaction(2112140361, category_id: 315162)
+
+        assert_kind_of LunchMoney::Objects::Transaction, result
+        assert_equal 2112140361, result.id
+        assert_equal 315162, result.category_id
       end
 
-      test "update_transaction returns a hash containing an updated boolean and split ids on success split response" do
-        VCR.use_cassette("transactions/update_transactions_split_success") do
-          split = [
-            LunchMoney::Objects::Split.new(amount: "10.00"),
-            LunchMoney::Objects::Split.new(amount: "47.54"),
-          ]
-          api_call = LunchMoney::Calls::Transactions.new.update_transaction(904778058, split:)
+      # --- delete_transaction ---
 
-          assert(api_call[:updated])
+      test "delete_transaction returns nil on 204" do
+        stub_lunchmoney(:delete, "/transactions/123", status: 204, body: nil)
 
-          api_call[:split].each do |split_id|
-            assert_kind_of(Integer, split_id)
-          end
-        end
-      end
+        result = @api.delete_transaction(123)
 
-      test "update_transaction raises an exception if neither a transaction or split were provided" do
-        assert_raises(LunchMoney::MissingArgument) do
-          LunchMoney::Calls::Transactions.new.update_transaction(897349559)
-        end
-      end
-
-      test "update_transaction returns an array of Error objects on error response" do
-        response = mock_faraday_lunchmoney_error_response
-        LunchMoney::Calls::Transactions.any_instance.stubs(:put).returns(response)
-
-        api_call = LunchMoney::Calls::Transactions.new.update_transaction(
-          897349559,
-          transaction: random_update_transaction(status: "cleared"),
-        )
-
-        assert_kind_of(LunchMoney::Errors, api_call)
-      end
-
-      test "unsplit_transaction returns an array of unsplit transaction ids on success response" do
-        VCR.use_cassette("transactions/unsplit_transaction_success") do
-          api_call = LunchMoney::Calls::Transactions.new.unsplit_transaction([904778058])
-
-          api_call.each do |transaction_id|
-            assert_kind_of(Integer, transaction_id)
-          end
-        end
-      end
-
-      test "unsplit_transaction returns an array of Error objects on error response" do
-        response = mock_faraday_lunchmoney_error_response
-        LunchMoney::Calls::Transactions.any_instance.stubs(:post).returns(response)
-
-        api_call = LunchMoney::Calls::Transactions.new.unsplit_transaction([904778058])
-
-        assert_kind_of(LunchMoney::Errors, api_call)
-      end
-
-      test "create_transaction_group returns a transaction id of the created group on success response" do
-        VCR.use_cassette("transactions/create_transaction_group_success") do
-          arguments = {
-            date: "2024-01-30",
-            payee: "Group Transaction",
-            transactions: [898357857, 898359936],
-          }
-          api_call = LunchMoney::Calls::Transactions.new.create_transaction_group(**arguments)
-
-          assert_kind_of(Integer, api_call)
-        end
-      end
-
-      test "create_transaction_group returns an array of Error objects on error response" do
-        response = mock_faraday_lunchmoney_error_response
-        LunchMoney::Calls::Transactions.any_instance.stubs(:post).returns(response)
-        arguments = {
-          date: "2024-01-30",
-          payee: "Group Transaction",
-          transactions: [898357857, 898359936],
-        }
-
-        api_call = LunchMoney::Calls::Transactions.new.create_transaction_group(**arguments)
-
-        assert_kind_of(LunchMoney::Errors, api_call)
-      end
-
-      test "delete_transaction_group returns an array of transaction ids from the deleted group on success response" do
-        VCR.use_cassette("transactions/delete_transaction_group_success") do
-          api_call = LunchMoney::Calls::Transactions.new.delete_transaction_group(2266193461)
-
-          api_call[:transactions].each do |transaction_id|
-            assert_kind_of(Integer, transaction_id)
-          end
-        end
-      end
-
-      test "delete_transaction_group returns an array of Error objects on error response" do
-        response = mock_faraday_lunchmoney_error_response
-        LunchMoney::Calls::Transactions.any_instance.stubs(:delete).returns(response)
-
-        api_call = LunchMoney::Calls::Transactions.new.delete_transaction_group(905483362)
-
-        assert_kind_of(LunchMoney::Errors, api_call)
-      end
-
-      private
-
-      sig { params(status: String).returns(LunchMoney::Objects::UpdateTransaction) }
-      def random_update_transaction(status: "uncleared")
-        date = Time.now.utc.strftime("%F")
-        amount = rand(0.1..99.9).to_s
-        payee = "Gem Remote Testing"
-        notes = "Remote test at #{Time.now.utc}"
-        currency = "cad"
-        LunchMoney::Objects::UpdateTransaction.new(date:, amount:, payee:, notes:, currency:, status:)
+        assert_nil result
       end
     end
   end

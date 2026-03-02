@@ -1,24 +1,13 @@
-# typed: strict
 # frozen_string_literal: true
 
-require_relative "tag_base"
+# AUTO-GENERATED from LunchMoney OpenAPI spec v2.8.5
+# Do not edit manually. Run `toys generate models` to regenerate.
 
 module LunchMoney
   module Objects
-    # https://lunchmoney.dev/#tags-object
-    class Tag < TagBase
-      sig { returns(T.nilable(String)) }
-      attr_accessor :description
-
-      sig { returns(T::Boolean) }
-      attr_accessor :archived
-
-      sig { params(id: Integer, name: String, archived: T::Boolean, description: T.nilable(String)).void }
-      def initialize(id:, name:, archived:, description: nil)
-        super(id:, name:)
-        @archived = archived
-        @description = description
-      end
+    class Tag < Base
+      attr_accessor :id, :name, :description, :text_color, :background_color, :updated_at,
+                    :created_at, :archived, :archived_at
     end
   end
 end

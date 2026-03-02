@@ -1,27 +1,32 @@
-# typed: strict
 # frozen_string_literal: true
-
-require_relative "../objects/recurring_item"
 
 module LunchMoney
   module Calls
-    # https://lunchmoney.dev/#recurring-items
-    class RecurringItems < LunchMoney::Calls::Base
-      sig do
-        params(
-          start_date: T.nilable(String),
-          end_date: T.nilable(String),
-        ).returns(T.any(T::Array[LunchMoney::Objects::RecurringItem], LunchMoney::Errors))
-      end
-      def recurring_items(start_date: nil, end_date: nil)
-        params = clean_params({ start_date:, end_date: })
-        response = get("recurring_items", query_params: params)
+    module RecurringItems
+      include Base
 
-        handle_api_response(response) do |body|
-          body.map do |recurring_item|
-            LunchMoney::Objects::RecurringItem.new(**recurring_item)
-          end
-        end
+      # List all recurring items.
+      #
+      # @param start_date [String] ISO 8601 date (required)
+      # @param end_date [String] ISO 8601 date (required)
+      # @return [Array<LunchMoney::Objects::RecurringItem>]
+      def recurring_items(start_date:, end_date:)
+        params = { start_date:, end_date: }
+        data = get("/recurring_items", params: params)
+        build_collection(Objects::RecurringItem, data, key: :recurring_items)
+      end
+
+      # Get a single recurring item by ID.
+      #
+      # @param id [Integer]
+      # @param start_date [String] ISO 8601 date (required for occurrence calculation)
+      # @param end_date [String] ISO 8601 date (required for occurrence calculation)
+      # @return [LunchMoney::Objects::RecurringItem]
+      # @raise [LunchMoney::NotFoundError]
+      def recurring_item(id, start_date:, end_date:)
+        params = { start_date:, end_date: }
+        data = get("/recurring_items/#{id}", params: params)
+        build_object(Objects::RecurringItem, data)
       end
     end
   end

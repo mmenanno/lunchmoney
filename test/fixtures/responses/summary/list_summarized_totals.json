@@ -1,0 +1,93 @@
+{
+  "aligned": true,
+  "categories": [
+    {
+      "category_id": 315177,
+      "totals": {
+        "other_activity": 156.64,
+        "recurring_activity": 0,
+        "budgeted": 400,
+        "available": 243.36,
+        "recurring_remaining": 0,
+        "recurring_expected": 0
+      },
+      "occurrences": [
+        {
+          "in_range": true,
+          "start_date": "2025-07-01",
+          "end_date": "2025-07-31",
+          "other_activity": 156.64,
+          "recurring_activity": 0,
+          "budgeted": 400,
+          "budgeted_amount": "400.0000",
+          "budgeted_currency": "usd",
+          "notes": "Monthly budget allocation"
+        }
+      ]
+    },
+    {
+      "category_id": 315628,
+      "totals": {
+        "other_activity": 424.8,
+        "recurring_activity": 0,
+        "budgeted": 200,
+        "available": -224.8,
+        "recurring_remaining": 0,
+        "recurring_expected": 0
+      },
+      "occurrences": [
+        {
+          "in_range": true,
+          "start_date": "2025-07-01",
+          "end_date": "2025-07-31",
+          "other_activity": 424.8,
+          "recurring_activity": 0,
+          "budgeted": 200,
+          "budgeted_amount": "200.0000",
+          "budgeted_currency": "usd",
+          "notes": "Based on previous month's activity"
+        }
+      ]
+    },
+    {
+      "category_id": 315629,
+      "totals": {
+        "other_activity": 0,
+        "recurring_activity": 0,
+        "budgeted": 150,
+        "available": 150,
+        "recurring_remaining": 0,
+        "recurring_expected": 0
+      },
+      "occurrences": [
+        {
+          "in_range": true,
+          "start_date": "2025-07-01",
+          "end_date": "2025-07-31",
+          "other_activity": 0,
+          "recurring_activity": 0,
+          "budgeted": 150,
+          "budgeted_amount": "150.0000",
+          "budgeted_currency": "usd",
+          "notes": "Emergency fund contribution"
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "inflow": {
+      "other_activity": -125.5,
+      "recurring_activity": -89.99,
+      "uncategorized": 0,
+      "uncategorized_count": 0,
+      "uncategorized_recurring": 0
+    },
+    "outflow": {
+      "other_activity": 581.44,
+      "recurring_activity": 0,
+      "uncategorized": 45.2,
+      "uncategorized_count": 3,
+      "uncategorized_recurring": 0
+    }
+  }
+}

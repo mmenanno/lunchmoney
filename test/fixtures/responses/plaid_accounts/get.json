@@ -1,0 +1,23 @@
+{
+  "id": 119805,
+  "plaid_item_id": "xY9zW8vU7tS6rQ5pO4nM3lK2jI1hG0fE9dC8bA7",
+  "date_linked": "2020-01-28",
+  "linked_by_name": "User 1",
+  "name": "Freedom",
+  "display_name": "Penny's Visa",
+  "type": "credit",
+  "subtype": "credit card",
+  "mask": "1973",
+  "institution_name": "Chase",
+  "status": "active",
+  "allow_transaction_modifications": true,
+  "limit": 15000,
+  "balance": "0.0000",
+  "currency": "usd",
+  "to_base": 0,
+  "balance_last_update": "2025-01-27T01:38:07.460Z",
+  "import_start_date": "2023-01-01",
+  "last_import": "2025-01-24T12:57:03.250Z",
+  "last_fetch": "2025-01-28T01:38:11.862Z",
+  "plaid_last_successful_update": "2025-01-27T01:38:11.862Z"
+}

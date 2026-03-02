@@ -1,68 +1,46 @@
-# typed: strict
 # frozen_string_literal: true
 
-require "test_helper"
+require "minitest/autorun"
 
-module LunchMoney
-  module Calls
-    class BaseTest < ActiveSupport::TestCase
-      include Mocha::Typed
-      include MockResponseHelper
+$LOAD_PATH.unshift(File.expand_path("../../../lib", __dir__))
+require "lunchmoney"
+require "lunchmoney/calls/base"
+require "lunchmoney/objects/base"
+require "lunchmoney/objects/user"
+require "lunchmoney/objects/category"
 
-      test "errors returns and empty array if no errors are present" do
-        response = mock_faraday_response({})
+class CallsBaseTest < Minitest::Test
+  include LunchMoney::Calls::Base
 
-        errors = LunchMoney::Calls::Base.new.send(:errors, response)
+  def test_build_object_creates_instance_from_hash
+    result = build_object(LunchMoney::Objects::User, { id: 1, user_name: "Test", user_email: "test@example.com",
+                                                       budget_name: "Test Budget", api_key_label: "key" })
+    assert_kind_of LunchMoney::Objects::User, result
+    assert_equal 1, result.id
+  end
 
-        assert_empty(errors)
-      end
+  def test_build_object_returns_nil_for_nil_data
+    assert_nil build_object(LunchMoney::Objects::User, nil)
+  end
 
-      test "errors returns errors when single error is returned" do
-        error_message = "This is an error"
-        response = mock_faraday_response({ error: error_message })
+  def test_build_collection_maps_array_with_key
+    data = { categories: [{ id: 1, name: "Food" }, { id: 2, name: "Rent" }] }
+    result = build_collection(LunchMoney::Objects::Category, data, key: :categories)
+    assert_equal 2, result.length
+    assert_kind_of LunchMoney::Objects::Category, result.first
+  end
 
-        errors = LunchMoney::Calls::Base.new.send(:errors, response)
+  def test_build_collection_maps_array_without_key
+    data = [{ id: 1, name: "Food" }, { id: 2, name: "Rent" }]
+    result = build_collection(LunchMoney::Objects::Category, data)
+    assert_equal 2, result.length
+  end
 
-        refute_empty(errors)
+  def test_build_collection_returns_empty_array_for_nil_data
+    assert_equal [], build_collection(LunchMoney::Objects::Category, nil)
+  end
 
-        assert_equal(error_message, errors.first)
-      end
-
-      test "errors returns errors when multiple errors are returned" do
-        error_messages = ["This is an error", "This is another error"]
-        response = mock_faraday_response({ error: error_messages })
-
-        errors = LunchMoney::Calls::Base.new.send(:errors, response)
-
-        refute_empty(errors)
-
-        errors.each do |error|
-          assert_includes(error_messages, error)
-        end
-      end
-
-      test "clean_params removes params with nil values from hash" do
-        test_params = {
-          param_with_value: "param_with_value",
-          other_param_with_value: "other_param_with_value",
-          param_without_value: nil,
-          other_param_without_value: nil,
-        }
-
-        cleaned_params = LunchMoney::Calls::Base.new.send(:clean_params, test_params)
-
-        assert_equal(2, cleaned_params.keys.count)
-      end
-
-      test "get does not send query params when empty" do
-        response = mock_faraday_response({})
-        endpoint = LunchMoney::Calls::Base::BASE_URL + "me"
-
-        Faraday::Connection.any_instance.expects(:get).with(endpoint).returns(response).once
-        Faraday::Connection.any_instance.expects(:get).with(endpoint, {}).returns(response).never
-
-        LunchMoney::Calls::Base.new.send(:get, "me", query_params: {})
-      end
-    end
+  def test_build_collection_returns_empty_array_when_key_not_found
+    assert_equal [], build_collection(LunchMoney::Objects::Category, {}, key: :categories)
   end
 end
