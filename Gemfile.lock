@@ -173,9 +173,9 @@ GEM
       yard-sorbet
     thor (1.5.0)
     tomlrb (2.0.4)
-    toys (0.20.0)
-      toys-core (= 0.20.0)
-    toys-core (0.20.0)
+    toys (0.21.0)
+      toys-core (= 0.21.0)
+    toys-core (0.21.0)
       logger
     tsort (0.2.0)
     tzinfo (2.0.6)
