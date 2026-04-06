@@ -19,6 +19,7 @@ gem "sorbet-static-and-runtime", require: false
 gem "spoom", require: false
 gem "tapioca", require: false
 gem "dotenv"
+gem "irb", require: false
 gem "yard", require: false
 gem "yard-sorbet", require: false
 gem "appraisal", require: false

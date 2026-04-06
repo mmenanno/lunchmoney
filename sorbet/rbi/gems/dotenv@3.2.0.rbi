@@ -7,30 +7,30 @@
 
 # Shim to load environment variables from `.env files into `ENV`.
 #
-# source://dotenv//lib/dotenv/version.rb#1
+# pkg:gem/dotenv#lib/dotenv/version.rb:1
 module Dotenv
   extend ::Dotenv
 
   # Returns the value of attribute instrumenter.
   #
-  # source://dotenv//lib/dotenv.rb#15
+  # pkg:gem/dotenv#lib/dotenv.rb:15
   def instrumenter; end
 
   # Sets the attribute instrumenter
   #
   # @param value the value to set the attribute instrumenter to.
   #
-  # source://dotenv//lib/dotenv.rb#15
+  # pkg:gem/dotenv#lib/dotenv.rb:15
   def instrumenter=(_arg0); end
 
   # Loads environment variables from one or more `.env` files. See `#parse` for more details.
   #
-  # source://dotenv//lib/dotenv.rb#18
+  # pkg:gem/dotenv#lib/dotenv.rb:18
   def load(*filenames, overwrite: T.unsafe(nil), ignore: T.unsafe(nil)); end
 
   # Same as `#load`, but raises Errno::ENOENT if any files don't exist
   #
-  # source://dotenv//lib/dotenv.rb#27
+  # pkg:gem/dotenv#lib/dotenv.rb:27
   def load!(*filenames); end
 
   # Modify `ENV` for the block and restore it to its previous state afterwards.
@@ -40,27 +40,27 @@ module Dotenv
   #
   # @param env [Hash] Hash of keys and values to set in `ENV`
   #
-  # source://dotenv//lib/dotenv.rb#124
+  # pkg:gem/dotenv#lib/dotenv.rb:124
   def modify(env = T.unsafe(nil), &block); end
 
   # same as `#load`, but will overwrite existing values in `ENV`
   #
-  # source://dotenv//lib/dotenv.rb#35
+  # pkg:gem/dotenv#lib/dotenv.rb:35
   def overload(*filenames); end
 
   # same as `#overwrite`, but raises Errno::ENOENT if any files don't exist
   #
-  # source://dotenv//lib/dotenv.rb#41
+  # pkg:gem/dotenv#lib/dotenv.rb:41
   def overload!(*filenames); end
 
   # same as `#load`, but will overwrite existing values in `ENV`
   #
-  # source://dotenv//lib/dotenv.rb#32
+  # pkg:gem/dotenv#lib/dotenv.rb:32
   def overwrite(*filenames); end
 
   # same as `#overwrite`, but raises Errno::ENOENT if any files don't exist
   #
-  # source://dotenv//lib/dotenv.rb#38
+  # pkg:gem/dotenv#lib/dotenv.rb:38
   def overwrite!(*filenames); end
 
   # Parses the given files, yielding for each file if a block is given.
@@ -71,12 +71,12 @@ module Dotenv
   # @param overwrite [Boolean] Overwrite existing `ENV` values
   # @return [Hash] parsed key/value pairs
   #
-  # source://dotenv//lib/dotenv.rb#50
+  # pkg:gem/dotenv#lib/dotenv.rb:50
   def parse(*filenames, overwrite: T.unsafe(nil), ignore: T.unsafe(nil), &block); end
 
   # @raise [MissingKeys]
   #
-  # source://dotenv//lib/dotenv.rb#134
+  # pkg:gem/dotenv#lib/dotenv.rb:134
   def require_keys(*keys); end
 
   # Restore `ENV` to a given state
@@ -84,12 +84,12 @@ module Dotenv
   # @param env [Hash] Hash of keys and values to restore, defaults to the last saved state
   # @param safe [Boolean] Is it safe to modify `ENV`? Defaults to `true` in the main thread, otherwise raises an error.
   #
-  # source://dotenv//lib/dotenv.rb#77
+  # pkg:gem/dotenv#lib/dotenv.rb:77
   def restore(env = T.unsafe(nil), safe: T.unsafe(nil)); end
 
   # Save the current `ENV` to be restored later
   #
-  # source://dotenv//lib/dotenv.rb#67
+  # pkg:gem/dotenv#lib/dotenv.rb:67
   def save; end
 
   # Update `ENV` with the given hash of keys and values
@@ -97,18 +97,18 @@ module Dotenv
   # @param env [Hash] Hash of keys and values to set in `ENV`
   # @param overwrite [Boolean|:warn] Overwrite existing `ENV` values
   #
-  # source://dotenv//lib/dotenv.rb#98
+  # pkg:gem/dotenv#lib/dotenv.rb:98
   def update(env = T.unsafe(nil), overwrite: T.unsafe(nil)); end
 
   private
 
-  # source://dotenv//lib/dotenv.rb#142
+  # pkg:gem/dotenv#lib/dotenv.rb:142
   def instrument(name, payload = T.unsafe(nil), &block); end
 end
 
 # A diff between multiple states of ENV.
 #
-# source://dotenv//lib/dotenv/diff.rb#3
+# pkg:gem/dotenv#lib/dotenv/diff.rb:3
 class Dotenv::Diff
   # Create a new diff. If given a block, the state of ENV after the block will be preserved as
   # the final state for comparison. Otherwise, the current ENV will be the final state.
@@ -118,55 +118,55 @@ class Dotenv::Diff
   # @return [Diff] a new instance of Diff
   # @yield [diff] a block to execute before recording the final state
   #
-  # source://dotenv//lib/dotenv/diff.rb#16
+  # pkg:gem/dotenv#lib/dotenv/diff.rb:16
   def initialize(a: T.unsafe(nil), b: T.unsafe(nil), &block); end
 
   # The initial state
   #
-  # source://dotenv//lib/dotenv/diff.rb#5
+  # pkg:gem/dotenv#lib/dotenv/diff.rb:5
   def a; end
 
   # Return a Hash of keys added with their new values
   #
-  # source://dotenv//lib/dotenv/diff.rb#24
+  # pkg:gem/dotenv#lib/dotenv/diff.rb:24
   def added; end
 
   # Returns true if any keys were added, removed, or changed
   #
   # @return [Boolean]
   #
-  # source://dotenv//lib/dotenv/diff.rb#46
+  # pkg:gem/dotenv#lib/dotenv/diff.rb:46
   def any?; end
 
   # The final or current state
   #
-  # source://dotenv//lib/dotenv/diff.rb#8
+  # pkg:gem/dotenv#lib/dotenv/diff.rb:8
   def b; end
 
   # Returns of Hash of keys changed with an array of their previous and new values
   #
-  # source://dotenv//lib/dotenv/diff.rb#34
+  # pkg:gem/dotenv#lib/dotenv/diff.rb:34
   def changed; end
 
   # Returns a Hash of all added, changed, and removed keys and their new values
   #
-  # source://dotenv//lib/dotenv/diff.rb#41
+  # pkg:gem/dotenv#lib/dotenv/diff.rb:41
   def env; end
 
   # Returns a Hash of keys removed with their previous values
   #
-  # source://dotenv//lib/dotenv/diff.rb#29
+  # pkg:gem/dotenv#lib/dotenv/diff.rb:29
   def removed; end
 
   private
 
-  # source://dotenv//lib/dotenv/diff.rb#52
+  # pkg:gem/dotenv#lib/dotenv/diff.rb:52
   def snapshot; end
 end
 
 # A `.env` file that will be read and parsed into a Hash
 #
-# source://dotenv//lib/dotenv/environment.rb#3
+# pkg:gem/dotenv#lib/dotenv/environment.rb:3
 class Dotenv::Environment < ::Hash
   # Create a new Environment
   #
@@ -174,53 +174,53 @@ class Dotenv::Environment < ::Hash
   # @param overwrite [Boolean] whether the parser should assume existing values will be overwritten
   # @return [Environment] a new instance of Environment
   #
-  # source://dotenv//lib/dotenv/environment.rb#10
+  # pkg:gem/dotenv#lib/dotenv/environment.rb:10
   def initialize(filename, overwrite: T.unsafe(nil)); end
 
   # Returns the value of attribute filename.
   #
-  # source://dotenv//lib/dotenv/environment.rb#4
+  # pkg:gem/dotenv#lib/dotenv/environment.rb:4
   def filename; end
 
-  # source://dotenv//lib/dotenv/environment.rb#17
+  # pkg:gem/dotenv#lib/dotenv/environment.rb:17
   def load; end
 
   # Returns the value of attribute overwrite.
   #
-  # source://dotenv//lib/dotenv/environment.rb#4
+  # pkg:gem/dotenv#lib/dotenv/environment.rb:4
   def overwrite; end
 
-  # source://dotenv//lib/dotenv/environment.rb#21
+  # pkg:gem/dotenv#lib/dotenv/environment.rb:21
   def read; end
 end
 
-# source://dotenv//lib/dotenv/missing_keys.rb#2
+# pkg:gem/dotenv#lib/dotenv/missing_keys.rb:2
 class Dotenv::Error < ::StandardError; end
 
 # Error raised when encountering a syntax error while parsing a .env file.
 #
-# source://dotenv//lib/dotenv/parser.rb#6
+# pkg:gem/dotenv#lib/dotenv/parser.rb:6
 class Dotenv::FormatError < ::SyntaxError; end
 
-# source://dotenv//lib/dotenv/missing_keys.rb#4
+# pkg:gem/dotenv#lib/dotenv/missing_keys.rb:4
 class Dotenv::MissingKeys < ::Dotenv::Error
   # @return [MissingKeys] a new instance of MissingKeys
   #
-  # source://dotenv//lib/dotenv/missing_keys.rb#5
+  # pkg:gem/dotenv#lib/dotenv/missing_keys.rb:5
   def initialize(keys); end
 end
 
 # Parses the `.env` file format into key/value pairs.
 # It allows for variable substitutions, command substitutions, and exporting of variables.
 #
-# source://dotenv//lib/dotenv/parser.rb#10
+# pkg:gem/dotenv#lib/dotenv/parser.rb:10
 class Dotenv::Parser
   # @return [Parser] a new instance of Parser
   #
-  # source://dotenv//lib/dotenv/parser.rb#46
+  # pkg:gem/dotenv#lib/dotenv/parser.rb:46
   def initialize(string, overwrite: T.unsafe(nil)); end
 
-  # source://dotenv//lib/dotenv/parser.rb#53
+  # pkg:gem/dotenv#lib/dotenv/parser.rb:53
   def call; end
 
   private
@@ -229,51 +229,51 @@ class Dotenv::Parser
   #
   # @return [Boolean]
   #
-  # source://dotenv//lib/dotenv/parser.rb#76
+  # pkg:gem/dotenv#lib/dotenv/parser.rb:76
   def existing?(key); end
 
-  # source://dotenv//lib/dotenv/parser.rb#101
+  # pkg:gem/dotenv#lib/dotenv/parser.rb:101
   def expand_newlines(value); end
 
-  # source://dotenv//lib/dotenv/parser.rb#80
+  # pkg:gem/dotenv#lib/dotenv/parser.rb:80
   def parse_value(value); end
 
-  # source://dotenv//lib/dotenv/parser.rb#97
+  # pkg:gem/dotenv#lib/dotenv/parser.rb:97
   def unescape_characters(value); end
 
   class << self
-    # source://dotenv//lib/dotenv/parser.rb#41
+    # pkg:gem/dotenv#lib/dotenv/parser.rb:41
     def call(*_arg0, **_arg1, &_arg2); end
 
     # Returns the value of attribute substitutions.
     #
-    # source://dotenv//lib/dotenv/parser.rb#39
+    # pkg:gem/dotenv#lib/dotenv/parser.rb:39
     def substitutions; end
   end
 end
 
-# source://dotenv//lib/dotenv/parser.rb#16
+# pkg:gem/dotenv#lib/dotenv/parser.rb:16
 Dotenv::Parser::LINE = T.let(T.unsafe(nil), Regexp)
 
-# source://dotenv//lib/dotenv/parser.rb#36
+# pkg:gem/dotenv#lib/dotenv/parser.rb:36
 Dotenv::Parser::QUOTED_STRING = T.let(T.unsafe(nil), Regexp)
 
 # An internal monitor to synchronize access to ENV in multi-threaded environments.
 #
-# source://dotenv//lib/dotenv.rb#12
+# pkg:gem/dotenv#lib/dotenv.rb:12
 Dotenv::SEMAPHORE = T.let(T.unsafe(nil), Monitor)
 
-# source://dotenv//lib/dotenv/substitutions/variable.rb#4
+# pkg:gem/dotenv#lib/dotenv/substitutions/variable.rb:4
 module Dotenv::Substitutions; end
 
 # Substitute shell commands in a value.
 #
 #   SHA=$(git rev-parse HEAD)
 #
-# source://dotenv//lib/dotenv/substitutions/command.rb#9
+# pkg:gem/dotenv#lib/dotenv/substitutions/command.rb:9
 module Dotenv::Substitutions::Command
   class << self
-    # source://dotenv//lib/dotenv/substitutions/command.rb#23
+    # pkg:gem/dotenv#lib/dotenv/substitutions/command.rb:23
     def call(value, env); end
   end
 end
@@ -283,13 +283,13 @@ end
 #   HOST=example.com
 #   URL="https://$HOST"
 #
-# source://dotenv//lib/dotenv/substitutions/variable.rb#10
+# pkg:gem/dotenv#lib/dotenv/substitutions/variable.rb:10
 module Dotenv::Substitutions::Variable
   class << self
-    # source://dotenv//lib/dotenv/substitutions/variable.rb#21
+    # pkg:gem/dotenv#lib/dotenv/substitutions/variable.rb:21
     def call(value, env); end
   end
 end
 
-# source://dotenv//lib/dotenv/version.rb#2
+# pkg:gem/dotenv#lib/dotenv/version.rb:2
 Dotenv::VERSION = T.let(T.unsafe(nil), String)

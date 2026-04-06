@@ -4,7 +4,8 @@
 # Plus instead update this file by running `bin/tapioca require`.
 # frozen_string_literal: true
 
-require "minitest/autorun"
+require "minitest"
+require "minitest/spec"
 require "sorbet-runtime"
 require "active_support"
 require "active_support/core_ext/numeric/time.rb"

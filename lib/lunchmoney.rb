@@ -19,7 +19,7 @@ require_relative "lunchmoney/version"
 require_relative "lunchmoney/validators"
 require_relative "lunchmoney/api"
 
-module LunchMoney
+module LunchMoney # rubocop:disable Style/OneClassPerFile
   # Lock used to avoid config conflicts
   LOCK = T.let(Mutex.new, Mutex)
 
