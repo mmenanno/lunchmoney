@@ -5565,10 +5565,16 @@ module YARD::Handlers::RBS; end
 class YARD::Handlers::RBS::AttributeHandler < ::YARD::Handlers::RBS::Base
   private
 
-  # pkg:gem/yard#lib/yard/handlers/rbs/attribute_handler.rb:28
+  # pkg:gem/yard#lib/yard/handlers/rbs/attribute_handler.rb:66
+  def apply_tag_types(obj, tag_name, types, tag_param_name = T.unsafe(nil)); end
+
+  # pkg:gem/yard#lib/yard/handlers/rbs/attribute_handler.rb:55
+  def register_existing_attribute_method(attr_name, meth_name, type, scope); end
+
+  # pkg:gem/yard#lib/yard/handlers/rbs/attribute_handler.rb:30
   def register_reader(name, types, scope); end
 
-  # pkg:gem/yard#lib/yard/handlers/rbs/attribute_handler.rb:36
+  # pkg:gem/yard#lib/yard/handlers/rbs/attribute_handler.rb:42
   def register_writer(name, types, scope); end
 end
 
@@ -15542,169 +15548,172 @@ class YARD::Templates::Helpers::Markup::HybridMarkdown
 
   private
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2101
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2123
   def append_folded_codepoint(buffer, codepoint); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2074
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2096
   def ascii_only_compat?(text); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1595
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1617
   def ascii_punctuation_char?(char); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:804
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:814
   def autolink_urls(text); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1537
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1559
   def available_delimiter_length(token); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:898
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:908
   def blank_line?(line); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1129
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1151
   def block_boundary?(line); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1986
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2008
   def blockquote_open_fence?(quoted_lines); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2002
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2024
   def blockquote_paragraph_context?(quoted_lines); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:951
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:973
   def blockquote_start?(line); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:994
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1016
   def code_block(text, lang = T.unsafe(nil)); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1922
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:939
+  def colon_indented_code_block_start?(lines, index); end
+
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1944
   def consume_columns(text, columns, start_column = T.unsafe(nil), normalize_remaining = T.unsafe(nil)); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1756
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1778
   def contains_nested_link?(label, placeholders); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1514
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1536
   def decode_entities(text); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1848
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1870
   def decode_entity(entity); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1550
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1572
   def delimiter_flags(text, run_start, run_end, char); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2066
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2088
   def each_char_compat(text); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1638
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1660
   def escape_autolink_url(url); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1619
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1641
   def escape_list_marker_text(line); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1634
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1656
   def escape_url(url); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1000
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1022
   def extract_codeblock_language(text, lang = T.unsafe(nil)); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:833
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:843
   def extract_reference_definitions(text); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1049
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1071
   def fence_closer?(line, char, min_length); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:910
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:920
   def fenced_code_start?(line); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1480
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1502
   def find_braced_text_link_label_end(text, index); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1314
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1336
   def find_closing_bracket(text, open_index); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1332
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1354
   def find_matching_backtick_run(text, index, length); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1737
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1759
   def find_reference_label_end(text); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:733
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:743
   def format_emphasis(text); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:524
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:525
   def format_inline(text); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:800
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:810
   def format_strikethrough(text); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1867
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1889
   def h(text); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1016
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1038
   def heading_id(text); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1829
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1851
   def html_block_end?(type, line); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:955
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:977
   def html_block_start?(line, interrupt_paragraph = T.unsafe(nil)); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1812
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1834
   def html_block_type(line, interrupt_paragraph = T.unsafe(nil)); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1506
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1528
   def image_html(label, dest, title = T.unsafe(nil)); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:918
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:928
   def indented_code_block_start?(lines, index, previous_block_type = T.unsafe(nil)); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:914
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:924
   def indented_code_start?(line); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1611
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1633
   def indented_to?(line, indent); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:577
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:579
   def inside_angle_autolink_candidate?(text, index); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:945
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:967
   def labeled_list_start?(lines, index); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1975
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1997
   def lazy_blockquote_continuation?(quoted_lines, line); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1607
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1629
   def leading_columns(line); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1498
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1520
   def link_html(label, dest, title = T.unsafe(nil)); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1118
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1140
   def list_item_padding(marker); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:936
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:958
   def list_start?(line, interrupt_paragraph = T.unsafe(nil)); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2041
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2063
   def loose_list_item_continuation?(item_lines); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1528
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1550
   def normalize_code_span(code); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2016
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2038
   def normalize_heading_line(line); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2012
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2034
   def normalize_paragraph_line(line); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:875
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:885
   def normalize_reference_label(label); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1541
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1563
   def odd_match_disallowed?(opener, closer); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2050
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2072
   def open_fence_in_lines?(lines); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1022
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1044
   def parse_atx_heading(line); end
 
   # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:443
@@ -15713,7 +15722,7 @@ class YARD::Templates::Helpers::Markup::HybridMarkdown
   # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:102
   def parse_blocks(lines, index); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1036
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1058
   def parse_fence_opener(line); end
 
   # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:216
@@ -15728,28 +15737,28 @@ class YARD::Templates::Helpers::Markup::HybridMarkdown
   # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:236
   def parse_indented_code(lines, index); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1348
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1370
   def parse_inline_destination(text, index, placeholders = T.unsafe(nil)); end
 
   # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:408
   def parse_labeled_list(lines, index); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:827
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:837
   def parse_labeled_list_line(line); end
 
   # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:296
   def parse_list(lines, index); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1063
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1085
   def parse_list_marker(line); end
 
   # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:500
   def parse_paragraph(lines, index); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1135
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1157
   def parse_reference_definition(label, definition); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1642
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1664
   def parse_reference_definition_block(lines, index, previous_line); end
 
   # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:181
@@ -15758,160 +15767,163 @@ class YARD::Templates::Helpers::Markup::HybridMarkdown
   # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:267
   def parse_table(lines, index); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1451
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1473
   def parse_text_link_destination(text, index); end
 
   # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:253
   def parse_yard_indented_code(lines, index); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1796
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1818
   def percent_encode_url(text, allowed_re); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1444
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1466
   def plain_text(text); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:601
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:603
   def protect_autolinks(text, placeholders); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:701
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:711
   def protect_braced_text_links(text, placeholders); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:546
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:548
   def protect_code_spans(text, placeholders); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:629
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:631
   def protect_entities(text, placeholders); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:621
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:623
   def protect_escaped_characters(text, placeholders); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:633
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:635
   def protect_hard_breaks(text, placeholders); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:637
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:647
   def protect_inline_images(text, placeholders); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:647
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:657
   def protect_inline_links(text, placeholders); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:609
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:611
   def protect_raw_html(text, placeholders); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:657
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:639
+  def protect_rdoc_images(text, placeholders); end
+
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:667
   def protect_reference_images(text, placeholders); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:661
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:671
   def protect_reference_links(text, placeholders); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:665
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:675
   def protect_single_word_text_links(text, placeholders); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:590
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:592
   def protect_yard_links(text, placeholders); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1575
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1597
   def punctuation_char?(char); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1711
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1733
   def reference_definition_context?(previous_line); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1520
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1542
   def reference_definition_continuation?(line); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1731
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1753
   def reference_definition_replacement_line(line, prefix); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:889
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:899
   def reference_image_html(alt, ref); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:880
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:890
   def reference_link_html(label, ref); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1197
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1219
   def replace_inline_constructs(text, placeholders, prefix); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:818
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:828
   def restore_placeholders(text, placeholders); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1122
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1144
   def same_list_type?(base, other); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1879
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1901
   def scan_leading_columns(text); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1899
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1921
   def scan_padding_columns(text, index, start_column); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1245
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1267
   def scan_reference_constructs(text, placeholders, kind); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:906
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:916
   def setext_underline_line?(line); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2020
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2042
   def split_blockquote_prefix(line); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1875
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1897
   def split_lines(text); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1719
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1741
   def split_reference_container_prefix(line); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:969
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:991
   def split_table_row(line); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:822
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:832
   def store_placeholder(placeholders, html); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2036
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2058
   def strip_blockquote_marker(line); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1057
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1079
   def strip_fenced_indent(line, indent); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1615
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1637
   def strip_list_item_indent(line, content_indent); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1007
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1029
   def strip_trailing_punctuation(url); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:973
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:995
   def table_alignment(cell); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:964
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:986
   def table_row?(line); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:959
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:981
   def table_start?(lines, index); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:902
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:912
   def thematic_break?(line); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1784
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1806
   def unclosed_reference_title?(text); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1871
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1893
   def unescape_markdown_punctuation(text); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2090
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2112
   def unicode_casefold_compat(text); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1581
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1603
   def unicode_symbol_char?(char); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:982
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1004
   def unindent(lines); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:990
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1012
   def unindent_indented_code(lines); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2082
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:2104
   def utf8_bytes(char); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1571
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:1593
   def whitespace_char?(char); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:928
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/hybrid_markdown.rb:950
   def yard_indented_code_start?(lines, index); end
 end
 
