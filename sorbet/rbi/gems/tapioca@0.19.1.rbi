@@ -92,11 +92,10 @@ class RBI::Tree < ::RBI::NodeWithComments
       class_method: T::Boolean,
       visibility: ::RBI::Visibility,
       comments: T::Array[::RBI::Comment],
-      type_params: T::Array[::String],
       block: T.nilable(T.proc.params(node: ::RBI::Method).void)
     ).void
   end
-  def create_method(name, parameters: T.unsafe(nil), return_type: T.unsafe(nil), class_method: T.unsafe(nil), visibility: T.unsafe(nil), comments: T.unsafe(nil), type_params: T.unsafe(nil), &block); end
+  def create_method(name, parameters: T.unsafe(nil), return_type: T.unsafe(nil), class_method: T.unsafe(nil), visibility: T.unsafe(nil), comments: T.unsafe(nil), &block); end
 
   # pkg:gem/tapioca#lib/tapioca/rbi_ext/model.rb:52
   sig { params(name: ::String).void }
@@ -130,16 +129,16 @@ class RBI::Tree < ::RBI::NodeWithComments
 
   private
 
-  # pkg:gem/tapioca#lib/tapioca/rbi_ext/model.rb:96
+  # pkg:gem/tapioca#lib/tapioca/rbi_ext/model.rb:100
   sig { params(node: ::RBI::Node).returns(::RBI::Node) }
   def create_node(node); end
 
-  # pkg:gem/tapioca#lib/tapioca/rbi_ext/model.rb:91
+  # pkg:gem/tapioca#lib/tapioca/rbi_ext/model.rb:95
   sig { returns(T::Hash[::String, ::RBI::Node]) }
   def nodes_cache; end
 end
 
-# pkg:gem/tapioca#lib/tapioca/rbi_ext/model.rb:106
+# pkg:gem/tapioca#lib/tapioca/rbi_ext/model.rb:110
 class RBI::TypedParam < ::T::Struct
   const :param, ::RBI::Param
   const :type, ::String
@@ -824,11 +823,11 @@ class Tapioca::Commands::Configure < ::Tapioca::Commands::CommandWithoutTracker
 
   private
 
-  # pkg:gem/tapioca#lib/tapioca/commands/configure.rb:74
+  # pkg:gem/tapioca#lib/tapioca/commands/configure.rb:75
   sig { void }
   def create_binstub; end
 
-  # pkg:gem/tapioca#lib/tapioca/commands/configure.rb:64
+  # pkg:gem/tapioca#lib/tapioca/commands/configure.rb:65
   sig { void }
   def create_post_require; end
 
@@ -836,7 +835,7 @@ class Tapioca::Commands::Configure < ::Tapioca::Commands::CommandWithoutTracker
   sig { void }
   def create_sorbet_config; end
 
-  # pkg:gem/tapioca#lib/tapioca/commands/configure.rb:45
+  # pkg:gem/tapioca#lib/tapioca/commands/configure.rb:46
   sig { void }
   def create_tapioca_config; end
 
@@ -846,11 +845,11 @@ class Tapioca::Commands::Configure < ::Tapioca::Commands::CommandWithoutTracker
   sig { override.void }
   def execute; end
 
-  # pkg:gem/tapioca#lib/tapioca/commands/configure.rb:87
+  # pkg:gem/tapioca#lib/tapioca/commands/configure.rb:88
   sig { returns(::Bundler::Installer) }
   def installer; end
 
-  # pkg:gem/tapioca#lib/tapioca/commands/configure.rb:92
+  # pkg:gem/tapioca#lib/tapioca/commands/configure.rb:93
   sig { returns(T.any(::Bundler::StubSpecification, ::Gem::Specification)) }
   def spec; end
 end
@@ -1160,7 +1159,7 @@ class Tapioca::Dsl::Compiler
   sig { params(method_def: T.any(::Method, ::UnboundMethod)).returns(::String) }
   def compile_method_return_type_to_rbi(method_def); end
 
-  # pkg:gem/tapioca#lib/tapioca/dsl/compiler.rb:142
+  # pkg:gem/tapioca#lib/tapioca/dsl/compiler.rb:144
   sig { params(scope: ::RBI::Scope, method_def: T.any(::Method, ::UnboundMethod), class_method: T::Boolean).void }
   def create_method_from_def(scope, method_def, class_method: T.unsafe(nil)); end
 
@@ -1768,7 +1767,7 @@ class Tapioca::Gem::Listeners::SorbetSignatures < ::Tapioca::Gem::Listeners::Bas
 
   # @override
   #
-  # pkg:gem/tapioca#lib/tapioca/gem/listeners/sorbet_signatures.rb:75
+  # pkg:gem/tapioca#lib/tapioca/gem/listeners/sorbet_signatures.rb:77
   sig { override.params(event: ::Tapioca::Gem::NodeAdded).returns(T::Boolean) }
   def ignore?(event); end
 
@@ -1778,7 +1777,7 @@ class Tapioca::Gem::Listeners::SorbetSignatures < ::Tapioca::Gem::Listeners::Bas
   sig { override.params(event: ::Tapioca::Gem::MethodNodeAdded).void }
   def on_method(event); end
 
-  # pkg:gem/tapioca#lib/tapioca/gem/listeners/sorbet_signatures.rb:63
+  # pkg:gem/tapioca#lib/tapioca/gem/listeners/sorbet_signatures.rb:65
   sig { params(signature: T.untyped).returns(T::Boolean) }
   def signature_final?(signature); end
 end
@@ -3367,13 +3366,17 @@ module Tapioca::SorbetHelper
   sig { params(sorbet_args: ::String).returns(::Spoom::ExecResult) }
   def sorbet(*sorbet_args); end
 
-  # pkg:gem/tapioca#lib/tapioca/helpers/sorbet_helper.rb:26
+  # pkg:gem/tapioca#lib/tapioca/helpers/sorbet_helper.rb:45
   sig { returns(::String) }
   def sorbet_path; end
 
-  # pkg:gem/tapioca#lib/tapioca/helpers/sorbet_helper.rb:33
+  # pkg:gem/tapioca#lib/tapioca/helpers/sorbet_helper.rb:52
   sig { params(feature: ::Symbol, version: T.nilable(::Gem::Version)).returns(T::Boolean) }
   def sorbet_supports?(feature, version: T.unsafe(nil)); end
+
+  # pkg:gem/tapioca#lib/tapioca/helpers/sorbet_helper.rb:26
+  sig { params(source: ::String, rbi_mode: T::Boolean, on_failure: T.proc.params(stderr: ::String).void).void }
+  def sorbet_syntax_check!(source, rbi_mode:, &on_failure); end
 end
 
 # pkg:gem/tapioca#lib/tapioca/helpers/sorbet_helper.rb:16
