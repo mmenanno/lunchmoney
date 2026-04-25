@@ -49,8 +49,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - ruby-version: '3.2'
-            experimental: false
           - ruby-version: '3.3'
             experimental: false
           - ruby-version: '3.4'
