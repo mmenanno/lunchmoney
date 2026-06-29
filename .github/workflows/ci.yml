@@ -72,7 +72,7 @@ jobs:
           ruby-version: ${{ matrix.ruby-version }}
 
       - name: Cache test fixtures
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: test/cassettes
           key: vcr-cassettes-${{ hashFiles('test/cassettes/**/*.yml') }}
