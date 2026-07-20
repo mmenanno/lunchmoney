@@ -6426,7 +6426,7 @@ class YARD::Handlers::Ruby::PublicClassMethodHandler < ::YARD::Handlers::Ruby::B
   include ::YARD::Handlers::Ruby::DecoratorHandlerMethods
 end
 
-# Helper methods to parse @attr_* tags on a class.
+# Helper methods to document generated Struct and Data members.
 #
 # @deprecated The use of +@attr+ tags are deprecated since 0.8.0 in favour of
 #   the +@!attribute+ directive. This module should not be relied on.
@@ -6444,7 +6444,7 @@ module YARD::Handlers::Ruby::StructHandlerMethods
   # @param [String] member the name of the member we're generating documentation for
   # @return [String] a docstring to be attached to the getter method for this member
   #
-  # pkg:gem/yard#lib/yard/handlers/ruby/struct_handler_methods.rb:62
+  # pkg:gem/yard#lib/yard/handlers/ruby/struct_handler_methods.rb:82
   def add_reader_tags(klass, new_method, member); end
 
   # Creates the auto-generated docstring for the setter method of a struct's
@@ -6455,7 +6455,7 @@ module YARD::Handlers::Ruby::StructHandlerMethods
   # @param [String] member the name of the member we're generating documentation for
   # @return [String] a docstring to be attached to the setter method for this member
   #
-  # pkg:gem/yard#lib/yard/handlers/ruby/struct_handler_methods.rb:77
+  # pkg:gem/yard#lib/yard/handlers/ruby/struct_handler_methods.rb:97
   def add_writer_tags(klass, new_method, member); end
 
   # Creates the given member methods and attaches them to the given ClassObject.
@@ -6463,7 +6463,7 @@ module YARD::Handlers::Ruby::StructHandlerMethods
   # @param [ClassObject] klass the class to generate attributes for
   # @param [Array<String>] members a list of member names
   #
-  # pkg:gem/yard#lib/yard/handlers/ruby/struct_handler_methods.rb:134
+  # pkg:gem/yard#lib/yard/handlers/ruby/struct_handler_methods.rb:154
   def create_attributes(klass, members); end
 
   # Creates and registers a class object with the given name and superclass name.
@@ -6473,7 +6473,7 @@ module YARD::Handlers::Ruby::StructHandlerMethods
   # @param [String] superclass the name of the superclass
   # @return [ClassObject] the class object for further processing/method attaching
   #
-  # pkg:gem/yard#lib/yard/handlers/ruby/struct_handler_methods.rb:92
+  # pkg:gem/yard#lib/yard/handlers/ruby/struct_handler_methods.rb:112
   def create_class(classname, superclass); end
 
   # Determines whether to create an attribute method based on the class's
@@ -6484,7 +6484,7 @@ module YARD::Handlers::Ruby::StructHandlerMethods
   # @param [Symbol] type (:read) reader method, or writer method?
   # @return [Boolean] should the attribute be created?
   #
-  # pkg:gem/yard#lib/yard/handlers/ruby/struct_handler_methods.rb:38
+  # pkg:gem/yard#lib/yard/handlers/ruby/struct_handler_methods.rb:58
   def create_member_method?(klass, member, type = T.unsafe(nil)); end
 
   # Creates the getter (reader) method and attaches it to the class as an attribute.
@@ -6493,7 +6493,7 @@ module YARD::Handlers::Ruby::StructHandlerMethods
   # @param [ClassObject] klass the class to attach the method to
   # @param [String] member the name of the member we're generating a method for
   #
-  # pkg:gem/yard#lib/yard/handlers/ruby/struct_handler_methods.rb:121
+  # pkg:gem/yard#lib/yard/handlers/ruby/struct_handler_methods.rb:141
   def create_reader(klass, member); end
 
   # Creates the setter (writer) method and attaches it to the class as an attribute.
@@ -6502,7 +6502,7 @@ module YARD::Handlers::Ruby::StructHandlerMethods
   # @param [ClassObject] klass the class to attach the method to
   # @param [String] member the name of the member we're generating a method for
   #
-  # pkg:gem/yard#lib/yard/handlers/ruby/struct_handler_methods.rb:104
+  # pkg:gem/yard#lib/yard/handlers/ruby/struct_handler_methods.rb:124
   def create_writer(klass, member); end
 
   # Extracts the user's defined @member tag for a given class and its member. Returns
@@ -6521,8 +6521,27 @@ module YARD::Handlers::Ruby::StructHandlerMethods
   # @param [ClassObject] klass the class with the attributes
   # @return [Array<String>] the list of members defined as attributes on the class
   #
-  # pkg:gem/yard#lib/yard/handlers/ruby/struct_handler_methods.rb:26
+  # pkg:gem/yard#lib/yard/handlers/ruby/struct_handler_methods.rb:46
   def members_from_tags(klass); end
+
+  # Extracts the user's defined @param tag for a given generated member.
+  #
+  # @param [ClassObject] klass the class whose tags we're searching
+  # @param [String] member the name of the struct or data member we need
+  # @return [Tags::Tag, nil] the matching tag, or nil if not found
+  #
+  # pkg:gem/yard#lib/yard/handlers/ruby/struct_handler_methods.rb:27
+  def parameter_tag_for_member(klass, member); end
+
+  # pkg:gem/yard#lib/yard/handlers/ruby/struct_handler_methods.rb:175
+  def register_docstring(object, docstring = T.unsafe(nil), stmt = T.unsafe(nil)); end
+
+  # Registers an auto-generated member method without reapplying the class's
+  # docstring to it. The generated reader or writer receives its own docstring
+  # and tags immediately after registration.
+  #
+  # pkg:gem/yard#lib/yard/handlers/ruby/struct_handler_methods.rb:167
+  def register_struct_member_method(method, &block); end
 
   # Gets the return type for the member in a nicely formatted string. Used
   # to be injected into auto-generated docstrings.
@@ -6531,8 +6550,19 @@ module YARD::Handlers::Ruby::StructHandlerMethods
   # @return [String] the user-declared type of the struct member, or [Object] if
   #   the user did not define a type for this member.
   #
-  # pkg:gem/yard#lib/yard/handlers/ruby/struct_handler_methods.rb:51
+  # pkg:gem/yard#lib/yard/handlers/ruby/struct_handler_methods.rb:71
   def return_type_from_tag(member_tag); end
+
+  # Returns the tag that supplies a generated member's type. Existing @attr*
+  # tags take precedence over the more concise @param form.
+  #
+  # @param [ClassObject] klass the class whose tags we're searching
+  # @param [String] member the name of the struct or data member we need
+  # @param [Symbol] type reader method, or writer method?
+  # @return [Tags::Tag, nil] the tag supplying the type, or nil if not found
+  #
+  # pkg:gem/yard#lib/yard/handlers/ruby/struct_handler_methods.rb:38
+  def type_tag_for_member(klass, member, type = T.unsafe(nil)); end
 end
 
 # pkg:gem/yard#lib/yard/handlers/ruby/base.rb:53
@@ -10109,22 +10139,22 @@ class YARD::Parser::Ruby::RipperParser < ::Ripper
 
   private
 
-  # pkg:gem/yard#lib/yard/parser/ruby/ruby_parser.rb:747
+  # pkg:gem/yard#lib/yard/parser/ruby/ruby_parser.rb:750
   def add_comment(line, node = T.unsafe(nil), before_node = T.unsafe(nil), into = T.unsafe(nil)); end
 
   # pkg:gem/yard#lib/yard/parser/ruby/ruby_parser.rb:286
   def add_token(token, data); end
 
-  # pkg:gem/yard#lib/yard/parser/ruby/ruby_parser.rb:671
+  # pkg:gem/yard#lib/yard/parser/ruby/ruby_parser.rb:674
   def comment_starts_line?(charno); end
 
-  # pkg:gem/yard#lib/yard/parser/ruby/ruby_parser.rb:669
+  # pkg:gem/yard#lib/yard/parser/ruby/ruby_parser.rb:672
   def compile_error(msg); end
 
-  # pkg:gem/yard#lib/yard/parser/ruby/ruby_parser.rb:778
+  # pkg:gem/yard#lib/yard/parser/ruby/ruby_parser.rb:781
   def freeze_tree(node = T.unsafe(nil)); end
 
-  # pkg:gem/yard#lib/yard/parser/ruby/ruby_parser.rb:681
+  # pkg:gem/yard#lib/yard/parser/ruby/ruby_parser.rb:684
   def insert_comments; end
 
   # pkg:gem/yard#lib/yard/parser/ruby/ruby_parser.rb:175
@@ -10136,12 +10166,6 @@ class YARD::Parser::Ruby::RipperParser < ::Ripper
   # pkg:gem/yard#lib/yard/parser/ruby/ruby_parser.rb:168
   def on_array(other); end
 
-  # Ruby 3.0+ pattern matching: array patterns (SomeClass[a, b]) and find patterns
-  # (SomeClass[*pre, val, *post]) use [...] brackets, which fire on_lbracket and
-  # on_rbracket scanner events. The corresponding parser events are on_aryptn/on_fndptn
-  # (not on_aref), so we must clean up the bracket maps to prevent stale entries from
-  # corrupting source ranges of later array indexing expressions.
-  #
   # pkg:gem/yard#lib/yard/parser/ruby/ruby_parser.rb:175
   def on_aryptn(*args); end
 
@@ -10184,13 +10208,6 @@ class YARD::Parser::Ruby::RipperParser < ::Ripper
   # pkg:gem/yard#lib/yard/parser/ruby/ruby_parser.rb:168
   def on_hash(*args); end
 
-  # Ruby 3.0+ pattern matching: braced hash patterns ({key: val} syntax) fire
-  # on_lbrace and on_rbrace scanner events. The corresponding parser event is
-  # on_hshptn (not on_hash), so we must clean up the brace maps to prevent stale
-  # entries from corrupting source ranges of later hash literals and brace blocks.
-  # Bare hash patterns (key: val without braces) fire no brace scanner events, so
-  # we only clean up when @map[:rbrace] confirms a closing brace was scanned.
-  #
   # pkg:gem/yard#lib/yard/parser/ruby/ruby_parser.rb:175
   def on_hshptn(*args); end
 
@@ -11853,12 +11870,20 @@ end
 # pkg:gem/yard#lib/yard/autoload.rb:230
 module YARD::Server
   class << self
+    # Normalizes an HTTP request path into a relative command path.
+    # @api private
+    # @param [String] path the request path to normalize
+    # @return [String] a relative path using forward slashes
+    #
+    # pkg:gem/yard#lib/yard/server.rb:8
+    def clean_path(path); end
+
     # Registers a static path to be used in static asset lookup.
     # @param [String] path the pathname to register
     # @return [void]
     # @since 0.6.2
     #
-    # pkg:gem/yard#lib/yard/server.rb:8
+    # pkg:gem/yard#lib/yard/server.rb:17
     def register_static_path(path); end
   end
 end
@@ -14773,15 +14798,18 @@ class YARD::Tags::TypesExplainer::Parser
 
   private
 
-  # pkg:gem/yard#lib/yard/tags/types_explainer.rb:264
+  # pkg:gem/yard#lib/yard/tags/types_explainer.rb:273
   def create_type(name); end
 
-  # pkg:gem/yard#lib/yard/tags/types_explainer.rb:233
+  # pkg:gem/yard#lib/yard/tags/types_explainer.rb:241
   def parse_hash_collection(name); end
+
+  # pkg:gem/yard#lib/yard/tags/types_explainer.rb:184
+  def parse_until(until_tokens); end
 
   # @return [Array<Type>]
   #
-  # pkg:gem/yard#lib/yard/tags/types_explainer.rb:215
+  # pkg:gem/yard#lib/yard/tags/types_explainer.rb:223
   def parse_with_handlers; end
 
   class << self
@@ -16079,18 +16107,18 @@ end
 class YARD::Templates::Helpers::Markup::RDocMarkup
   # @param text [String]
   #
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/rdoc_markup.rb:42
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/rdoc_markup.rb:46
   def initialize(text); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/rdoc_markup.rb:35
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/rdoc_markup.rb:39
   def from_path; end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/rdoc_markup.rb:35
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/rdoc_markup.rb:39
   def from_path=(_arg0); end
 
   # @return [String]
   #
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/rdoc_markup.rb:52
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/rdoc_markup.rb:56
   def to_html; end
 
   private
@@ -16100,14 +16128,14 @@ class YARD::Templates::Helpers::Markup::RDocMarkup
   #
   # @todo Refactor into own SimpleMarkup subclass
   #
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/rdoc_markup.rb:89
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/rdoc_markup.rb:93
   def fix_dash_dash(text); end
 
   # Fixes RDoc behaviour with ++ only supporting alphanumeric text.
   #
   # @todo Refactor into own SimpleMarkup subclass
   #
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/rdoc_markup.rb:68
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/rdoc_markup.rb:72
   def fix_typewriter(text); end
 end
 
@@ -16116,21 +16144,21 @@ YARD::Templates::Helpers::Markup::RDocMarkup::MARKUP = RDoc::Markup
 
 # pkg:gem/yard#lib/yard/templates/helpers/markup/rdoc_markup.rb:13
 class YARD::Templates::Helpers::Markup::RDocMarkupToHtml < ::RDoc::Markup::ToHtml
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/rdoc_markup.rb:16
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/rdoc_markup.rb:20
   def initialize; end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/rdoc_markup.rb:102
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/rdoc_markup.rb:106
   def accept_paragraph(*args); end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/rdoc_markup.rb:95
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/rdoc_markup.rb:99
   def from_path; end
 
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/rdoc_markup.rb:95
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/rdoc_markup.rb:99
   def from_path=(_arg0); end
 
   # Disable auto-link of URLs
   #
-  # pkg:gem/yard#lib/yard/templates/helpers/markup/rdoc_markup.rb:98
+  # pkg:gem/yard#lib/yard/templates/helpers/markup/rdoc_markup.rb:102
   def handle_special_HYPERLINK(special); end
 end
 
