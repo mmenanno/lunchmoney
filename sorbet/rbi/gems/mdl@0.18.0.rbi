@@ -19,16 +19,21 @@ class Kramdown::Parser::MarkdownLint < ::Kramdown::Parser::Kramdown
   def initialize(source, options); end
 end
 
-# Regular kramdown parser, but with GFM style fenced code blocks
+# GFM fenced code blocks, extended to allow spaces in the info string
+# (e.g. ```c hlines=2). The GFM regex restricts the info string to a
+# single non-whitespace token, which causes kramdown to miss blocks whose
+# info string contains a space, leading to false positives inside them.
+# Capture groups match GFM's: 1=fence, 2=fence-char, 3=full-info,
+# 4=first-word, 5=content.
 #
-# pkg:gem/mdl#lib/mdl/kramdown_parser.rb:18
+# pkg:gem/mdl#lib/mdl/kramdown_parser.rb:23
 Kramdown::Parser::MarkdownLint::FENCED_CODEBLOCK_MATCH = T.let(T.unsafe(nil), Regexp)
 
 # End paragraphs when a fenced code block starts, matching GFM
 # behavior. Without this, fenced code blocks without a preceding
 # blank line are swallowed into the paragraph.
 #
-# pkg:gem/mdl#lib/mdl/kramdown_parser.rb:23
+# pkg:gem/mdl#lib/mdl/kramdown_parser.rb:29
 Kramdown::Parser::MarkdownLint::PARAGRAPH_END = T.let(T.unsafe(nil), Regexp)
 
 # Primary MDL container
@@ -38,10 +43,10 @@ module MarkdownLint
   class << self
     # Creates hyperlinks in terminal emulators, if available: https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
     #
-    # pkg:gem/mdl#lib/mdl.rb:179
+    # pkg:gem/mdl#lib/mdl.rb:184
     def linkify(text, url); end
 
-    # pkg:gem/mdl#lib/mdl.rb:172
+    # pkg:gem/mdl#lib/mdl.rb:177
     def printable_id(rule); end
 
     # pkg:gem/mdl#lib/mdl.rb:15
@@ -57,14 +62,14 @@ class MarkdownLint::CLI
   extend ::Mixlib::CLI::ClassMethods
   extend ::Mixlib::CLI::InheritMethods
 
-  # pkg:gem/mdl#lib/mdl/cli.rb:122
+  # pkg:gem/mdl#lib/mdl/cli.rb:141
   def run(argv = T.unsafe(nil)); end
 
   class << self
-    # pkg:gem/mdl#lib/mdl/cli.rb:179
+    # pkg:gem/mdl#lib/mdl/cli.rb:198
     def probe_config_file(path); end
 
-    # pkg:gem/mdl#lib/mdl/cli.rb:162
+    # pkg:gem/mdl#lib/mdl/cli.rb:181
     def toggle_list(parts, to_sym = T.unsafe(nil)); end
   end
 end
@@ -130,32 +135,32 @@ class MarkdownLint::Doc
   # Create a new document given a string containing the markdown source
   #
   # pkg:gem/mdl#lib/mdl/doc.rb:29
-  def initialize(text, ignore_front_matter = T.unsafe(nil)); end
+  def initialize(text, ignore_front_matter = T.unsafe(nil), **_arg2); end
 
   # Returns the actual source line for a given element. You can pass in an
   # element object or an options hash here. This is useful if you need to
   # examine the source line directly for your rule to make use of
   # information that isn't present in the parsed document.
   #
-  # pkg:gem/mdl#lib/mdl/doc.rb:140
+  # pkg:gem/mdl#lib/mdl/doc.rb:141
   def element_line(element); end
 
   # Returns the line number a given element is located on in the source
   # file. You can pass in either an element object or an options hash here.
   #
-  # pkg:gem/mdl#lib/mdl/doc.rb:129
+  # pkg:gem/mdl#lib/mdl/doc.rb:130
   def element_linenumber(element); end
 
   # Returns a list of line numbers for all elements passed in. You can pass
   # in a list of element objects or a list of options hashes here.
   #
-  # pkg:gem/mdl#lib/mdl/doc.rb:148
+  # pkg:gem/mdl#lib/mdl/doc.rb:149
   def element_linenumbers(elements); end
 
   # Returns the actual source lines for a list of elements. You can pass in
   # a list of elements objects or a list of options hashes here.
   #
-  # pkg:gem/mdl#lib/mdl/doc.rb:156
+  # pkg:gem/mdl#lib/mdl/doc.rb:157
   def element_lines(elements); end
 
   # A list of raw markdown source lines. Note that the list is 0-indexed,
@@ -168,13 +173,13 @@ class MarkdownLint::Doc
 
   # Returns the element as plaintext
   #
-  # pkg:gem/mdl#lib/mdl/doc.rb:280
+  # pkg:gem/mdl#lib/mdl/doc.rb:281
   def extract_as_text(element); end
 
   # Extracts the text from an element whose children consist of text
   # elements and other things
   #
-  # pkg:gem/mdl#lib/mdl/doc.rb:251
+  # pkg:gem/mdl#lib/mdl/doc.rb:252
   def extract_text(element, prefix = T.unsafe(nil), restore_whitespace = T.unsafe(nil)); end
 
   # Find all elements of a given type, returning their options hash. The
@@ -187,7 +192,7 @@ class MarkdownLint::Doc
   # If +nested+ is set to false, this returns only top level elements of a
   # given type.
   #
-  # pkg:gem/mdl#lib/mdl/doc.rb:72
+  # pkg:gem/mdl#lib/mdl/doc.rb:73
   def find_type(type, nested = T.unsafe(nil)); end
 
   # Find all elements of a given type, returning a list of the element
@@ -199,7 +204,7 @@ class MarkdownLint::Doc
   # If +nested+ is set to false, this returns only top level elements of a
   # given type.
   #
-  # pkg:gem/mdl#lib/mdl/doc.rb:86
+  # pkg:gem/mdl#lib/mdl/doc.rb:87
   def find_type_elements(type, nested = T.unsafe(nil), elements = T.unsafe(nil)); end
 
   # A variation on find_type_elements that allows you to skip drilling down
@@ -211,7 +216,7 @@ class MarkdownLint::Doc
   # Unlike find_type_elements, this method will always search for nested
   # elements, and skip the element types given to nested_except.
   #
-  # pkg:gem/mdl#lib/mdl/doc.rb:108
+  # pkg:gem/mdl#lib/mdl/doc.rb:109
   def find_type_elements_except(type, nested_except = T.unsafe(nil), elements = T.unsafe(nil)); end
 
   # A list of raw markdown source lines. Note that the list is 0-indexed,
@@ -227,13 +232,13 @@ class MarkdownLint::Doc
   # (underlined). You can pass in the element object or an options hash
   # here.
   #
-  # pkg:gem/mdl#lib/mdl/doc.rb:166
+  # pkg:gem/mdl#lib/mdl/doc.rb:167
   def header_style(header); end
 
   # Returns how much a given line is indented. Hard tabs are treated as an
   # indent of 8 spaces. You need to pass in the raw string here.
   #
-  # pkg:gem/mdl#lib/mdl/doc.rb:211
+  # pkg:gem/mdl#lib/mdl/doc.rb:212
   def indent_for(line); end
 
   # A list of raw markdown source lines. Note that the list is 0-indexed,
@@ -248,19 +253,19 @@ class MarkdownLint::Doc
   # :ordered_paren depending on which symbol is used to denote the list
   # item. You can pass in either the element itself or an options hash here.
   #
-  # pkg:gem/mdl#lib/mdl/doc.rb:188
+  # pkg:gem/mdl#lib/mdl/doc.rb:189
   def list_style(item); end
 
   # Returns line numbers for lines that match the given regular expression
   #
-  # pkg:gem/mdl#lib/mdl/doc.rb:218
+  # pkg:gem/mdl#lib/mdl/doc.rb:219
   def matching_lines(regex); end
 
   # Returns line numbers for lines that match the given regular expression.
   # Only considers text inside of 'text' elements (i.e. regular markdown
   # text and not code/links or other elements).
   #
-  # pkg:gem/mdl#lib/mdl/doc.rb:230
+  # pkg:gem/mdl#lib/mdl/doc.rb:231
   def matching_text_element_lines(regex, exclude_nested = T.unsafe(nil)); end
 
   # A list of raw markdown source lines. Note that the list is 0-indexed,
@@ -281,7 +286,7 @@ class MarkdownLint::Doc
 
   # Reconstruct the full file content from front matter and lines
   #
-  # pkg:gem/mdl#lib/mdl/doc.rb:303
+  # pkg:gem/mdl#lib/mdl/doc.rb:304
   def to_s; end
 
   private
@@ -289,14 +294,14 @@ class MarkdownLint::Doc
   # Adds a 'level' and 'parent' option to all elements to show how nested they
   # are
   #
-  # pkg:gem/mdl#lib/mdl/doc.rb:313
+  # pkg:gem/mdl#lib/mdl/doc.rb:314
   def add_annotations(elements, level = T.unsafe(nil), parent = T.unsafe(nil)); end
 
   class << self
     # Alternate 'constructor' passing in a filename
     #
     # pkg:gem/mdl#lib/mdl/doc.rb:50
-    def new_from_file(filename, ignore_front_matter = T.unsafe(nil)); end
+    def new_from_file(filename, ignore_front_matter = T.unsafe(nil), **_arg2); end
   end
 end
 
