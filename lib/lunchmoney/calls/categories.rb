@@ -8,13 +8,10 @@ module LunchMoney
     # https://lunchmoney.dev/#categories
     class Categories < LunchMoney::Calls::Base
       # Valid query parameter formats for categories
-      VALID_FORMATS = T.let(
-        [
-          "flattened",
-          "nested",
-        ],
-        T::Array[String],
-      )
+      VALID_FORMATS = [
+        "flattened",
+        "nested",
+      ]
 
       sig do
         params(

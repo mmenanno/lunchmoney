@@ -21,7 +21,7 @@ require_relative "lunchmoney/api"
 
 module LunchMoney # rubocop:disable Style/OneClassPerFile
   # Lock used to avoid config conflicts
-  LOCK = T.let(Mutex.new, Mutex)
+  LOCK = Mutex.new
 
   class << self
     # @example Set your API key
