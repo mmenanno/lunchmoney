@@ -26,22 +26,19 @@ module LunchMoney
       attr_accessor :to_base
 
       # Valid asset type names
-      VALID_TYPE_NAMES = T.let(
-        [
-          "cash",
-          "credit",
-          "investment",
-          "real estate",
-          "loan",
-          "vehicle",
-          "cryptocurrency",
-          "employee compensation",
-          "other liability",
-          "other asset",
-          "depository",
-        ],
-        T::Array[String],
-      )
+      VALID_TYPE_NAMES = [
+        "cash",
+        "credit",
+        "investment",
+        "real estate",
+        "loan",
+        "vehicle",
+        "cryptocurrency",
+        "employee compensation",
+        "other liability",
+        "other asset",
+        "depository",
+      ]
 
       sig do
         params(

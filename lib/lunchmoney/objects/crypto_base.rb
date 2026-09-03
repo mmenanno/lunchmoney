@@ -20,13 +20,10 @@ module LunchMoney
       attr_accessor :display_name, :institution_name
 
       # Valid crypto source types
-      VALID_SOURCES = T.let(
-        [
-          "synced",
-          "manual",
-        ],
-        T::Array[String],
-      )
+      VALID_SOURCES = [
+        "synced",
+        "manual",
+      ]
 
       sig do
         params(
