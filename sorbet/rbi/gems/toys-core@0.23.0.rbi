@@ -5,7 +5,7 @@
 # Please instead update this file by running `bin/tapioca gem toys-core`.
 
 
-# Toys is a configurable command line tool. Write commands in config files
+# Toys is a configurable command line tool. Write commands in source files
 # using a simple DSL, and Toys will provide the command line executable and
 # take care of all the details such as argument parsing, online help, and error
 # reporting. Toys is designed for software developers, IT professionals, and
@@ -33,14 +33,49 @@
 #   the implementations of corresponding mixins.
 # * The main entrypoint for the command line framework is {Toys::CLI}.
 #
-# Other important internal classes are listed below.
+# ## Architecture layers
 #
-# * The definition of a tool is represented by {Toys::ToolDefinition} along
-#   the helpers {Toys::Flag}, {Toys::PositionalArg}, and {Toys::FlagGroup}.
-# * Argument parsing is implemented by {Toys::ArgParser}.
-# * The process of finding and loading a tool definition given a tool name, is
-#   implemented by {Toys::Loader}.
-# * Text wrapping is handled by {Toys::WrappableString}.
+# The classes directly under the {Toys} module are not grouped by directory,
+# but fall into four layers, listed here from the outside in. Except where
+# noted below, dependencies point downward.
+#
+# * **Execution** — runs tools. {Toys::CLI} is the main entrypoint and owns
+#   the configuration, {Toys::Runner} holds the environment tools run in and
+#   carries out each run, {Toys::ArgParser} parses the command line, and
+#   {Toys::Context} is the base class for tool runtime.
+# * **Loading** — resolves a tool name to a definition. {Toys::Loader}
+#   discovers and loads tool definitions, {Toys::SourceInfo} tracks their
+#   provenance, and {Toys::InputFile} reads tool files. A source is described
+#   unresolved by a {Toys::SourceSpec}; {Toys::SourceList} is the ordered
+#   collection of root sources that a loader reads tools from. The loader
+#   resolves each spec into a {Toys::SourceInfo} when it first needs that
+#   priority level.
+# * **Definition** — models a tool. {Toys::ToolDefinition} is the central
+#   class, with {Toys::Flag}, {Toys::FlagGroup}, and {Toys::PositionalArg} as
+#   its components, along with the pluggable {Toys::Acceptor} and
+#   {Toys::Completion} types that the DSL attaches to flags and args.
+# * **Support** — shared vocabulary used by all of the above. This includes
+#   the pluggable extension types {Toys::Mixin}, {Toys::Template}, and
+#   {Toys::Middleware}, which are resolved by name through
+#   {Toys::ModuleLookup}, as well as {Toys::WrappableString},
+#   {Toys::ToolNameSplitter} which interprets delimiters in tool names, the
+#   named sentinel {Toys::UniqueKey}, and the error classes.
+#
+# The deliberate upward dependencies are:
+#
+# * The definition layer builds each tool class as a subclass of
+#   {Toys::Context}, so that a tool's implementation inherits the runtime
+#   methods defined there.
+# * Completion is computed against a partially parsed command line, so the
+#   completion classes in the definition layer reach upward for the machinery
+#   to do it. {Toys::Completion::Context} holds a {Toys::Loader} and builds a
+#   {Toys::ArgParser}, and a tool's default completion uses that loader to
+#   enumerate subtools and to resolve delegation targets.
+# * {Toys::ToolDefinition} retains the {Toys::SourceInfo} describing where it
+#   was defined.
+# * The context key constants under {Toys::Context::Key}, which are
+#   {Toys::UniqueKey} instances, act as shared vocabulary, and are referenced
+#   from any layer.
 #
 # This file is vendored from the exec_service gem.
 # Do not edit directly; run `toys vendor-util exec` to regenerate.
@@ -49,7 +84,7 @@
 # This file is vendored from the simple_xdg gem.
 # Do not edit directly; run `toys vendor-util xdg` to regenerate.
 #
-# pkg:gem/toys-core#lib/toys-core.rb:41
+# pkg:gem/toys-core#lib/toys-core.rb:76
 module Toys
   class << self
     # Create a base class for defining a tool with a given name.
@@ -85,7 +120,7 @@ module Toys
     # @return [String] if there is an executable
     # @return [nil] if there is no such executable
     #
-    # pkg:gem/toys-core#lib/toys-core.rb:113
+    # pkg:gem/toys-core#lib/toys-core.rb:150
     def executable_path; end
 
     # Path to the executable. This can, for example, be invoked to run a subtool
@@ -94,8 +129,16 @@ module Toys
     # @return [String] if there is an executable
     # @return [nil] if there is no such executable
     #
-    # pkg:gem/toys-core#lib/toys-core.rb:113
+    # pkg:gem/toys-core#lib/toys-core.rb:150
     def executable_path=(_arg0); end
+
+    # Array of directory absolute paths within which Ruby files for the
+    # toys-core (and toys, if present) gems live.
+    #
+    # @return [Array<String>] Array of directory paths
+    #
+    # pkg:gem/toys-core#lib/toys-core.rb:158
+    def framework_lib_paths; end
   end
 end
 
@@ -496,7 +539,7 @@ Toys::Acceptor::RATIONAL_CONVERTER = T.let(T.unsafe(nil), Proc)
 # @return [Object]
 #
 # pkg:gem/toys-core#lib/toys/acceptor.rb:25
-Toys::Acceptor::REJECT = T.let(T.unsafe(nil), Object)
+Toys::Acceptor::REJECT = T.let(T.unsafe(nil), Toys::UniqueKey)
 
 # An acceptor that recognizes a range of values.
 #
@@ -617,33 +660,34 @@ Toys::Acceptor::TRUE_STRINGS = T.let(T.unsafe(nil), Array)
 class Toys::ArgParser
   # Create an argument parser for a particular tool.
   #
-  # @param cli [Toys::CLI] The CLI in effect.
   # @param tool [Toys::ToolDefinition] The tool defining the argument format.
-  # @param default_data [Hash] Additional initial data (such as verbosity).
+  # @param loader [Toys::Loader] The loader, used to generate suggestions
+  #     for unrecognized arguments.
+  # @param common_data [Hash] Additional initial data (such as verbosity).
   # @param require_exact_flag_match [boolean] Whether to require flag matches
   #     be exact (not partial). Default is false.
   #
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:297
-  def initialize(cli, tool, default_data: T.unsafe(nil), require_exact_flag_match: T.unsafe(nil)); end
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:298
+  def initialize(tool, loader, common_data: T.unsafe(nil), require_exact_flag_match: T.unsafe(nil)); end
 
   # The current flag definition whose value is still pending
   #
   # @return [Toys::Flag] The pending flag definition
   # @return [nil] if there is no pending flag
   #
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:364
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:379
   def active_flag_def; end
 
   # The collected tool data from parsed arguments.
   # @return [Hash]
   #
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:350
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:365
   def data; end
 
   # An array of parse error messages.
   # @return [Array<Toys::ArgParser::UsageError>]
   #
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:356
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:371
   def errors; end
 
   # Complete parsing. This should be called after all arguments have been
@@ -655,27 +699,27 @@ class Toys::ArgParser
   #  *  One or more extra arguments were provided.
   #  *  Restrictions defined in one or more flag groups were not fulfilled.
   #
-  # Any errors are added to the errors array. It also fills in final values
-  # for `Context::Key::USAGE_ERRORS` and `Context::Key::ARGS`.
+  # Any errors are added to the errors array, and are thus reflected in
+  # {#data} under `Context::Key::USAGE_ERRORS`.
   #
   # After this method is called, this object is locked down, and no
   # additional arguments may be parsed.
   #
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:427
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:442
   def finish; end
 
   # Determine if this parser is finished
   # @return [boolean]
   #
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:378
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:393
   def finished?; end
 
   # Whether flags are currently allowed. Returns false after `--` is received.
   # @return [boolean]
   #
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:370
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:385
   def flags_allowed?; end
 
   # The argument definition that will be applied to the next argument.
@@ -683,7 +727,7 @@ class Toys::ArgParser
   # @return [Toys::PositionalArg] The next argument definition.
   # @return [nil] if all arguments have been filled.
   #
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:388
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:403
   def next_arg_def; end
 
   # Incrementally parse a single string or an array of strings
@@ -691,82 +735,96 @@ class Toys::ArgParser
   # @param args [String,Array<String>]
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:398
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:413
   def parse(args); end
 
   # All command line arguments that have been parsed.
   # @return [Array<String>]
   #
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:326
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:341
   def parsed_args; end
 
   # The tool definition governing this parser.
   # @return [Toys::ToolDefinition]
   #
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:320
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:335
   def tool; end
 
   # All args that were not matched.
   # @return [Array<String>]
   #
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:344
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:359
   def unmatched_args; end
 
   # Flags that were not matched.
   # @return [Array<String>]
   #
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:338
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:353
   def unmatched_flags; end
 
   # Extra positional args that were not matched.
   # @return [Array<String>]
   #
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:332
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:347
   def unmatched_positional; end
 
   private
 
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:562
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:601
   def add_data(key, handler, accept, value, type_name, display_name); end
 
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:469
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:467
   def check_flag(arg); end
 
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:458
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:456
   def check_flag_value(arg); end
 
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:542
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:581
   def find_flag(name); end
 
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:584
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:623
   def finish_active_flag; end
 
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:595
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:634
   def finish_arg_defs; end
 
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:613
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:652
   def finish_flag_groups; end
 
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:619
-  def finish_special_data; end
-
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:492
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:531
   def handle_plain_flag(name, following = T.unsafe(nil)); end
 
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:527
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:566
   def handle_positional(arg); end
 
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:486
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:525
   def handle_single_flags(str); end
 
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:513
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:552
   def handle_valued_flag(name, value); end
 
-  # pkg:gem/toys-core#lib/toys/arg_parser.rb:442
-  def initial_data(cli, tool, default_data); end
+  # Determine whether a cluster of single-character flags should be
+  # redirected to the positional arguments. This walks the cluster in the
+  # same manner as {#handle_single_flags}, and returns true if any character
+  # that would be interpreted as a flag is unknown. An ambiguous character is
+  # not considered unknown, and is left for the normal parsing path to
+  # report.
+  #
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:507
+  def redirect_cluster?(str); end
+
+  # Determine whether the given flag name should be redirected to the
+  # positional arguments rather than resolved as a flag. Always false unless
+  # the tool has enabled the behavior.
+  #
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:494
+  def redirect_flag?(name); end
+
+  # pkg:gem/toys-core#lib/toys/arg_parser.rb:521
+  def unknown_flag?(flag_result); end
 end
 
-# pkg:gem/toys-core#lib/toys/arg_parser.rb:439
+# pkg:gem/toys-core#lib/toys/arg_parser.rb:453
 Toys::ArgParser::ARG_HANDLER = T.let(T.unsafe(nil), Proc)
 
 # A UsageError indicating a required positional argument was not fulfilled.
@@ -912,7 +970,7 @@ class Toys::ArgParser::FlagValueUnacceptableError < ::Toys::ArgParser::UsageErro
   def initialize(message = T.unsafe(nil), name: T.unsafe(nil), value: T.unsafe(nil), suggestions: T.unsafe(nil)); end
 end
 
-# pkg:gem/toys-core#lib/toys/arg_parser.rb:438
+# pkg:gem/toys-core#lib/toys/arg_parser.rb:452
 Toys::ArgParser::REMAINING_HANDLER = T.let(T.unsafe(nil), Proc)
 
 # A UsageError indicating the given subtool name does not exist.
@@ -1005,29 +1063,35 @@ class Toys::ArgParser::UsageError < ::StandardError
   def value; end
 end
 
-# An exception indicating problems parsing arguments.
+# An exception indicating problems parsing arguments. These are generally
+# handled internally by triggering usage error handlers.
 #
-# pkg:gem/toys-core#lib/toys/errors.rb:19
+# pkg:gem/toys-core#lib/toys/errors.rb:40
 class Toys::ArgParsingError < ::StandardError
   # Create an ArgParsingError given a set of error messages
   # @param errors [Array<Toys::ArgParser::UsageError>]
   #
-  # pkg:gem/toys-core#lib/toys/errors.rb:24
+  # pkg:gem/toys-core#lib/toys/errors.rb:45
   def initialize(errors); end
 
   # The individual usage error messages.
   # @return [Array<Toys::ArgParser::UsageError>]
   #
-  # pkg:gem/toys-core#lib/toys/errors.rb:33
+  # pkg:gem/toys-core#lib/toys/errors.rb:54
   def usage_errors; end
 end
 
 # A Toys-based CLI.
 #
-# This is the entry point for command line execution. It includes the set of
-# tool definitions (and/or information on how to load them from the file
-# system), configuration parameters such as logging and error handling, and a
-# method to call to invoke a command.
+# This is the entry point for command line execution, and the stable public
+# interface to the framework. A CLI owns the configuration: it gathers all
+# the settings in one place, constructs the {Toys::Loader} that finds and
+# loads tool definitions, and constructs the {Toys::Runner} that runs them.
+# It also provides {#child}, which clones the configuration so a tool can be
+# run under modified settings.
+#
+# Running a tool is delegated to the Runner; {#run} and {#load_tool} are thin
+# wrappers around it that supply the CLI's configuration.
 #
 # This is the class to instantiate to create a Toys-based command line
 # executable. For example:
@@ -1035,30 +1099,33 @@ end
 #     #!/usr/bin/env ruby
 #     require "toys-core"
 #     cli = Toys::CLI.new
-#     cli.add_config_block do
+#     cli.add_source do
 #       def run
 #         puts "Hello, world!"
 #       end
 #     end
 #     exit(cli.run(*ARGV))
 #
-# The currently running CLI is also available at runtime, and can be used by
-# tools that want to invoke other tools. For example:
+# The currently running CLI is also available at runtime, as
+# {Toys::Context#cli}. Use it when a tool needs the CLI configuration
+# itself, most often to build a modified copy with {#child}. For example:
 #
 #     # My .toys.rb
-#     tool "foo" do
-#       def run
-#         puts "in foo"
-#       end
-#     end
 #     tool "bar" do
 #       def run
-#         puts "in bar"
-#         cli.run "foo"
+#         # Run "some-tool" with the tools from the "my-tools" gem also
+#         # available.
+#         child = cli.child(copy_sources: true) do |c|
+#           c.add_source(Toys::SourceSpec.gem("my-tools"), high_priority: true)
+#         end
+#         child.run("some-tool")
 #       end
 #     end
 #
-# pkg:gem/toys-core#lib/toys/cli.rb:43
+# A tool that simply wants to invoke another tool should instead use the
+# runner, as described in {Toys::Runner}.
+#
+# pkg:gem/toys-core#lib/toys/cli.rb:52
 class Toys::CLI
   # Create a CLI.
   #
@@ -1080,17 +1147,16 @@ class Toys::CLI
   #      *  `mixin_lookup`: Where to find well-known mixins
   #      *  `middleware_lookup`: Where to find well-known middleware
   #      *  `template_lookup`: Where to find well-known templates
-  #  *  Options affecting tool files and directories
-  #      *  `config_dir_name`: Directory name containing tool files
-  #      *  `config_file_name`: File name for tools
-  #      *  `index_file_name`: Name of index files in tool directories
-  #      *  `preload_file_name`: Name of preload files in tool directories
-  #      *  `preload_dir_name`: Name of preload directories in tool directories
-  #      *  `data_dir_name`: Name of data directories in tool directories
+  #  *  Options affecting tool sources
+  #      *  `toplevel_tool_dir_name`: Directory name containing tool files
+  #      *  `toplevel_tool_file_name`: File name for tools
+  #      *  `source_list`: Initial sources to populate
+  #      *  `git_cache`: How to resolve git sources
+  #      *  `gems_util`: How to resolve gem sources
   #
   # @param logger [Logger] A global logger to use for all tools. This can be
   #     set if the CLI will call at most one tool at a time. However, it will
-  #     behave incorrectly if CLI might run multiple tools at the same time
+  #     behave incorrectly if the CLI might run multiple tools concurrently
   #     with different verbosity settings (since the logger cannot have
   #     multiple level settings simultaneously). In that case, do not set a
   #     global logger, but use the `logger_factory` parameter instead.
@@ -1100,18 +1166,17 @@ class Toys::CLI
   #     {Toys::CLI.default_logger_factory} is called to get a basic default.
   # @param base_level [Integer] The logger level that should correspond
   #     to zero verbosity.
-  #     Optional. If not provided, defaults to the current level of the
-  #     logger (which is often `Logger::WARN`).
+  #     Optional. If not provided, defaults to the level the logger has
+  #     before a run adjusts it (which is often `Logger::WARN`). See the
+  #     same argument to {Toys::Runner#initialize} for how this interacts
+  #     with nested runs.
   # @param error_handler [Proc,nil] A proc that is called when an unhandled
-  #     exception (a normal exception subclassing `StandardError`, an error
-  #     loading a toys config file subclassing `SyntaxError`, or an unhandled
-  #     signal subclassing `SignalException`) is detected. The proc should
-  #     take a {Toys::ContextualError}, whose cause is the unhandled
-  #     exception, as the sole argument, and report the error. It could
-  #     simply reraise the exception, or it could display an error message
-  #     and/or return an exit code (normally nonzero) appropriate to the
-  #     error. Optional. If not provided, {Toys::CLI.default_error_handler}
-  #     is called to get a basic default handler that reraises the exception.
+  #     exception is detected. See the `error_handler` argument to
+  #     {Toys::Runner#initialize} for the handler's contract. Because a CLI
+  #     always wraps errors, a handler installed here sees only a
+  #     {Toys::ContextualError} or a bare `SignalException`.
+  #     Optional. If not provided, {Toys::CLI.default_error_handler} is
+  #     called to get a basic default handler that reraises the exception.
   # @param executable_name [String] The executable name displayed in help
   #     text. Optional. Defaults to the ruby program name.
   #
@@ -1148,85 +1213,90 @@ class Toys::CLI
   #     {Toys::CLI.default_template_lookup}. If you explicitly want no
   #     standard templates, pass an empty instance of {Toys::ModuleLookup}.
   #
-  # @param config_dir_name [String] A directory with this name that appears
-  #     in the loader path, is treated as a configuration directory whose
-  #     contents are loaded into the toys configuration.
-  #     Optional. If not provided, toplevel configuration directories are
-  #     disabled.
-  #     Note: the standard toys executable sets this to `".toys"`.
-  # @param config_file_name [String] A file with this name that appears in
-  #     the loader path, is treated as a toplevel configuration file whose
-  #     contents are loaded into the toys configuration. This does not
-  #     include "index" configuration files located within a configuration
-  #     directory.
-  #     Optional. If not provided, toplevel configuration files are disabled.
-  #     Note: the standard toys executable sets this to `".toys.rb"`.
-  # @param index_file_name [String] A file with this name that appears in any
-  #     configuration directory is loaded first as a standalone configuration
-  #     file. This does not include "toplevel" configuration files outside
-  #     configuration directories.
-  #     Optional. If not provided, index configuration files are disabled.
-  #     Note: the standard toys executable sets this to `".toys.rb"`.
-  # @param preload_file_name [String] A file with this name that appears
-  #     in any configuration directory is preloaded using `require` before
-  #     any tools in that configuration directory are defined. A preload file
-  #     includes normal Ruby code, rather than Toys DSL definitions. The
-  #     preload file is loaded before any files in a preload directory.
-  #     Optional. If not provided, preload files are disabled.
-  #     Note: the standard toys executable sets this to `".preload.rb"`.
-  # @param preload_dir_name [String] A directory with this name that appears
-  #     in any configuration directory is searched for Ruby files, which are
-  #     preloaded using `require` before any tools in that configuration
-  #     directory are defined. Files in a preload directory include normal
-  #     Ruby code, rather than Toys DSL definitions. Files in a preload
-  #     directory are loaded after any standalone preload file.
-  #     Optional. If not provided, preload directories are disabled.
-  #     Note: the standard toys executable sets this to `".preload"`.
-  # @param data_dir_name [String] A directory with this name that appears in
-  #     any configuration directory is added to the data directory search
-  #     path for any tool file in that directory.
-  #     Optional. If not provided, data directories are disabled.
-  #     Note: the standard toys executable sets this to `".data"`.
-  # @param lib_dir_name [String] A directory with this name that appears in
-  #     any configuration directory is added to the Ruby load path when
-  #     executing any tool file in that directory.
-  #     Optional. If not provided, lib directories are disabled.
-  #     Note: the standard toys executable sets this to `".lib"`.
+  # @param toplevel_tool_dir_name [String] Tools are loaded from directories
+  #     of this name that appear in a search path.
+  #     Optional. If not provided, search paths do not load tool directories.
+  #     The standard toys executable sets this to `".toys"`.
+  # @param toplevel_tool_file_name [String] Tools are loaded from files of
+  #     this name that appear in a search path.
+  #     Optional. If not provided, search paths do not load tool files.
+  #     The standard toys executable sets this to `".toys.rb"`.
+  #     Note: This setting does not affect the name of "index" toys files,
+  #     which is fixed at `".toys.rb"`.
+  # @param source_list [Toys::SourceList] An optional list of sources to
+  #     prepopulate into the CLI.
+  # @param git_cache [Toys::Utils::GitCache,nil] A custom GitCache instance
+  #     to use when resolving git sources. Optional. If nil or not
+  #     specified, uses a process-wide default GitCache.
+  # @param gems_util [Toys::Utils::Gems,nil] A custom Gems utility instance
+  #     to use when resolving gem sources. Optional. If nil or not
+  #     specified, uses a process-wide default Gems utility.
   #
-  # pkg:gem/toys-core#lib/toys/cli.rb:178
-  def initialize(executable_name: T.unsafe(nil), middleware_stack: T.unsafe(nil), extra_delimiters: T.unsafe(nil), config_dir_name: T.unsafe(nil), config_file_name: T.unsafe(nil), index_file_name: T.unsafe(nil), preload_file_name: T.unsafe(nil), preload_dir_name: T.unsafe(nil), data_dir_name: T.unsafe(nil), lib_dir_name: T.unsafe(nil), mixin_lookup: T.unsafe(nil), middleware_lookup: T.unsafe(nil), template_lookup: T.unsafe(nil), logger_factory: T.unsafe(nil), logger: T.unsafe(nil), base_level: T.unsafe(nil), error_handler: T.unsafe(nil), completion: T.unsafe(nil)); end
+  # pkg:gem/toys-core#lib/toys/cli.rb:159
+  def initialize(executable_name: T.unsafe(nil), middleware_stack: T.unsafe(nil), extra_delimiters: T.unsafe(nil), toplevel_tool_dir_name: T.unsafe(nil), toplevel_tool_file_name: T.unsafe(nil), mixin_lookup: T.unsafe(nil), middleware_lookup: T.unsafe(nil), template_lookup: T.unsafe(nil), logger_factory: T.unsafe(nil), logger: T.unsafe(nil), base_level: T.unsafe(nil), error_handler: T.unsafe(nil), completion: T.unsafe(nil), source_list: T.unsafe(nil), git_cache: T.unsafe(nil), gems_util: T.unsafe(nil)); end
 
-  # Add a configuration block to the loader.
+  # Add a block to the source list.
   #
-  # This is used to create tools "inline", and is useful for simple command
-  # line executables based on Toys.
+  # This is a deprecated legacy method that has been superseded by
+  # {#add_source}. Instead of:
   #
-  # @param high_priority [boolean] Add the config at the head of the priority
+  #     cli.add_config_block do
+  #       ...
+  #     end
+  #
+  # You should now:
+  #
+  #     cli.add_source do
+  #       ...
+  #     end
+  #
+  # Or, if you need to configure the source name or context directory:
+  #
+  #     source = Toys::SourceSpec.block(context_directory: "/var/project") do
+  #       ...
+  #     end
+  #     cli.add_source(source)
+  #
+  # @deprecated Prefer {#add_source}.
+  #
+  # @param high_priority [boolean] Add the source at the head of the priority
   #     list rather than the tail.
   # @param source_name [String] The source name that will be shown in
   #     documentation for tools defined in this block. If omitted, a default
   #     unique string will be generated.
-  # @param block [Proc] The block of configuration, executed in the context
-  #     of the tool DSL {Toys::DSL::Tool}.
+  # @param block [Proc] The source block, executed in the context of the tool
+  #     DSL {Toys::DSL::Tool}.
   # @param context_directory [String,nil] The context directory for tools
   #     loaded from this block. You can pass a directory path as a string, or
   #     `nil` to denote no context. Defaults to `nil`.
-  # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/cli.rb:360
+  # @return [self]
+  # @raise [Toys::SourceListFinalizedError] if the source list has already
+  #     been finalized.
+  #
+  # pkg:gem/toys-core#lib/toys/cli.rb:630
   def add_config_block(high_priority: T.unsafe(nil), source_name: T.unsafe(nil), context_directory: T.unsafe(nil), &block); end
 
-  # Add a specific configuration file or directory to the loader.
+  # Add a specific tool file or directory to the source list.
   #
-  # This is generally used to load a static or "built-in" set of tools,
-  # either for a standalone command line executable based on Toys, or to
-  # provide a "default" set of tools for a dynamic executable. For example,
-  # the main Toys executable uses this to load the builtin tools from its
-  # "builtins" directory.
+  # This is a deprecated legacy method that has been superseded by
+  # {#add_source}. However, note that while `add_config_path` sets a
+  # particular context directory by default, {#add_source} does not. So the
+  # equivalent of:
   #
-  # @param path [String] A path to add. May reference a single Toys file or
-  #     a Toys directory.
-  # @param high_priority [boolean] Add the config at the head of the priority
+  #     cli.add_config_path("/path/to/tools")
+  #
+  # is technically:
+  #
+  #     source = Toys::SourceSpec.path("/path/to/tools",
+  #                                    context_directory: "/path/to")
+  #     cli.add_source(source)
+  #
+  # @deprecated Prefer {#add_source}.
+  #
+  # @param path [String] A path to add. May reference a single tool file or a
+  #     tool directory.
+  # @param high_priority [boolean] Add the source at the head of the priority
   #     list rather than the tail.
   # @param source_name [String] A custom name for the root source. Optional.
   # @param context_directory [String,nil,:path,:parent] The context directory
@@ -1234,60 +1304,142 @@ class Toys::CLI
   #     string, `:path` to denote the given path, `:parent` to denote the
   #     given path's parent directory, or `nil` to denote no context.
   #     Defaults to `:parent`.
-  # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/cli.rb:331
+  # @return [self]
+  # @raise [Toys::SourceListFinalizedError] if the source list has already
+  #     been finalized.
+  #
+  # pkg:gem/toys-core#lib/toys/cli.rb:580
   def add_config_path(path, high_priority: T.unsafe(nil), source_name: T.unsafe(nil), context_directory: T.unsafe(nil)); end
 
-  # Checks the given directory path. If it contains a config file and/or
-  # config directory, those are added to the loader.
+  # Checks the given search directory. If it contains a tool file and/or
+  # tool directory (identified by the `toplevel_tool_file_name` and
+  # `toplevel_tool_dir_name` constructor arguments), those are added to the
+  # source list. If the given search directory path does not exist or does
+  # not contain either the file or directory, nothing is added.
   #
   # The main Toys executable uses this method to load tools from directories
   # in the `TOYS_PATH`.
   #
-  # @param search_path [String] A path to search for configs.
-  # @param high_priority [boolean] Add the configs at the head of the
+  # @param search_path [String,Pathname] A directory path to search for the
+  #     well-known source file and directory. Must be a String or a Pathname.
+  #     Paths should generally be absolute. Relative paths will be converted
+  #     to absolute, using the current working directory at call time.
+  # @param high_priority [boolean] Add the sources at the head of the
   #     priority list rather than the tail.
-  # @param context_directory [String,nil,:path,:parent] The context directory
-  #     for tools loaded from this path. You can pass a directory path as a
-  #     string, `:path` to denote the given path, `:parent` to denote the
-  #     given path's parent directory, or `nil` to denote no context.
-  #     Defaults to `:path`.
-  # @return [self]
+  # @param context_directory [String,Pathname,nil,:path,:parent] The context
+  #     directory for tools loaded from sources found using this method. You
+  #     can pass a directory path as a String or Pathname, `:path` to denote
+  #     the given search_path, `:parent` to denote the given search_path's
+  #     parent directory, or `nil` to denote no context. Defaults to `:path`.
+  #     If a path is provided, it should generally be an absolute path; any
+  #     relative path will be expanded relative to the current working
+  #     directory at call time.
   #
-  # pkg:gem/toys-core#lib/toys/cli.rb:388
+  # @return [self]
+  # @raise [ArgumentError] if a given path is not a legal value.
+  # @raise [Toys::SourceListFinalizedError] if the source list has already
+  #     been finalized.
+  #
+  # pkg:gem/toys-core#lib/toys/cli.rb:377
   def add_search_path(search_path, high_priority: T.unsafe(nil), context_directory: T.unsafe(nil)); end
 
-  # Walk up the directory hierarchy from the given start location, and add to
-  # the loader any config files and directories found.
+  # Walk up the directory hierarchy from the given start location, searching
+  # for toplevel tool files and directories, and add any found. Starts at the
+  # given directory and works up through parent directories until it reaches
+  # the file system root or it encounters one of the "terminate" directories.
   #
   # The main Toys executable uses this method to load tools from the current
   # directory and its ancestors.
   #
-  # @param start [String] The first directory to add. Defaults to the current
-  #     working directory.
-  # @param terminate [Array<String>] Optional list of directories that should
-  #     terminate the search. If the walk up the directory tree encounters
-  #     one of these directories, the search is halted without checking the
-  #     terminating directory.
-  # @param high_priority [boolean] Add the configs at the head of the
+  # @param start [String,Pathname,nil] The first directory path to search.
+  #     If not given, defaults to the current working directory. If provided,
+  #     must be a String or a Pathname. Paths should generally be absolute.
+  #     Relative paths will be converted to absolute, using the current
+  #     working directory at call time.
+  # @param terminate [Array<String,Pathname>] Optional list of directories
+  #     that should terminate the search. If the walk up the directory tree
+  #     encounters one of these directories, the search is halted without
+  #     checking the terminating directory. Terminating directories should
+  #     generally be absolute paths. Relative paths will be converted to
+  #     absolute, using the current working directory at call time.
+  # @param high_priority [boolean] Add the sources at the head of the
   #     priority list rather than the tail.
-  # @return [self]
+  # @param context_directory [String,Pathname,nil,:path,:parent] The context
+  #     directory for tools loaded from sources found using this method. You
+  #     can pass a directory path as a String or Pathname, `:path` to denote
+  #     the current path during the directory walk, `:parent` to denote the
+  #     current walk directory's _parent directory_, or `nil` to denote no
+  #     context. Defaults to `:path`, which is the behavior of the Toys
+  #     executable when it loads tools from the current directory and its
+  #     ancestors. If a context directory path is provided, it should
+  #     generally be an absolute path; any relative path will be expanded
+  #     relative to the current working directory at call time.
   #
-  # pkg:gem/toys-core#lib/toys/cli.rb:423
-  def add_search_path_hierarchy(start: T.unsafe(nil), terminate: T.unsafe(nil), high_priority: T.unsafe(nil)); end
+  # @return [self]
+  # @raise [ArgumentError] if a given path is not a legal value.
+  # @raise [Toys::SourceListFinalizedError] if the source list has already
+  #     been finalized.
+  #
+  # pkg:gem/toys-core#lib/toys/cli.rb:440
+  def add_search_path_hierarchy(start: T.unsafe(nil), terminate: T.unsafe(nil), high_priority: T.unsafe(nil), context_directory: T.unsafe(nil)); end
+
+  # Add a source to the source list, described by the given source spec.
+  #
+  # This is generally used to load a static or "built-in" set of tools,
+  # either for a standalone command line executable based on Toys, or to
+  # provide a "default" set of tools for a dynamic executable. For example,
+  # the main Toys executable uses this to load the builtin tools from its
+  # "builtins" directory.
+  #
+  # The source can be specified in one of three ways:
+  #
+  # * A source spec built using one of the {Toys::SourceSpec} module methods.
+  #   If you need to configure the context directory or name of the source,
+  #   you must use a full SourceSpec object.
+  # * A string (or other object convertible to a path, such as a `Pathname`)
+  #   interpreted as a file system path, which will be passed to
+  #   {Toys::SourceSpec.path} to get the source spec.
+  # * A block, which will be passed to {Toys::SourceSpec.block} to get the
+  #   source spec. (Do not include an argument if passing a block.)
+  #
+  # The spec is not resolved here. The loader resolves it, at most once, the
+  # first time it looks up a tool, so a source that cannot be read, fetched,
+  # or activated fails then rather than now.
+  #
+  # @param spec [Toys::SourceSpec::Base,String] The source spec to add.
+  # @param high_priority [boolean] Add the source at the head of the priority
+  #     list rather than the tail.
+  #
+  # @return [self]
+  # @raise [ArgumentError] if no source is given, or if the given source is
+  #     neither a source spec nor a legal path.
+  # @raise [Toys::SourceListFinalizedError] if the source list has already
+  #     been finalized.
+  #
+  # pkg:gem/toys-core#lib/toys/cli.rb:332
+  def add_source(spec = T.unsafe(nil), high_priority: T.unsafe(nil), &block); end
 
   # The initial logger level in this CLI, used as the level for verbosity 0.
   # May be `nil`, indicating it will use the initial logger setting.
   # @return [Integer,nil]
   #
-  # pkg:gem/toys-core#lib/toys/cli.rb:302
+  # pkg:gem/toys-core#lib/toys/cli.rb:290
   def base_level; end
 
-  # Make a clone with the same settings but no config blocks and no paths in
-  # the loader. This is sometimes useful for calling another tool that has to
-  # be loaded from a different configuration.
+  # Make a clone of this CLI with the same settings.
   #
+  # By default, the new CLI has no tool sources, which is sometimes useful
+  # for calling another tool that has to be loaded from a different source
+  # configuration. Alternately, you can pass `copy_sources: true` to start
+  # with the same sources as the original (to which you can add additional
+  # sources before starting to load tools). Sources are copied before the
+  # block (if any) is called, so any sources the block adds at high priority
+  # will take priority over the originals.
+  #
+  # @param copy_sources [boolean] If true, the new CLI is populated with the
+  #     same sources as the original. Default is false, resulting in a copy
+  #     with no sources initially.
   # @param opts [keywords] Any configuration arguments that should be
   #     modified from the original. See {#initialize} for a list of
   #     recognized keywords.
@@ -1295,127 +1447,178 @@ class Toys::CLI
   # @yieldparam cli [Toys::CLI] If you pass a block, the new CLI is yielded
   #     to it so you can add paths and make other modifications.
   #
-  # pkg:gem/toys-core#lib/toys/cli.rb:241
-  def child(**opts); end
+  # pkg:gem/toys-core#lib/toys/cli.rb:218
+  def child(copy_sources: T.unsafe(nil), **opts); end
 
   # The overall completion strategy for this CLI.
   # @return [Toys::Completion::Base,Proc]
   #
-  # pkg:gem/toys-core#lib/toys/cli.rb:308
+  # pkg:gem/toys-core#lib/toys/cli.rb:296
   def completion; end
 
   # The effective executable name used for usage text in this CLI.
   # @return [String]
   #
-  # pkg:gem/toys-core#lib/toys/cli.rb:277
+  # pkg:gem/toys-core#lib/toys/cli.rb:258
   def executable_name; end
 
   # The string of tool name delimiter characters (besides space).
   # @return [String]
   #
-  # pkg:gem/toys-core#lib/toys/cli.rb:283
+  # pkg:gem/toys-core#lib/toys/cli.rb:264
   def extra_delimiters; end
+
+  # Finalize the source list. Any subsequent attempt to add a source will
+  # raise {Toys::SourceListFinalizedError}.
+  #
+  # @return [self]
+  #
+  # pkg:gem/toys-core#lib/toys/cli.rb:523
+  def finalize_sources!; end
 
   # Prepare a tool to be run, but just execute the given block rather than
   # performing a full run of the tool. This is intended for testing tools.
-  # Unlike {#run}, this does not catch errors and perform error handling.
   #
-  # @param args [String...] Command line arguments specifying which tool to
-  #     run and what arguments to pass to it. You may pass either a single
-  #     array of strings, or a series of string arguments.
-  # @yieldparam context [Toys::Context] Yields the tool context.
+  # Unlike {#run}, this neither wraps errors nor passes them to the error
+  # handler. An error such as a failure to parse arguments or to load the
+  # requested tool is raised out of this method as-is, so the block does not
+  # execute and this method does not return.
   #
-  # @return [Object] The value returned from the block. Returns nil if the
-  #     block did not execute because of an error such as failure to parse
-  #     arguments or load the requested tool.
-  #
-  # pkg:gem/toys-core#lib/toys/cli.rb:487
-  def load_tool(*args); end
-
-  # The current loader for this CLI.
-  # @return [Toys::Loader]
-  #
-  # pkg:gem/toys-core#lib/toys/cli.rb:271
-  def loader; end
-
-  # The global logger, if any.
-  # @return [Logger,nil]
-  #
-  # pkg:gem/toys-core#lib/toys/cli.rb:289
-  def logger; end
-
-  # The logger factory.
-  # @return [Proc]
-  #
-  # pkg:gem/toys-core#lib/toys/cli.rb:295
-  def logger_factory; end
-
-  # Run the CLI with the given command line arguments.
-  # Handles exceptions using the error handler.
+  # Note that calling this finalizes this CLI's source list if not already
+  # finalized. Any subsequent attempt to add a source raises
+  # {Toys::SourceListFinalizedError}.
   #
   # @param args [String...] Command line arguments specifying which tool to
   #     run and what arguments to pass to it. You may pass either a single
   #     array of strings, or a series of string arguments.
   # @param verbosity [Integer] Initial verbosity. Default is 0.
-  # @param delegated_from [Toys::Context] The context from which this
-  #     execution is delegated. Optional. Should be set only if this is a
-  #     delegated execution.
+  # @yieldparam context [Toys::Context] Yields the tool context.
+  #
+  # @return [Object] The value returned from the block.
+  #
+  # pkg:gem/toys-core#lib/toys/cli.rb:508
+  def load_tool(*args, verbosity: T.unsafe(nil)); end
+
+  # The current loader for this CLI.
+  #
+  # Note that calling this finalizes this CLI's source list if not already
+  # finalized. Any subsequent attempt to add a source raises
+  # {Toys::SourceListFinalizedError}.
+  #
+  # @return [Toys::Loader]
+  #
+  # pkg:gem/toys-core#lib/toys/cli.rb:233
+  def loader; end
+
+  # The global logger, if any.
+  # @return [Logger,nil]
+  #
+  # pkg:gem/toys-core#lib/toys/cli.rb:277
+  def logger; end
+
+  # The logger factory.
+  # @return [Proc]
+  #
+  # pkg:gem/toys-core#lib/toys/cli.rb:283
+  def logger_factory; end
+
+  # Run the CLI with the given command line arguments.
+  # Handles exceptions using the error handler.
+  #
+  # Any error that is not handled by the tool itself is passed to this CLI's
+  # error handler, and this method returns the exit code that the handler
+  # produces. Ordinary errors arrive as a {Toys::ContextualError} wrapper,
+  # but a signal that no tool intercepted arrives as the `SignalException`
+  # itself, unwrapped. See the `error_handler` argument to {#initialize}.
+  #
+  # Note that calling this finalizes this CLI's source list if not already
+  # finalized. Any subsequent attempt to add a source raises
+  # {Toys::SourceListFinalizedError}.
+  #
+  # @param args [String...] Command line arguments specifying which tool to
+  #     run and what arguments to pass to it. You may pass either a single
+  #     array of strings, or a series of string arguments.
+  # @param verbosity [Integer] Initial verbosity. Default is 0.
   #
   # @return [Integer] The resulting process status code (i.e. 0 for success).
   #
-  # pkg:gem/toys-core#lib/toys/cli.rb:454
-  def run(*args, verbosity: T.unsafe(nil), delegated_from: T.unsafe(nil)); end
+  # pkg:gem/toys-core#lib/toys/cli.rb:483
+  def run(*args, verbosity: T.unsafe(nil)); end
+
+  # The runner this CLI uses to run tools, configured with this CLI's
+  # settings. Use it directly when you need more control over a single run
+  # than {#run} provides, such as turning off error handling.
+  #
+  # Note that calling this finalizes this CLI's source list if not already
+  # finalized. Any subsequent attempt to add a source raises
+  # {Toys::SourceListFinalizedError}.
+  #
+  # @return [Toys::Runner]
+  #
+  # pkg:gem/toys-core#lib/toys/cli.rb:249
+  def runner; end
+
+  # The splitter that interprets delimiters in tool names, reflecting this
+  # CLI's {#extra_delimiters}.
+  # @return [Toys::ToolNameSplitter]
+  #
+  # pkg:gem/toys-core#lib/toys/cli.rb:271
+  def tool_name_splitter; end
 
   private
 
-  # pkg:gem/toys-core#lib/toys/cli.rb:593
-  def build_context(tool, args, verbosity: T.unsafe(nil), delegated_from: T.unsafe(nil)); end
+  # Ensure that the source list is still open for additions.
+  #
+  # @raise [Toys::SourceListFinalizedError] if the source list is finalized.
+  #
+  # pkg:gem/toys-core#lib/toys/cli.rb:744
+  def check_source_list_open; end
 
-  # pkg:gem/toys-core#lib/toys/cli.rb:637
-  def build_executor(tool, context); end
+  # The configuration settings of this CLI, as a hash of constructor
+  # arguments suitable for creating a copy.
+  #
+  # pkg:gem/toys-core#lib/toys/cli.rb:754
+  def current_settings(copy_sources); end
 
-  # pkg:gem/toys-core#lib/toys/cli.rb:671
-  def call_handler(context, handler, argument); end
+  # Synchronize access to the source list. Ensures that the source list is
+  # still open for additions, and serializes the given block.
+  #
+  # @raise [Toys::SourceListFinalizedError] if the source list is finalized.
+  #
+  # pkg:gem/toys-core#lib/toys/cli.rb:732
+  def ensure_source_list_open; end
 
-  # pkg:gem/toys-core#lib/toys/cli.rb:618
-  def execute_tool(tool, context, &block); end
-
-  # pkg:gem/toys-core#lib/toys/cli.rb:662
-  def handle_signal_by_tool(context, tool, exception); end
-
-  # pkg:gem/toys-core#lib/toys/cli.rb:655
-  def handle_usage_errors(context, tool); end
-
-  # pkg:gem/toys-core#lib/toys/cli.rb:680
-  def make_executor(middleware, context, next_executor); end
-
-  # pkg:gem/toys-core#lib/toys/cli.rb:605
-  def make_run_handler(tool); end
+  # Resolve symbolic values for context_directory supported by
+  # add_search_path and add_config_path. The values `:parent` and `:path` are
+  # resolved relative to the given path, which must be an absolute path as
+  # a string.
+  #
+  # pkg:gem/toys-core#lib/toys/cli.rb:787
+  def resolve_context_directory(context_directory, path); end
 
   class << self
     # Returns a default Completion that simply uses the tool's completion.
     #
-    # pkg:gem/toys-core#lib/toys/cli.rb:584
+    # pkg:gem/toys-core#lib/toys/cli.rb:717
     def default_completion; end
 
-    # Returns a bare-bones error handler that takes simply reraises the
-    # error. If the original error (the cause of the {Toys::ContextualError})
-    # was a `SignalException` (or a subclass such as `Interrupted`), that
-    # `SignalException` itself is reraised so that the Ruby VM has a chance
-    # to handle it. Otherwise, for any other error, the
-    # {Toys::ContextualError} is reraised.
+    # Returns a bare-bones error handler that simply reraises the error it is
+    # given. A {Toys::ContextualError} is reraised as itself, so that a
+    # rescue block has access to the context information. An unhandled
+    # `SignalException` (or a subclass such as `Interrupt`) is also reraised
+    # as itself, so that the Ruby VM has a chance to handle it normally.
     #
     # @return [Proc]
     #
-    # pkg:gem/toys-core#lib/toys/cli.rb:560
+    # pkg:gem/toys-core#lib/toys/cli.rb:700
     def default_error_handler; end
 
     # Returns a default logger factory that generates simple loggers that
-    # write to STDERR.
+    # write to the current stderr.
     #
     # @return [Proc]
     #
-    # pkg:gem/toys-core#lib/toys/cli.rb:573
+    # pkg:gem/toys-core#lib/toys/cli.rb:710
     def default_logger_factory; end
 
     # Returns a default ModuleLookup for middleware that points at the
@@ -1423,7 +1626,7 @@ class Toys::CLI
     #
     # @return [Toys::ModuleLookup]
     #
-    # pkg:gem/toys-core#lib/toys/cli.rb:537
+    # pkg:gem/toys-core#lib/toys/cli.rb:678
     def default_middleware_lookup; end
 
     # Returns a default set of middleware that may be used as a starting
@@ -1439,7 +1642,7 @@ class Toys::CLI
     #
     # @return [Array<Toys::Middleware::Spec>]
     #
-    # pkg:gem/toys-core#lib/toys/cli.rb:512
+    # pkg:gem/toys-core#lib/toys/cli.rb:653
     def default_middleware_stack; end
 
     # Returns a default ModuleLookup for mixins that points at the
@@ -1447,21 +1650,21 @@ class Toys::CLI
     #
     # @return [Toys::ModuleLookup]
     #
-    # pkg:gem/toys-core#lib/toys/cli.rb:527
+    # pkg:gem/toys-core#lib/toys/cli.rb:668
     def default_mixin_lookup; end
 
     # Returns a default empty ModuleLookup for templates.
     #
     # @return [Toys::ModuleLookup]
     #
-    # pkg:gem/toys-core#lib/toys/cli.rb:546
+    # pkg:gem/toys-core#lib/toys/cli.rb:687
     def default_template_lookup; end
   end
 end
 
 # @private
 #
-# pkg:gem/toys-core#lib/toys-core.rb:119
+# pkg:gem/toys-core#lib/toys-core.rb:164
 Toys::CORE_LIB_PATH = T.let(T.unsafe(nil), String)
 
 # Deprecated
@@ -1600,8 +1803,8 @@ module Toys::Completion
     #     block is ignored.
     #
     #  *  An **Array** of strings. Returns a completion that uses those values
-    #     as candidates. You may also pass any of the options recognized by
-    #     {Toys::Completion::Enum#initialize}. The block is ignored.
+    #     as candidates. {Toys::Completion::Enum#initialize} recognizes no
+    #     options, so none may be passed. The block is ignored.
     #
     #  *  A **function**, either passed as a Proc (where the block is ignored)
     #     or as a block (if the spec is nil). The function must behave as a
@@ -1621,7 +1824,7 @@ module Toys::Completion
     # @param block [Proc] See the description for recognized forms.
     # @return [Toys::Completion::Base,Proc]
     #
-    # pkg:gem/toys-core#lib/toys/completion.rb:425
+    # pkg:gem/toys-core#lib/toys/completion.rb:416
     def create(spec = T.unsafe(nil), **options, &block); end
   end
 end
@@ -1631,7 +1834,7 @@ end
 # Completions *may* but do not need to subclass this base class. They
 # merely need to duck-type `Proc` by implementing the `call` method.
 #
-# pkg:gem/toys-core#lib/toys/completion.rb:226
+# pkg:gem/toys-core#lib/toys/completion.rb:237
 class Toys::Completion::Base
   # Returns candidates for the current completion.
   # This default implementation returns an empty list.
@@ -1640,7 +1843,7 @@ class Toys::Completion::Base
   #     context including the string fragment.
   # @return [Array<Toys::Completion::Candidate>] An array of candidates
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:235
+  # pkg:gem/toys-core#lib/toys/completion.rb:246
   def call(context); end
 end
 
@@ -1652,7 +1855,7 @@ end
 # Generally, tab completion systems should add a trailing space after a
 # final completion but not after a partial completion.
 #
-# pkg:gem/toys-core#lib/toys/completion.rb:151
+# pkg:gem/toys-core#lib/toys/completion.rb:149
 class Toys::Completion::Candidate
   include ::Comparable
 
@@ -1661,44 +1864,55 @@ class Toys::Completion::Candidate
   # @param partial [boolean] Whether the candidate is partial. Defaults
   #     to `false`.
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:160
+  # pkg:gem/toys-core#lib/toys/completion.rb:158
   def initialize(string, partial: T.unsafe(nil)); end
 
   # @private
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:198
+  # pkg:gem/toys-core#lib/toys/completion.rb:209
   def <=>(other); end
 
   # @private
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:191
+  # pkg:gem/toys-core#lib/toys/completion.rb:202
   def eql?(other); end
 
   # Determine whether the candidate is a final completion.
   # @return [boolean]
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:184
+  # pkg:gem/toys-core#lib/toys/completion.rb:182
   def final?; end
 
   # @private
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:205
+  # pkg:gem/toys-core#lib/toys/completion.rb:216
   def hash; end
 
   # Determine whether the candidate is partial completion.
   # @return [boolean]
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:176
+  # pkg:gem/toys-core#lib/toys/completion.rb:174
   def partial?; end
 
   # Get the candidate string.
   # @return [String]
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:169
+  # pkg:gem/toys-core#lib/toys/completion.rb:167
   def string; end
 
-  # pkg:gem/toys-core#lib/toys/completion.rb:170
+  # pkg:gem/toys-core#lib/toys/completion.rb:168
   def to_s; end
+
+  # Returns a copy of this candidate with the given string prepended.
+  # Use this when a completion handles only the tail of the word being
+  # completed, and must restore the head to each candidate so that the
+  # candidate remains a replacement for the whole word.
+  #
+  # @param prefix [String] The string to prepend
+  # @return [Toys::Completion::Candidate]
+  #
+  # pkg:gem/toys-core#lib/toys/completion.rb:195
+  def with_prefix(prefix); end
 
   class << self
     # Create an array of candidates given an array of strings.
@@ -1706,14 +1920,20 @@ class Toys::Completion::Candidate
     # @param array [Array<String>]
     # @return [Array<Toys::Completion::Candidate>]
     #
-    # pkg:gem/toys-core#lib/toys/completion.rb:215
+    # pkg:gem/toys-core#lib/toys/completion.rb:226
     def new_multi(array, partial: T.unsafe(nil)); end
   end
 end
 
 # The context in which to determine completion candidates.
 #
-# pkg:gem/toys-core#lib/toys/completion.rb:18
+# The {#fragment} is the entire word being completed, and each candidate
+# returned for it must be a replacement for that entire word. If the shell
+# replaces less than the whole word, because it breaks words at certain
+# characters, the completion engine trims the candidates to match; that is
+# not the concern of a completion.
+#
+# pkg:gem/toys-core#lib/toys/completion.rb:24
 class Toys::Completion::Context
   # Create a completion context.
   #
@@ -1725,22 +1945,21 @@ class Toys::Completion::Context
   # * `disable_flags: true` causes tool completion to omit flag completions
   #   which is used by the `toys do` built-in tool
   #
-  # @param cli [Toys::CLI] The CLI being run. Required.
+  # @param loader [Toys::Loader] The loader providing the tools being
+  #     completed. Required.
   # @param previous_words [Array<String>] Array of complete strings that
   #     appeared prior to the fragment to complete.
-  # @param fragment_prefix [String] A prefix in the fragment that does not
-  #     participate in completion. (e.g. "key=")
   # @param fragment [String] The string fragment to complete.
   # @param params [Hash] Miscellaneous context data
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:38
-  def initialize(cli:, previous_words: T.unsafe(nil), fragment_prefix: T.unsafe(nil), fragment: T.unsafe(nil), **params); end
+  # pkg:gem/toys-core#lib/toys/completion.rb:43
+  def initialize(loader:, previous_words: T.unsafe(nil), fragment: T.unsafe(nil), **params); end
 
   # Get data for arbitrary key.
   # @param [Symbol] key
   # @return [Object]
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:92
+  # pkg:gem/toys-core#lib/toys/completion.rb:90
   def [](key); end
 
   # Current ArgParser indicating the status of argument parsing up to
@@ -1748,52 +1967,47 @@ class Toys::Completion::Context
   #
   # @return [Toys::ArgParser]
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:122
+  # pkg:gem/toys-core#lib/toys/completion.rb:120
   def arg_parser; end
 
   # An array of complete arguments passed to the tool, prior to the
   # fragment to complete.
   # @return [Array<String>]
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:111
+  # pkg:gem/toys-core#lib/toys/completion.rb:109
   def args; end
 
-  # The CLI being run.
-  # @return [Toys::CLI]
-  #
-  # pkg:gem/toys-core#lib/toys/completion.rb:67
-  def cli; end
-
-  # The current string fragment to complete
+  # The current string fragment to complete. This is the entire word under
+  # the cursor, and candidates must replace all of it.
   # @return [String]
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:85
+  # pkg:gem/toys-core#lib/toys/completion.rb:83
   def fragment; end
 
-  # A non-completed prefix for the current fragment.
-  # @return [String]
-  #
-  # pkg:gem/toys-core#lib/toys/completion.rb:79
-  def fragment_prefix; end
-
-  # pkg:gem/toys-core#lib/toys/completion.rb:95
+  # pkg:gem/toys-core#lib/toys/completion.rb:93
   def get(key); end
 
   # @private
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:130
+  # pkg:gem/toys-core#lib/toys/completion.rb:128
   def inspect; end
+
+  # The loader providing the tools being completed.
+  # @return [Toys::Loader]
+  #
+  # pkg:gem/toys-core#lib/toys/completion.rb:70
+  def loader; end
 
   # All previous words.
   # @return [Array<String>]
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:73
+  # pkg:gem/toys-core#lib/toys/completion.rb:76
   def previous_words; end
 
   # The tool being invoked, which should control the completion.
   # @return [Toys::ToolDefinition]
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:101
+  # pkg:gem/toys-core#lib/toys/completion.rb:99
   def tool; end
 
   # Create a new completion context with the given modifications.
@@ -1801,33 +2015,31 @@ class Toys::Completion::Context
   # @param delta_params [Hash] Replace context data.
   # @return [Toys::Completion::Context]
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:59
+  # pkg:gem/toys-core#lib/toys/completion.rb:62
   def with(**delta_params); end
 
   private
 
-  # pkg:gem/toys-core#lib/toys/completion.rb:137
+  # pkg:gem/toys-core#lib/toys/completion.rb:135
   def lookup_tool; end
 end
 
 # An instance of the empty completion that returns no candidates.
 # @return [Toys:::Completion::Base]
 #
-# pkg:gem/toys-core#lib/toys/completion.rb:386
+# pkg:gem/toys-core#lib/toys/completion.rb:377
 Toys::Completion::EMPTY = T.let(T.unsafe(nil), Toys::Completion::Base)
 
 # A Completion whose candidates come from a static list of strings.
 #
-# pkg:gem/toys-core#lib/toys/completion.rb:342
+# pkg:gem/toys-core#lib/toys/completion.rb:343
 class Toys::Completion::Enum < ::Toys::Completion::Base
   # Create a completion from a list of values.
   #
   # @param values [Array<String>]
-  # @param prefix_constraint [String,Regexp] Constraint on the fragment
-  #     prefix. Defaults to requiring the prefix be empty.
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:350
-  def initialize(values, prefix_constraint: T.unsafe(nil)); end
+  # pkg:gem/toys-core#lib/toys/completion.rb:349
+  def initialize(values); end
 
   # Returns candidates for the current completion.
   #
@@ -1835,25 +2047,19 @@ class Toys::Completion::Enum < ::Toys::Completion::Base
   #     context including the string fragment.
   # @return [Array<Toys::Completion::Candidate>] an array of candidates
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:375
+  # pkg:gem/toys-core#lib/toys/completion.rb:367
   def call(context); end
-
-  # Constraint on the fragment prefix.
-  # @return [String,Regexp]
-  #
-  # pkg:gem/toys-core#lib/toys/completion.rb:366
-  def prefix_constraint; end
 
   # The array of completion candidates.
   # @return [Array<Toys::Completion::Candidate>]
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:360
+  # pkg:gem/toys-core#lib/toys/completion.rb:358
   def values; end
 end
 
 # A Completion that returns candidates from the local file system.
 #
-# pkg:gem/toys-core#lib/toys/completion.rb:243
+# pkg:gem/toys-core#lib/toys/completion.rb:254
 class Toys::Completion::FileSystem < ::Toys::Completion::Base
   # Create a completion that gets candidates from names in the local file
   # system.
@@ -1861,11 +2067,9 @@ class Toys::Completion::FileSystem < ::Toys::Completion::Base
   # @param cwd [String] Working directory (defaults to the current dir).
   # @param omit_files [boolean] Omit files from candidates
   # @param omit_directories [boolean] Omit directories from candidates
-  # @param prefix_constraint [String,Regexp] Constraint on the fragment
-  #     prefix. Defaults to requiring the prefix be empty.
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:254
-  def initialize(cwd: T.unsafe(nil), omit_files: T.unsafe(nil), omit_directories: T.unsafe(nil), prefix_constraint: T.unsafe(nil)); end
+  # pkg:gem/toys-core#lib/toys/completion.rb:263
+  def initialize(cwd: T.unsafe(nil), omit_files: T.unsafe(nil), omit_directories: T.unsafe(nil)); end
 
   # Returns candidates for the current completion.
   #
@@ -1873,36 +2077,30 @@ class Toys::Completion::FileSystem < ::Toys::Completion::Base
   #     context including the string fragment.
   # @return [Array<Toys::Completion::Candidate>] an array of candidates
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:293
+  # pkg:gem/toys-core#lib/toys/completion.rb:295
   def call(context); end
 
   # Path to the starting directory.
   # @return [String]
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:284
+  # pkg:gem/toys-core#lib/toys/completion.rb:286
   def cwd; end
 
   # Whether directories are included in the completion candidates.
   # @return [boolean]
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:272
+  # pkg:gem/toys-core#lib/toys/completion.rb:280
   def include_directories; end
 
   # Whether files are included in the completion candidates.
   # @return [boolean]
   #
-  # pkg:gem/toys-core#lib/toys/completion.rb:266
+  # pkg:gem/toys-core#lib/toys/completion.rb:274
   def include_files; end
-
-  # Constraint on the fragment prefix.
-  # @return [String,Regexp]
-  #
-  # pkg:gem/toys-core#lib/toys/completion.rb:278
-  def prefix_constraint; end
 
   private
 
-  # pkg:gem/toys-core#lib/toys/completion.rb:320
+  # pkg:gem/toys-core#lib/toys/completion.rb:321
   def generate_candidates(children, prefix, dir); end
 end
 
@@ -1940,7 +2138,7 @@ class Toys::Context
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # pkg:gem/toys-core#lib/toys/context.rb:392
+  # pkg:gem/toys-core#lib/toys/context.rb:449
   def initialize(data); end
 
   # Fetch an option or other piece of data by key.
@@ -1951,7 +2149,7 @@ class Toys::Context
   # @param key [Symbol]
   # @return [Object]
   #
-  # pkg:gem/toys-core#lib/toys/context.rb:273
+  # pkg:gem/toys-core#lib/toys/context.rb:330
   def [](key); end
 
   # Set an option or other piece of context data by key.
@@ -1959,46 +2157,52 @@ class Toys::Context
   # @param key [Symbol]
   # @param value [Object]
   #
-  # pkg:gem/toys-core#lib/toys/context.rb:285
+  # pkg:gem/toys-core#lib/toys/context.rb:342
   def []=(key, value); end
 
-  # pkg:gem/toys-core#lib/toys/context.rb:153
+  # pkg:gem/toys-core#lib/toys/context.rb:177
   def __args; end
 
-  # pkg:gem/toys-core#lib/toys/context.rb:168
+  # pkg:gem/toys-core#lib/toys/context.rb:193
   def __cli; end
 
-  # pkg:gem/toys-core#lib/toys/context.rb:187
+  # pkg:gem/toys-core#lib/toys/context.rb:212
   def __context_directory; end
 
-  # pkg:gem/toys-core#lib/toys/context.rb:367
+  # pkg:gem/toys-core#lib/toys/context.rb:424
   def __exit(code = T.unsafe(nil)); end
 
-  # pkg:gem/toys-core#lib/toys/context.rb:352
+  # pkg:gem/toys-core#lib/toys/context.rb:409
   def __find_data(path, type: T.unsafe(nil)); end
 
-  # pkg:gem/toys-core#lib/toys/context.rb:277
+  # pkg:gem/toys-core#lib/toys/context.rb:334
   def __get(key); end
 
-  # pkg:gem/toys-core#lib/toys/context.rb:202
+  # pkg:gem/toys-core#lib/toys/context.rb:228
+  def __loader; end
+
+  # pkg:gem/toys-core#lib/toys/context.rb:243
   def __logger; end
 
-  # pkg:gem/toys-core#lib/toys/context.rb:334
+  # pkg:gem/toys-core#lib/toys/context.rb:391
   def __options; end
 
-  # pkg:gem/toys-core#lib/toys/context.rb:316
+  # pkg:gem/toys-core#lib/toys/context.rb:259
+  def __runner; end
+
+  # pkg:gem/toys-core#lib/toys/context.rb:373
   def __set(key, value = T.unsafe(nil)); end
 
-  # pkg:gem/toys-core#lib/toys/context.rb:217
+  # pkg:gem/toys-core#lib/toys/context.rb:274
   def __tool_name; end
 
-  # pkg:gem/toys-core#lib/toys/context.rb:232
+  # pkg:gem/toys-core#lib/toys/context.rb:289
   def __tool_source; end
 
-  # pkg:gem/toys-core#lib/toys/context.rb:247
+  # pkg:gem/toys-core#lib/toys/context.rb:304
   def __usage_errors; end
 
-  # pkg:gem/toys-core#lib/toys/context.rb:262
+  # pkg:gem/toys-core#lib/toys/context.rb:319
   def __verbosity; end
 
   # The raw arguments passed to the tool, as an array of strings.
@@ -2011,35 +2215,36 @@ class Toys::Context
   #
   # @return [Array<String>]
   #
-  # pkg:gem/toys-core#lib/toys/context.rb:150
+  # pkg:gem/toys-core#lib/toys/context.rb:174
   def args; end
 
   # The currently running CLI.
   #
-  # This is a convenience getter for {Toys::Context::Key::CLI}.
+  # This is a convenience getter for {Toys::Context::Key::CLI}. Note the
+  # value could be nil if no CLI is present during the execution.
   #
   # If the `cli` method is overridden by the tool, you can still access it
   # using the name `__cli`.
   #
-  # @return [Toys::CLI]
+  # @return [Toys::CLI,nil]
   #
-  # pkg:gem/toys-core#lib/toys/context.rb:165
+  # pkg:gem/toys-core#lib/toys/context.rb:190
   def cli; end
 
-  # Return the context directory for this tool. Generally, this defaults
-  # to the directory containing the toys config directory structure being
-  # read, but it may be changed by setting a different context directory
-  # for the tool.
+  # Return the effective context directory for this tool run. Generally, this
+  # is set to the directory _containing_ the toys tool directory structure
+  # being read, or it may have been set by the tool definition itself. If a
+  # context directory has not been set explicitly, returns the current
+  # working directory. Will not return nil.
   #
   # This is a convenience getter for {Toys::Context::Key::CONTEXT_DIRECTORY}.
   #
   # If the `context_directory` method is overridden by the tool, you can
   # still access it using the name `__context_directory`.
   #
-  # @return [String] Context directory path
-  # @return [nil] if there is no context.
+  # @return [String] Effective context directory path
   #
-  # pkg:gem/toys-core#lib/toys/context.rb:184
+  # pkg:gem/toys-core#lib/toys/context.rb:209
   def context_directory; end
 
   # Exit immediately with the given status code.
@@ -2051,7 +2256,7 @@ class Toys::Context
   #     or nonzero for an error condition. Default is 0.
   # @return [void]
   #
-  # pkg:gem/toys-core#lib/toys/context.rb:364
+  # pkg:gem/toys-core#lib/toys/context.rb:421
   def exit(code = T.unsafe(nil)); end
 
   # Find the given data file or directory in this tool's search path.
@@ -2066,18 +2271,31 @@ class Toys::Context
   # @return [String] Absolute path of the result
   # @return [nil] if the data was not found.
   #
-  # pkg:gem/toys-core#lib/toys/context.rb:349
+  # pkg:gem/toys-core#lib/toys/context.rb:406
   def find_data(path, type: T.unsafe(nil)); end
 
-  # pkg:gem/toys-core#lib/toys/context.rb:276
+  # pkg:gem/toys-core#lib/toys/context.rb:333
   def get(key); end
 
   # Include the tool name in the object inspection dump.
   #
   # @private
   #
-  # pkg:gem/toys-core#lib/toys/context.rb:401
+  # pkg:gem/toys-core#lib/toys/context.rb:458
   def inspect; end
+
+  # The loader that loaded the tool being executed. It can be used to look up
+  # and load other tools.
+  #
+  # This is a convenience getter for {Toys::Context::Key::LOADER}.
+  #
+  # If the `loader` method is overridden by the tool, you can still access it
+  # using the name `__loader`.
+  #
+  # @return [Toys::Loader]
+  #
+  # pkg:gem/toys-core#lib/toys/context.rb:225
+  def loader; end
 
   # The logger for this execution.
   #
@@ -2088,7 +2306,7 @@ class Toys::Context
   #
   # @return [Logger]
   #
-  # pkg:gem/toys-core#lib/toys/context.rb:199
+  # pkg:gem/toys-core#lib/toys/context.rb:240
   def logger; end
 
   # The subset of the context that uses string or symbol keys. By convention,
@@ -2101,8 +2319,21 @@ class Toys::Context
   #
   # @return [Hash]
   #
-  # pkg:gem/toys-core#lib/toys/context.rb:329
+  # pkg:gem/toys-core#lib/toys/context.rb:386
   def options; end
+
+  # The runner that is running the tool. It can be used to run other tools
+  # in the same process.
+  #
+  # This is a convenience getter for {Toys::Context::Key::RUNNER}.
+  #
+  # If the `runner` method is overridden by the tool, you can still access it
+  # using the name `__runner`.
+  #
+  # @return [Toys::Runner]
+  #
+  # pkg:gem/toys-core#lib/toys/context.rb:256
+  def runner; end
 
   # Set one or more options or other context data by key.
   #
@@ -2122,7 +2353,7 @@ class Toys::Context
   #   @param hash [Hash] The keys and values to set
   #   @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/context.rb:308
+  # pkg:gem/toys-core#lib/toys/context.rb:365
   def set(key, value = T.unsafe(nil)); end
 
   # The full name of the tool being executed, as an array of strings.
@@ -2134,7 +2365,7 @@ class Toys::Context
   #
   # @return [Array<String>]
   #
-  # pkg:gem/toys-core#lib/toys/context.rb:214
+  # pkg:gem/toys-core#lib/toys/context.rb:271
   def tool_name; end
 
   # The source of the tool being executed.
@@ -2146,7 +2377,7 @@ class Toys::Context
   #
   # @return [Toys::SourceInfo]
   #
-  # pkg:gem/toys-core#lib/toys/context.rb:229
+  # pkg:gem/toys-core#lib/toys/context.rb:286
   def tool_source; end
 
   # The (possibly empty) array of errors detected during argument parsing.
@@ -2158,7 +2389,7 @@ class Toys::Context
   #
   # @return [Array<Toys::ArgParser::UsageError>]
   #
-  # pkg:gem/toys-core#lib/toys/context.rb:244
+  # pkg:gem/toys-core#lib/toys/context.rb:301
   def usage_errors; end
 
   # The current verbosity setting as an integer.
@@ -2170,7 +2401,7 @@ class Toys::Context
   #
   # @return [Integer]
   #
-  # pkg:gem/toys-core#lib/toys/context.rb:259
+  # pkg:gem/toys-core#lib/toys/context.rb:316
   def verbosity; end
 
   class << self
@@ -2182,7 +2413,7 @@ class Toys::Context
     #     (Note: if a non-integer is passed in, it is changed to -1.)
     # @return [void]
     #
-    # pkg:gem/toys-core#lib/toys/context.rb:378
+    # pkg:gem/toys-core#lib/toys/context.rb:435
     def exit(code = T.unsafe(nil)); end
   end
 end
@@ -2209,154 +2440,235 @@ module Toys::Context::Key; end
 # @return [Object]
 #
 # pkg:gem/toys-core#lib/toys/context.rb:54
-Toys::Context::Key::ARGS = T.let(T.unsafe(nil), Object)
+Toys::Context::Key::ARGS = T.let(T.unsafe(nil), Toys::UniqueKey)
 
 # Context key for the currently running {Toys::CLI}. You can use the
-# value to run other tools from your tool by calling {Toys::CLI#run}.
+# value to reconfigure the framework, for example by calling
+# {Toys::CLI#child} to run a tool under modified settings. To run a
+# sibling tool without reconfiguring anything, you can also use
+# {Key::RUNNER} instead. The value could be nil if a CLI is not present.
 # @return [Object]
 #
-# pkg:gem/toys-core#lib/toys/context.rb:61
-Toys::Context::Key::CLI = T.let(T.unsafe(nil), Object)
+# pkg:gem/toys-core#lib/toys/context.rb:64
+Toys::Context::Key::CLI = T.let(T.unsafe(nil), Toys::UniqueKey)
 
-# Context key for the context directory path. The value is a string
+# Context key for the context directory path. The value is a string.
 # @return [Object]
 #
-# pkg:gem/toys-core#lib/toys/context.rb:67
-Toys::Context::Key::CONTEXT_DIRECTORY = T.let(T.unsafe(nil), Object)
+# pkg:gem/toys-core#lib/toys/context.rb:70
+Toys::Context::Key::CONTEXT_DIRECTORY = T.let(T.unsafe(nil), Toys::UniqueKey)
 
 # Context key for the context from which the current call was delegated.
 # The value is either another context object, or `nil` if the current
 # call is not delegated.
 # @return [Object]
 #
-# pkg:gem/toys-core#lib/toys/context.rb:75
-Toys::Context::Key::DELEGATED_FROM = T.let(T.unsafe(nil), Object)
+# pkg:gem/toys-core#lib/toys/context.rb:78
+Toys::Context::Key::DELEGATED_FROM = T.let(T.unsafe(nil), Toys::UniqueKey)
+
+# Context key for the executable name displayed in help text. The value
+# is a String, provided by the {Toys::Runner}.
+# @return [Object]
+#
+# pkg:gem/toys-core#lib/toys/context.rb:85
+Toys::Context::Key::EXECUTABLE_NAME = T.let(T.unsafe(nil), Toys::UniqueKey)
+
+# Context key for the active `Loader` object.
+# @return [Object]
+#
+# pkg:gem/toys-core#lib/toys/context.rb:91
+Toys::Context::Key::LOADER = T.let(T.unsafe(nil), Toys::UniqueKey)
 
 # Context key for the active `Logger` object.
 # @return [Object]
 #
-# pkg:gem/toys-core#lib/toys/context.rb:81
-Toys::Context::Key::LOGGER = T.let(T.unsafe(nil), Object)
+# pkg:gem/toys-core#lib/toys/context.rb:97
+Toys::Context::Key::LOGGER = T.let(T.unsafe(nil), Toys::UniqueKey)
+
+# Context key for the {Toys::Runner} that is running the current tool.
+# You can use the value to run other tools from your tool by calling
+# {Toys::Runner#run}.
+# @return [Object]
+#
+# pkg:gem/toys-core#lib/toys/context.rb:105
+Toys::Context::Key::RUNNER = T.let(T.unsafe(nil), Toys::UniqueKey)
 
 # Context key for the {Toys::ToolDefinition} object being executed.
 # @return [Object]
 #
-# pkg:gem/toys-core#lib/toys/context.rb:87
-Toys::Context::Key::TOOL = T.let(T.unsafe(nil), Object)
+# pkg:gem/toys-core#lib/toys/context.rb:111
+Toys::Context::Key::TOOL = T.let(T.unsafe(nil), Toys::UniqueKey)
 
 # Context key for the full name of the tool being executed. Value is an
 # array of strings.
 # @return [Object]
 #
-# pkg:gem/toys-core#lib/toys/context.rb:94
-Toys::Context::Key::TOOL_NAME = T.let(T.unsafe(nil), Object)
+# pkg:gem/toys-core#lib/toys/context.rb:118
+Toys::Context::Key::TOOL_NAME = T.let(T.unsafe(nil), Toys::UniqueKey)
 
 # Context key for the {Toys::SourceInfo} describing the source of this
 # tool.
 # @return [Object]
 #
-# pkg:gem/toys-core#lib/toys/context.rb:101
-Toys::Context::Key::TOOL_SOURCE = T.let(T.unsafe(nil), Object)
+# pkg:gem/toys-core#lib/toys/context.rb:125
+Toys::Context::Key::TOOL_SOURCE = T.let(T.unsafe(nil), Toys::UniqueKey)
 
 # Context key for all unmatched args in order. The value is an array of
 # strings.
 # @return [Object]
 #
-# pkg:gem/toys-core#lib/toys/context.rb:108
-Toys::Context::Key::UNMATCHED_ARGS = T.let(T.unsafe(nil), Object)
+# pkg:gem/toys-core#lib/toys/context.rb:132
+Toys::Context::Key::UNMATCHED_ARGS = T.let(T.unsafe(nil), Toys::UniqueKey)
 
 # Context key for unmatched flags. The value is an array of strings.
 # @return [Object]
 #
-# pkg:gem/toys-core#lib/toys/context.rb:114
-Toys::Context::Key::UNMATCHED_FLAGS = T.let(T.unsafe(nil), Object)
+# pkg:gem/toys-core#lib/toys/context.rb:138
+Toys::Context::Key::UNMATCHED_FLAGS = T.let(T.unsafe(nil), Toys::UniqueKey)
 
 # Context key for unmatched positional args. The value is an array of
 # strings.
 # @return [Object]
 #
-# pkg:gem/toys-core#lib/toys/context.rb:121
-Toys::Context::Key::UNMATCHED_POSITIONAL = T.let(T.unsafe(nil), Object)
+# pkg:gem/toys-core#lib/toys/context.rb:145
+Toys::Context::Key::UNMATCHED_POSITIONAL = T.let(T.unsafe(nil), Toys::UniqueKey)
 
 # Context key for the list of usage errors raised. The value is an array
 # of {Toys::ArgParser::UsageError}.
 # @return [Object]
 #
-# pkg:gem/toys-core#lib/toys/context.rb:128
-Toys::Context::Key::USAGE_ERRORS = T.let(T.unsafe(nil), Object)
+# pkg:gem/toys-core#lib/toys/context.rb:152
+Toys::Context::Key::USAGE_ERRORS = T.let(T.unsafe(nil), Toys::UniqueKey)
 
 # Context key for the verbosity value. The value is an integer defaulting
 # to 0, with higher values meaning more verbose and lower meaning more
 # quiet.
 # @return [Object]
 #
-# pkg:gem/toys-core#lib/toys/context.rb:136
-Toys::Context::Key::VERBOSITY = T.let(T.unsafe(nil), Object)
+# pkg:gem/toys-core#lib/toys/context.rb:160
+Toys::Context::Key::VERBOSITY = T.let(T.unsafe(nil), Toys::UniqueKey)
 
 # A wrapper exception used to provide user-oriented context for an error
-# thrown during tool execution.
+# thrown during tool execution. Most exceptions raised during a tool run are
+# wrapped with one of these (with the original exception set as the `cause`.)
 #
-# pkg:gem/toys-core#lib/toys/errors.rb:40
+# Signals are not wrapped in this class. A `SignalException` raised by a tool
+# propagates as itself, so that tools can intercept it and the Ruby VM can
+# ultimately handle it. See the `error_handler` argument to
+# {Toys::Runner#initialize} for how each is reported.
+#
+# pkg:gem/toys-core#lib/toys/errors.rb:67
 class Toys::ContextualError < ::StandardError
-  # Construct a ContextualError. This exception type is thrown from
-  # {ContextualError.capture} and should not be constructed directly.
+  # Construct a ContextualError. This exception type is thrown by the CLI
+  # and should not be constructed directly.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # pkg:gem/toys-core#lib/toys/errors.rb:47
-  def initialize(cause, banner, path, tool_name, tool_args); end
+  # pkg:gem/toys-core#lib/toys/errors.rb:74
+  def initialize(wrapped, banner, path, tool_verb, tool_name, tool_args, final); end
 
   # An overall banner message
   # @return [String]
   #
-  # pkg:gem/toys-core#lib/toys/errors.rb:66
+  # pkg:gem/toys-core#lib/toys/errors.rb:97
   def banner; end
 
-  # The line number in the toys config file in which the error was detected
-  # @return [Integer]
-  #
-  # pkg:gem/toys-core#lib/toys/errors.rb:78
+  # pkg:gem/toys-core#lib/toys/errors.rb:117
   def config_line; end
 
-  # The path to the toys config file in which the error was detected
-  # @return [String]
-  #
-  # pkg:gem/toys-core#lib/toys/errors.rb:72
+  # pkg:gem/toys-core#lib/toys/errors.rb:107
   def config_path; end
-
-  # The arguments passed to the tool that was running when the error occurred
-  # @return [Array<String>]
-  #
-  # pkg:gem/toys-core#lib/toys/errors.rb:90
-  def tool_args; end
-
-  # The full name of the tool that was running when the error occurred
-  # @return [Array<String>]
-  #
-  # pkg:gem/toys-core#lib/toys/errors.rb:84
-  def tool_name; end
 
   # @private
   #
-  # pkg:gem/toys-core#lib/toys/errors.rb:95
-  def update_fields!(path: T.unsafe(nil), tool_name: T.unsafe(nil), tool_args: T.unsafe(nil)); end
+  # pkg:gem/toys-core#lib/toys/errors.rb:161
+  def final?; end
+
+  # Returns the root cause of this error, i.e. the first cause in the chain
+  # that is not itself a ContextualError.
+  #
+  # @return [Exception] The root cause.
+  # @return [nil] if this error has no cause, which happens only if it was
+  #     constructed outside a rescue.
+  #
+  # pkg:gem/toys-core#lib/toys/errors.rb:150
+  def root_cause; end
+
+  # The arguments passed to the tool that was running when the error occurred.
+  #
+  # @return [Array<String>]
+  #
+  # pkg:gem/toys-core#lib/toys/errors.rb:140
+  def tool_args; end
+
+  # The line number in the toys tool file in which the error was detected.
+  #
+  # @return [Integer] if a tool file is found in the backtrace.
+  # @return [nil] if no backtrace is available or no toys tool file could be
+  #     found in it.
+  #
+  # pkg:gem/toys-core#lib/toys/errors.rb:116
+  def tool_file_line; end
+
+  # The path to the toys tool file in which the error was detected.
+  #
+  # @return [String] if a tool file is found in the backtrace.
+  # @return [nil] if no backtrace is available or no toys tool file could be
+  #     found in it.
+  #
+  # pkg:gem/toys-core#lib/toys/errors.rb:106
+  def tool_file_path; end
+
+  # The full name of the tool that was running or being loaded when the error
+  # occurred.
+  #
+  # @return [Array<String>]
+  #
+  # pkg:gem/toys-core#lib/toys/errors.rb:133
+  def tool_name; end
+
+  # The verb in progress when the error occurred.
+  #
+  # @return [String] should be either "loading" or "running"
+  # @return [nil] if the verb is not known
+  #
+  # pkg:gem/toys-core#lib/toys/errors.rb:125
+  def tool_verb; end
+
+  # @private
+  #
+  # pkg:gem/toys-core#lib/toys/errors.rb:168
+  def update_fields!(path: T.unsafe(nil), tool_verb: T.unsafe(nil), tool_name: T.unsafe(nil), tool_args: T.unsafe(nil), final: T.unsafe(nil)); end
 
   private
 
-  # Extract a line number from a cause exception
+  # Extract tool_file_path and tool_file_line from the error, if needed.
+  # Uses text in the SyntaxError, or the backtrace.
   #
-  # pkg:gem/toys-core#lib/toys/errors.rb:112
-  def line_from_cause(path, cause); end
+  # pkg:gem/toys-core#lib/toys/errors.rb:191
+  def find_locations(path, original); end
+
+  # Look through any ContextualError wrappers to the exception that
+  # originally caused the error. Falls back to the wrapper itself if it has
+  # no cause of its own, and returns nil if given nil.
+  #
+  # pkg:gem/toys-core#lib/toys/errors.rb:183
+  def original_of(wrapped); end
 
   class << self
     # Execute the given block, and wrap any exceptions thrown with a
-    # ContextualError. This is intended for loading a config file from the
-    # given path, and wraps any Ruby parsing errors.
+    # ContextualError. This is intended for errors caught during Ruby parsing
+    # or tool loading, or `StandardError`s caught during tool execution.
+    #
+    # Error types other than `StandardError` and `ScriptError` are *not*
+    # wrapped but passed through bare. In particular, a `SignalException`
+    # means the process is being asked to terminate, so it must stay
+    # recognizable as a signal all the way up the stack.
     #
     # @private This interface is internal and subject to change without warning.
     #
-    # pkg:gem/toys-core#lib/toys/errors.rb:132
-    def capture(banner: T.unsafe(nil), path: T.unsafe(nil), tool_name: T.unsafe(nil), tool_args: T.unsafe(nil)); end
+    # pkg:gem/toys-core#lib/toys/errors.rb:223
+    def capture(banner: T.unsafe(nil), path: T.unsafe(nil), tool_verb: T.unsafe(nil), tool_name: T.unsafe(nil), tool_args: T.unsafe(nil), final: T.unsafe(nil)); end
   end
 end
 
@@ -2372,7 +2684,7 @@ module Toys::Core; end
 Toys::Core::VERSION = T.let(T.unsafe(nil), String)
 
 # Namespace for DSL classes. These classes provide the directives that can be
-# used in configuration files.
+# used in tool files.
 #
 # DSL directives that can appear at the top level of Toys files and tool
 # blocks are defined by the {Toys::DSL::Tool} module.
@@ -2388,7 +2700,7 @@ Toys::Core::VERSION = T.let(T.unsafe(nil), String)
 # {Toys::DSL::Tool#optional_arg}, or {Toys::DSL::Tool#remaining_args} block,
 # are defined by the {Toys::DSL::PositionalArg} class.
 #
-# pkg:gem/toys-core#lib/toys-core.rb:60
+# pkg:gem/toys-core#lib/toys-core.rb:95
 module Toys::DSL; end
 
 # DSL for a flag definition block. Lets you set flag attributes in a block
@@ -2935,27 +3247,26 @@ end
 # pkg:gem/toys-core#lib/toys/dsl/internal.rb:10
 module Toys::DSL::Internal
   class << self
-    # Called by the DSL implementation to analyze the name of a new tool
-    # definition in context.
+    # Get the LoadState for the given class. Called by the DSL.
+    #
+    # This method is here so that the DSL calls only methods of this module
+    # rather than reaching directly into the Loader::LoadState namespace.
     #
     # @private
     #
-    # pkg:gem/toys-core#lib/toys/dsl/internal.rb:85
-    def analyze_name(tool_class, words); end
-
-    # Called by the Tool base class to set config values for a subclass.
-    #
-    # @private
-    #
-    # pkg:gem/toys-core#lib/toys/dsl/internal.rb:167
-    def configure_class(tool_class, given_name = T.unsafe(nil)); end
+    # pkg:gem/toys-core#lib/toys/dsl/internal.rb:42
+    def current_load_state(tool_class); end
 
     # Called by the DSL implementation to get, and optionally activate, the
     # current tool.
     #
+    # Always returns a non-nil tool if `activate` is false. If `activate`
+    # is true, it could return `nil` if a higher priority tool has already
+    # been activated.
+    #
     # @private
     #
-    # pkg:gem/toys-core#lib/toys/dsl/internal.rb:57
+    # pkg:gem/toys-core#lib/toys/dsl/internal.rb:30
     def current_tool(tool_class, activate); end
 
     # Called by the DSL implementation to load a long description from a
@@ -2963,48 +3274,33 @@ module Toys::DSL::Internal
     #
     # @private
     #
-    # pkg:gem/toys-core#lib/toys/dsl/internal.rb:147
+    # pkg:gem/toys-core#lib/toys/dsl/internal.rb:77
     def load_long_desc_file(path); end
 
     # Called by the DSL implementation to add a getter to the tool class.
     #
     # @private
     #
-    # pkg:gem/toys-core#lib/toys/dsl/internal.rb:102
+    # pkg:gem/toys-core#lib/toys/dsl/internal.rb:51
     def maybe_add_getter(tool_class, key, force); end
 
-    # Called by the Loader and InputFile to prepare a tool class for running
-    # the DSL.
+    # Called by the Loader, InputFile, and the Tool base class to add the
+    # DSL to a tool class.
     #
     # @private
     #
-    # pkg:gem/toys-core#lib/toys/dsl/internal.rb:26
-    def prepare(tool_class, words, priority, remaining_words, source, loader); end
-
-    # Called by the DSL implementation to find a named mixin.
-    #
-    # @private
-    #
-    # pkg:gem/toys-core#lib/toys/dsl/internal.rb:127
-    def resolve_mixin(mixin, cur_tool, loader); end
-
-    # Called by the Tool base class to add the DSL to a subclass.
-    #
-    # @private
-    #
-    # pkg:gem/toys-core#lib/toys/dsl/internal.rb:198
+    # pkg:gem/toys-core#lib/toys/dsl/internal.rb:109
     def setup_class_dsl(tool_class); end
 
-    private
-
-    # pkg:gem/toys-core#lib/toys/dsl/internal.rb:208
-    def class_name_to_tool_name(class_name); end
-
-    # pkg:gem/toys-core#lib/toys/dsl/internal.rb:227
-    def current_source_from_context; end
-
-    # pkg:gem/toys-core#lib/toys/dsl/internal.rb:214
-    def parent_from_mod_name_segments(mod_names); end
+    # Called by the Tool base class from its inherited hooks. Anonymous
+    # classes are skipped because they are not tools. (The load path calls
+    # setup_class_dsl directly, because the tool classes it prepares are
+    # anonymous.)
+    #
+    # @private
+    #
+    # pkg:gem/toys-core#lib/toys/dsl/internal.rb:99
+    def setup_subclass_dsl(tool_class); end
   end
 end
 
@@ -3176,12 +3472,12 @@ class Toys::DSL::PositionalArg
   def long_desc(*long_desc); end
 end
 
-# This module defines the DSL for a Toys configuration file.
+# This module defines the DSL for a Toys source.
 #
-# A Toys configuration defines one or more named tools. It provides syntax
-# for setting the description, defining flags and arguments, specifying
-# how to execute the tool, and requesting mixin modules and other services.
-# It also lets you define subtools, nested arbitrarily deep, using blocks.
+# A Toys source defines one or more named tools. It provides syntax for
+# setting the description, defining flags and arguments, specifying how to
+# execute the tool, and requesting mixin modules and other services. It
+# also lets you define subtools, nested arbitrarily deep, using blocks.
 #
 # ### Simple example
 #
@@ -3305,7 +3601,7 @@ module Toys::DSL::Tool
   # @return [self]
   # @deprecated Use {#tool} and pass `:delegate_relative` instead
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:370
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:360
   def alias_tool(word, target); end
 
   # Create a flag group of type `:required`. If a block is given, flags
@@ -3344,7 +3640,7 @@ module Toys::DSL::Tool
   #     as an optional argument.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:725
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:760
   def all_required(desc: T.unsafe(nil), long_desc: T.unsafe(nil), name: T.unsafe(nil), report_collisions: T.unsafe(nil), prepend: T.unsafe(nil), &block); end
 
   # Create a flag group of type `:at_least_one`. If a block is given, flags
@@ -3385,10 +3681,10 @@ module Toys::DSL::Tool
   #     as an optional argument.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:816
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:851
   def at_least_one(desc: T.unsafe(nil), long_desc: T.unsafe(nil), name: T.unsafe(nil), report_collisions: T.unsafe(nil), prepend: T.unsafe(nil), &block); end
 
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:821
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:856
   def at_least_one_required(desc: T.unsafe(nil), long_desc: T.unsafe(nil), name: T.unsafe(nil), report_collisions: T.unsafe(nil), prepend: T.unsafe(nil), &block); end
 
   # Create a flag group of type `:at_most_one`. If a block is given, flags
@@ -3429,10 +3725,10 @@ module Toys::DSL::Tool
   #     as an optional argument.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:770
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:805
   def at_most_one(desc: T.unsafe(nil), long_desc: T.unsafe(nil), name: T.unsafe(nil), report_collisions: T.unsafe(nil), prepend: T.unsafe(nil), &block); end
 
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:775
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:810
   def at_most_one_required(desc: T.unsafe(nil), long_desc: T.unsafe(nil), name: T.unsafe(nil), report_collisions: T.unsafe(nil), prepend: T.unsafe(nil), &block); end
 
   # Set the shell completion strategy for this tool's arguments.
@@ -3467,7 +3763,7 @@ module Toys::DSL::Tool
   # @param block [Proc]
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1522
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1597
   def complete_tool_args(spec = T.unsafe(nil), **options, &block); end
 
   # Create a named completion procedure that may be used by name by any
@@ -3510,26 +3806,26 @@ module Toys::DSL::Tool
   # @param block [Proc] See the description for recognized forms.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:261
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:258
   def completion(name, spec = T.unsafe(nil), **options, &block); end
 
-  # Return the context directory for this tool. Generally, this defaults
-  # to the directory containing the toys config directory structure being
-  # read, but it may be changed by setting a different context directory
-  # for the tool.
+  # Return the context directory for this tool. Generally, this is set to
+  # the directory _containing_ the toys tool directory structure being read,
+  # but it may be unset (nil) if the tool was not loaded from a normal tool
+  # file. It may also be changed by the tool definition itself.
   #
   # @return [String] Context directory path
-  # @return [nil] if there is no context.
+  # @return [nil] if there is no context directory
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1788
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1860
   def context_directory; end
 
-  # Return the current tool config. This object can be queried to determine
-  # such information as the name, but it should not be altered.
+  # Return the current tool definition. This object can be queried to
+  # determine such information as the name, but it should not be altered.
   #
   # @return [Toys::ToolDefinition]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1799
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1871
   def current_tool; end
 
   # Causes the current tool to delegate to another tool, specified by the
@@ -3557,7 +3853,7 @@ module Toys::DSL::Tool
   #     string possibly delimited by path separators.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:401
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:391
   def delegate_to(target); end
 
   # Set the short description for the current tool. The short description
@@ -3592,7 +3888,7 @@ module Toys::DSL::Tool
   # @param str [Toys::WrappableString,String,Array<String>]
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:582
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:616
   def desc(str); end
 
   # Disable argument parsing for this tool. Arguments will not be parsed
@@ -3613,7 +3909,7 @@ module Toys::DSL::Tool
   #
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1454
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1529
   def disable_argument_parsing; end
 
   # Mark one or more flags as disabled, preventing their use by any
@@ -3636,7 +3932,7 @@ module Toys::DSL::Tool
   # @param flags [String...] The flags to disable
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1482
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1557
   def disable_flag(*flags); end
 
   # Enforce that all flags must be provided before any positional args.
@@ -3644,12 +3940,12 @@ module Toys::DSL::Tool
   # line arguments, flag parsing is disabled as if `--` had appeared.
   #
   # Issuing this directive by itself turns on enforcement. You may turn it
-  # off by passsing `false` as the parameter.
+  # off by passing `false` as the parameter.
   #
   # @param state [boolean]
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1410
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1445
   def enforce_flags_before_args(state = T.unsafe(nil)); end
 
   # Create a flag group of type `:exactly_one`. If a block is given, flags
@@ -3690,10 +3986,10 @@ module Toys::DSL::Tool
   #     as an optional argument.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:862
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:897
   def exactly_one(desc: T.unsafe(nil), long_desc: T.unsafe(nil), name: T.unsafe(nil), report_collisions: T.unsafe(nil), prepend: T.unsafe(nil), &block); end
 
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:867
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:902
   def exactly_one_required(desc: T.unsafe(nil), long_desc: T.unsafe(nil), name: T.unsafe(nil), report_collisions: T.unsafe(nil), prepend: T.unsafe(nil), &block); end
 
   # Expand the given template in the current location.
@@ -3727,7 +4023,7 @@ module Toys::DSL::Tool
   # @param args [Object...] Template arguments
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:530
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:575
   def expand(template_class, *args, **kwargs); end
 
   # Find the given data path (file or directory).
@@ -3757,7 +4053,7 @@ module Toys::DSL::Tool
   # @return [String] Absolute path of the data.
   # @return [nil] if the given data path is not found.
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1775
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1847
   def find_data(path, type: T.unsafe(nil)); end
 
   # Add a flag to the current tool. Each flag must specify a key which
@@ -3937,7 +4233,7 @@ module Toys::DSL::Tool
   #     optional argument.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1047
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1082
   def flag(key, *flags, accept: T.unsafe(nil), default: T.unsafe(nil), handler: T.unsafe(nil), complete_flags: T.unsafe(nil), complete_values: T.unsafe(nil), report_collisions: T.unsafe(nil), group: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), display_name: T.unsafe(nil), add_method: T.unsafe(nil), &block); end
 
   # Create a flag group. If a block is given, flags defined in the block
@@ -3980,7 +4276,7 @@ module Toys::DSL::Tool
   #     as an optional argument.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:676
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:711
   def flag_group(type: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), name: T.unsafe(nil), report_collisions: T.unsafe(nil), prepend: T.unsafe(nil), &block); end
 
   # Specify that the given module should be mixed into this tool, and its
@@ -4013,7 +4309,7 @@ module Toys::DSL::Tool
   # @param kwargs [keywords] Keyword arguments to pass to the initializer
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1712
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1787
   def include(mixin, *args, **kwargs); end
 
   # Determine if the given module/mixin has already been included.
@@ -4025,9 +4321,8 @@ module Toys::DSL::Tool
   # @param mod [Module,Symbol,String] Module or module name.
   #
   # @return [boolean] Whether the mixin is included
-  # @return [nil] if the current tool is not active.
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1732
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1806
   def include?(mod); end
 
   # Set whether this tool's helper methods are inherited by subtools.
@@ -4037,30 +4332,43 @@ module Toys::DSL::Tool
   #     if any, or false for the root tool.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1880
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1964
   def inheritable_helper_methods(val); end
 
   # Include the tool name in the class inspection dump.
   #
   # @private
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1935
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:2019
   def inspect; end
 
-  # Load another config file or directory, as if its contents were inserted
+  # Load another tool file or directory, as if its contents were inserted
   # at the current location.
   #
+  # Note that this directive has restrictions within a {#subtool_apply}
+  # block. See the {#subtool_apply} documentation for details.
+  #
   # @param path [String] The file or directory to load.
-  # @param as [String] Load into the given tool/namespace. If omitted,
-  #     configuration will be loaded into the current namespace.
+  # @param context_directory [String,Pathname,nil] The context directory
+  #     path for tools loaded from this source. Optional. If not provided,
+  #     defaults to the context directory for the surrounding source.
+  #     Context directory paths should generally be absolute. Relative
+  #     paths will be converted to absolute, using the current working
+  #     directory at the time of loading.
+  # @param as [String] Load into the given tool/namespace, relative to the
+  #     current namespace. If omitted, tools will be loaded into the
+  #     current namespace.
   #
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:418
-  def load(path, as: T.unsafe(nil)); end
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:419
+  def load(path, context_directory: T.unsafe(nil), as: T.unsafe(nil)); end
 
-  # Load configuration from a gem, as if its contents were inserted at the
-  # current location.
+  # Load tools from a gem, as if its contents were inserted at the current
+  # location.
+  #
+  # Note that this directive has restrictions within a {#subtool_apply}
+  # block. See the {#subtool_apply} documentation for details.
   #
   # @param name [String] Name of the gem
   # @param versions [Array<String>] Version requirements for the gem.
@@ -4070,17 +4378,27 @@ module Toys::DSL::Tool
   #     directory to load. Defaults to the root of the gem's toys directory.
   # @param toys_dir [String] Optional override for the gem's toys
   #     directory name. If not specified, the default specified by the gem
-  #     will be used.
-  # @param as [String] Load into the given tool/namespace. If omitted,
-  #     configuration will be loaded into the current namespace.
+  #     will be used (normally "toys").
+  # @param context_directory [String,Pathname,nil] The context directory
+  #     path for tools loaded from this source. Optional. If not provided,
+  #     defaults to the context directory for the surrounding source.
+  #     Context directory paths should generally be absolute. Relative
+  #     paths will be converted to absolute, using the current working
+  #     directory at the time of loading.
+  # @param as [String] Load into the given tool/namespace, relative to the
+  #     current namespace. If omitted, tools will be loaded into the
+  #     current namespace.
   #
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:484
-  def load_gem(name, *versions, version: T.unsafe(nil), path: T.unsafe(nil), toys_dir: T.unsafe(nil), as: T.unsafe(nil)); end
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:517
+  def load_gem(name, *versions, version: T.unsafe(nil), path: T.unsafe(nil), toys_dir: T.unsafe(nil), context_directory: T.unsafe(nil), as: T.unsafe(nil)); end
 
-  # Load configuration from a public git repository, as if its contents
-  # were inserted at the current location.
+  # Load tools from a public git repository, as if its contents were
+  # inserted at the current location.
+  #
+  # Note that this directive has restrictions within a {#subtool_apply}
+  # block. See the {#subtool_apply} documentation for details.
   #
   # @param remote [String] The URL of the git repository. Defaults to the
   #     current repository if already loading from git.
@@ -4088,19 +4406,26 @@ module Toys::DSL::Tool
   #     to load. Defaults to the root of the repo.
   # @param commit [String] The commit branch, tag, or sha. Defaults to the
   #     current commit if already loading from git, or to `HEAD`.
-  # @param as [String] Load into the given tool/namespace. If omitted,
-  #     configuration will be loaded into the current namespace.
   # @param update [boolean,Integer] Whether and when to force-fetch from
   #     the remote (unless the commit is a SHA). Force-fetching will ensure
   #     that symbolic commits, such as branch names or HEAD, are up to date.
   #     You can pass `true` or `false` to specify whether to update, or an
   #     integer to update if the last update was done at least that many
   #     seconds ago. Default is false.
+  # @param context_directory [String,Pathname,nil] The context directory
+  #     path for tools loaded from this source. Optional. If not provided,
+  #     defaults to the context directory for the surrounding source.
+  #     Context directory paths should generally be absolute. Relative
+  #     paths will be converted to absolute, using the current working
+  #     directory at the time of loading.
+  # @param as [String] Load into the given tool/namespace, relative to the
+  #     current namespace. If omitted, tools will be loaded into the
+  #     current namespace.
   #
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:450
-  def load_git(remote: T.unsafe(nil), path: T.unsafe(nil), commit: T.unsafe(nil), as: T.unsafe(nil), update: T.unsafe(nil)); end
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:464
+  def load_git(remote: T.unsafe(nil), path: T.unsafe(nil), commit: T.unsafe(nil), update: T.unsafe(nil), context_directory: T.unsafe(nil), as: T.unsafe(nil)); end
 
   # Add to the long description for the current tool. The long description
   # is displayed in the usage documentation for the tool itself. This
@@ -4129,14 +4454,15 @@ module Toys::DSL::Tool
   #     file. The file must be a plain text file whose suffix is `.txt`.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:618
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:652
   def long_desc(*strs, file: T.unsafe(nil), data: T.unsafe(nil)); end
 
-  # Notify the tool definition when a method is defined in this tool class.
+  # A callback defined on `::Module`. Notifies the tool definition when a
+  # method is defined in this tool class.
   #
   # @private
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1925
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:2009
   def method_added(_meth); end
 
   # Create a named mixin module that can be included by name from this tool
@@ -4176,7 +4502,7 @@ module Toys::DSL::Tool
   # @param block [Proc] Defines the mixin module.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:150
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:149
   def mixin(name, mixin_module = T.unsafe(nil), &block); end
 
   # Specify how to handle interrupts.
@@ -4204,10 +4530,10 @@ module Toys::DSL::Tool
   # @param block [Proc] The callback as a block.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1610
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1685
   def on_interrupt(handler = T.unsafe(nil), &block); end
 
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1582
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1657
   def on_run(handler = T.unsafe(nil), &block); end
 
   # Specify how to handle the given signal.
@@ -4234,7 +4560,7 @@ module Toys::DSL::Tool
   # @param block [Proc] The callback as a block.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1642
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1717
   def on_signal(signal, handler = T.unsafe(nil), &block); end
 
   # Specify how to handle usage errors.
@@ -4261,10 +4587,10 @@ module Toys::DSL::Tool
   # @param block [Proc] The callback as a block.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1674
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1749
   def on_usage_error(handler = T.unsafe(nil), &block); end
 
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1230
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1265
   def optional(key, default: T.unsafe(nil), accept: T.unsafe(nil), complete: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), add_method: T.unsafe(nil), &block); end
 
   # Add an optional positional argument to the current tool. You must
@@ -4337,10 +4663,10 @@ module Toys::DSL::Tool
   #     also passed to the block as an optional argument.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1217
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1252
   def optional_arg(key, default: T.unsafe(nil), accept: T.unsafe(nil), complete: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), add_method: T.unsafe(nil), &block); end
 
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1316
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1351
   def remaining(key, default: T.unsafe(nil), accept: T.unsafe(nil), complete: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), add_method: T.unsafe(nil), &block); end
 
   # Specify what should be done with unmatched positional arguments. You
@@ -4413,7 +4739,7 @@ module Toys::DSL::Tool
   #     also passed to the block as an optional argument.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1303
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1338
   def remaining_args(key, default: T.unsafe(nil), accept: T.unsafe(nil), complete: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), add_method: T.unsafe(nil), &block); end
 
   # Require that flags must match exactly. That is, flags must appear in
@@ -4421,15 +4747,15 @@ module Toys::DSL::Tool
   # accepted as long as they are unambiguous.)
   #
   # Issuing this directive by itself turns on exact match. You may turn it
-  # off by passsing `false` as the parameter.
+  # off by passing `false` as the parameter.
   #
   # @param state [boolean]
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1428
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1463
   def require_exact_flag_match(state = T.unsafe(nil)); end
 
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1144
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1179
   def required(key, accept: T.unsafe(nil), complete: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), add_method: T.unsafe(nil), &block); end
 
   # Add a required positional argument to the current tool. You must
@@ -4497,7 +4823,7 @@ module Toys::DSL::Tool
   #     also passed to the block as an optional argument.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1131
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1166
   def required_arg(key, accept: T.unsafe(nil), complete: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), add_method: T.unsafe(nil), &block); end
 
   # Set option values statically without creating helper methods.
@@ -4523,7 +4849,7 @@ module Toys::DSL::Tool
   #   @param hash [Hash] The keys and values to set
   #   @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1388
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1423
   def set(key, value = T.unsafe(nil)); end
 
   # Set a custom context directory for this tool.
@@ -4531,17 +4857,17 @@ module Toys::DSL::Tool
   # @param dir [String] Context directory
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1809
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1881
   def set_context_directory(dir); end
 
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:588
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:622
   def short_desc(str); end
 
   # Return the current source info object.
   #
   # @return [Toys::SourceInfo] Source info.
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1743
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1815
   def source_info; end
 
   # Set option values statically and create helper methods.
@@ -4574,7 +4900,7 @@ module Toys::DSL::Tool
   #   @param hash [Hash] The keys and values to set
   #   @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1349
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1384
   def static(key, value = T.unsafe(nil)); end
 
   # Applies the given block to all subtools, recursively. Effectively, the
@@ -4583,6 +4909,21 @@ module Toys::DSL::Tool
   #
   # The block is applied only to subtools defined *after* the block
   # appears. Subtools defined before the block appears are not affected.
+  #
+  # A `subtool_apply` block cannot create or modify subtools of the subtool
+  # being applied to. (This is because the same block could be expected to
+  # apply to that subtool as well, and the semantics of the resulting
+  # recursion would be messy and ambiguous.) Thus, within the block:
+  #
+  #  *  You cannot use the `tool` directive.
+  #  *  You cannot create a `Toys::Tool` subclass.
+  #  *  You cannot use a nested `subtool_apply` directive.
+  #  *  You cannot pass the `as:` parameter to any `load` or related
+  #     directive.
+  #  *  You cannot use any `load` or related directive that references a
+  #     directory. (You can, however, load a file directly, as long as it
+  #     does not use the `as:` parameter, and the file's contents do not
+  #     violate any of these rules.)
   #
   # ### Example
   #
@@ -4608,7 +4949,7 @@ module Toys::DSL::Tool
   #       end
   #     end
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1848
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1935
   def subtool_apply(&block); end
 
   # Create a named template that can be expanded by name from this tool
@@ -4666,7 +5007,7 @@ module Toys::DSL::Tool
   # @param block [Proc] Defines the template class.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:213
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:211
   def template(name, template_class = T.unsafe(nil), &block); end
 
   # Specify how to run this tool.
@@ -4715,10 +5056,13 @@ module Toys::DSL::Tool
   # @param block [Proc] The run handler as a block.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1576
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1651
   def to_run(handler = T.unsafe(nil), &block); end
 
   # Create a subtool. You must provide a block defining the subtool.
+  #
+  # Note that this cannot be called from within {#subtool_apply} or from
+  # a middleware config method.
   #
   # ### Example
   #
@@ -4765,7 +5109,7 @@ module Toys::DSL::Tool
   # @param block [Proc] Defines the subtool.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:316
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:315
   def tool(words, if_defined: T.unsafe(nil), delegate_to: T.unsafe(nil), delegate_relative: T.unsafe(nil), &block); end
 
   # Asserts that the current Toys version against the given requirements,
@@ -4776,7 +5120,7 @@ module Toys::DSL::Tool
   # @raise [Toys::ToolDefinitionError] if the current Toys version does not
   #     satisfy the requirements.
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1909
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1992
   def toys_version!(*requirements); end
 
   # Determines whether the current Toys version satisfies the given
@@ -4784,8 +5128,43 @@ module Toys::DSL::Tool
   #
   # @return [boolean] whether or not the requirements are satisfied
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1893
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1976
   def toys_version?(*requirements); end
+
+  # Treat unknown flags as positional arguments. That is, if an argument
+  # looks like a flag but does not match any flag defined for this tool,
+  # it is passed to the tool's positional arguments instead of reporting a
+  # usage error.
+  #
+  # An argument is redirected in its entirety. Thus, an argument of the
+  # form `--foo=bar` is treated as a single positional argument, and a
+  # cluster of single-character flags such as `-abc` is treated as a
+  # single positional argument if any of its characters is unknown. (In
+  # particular, none of the flags in such a cluster are set.)
+  #
+  # This directive does not affect ambiguous flags. If an argument matches
+  # a prefix of multiple flags, it is still reported as a usage error.
+  #
+  # Issuing this directive by itself turns on the behavior. You may turn
+  # it off by passing `false` as the parameter.
+  #
+  # ### Example
+  #
+  #     tool "mytool" do
+  #       treat_unknown_flags_as_args
+  #       flag :verbose, "--verbose"
+  #       remaining_args :command
+  #       def run
+  #         # Invoking `mytool --verbose ls -l` sets verbose to true and
+  #         # command to ["ls", "-l"].
+  #       end
+  #     end
+  #
+  # @param state [boolean]
+  # @return [self]
+  #
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1503
+  def treat_unknown_flags_as_args(state = T.unsafe(nil)); end
 
   # Remove lower-priority sources from the load path. This prevents lower-
   # priority sources (such as Toys files from parent or global directories)
@@ -4796,7 +5175,7 @@ module Toys::DSL::Tool
   # @raise [Toys::ToolDefinitionError] if any lower-priority tools have
   #     already been loaded.
   #
-  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1865
+  # pkg:gem/toys-core#lib/toys/dsl/tool.rb:1952
   def truncate_load_path!; end
 end
 
@@ -5386,21 +5765,21 @@ end
 
 # A FlagGroup in which at least one flag must be set
 #
-# pkg:gem/toys-core#lib/toys/flag_group.rb:271
+# pkg:gem/toys-core#lib/toys/flag_group.rb:273
 class Toys::FlagGroup::AtLeastOne < ::Toys::FlagGroup::Base
   # @private
   #
-  # pkg:gem/toys-core#lib/toys/flag_group.rb:275
+  # pkg:gem/toys-core#lib/toys/flag_group.rb:277
   def validation_errors(seen); end
 end
 
 # A FlagGroup in which at most one flag must be set
 #
-# pkg:gem/toys-core#lib/toys/flag_group.rb:249
+# pkg:gem/toys-core#lib/toys/flag_group.rb:251
 class Toys::FlagGroup::AtMostOne < ::Toys::FlagGroup::Base
   # @private
   #
-  # pkg:gem/toys-core#lib/toys/flag_group.rb:253
+  # pkg:gem/toys-core#lib/toys/flag_group.rb:255
   def validation_errors(seen); end
 end
 
@@ -5517,64 +5896,67 @@ class Toys::FlagGroup::Base
   # This provides the behavioral distinctions between subclasses, returning
   # errors for any validations not satisfied by the current flags.
   #
-  # @param _seen [Array<Object>] A list of the keys of the flags actually
-  #     passed to the invocation
-  # @return [Array<ArgParser::FlagGroupConstraintError>] A list of errors
-  #     to raise, or the empty array if no errors were found
+  # @param _seen [Array<Toys::Flag>] A list of the flag definitions
+  #     actually matched during the invocation. Flags are identified by
+  #     object identity rather than by key, because multiple flag
+  #     definitions may share a context key.
+  # @return [Array<String>] A list of messages describing the constraints
+  #     that were not satisfied, or the empty array if all were satisfied.
+  #     The caller is responsible for converting these into errors.
   #
-  # pkg:gem/toys-core#lib/toys/flag_group.rb:185
+  # pkg:gem/toys-core#lib/toys/flag_group.rb:188
   def validation_errors(_seen); end
 end
 
 # A FlagGroup in which exactly one flag must be set
 #
-# pkg:gem/toys-core#lib/toys/flag_group.rb:224
+# pkg:gem/toys-core#lib/toys/flag_group.rb:226
 class Toys::FlagGroup::ExactlyOne < ::Toys::FlagGroup::Base
   # @private
   #
-  # pkg:gem/toys-core#lib/toys/flag_group.rb:228
+  # pkg:gem/toys-core#lib/toys/flag_group.rb:230
   def validation_errors(seen); end
 end
 
 # A FlagGroup containing all optional flags
 #
-# pkg:gem/toys-core#lib/toys/flag_group.rb:212
+# pkg:gem/toys-core#lib/toys/flag_group.rb:214
 class Toys::FlagGroup::Optional < ::Toys::FlagGroup::Base
   # @private
   #
-  # pkg:gem/toys-core#lib/toys/flag_group.rb:216
+  # pkg:gem/toys-core#lib/toys/flag_group.rb:218
   def validation_errors(_seen); end
 end
 
 # A FlagGroup containing all required flags
 #
-# pkg:gem/toys-core#lib/toys/flag_group.rb:193
+# pkg:gem/toys-core#lib/toys/flag_group.rb:196
 class Toys::FlagGroup::Required < ::Toys::FlagGroup::Base
   # @private
   #
-  # pkg:gem/toys-core#lib/toys/flag_group.rb:197
+  # pkg:gem/toys-core#lib/toys/flag_group.rb:200
   def validation_errors(seen); end
 end
 
 # This module is the root namespace for tool definitions loaded from files.
-# Whenever a toys configuration file is parsed, a module is created under this
-# parent for that file's contents. Tool classes defined in that file, along
-# with mixins and templates, and any other classes, modules, and constants
-# defined, are located within that file's module. This isolates the namespace,
-# so that, for example, constants defined in the file are not defined as
-# top-level constants but are isolated from other files.
+# Whenever a tool file is parsed, a module is created under this parent for
+# that file's contents. Tool classes defined in that file, along with mixins
+# and templates, and any other classes, modules, and constants defined, are
+# located within that file's module. This isolates the namespace, so that, for
+# example, constants defined in the file are not defined as top-level constants
+# but are isolated from other files.
 #
 # pkg:gem/toys-core#lib/toys/input_file.rb:12
 module Toys::InputFile
   class << self
     # @private
     #
-    # pkg:gem/toys-core#lib/toys/input_file.rb:46
+    # pkg:gem/toys-core#lib/toys/input_file.rb:50
     def __binding; end
 
     # @private
     #
-    # pkg:gem/toys-core#lib/toys/input_file.rb:53
+    # pkg:gem/toys-core#lib/toys/input_file.rb:57
     def build_eval_string(module_name, string); end
 
     # This is the main entrypoint. We create a module with a unique name, and
@@ -5587,198 +5969,93 @@ module Toys::InputFile
     # @private This interface is internal and subject to change without warning.
     #
     # pkg:gem/toys-core#lib/toys/input_file.rb:23
-    def evaluate(tool_class, words, priority, remaining_words, source, loader); end
+    def evaluate(tool_class, words, remaining_words, source, loader); end
   end
 end
 
-# The Loader service loads tools from configuration files, and finds the
+# The Loader service loads tools from tool sources, and finds the
 # appropriate tool given a set of command line arguments.
 #
 # pkg:gem/toys-core#lib/toys/loader.rb:8
 class Toys::Loader
-  # Create a Loader
+  # Create a Loader.
   #
-  # @param index_file_name [String,nil] A file with this name that appears
-  #     in any configuration directory (not just a toplevel directory) is
-  #     loaded first as a standalone configuration file. If not provided,
-  #     standalone configuration files are disabled.
-  # @param preload_file_name [String,nil] A file with this name that appears
-  #     in any configuration directory is preloaded before any tools in that
-  #     configuration directory are defined.
-  # @param preload_dir_name [String,nil] A directory with this name that
-  #     appears in any configuration directory is searched for Ruby files,
-  #     which are preloaded before any tools in that configuration directory
-  #     are defined.
-  # @param data_dir_name [String,nil] A directory with this name that appears
-  #     in any configuration directory is added to the data directory search
-  #     path for any tool file in that directory.
-  # @param lib_dir_name [String,nil] A directory with this name that appears
-  #     in any configuration directory is added to the Ruby load path for any
-  #     tool file in that directory.
+  # @param source_list [Toys::SourceList] The list of sources to use. The
+  #     source specs are snapshotted from the SourceList on construction, so
+  #     if the SourceList is modified later, those modifications are not
+  #     reflected in the constructed Loader. The specs themselves are not
+  #     resolved until the Loader first looks up a tool.
+  # @param tool_name_splitter [Toys::ToolNameSplitter] The splitter that
+  #     interprets delimiters in tool names. Defaults to
+  #     {Toys::ToolNameSplitter::DEFAULT}, which recognizes only whitespace.
   # @param middleware_stack [Array<Toys::Middleware::Spec>] An array of
   #     middleware that will be used by default for all tools loaded by this
   #     loader.
-  # @param extra_delimiters [String] A string containing characters that can
-  #     function as delimiters in a tool name. Defaults to empty. Allowed
-  #     characters are period, colon, and slash.
   # @param mixin_lookup [Toys::ModuleLookup] A lookup for well-known
   #     mixin modules. Defaults to an empty lookup.
-  # @param middleware_lookup [Toys::ModuleLookup] A lookup for
-  #     well-known middleware classes. Defaults to an empty lookup.
-  # @param template_lookup [Toys::ModuleLookup] A lookup for
-  #     well-known template classes. Defaults to an empty lookup.
+  # @param middleware_lookup [Toys::ModuleLookup] A lookup for well-known
+  #     middleware classes. Defaults to an empty lookup.
+  # @param template_lookup [Toys::ModuleLookup] A lookup for well-known
+  #     template classes. Defaults to an empty lookup.
+  # @param git_cache [Toys::Utils::GitCache,nil] A custom GitCache instance
+  #     to use when resolving git sources. Optional. If nil or not specified,
+  #     uses a process-wide default GitCache.
+  # @param gems_util [Toys::Utils::Gems,nil] A custom Gems utility instance
+  #     to use when resolving gem sources. Optional. If nil or not specified,
+  #     uses a process-wide default Gems utility.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:42
-  def initialize(index_file_name: T.unsafe(nil), preload_dir_name: T.unsafe(nil), preload_file_name: T.unsafe(nil), data_dir_name: T.unsafe(nil), lib_dir_name: T.unsafe(nil), middleware_stack: T.unsafe(nil), extra_delimiters: T.unsafe(nil), mixin_lookup: T.unsafe(nil), middleware_lookup: T.unsafe(nil), template_lookup: T.unsafe(nil), git_cache: T.unsafe(nil), gems_util: T.unsafe(nil)); end
+  # pkg:gem/toys-core#lib/toys/loader.rb:55
+  def initialize(source_list, tool_name_splitter: T.unsafe(nil), middleware_stack: T.unsafe(nil), mixin_lookup: T.unsafe(nil), middleware_lookup: T.unsafe(nil), template_lookup: T.unsafe(nil), git_cache: T.unsafe(nil), gems_util: T.unsafe(nil)); end
 
-  # Returns the active tool specified by the given words, with the given
-  # priority, without doing any loading. If the given priority matches the
-  # currently active tool, returns it. If the given priority is lower than
-  # the active priority, returns `nil`. If the given priority is higher than
-  # the active priority, returns and activates a new tool.
+  # Get a specific tool definition with the given name and priority. The
+  # returned definition may not be finished.
+  #
+  # If a `tool_class` argument is provided, it is an assertion of the tool's
+  # class. If the tool needs to be newly constructed, the given class will
+  # be used. If the tool exists, and its class is not the same as the given
+  # class, an error will be raised. (This could happen if the tool is being
+  # defined using a Toys::Tool subclass, where it had already previously been
+  # defined through some other means.)
+  #
+  # If `activate` is set to true, it is an assertion that the returned tool
+  # is the active one, of the given priority or higher. Thus, if there is no
+  # currently active tool, or the active tool has a lower priority than given,
+  # the current priority tool is activated and returned. If the currently
+  # active tool has a higher priority than given, *nil is returned*, i.e. you
+  # cannot activate a lower-priority tool than what is already active.
+  #
+  # Called from the DSL to get or activate the current ToolDefinition.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:414
-  def activate_tool(words, priority); end
-
-  # Add a configuration block to the loader.
+  # @param words [Array<String>] The tool name
+  # @param priority [Integer] The priority to get
+  # @param activate [boolean] Whether to return an activated tool
+  # @param tool_class [Class] Tool class to assert
+  # @return [Toys::ToolDefinition] The specified tool definition
+  # @return [nil] if `:activate` has been requested but a higher-priority
+  #     tool has already been activated
   #
-  # @param high_priority [boolean] If true, add this block at the top of the
-  #     priority list. Defaults to false, indicating the block should be at
-  #     the bottom of the priority list.
-  # @param source_name [String] The source name that will be shown in
-  #     documentation for tools loaded from this source. If omitted, a
-  #     default unique string will be generated.
-  # @param block [Proc] The block of configuration, executed in the context
-  #     of the tool DSL {Toys::DSL::Tool}.
-  # @param context_directory [String,nil] The context directory for tools
-  #     loaded from this block. You can pass a directory path as a string, or
-  #     `nil` to denote no context. Defaults to `nil`.
-  # @return [self]
-  #
-  # pkg:gem/toys-core#lib/toys/loader.rb:182
-  def add_block(high_priority: T.unsafe(nil), source_name: T.unsafe(nil), context_directory: T.unsafe(nil), &block); end
-
-  # Add a configuration gem source to the loader.
-  #
-  # @param gem_name [String] The name of the gem
-  # @param gem_version [String,Array<String>] The version requirements
-  # @param gem_path [String] The path from the gem's toys directory to the
-  #     relevant file or directory. Specify the empty string to use the
-  #     entire toys directory.
-  # @param high_priority [boolean] If true, add this path at the top of the
-  #     priority list. Defaults to false, indicating the new path should be
-  #     at the bottom of the priority list.
-  # @param source_name [String] The source name that will be shown in
-  #     documentation for tools loaded from this source. If omitted, a
-  #     default unique string will be generated.
-  # @param gem_toys_dir [String] The name of the toys directory. Optional.
-  #     Defaults to the directory specified in the gem's metadata, or the
-  #     value "toys".
-  # @param context_directory [String,nil] The context directory for tools
-  #     loaded from this source. You can pass a directory path as a string,
-  #     or `nil` to denote no context. Defaults to `nil`.
-  # @return [self]
-  #
-  # pkg:gem/toys-core#lib/toys/loader.rb:263
-  def add_gem(gem_name, gem_version, gem_path, high_priority: T.unsafe(nil), source_name: T.unsafe(nil), gem_toys_dir: T.unsafe(nil), context_directory: T.unsafe(nil)); end
-
-  # Add a configuration git source to the loader.
-  #
-  # @param git_remote [String] The git repo URL
-  # @param git_path [String] The path to the relevant file or directory in
-  #     the repo. Specify the empty string to use the entire repo.
-  # @param git_commit [String] The git ref (i.e. SHA, tag, or branch name)
-  # @param high_priority [boolean] If true, add this path at the top of the
-  #     priority list. Defaults to false, indicating the new path should be
-  #     at the bottom of the priority list.
-  # @param source_name [String] The source name that will be shown in
-  #     documentation for tools loaded from this source. If omitted, a
-  #     default unique string will be generated.
-  # @param update [boolean] If the commit is not a SHA, pulls any updates
-  #     from the remote. Defaults to false, which uses a local cache and does
-  #     not update if the commit has been fetched previously.
-  # @param context_directory [String,nil] The context directory for tools
-  #     loaded from this source. You can pass a directory path as a string,
-  #     or `nil` to denote no context. Defaults to `nil`.
-  # @return [self]
-  #
-  # pkg:gem/toys-core#lib/toys/loader.rb:221
-  def add_git(git_remote, git_path, git_commit, high_priority: T.unsafe(nil), source_name: T.unsafe(nil), update: T.unsafe(nil), context_directory: T.unsafe(nil)); end
-
-  # Add a configuration file/directory to the loader.
-  #
-  # @param path [String] A single path to add.
-  # @param high_priority [boolean] If true, add this path at the top of the
-  #     priority list. Defaults to false, indicating the new path should be
-  #     at the bottom of the priority list.
-  # @param source_name [String] The source name that will be shown in
-  #     documentation for tools loaded from this source. If omitted, a
-  #     default unique string will be generated.
-  # @param context_directory [String,nil,:path,:parent] The context directory
-  #     for tools loaded from this path. You can pass a directory path as a
-  #     string, `:path` to denote the given path, `:parent` to denote the
-  #     given path's parent directory, or `nil` to denote no context.
-  #     Defaults to `:parent`.
-  # @return [self]
-  #
-  # pkg:gem/toys-core#lib/toys/loader.rb:100
-  def add_path(path, high_priority: T.unsafe(nil), source_name: T.unsafe(nil), context_directory: T.unsafe(nil)); end
-
-  # Add a set of configuration files/directories from a common directory to
-  # the loader. The set of paths will be added at the same priority level and
-  # will share a root.
-  #
-  # @param root_path [String] A root path to be seen as the root source. This
-  #     should generally be a directory containing the paths to add.
-  # @param relative_paths [String,Array<String>] One or more paths to add, as
-  #     relative paths from the common root.
-  # @param high_priority [boolean] If true, add the paths at the top of the
-  #     priority list. Defaults to false, indicating the new paths should be
-  #     at the bottom of the priority list.
-  # @param source_name [String] The source name that will be shown in
-  #     documentation for tools loaded from these sources. (Specifically,
-  #     sets the name of the synthetic root source.) If omitted, a default
-  #     unique string will be generated.
-  # @param context_directory [String,nil,:path,:parent] The context directory
-  #     for tools loaded from this path. You can pass a directory path as a
-  #     string, `:path` to denote the given root path, `:parent` to denote
-  #     the given root path's parent directory, or `nil` to denote no context.
-  #     Defaults to `:path`.
-  # @return [self]
-  #
-  # pkg:gem/toys-core#lib/toys/loader.rb:141
-  def add_path_set(root_path, relative_paths, high_priority: T.unsafe(nil), source_name: T.unsafe(nil), context_directory: T.unsafe(nil)); end
-
-  # Build a new tool.
-  # Called only from ToolData.
-  #
-  # @private This interface is internal and subject to change without warning.
-  #
-  # pkg:gem/toys-core#lib/toys/loader.rb:436
-  def build_tool(words, priority, tool_class = T.unsafe(nil)); end
-
-  # Get or create the tool definition for the given name and priority.
-  #
-  # @private This interface is internal and subject to change without warning.
-  #
-  # pkg:gem/toys-core#lib/toys/loader.rb:399
-  def get_tool(words, priority, tool_class = T.unsafe(nil)); end
+  # pkg:gem/toys-core#lib/toys/loader.rb:279
+  def get_tool(words, priority, activate: T.unsafe(nil), tool_class: T.unsafe(nil)); end
 
   # Returns true if the given path has at least one subtool, even if they are
-  # hidden or non-runnable. Loads from the configuration if necessary.
+  # hidden or non-runnable. Loads from the sources if necessary.
   #
-  # @param words [Array<String>] The name of the parent tool
+  # @param words [Array<String>] The name of the parent tool. It must be an
+  #     array of strings; it cannot be a single string with delimiters.
   # @return [boolean]
+  # @raise [Toys::ToolSourceError] if a root tool source failed to load
+  # @raise [Toys::ContextualError] for errors in tool loading or definition
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:370
+  # pkg:gem/toys-core#lib/toys/loader.rb:210
   def has_subtools?(words); end
 
-  # Returns a list of subtools for the given path, loading from the
-  # configuration if necessary. The list will be sorted by name.
+  # Returns a list of subtools for the given path, loading from their sources
+  # and ensuring they are finished. The list will be sorted by name.
   #
-  # @param words [Array<String>] The name of the parent tool
+  # @param words [Array<String>] The name of the parent tool. It must be an
+  #     array of strings; it cannot be a single string with delimiters.
   # @param recursive [boolean] If true, return all subtools recursively
   #     rather than just the immediate children (the default)
   # @param include_hidden [boolean] If true, include hidden subtools,
@@ -5789,125 +6066,158 @@ class Toys::Loader
   # @param include_non_runnable [boolean] If true, include tools that have
   #     no children and are not runnable. Defaults to false.
   # @return [Array<Toys::ToolDefinition>] An array of subtools.
+  # @raise [Toys::ToolSourceError] if a root tool source failed to load
+  # @raise [Toys::ContextualError] for errors in tool loading or definition
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:345
+  # pkg:gem/toys-core#lib/toys/loader.rb:175
   def list_subtools(words, recursive: T.unsafe(nil), include_hidden: T.unsafe(nil), include_namespaces: T.unsafe(nil), include_non_runnable: T.unsafe(nil)); end
 
   # Load a subtool block. Called from the `tool` directive in the DSL.
   #
+  # Distinct from load_source in that it uses SourceInfo#proc_child which
+  # inherits all the SourceInfo fields from the parent source. e.g. we're
+  # still in the same source file or outer block, unlike the `load` methods
+  # which use load_source because they are jumping to a totally different
+  # source with different info fields.
+  #
   # @private This interface is internal and subject to change without warning.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:549
-  def load_block(parent_source, block, words, remaining_words, priority); end
+  # @param parent_source [Toys::SourceInfo] The source for the block's
+  #     enclosing context.
+  # @param block [Proc] The block to evaluate
+  # @param words [Array<String>] The tool name the block should configure
+  # @param remaining_words [Array<String>,nil] Remaining words in the current
+  #     lookup.
+  # @return [self]
+  #
+  # pkg:gem/toys-core#lib/toys/loader.rb:399
+  def load_block(parent_source, block, words, remaining_words); end
 
-  # Loads the subtree under the given prefix.
+  # Loads the subtree under the given prefix. Does not finish tools.
+  #
+  # If the prefix is nil, does no loading but does ensure that all sources
+  # are resolved.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:462
+  # @param prefix [Array<String>] The tool name prefix
+  #
+  # pkg:gem/toys-core#lib/toys/loader.rb:312
   def load_for_prefix(prefix); end
 
-  # Load configuration from the given gem. This is called from the `load_gem`
-  # directive in the DSL.
+  # Load tools from the source described by the given spec, resolved as a
+  # child of the given parent source. This is called from the `load`,
+  # `load_git`, and `load_gem` directives in the DSL.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:535
-  def load_gem(parent_source, gem_name, gem_version, gem_toys_dir, gem_path, words, remaining_words, priority); end
-
-  # Load configuration from the given git remote. This is called from the
-  # `load_git` directive in the DSL.
+  # @param parent_source [Toys::SourceInfo] The source for the load's
+  #     enclosing context.
+  # @param spec [Toys::SourceSpec::Base] The source to load
+  # @param words [Array<String>] The tool name to load under
+  # @param remaining_words [Array<String>,nil] Remaining words in the current
+  #     lookup.
+  # @return [self]
   #
-  # @private This interface is internal and subject to change without warning.
-  #
-  # pkg:gem/toys-core#lib/toys/loader.rb:520
-  def load_git(parent_source, git_remote, git_path, git_commit, update, words, remaining_words, priority); end
-
-  # Load configuration from the given path. This is called from the `load`
-  # directive in the DSL.
-  #
-  # @private This interface is internal and subject to change without warning.
-  #
-  # pkg:gem/toys-core#lib/toys/loader.rb:504
-  def load_path(parent_source, path, words, remaining_words, priority); end
+  # pkg:gem/toys-core#lib/toys/loader.rb:360
+  def load_source(parent_source, spec, words, remaining_words); end
 
   # Given a list of command line arguments, find the appropriate tool to
-  # handle the command, loading it from the configuration if necessary.
+  # handle the command, loading it from its source if necessary and ensuring
+  # it has been finished.
   # This always returns a tool. If the specific tool path is not defined and
-  # cannot be found in any configuration, it finds the nearest namespace that
-  # *would* contain that tool, up to the root tool.
+  # cannot be found in any source, it finds the nearest namespace that
+  # *would* contain that tool, up to the root tool (which always exists.)
   #
   # Returns a tuple of the found tool, and the array of remaining arguments
   # that are not part of the tool name and should be passed as tool args.
   #
-  # @param args [Array<String>] Command line arguments
+  # @param args [Array<String>] Command line arguments. The first argument
+  #     may be a full tool name with delimiters.
   # @return [Array(Toys::ToolDefinition,Array<String>)]
+  # @raise [Toys::ToolSourceError] if a root tool source failed to load
+  # @raise [Toys::ContextualError] for errors in tool loading or definition
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:296
+  # pkg:gem/toys-core#lib/toys/loader.rb:121
   def lookup(args); end
 
-  # Given a tool name, looks up the specific tool, loading it from the
-  # configuration if necessary.
+  # Given a tool name, looks up the specific tool, loading it from its source
+  # if necessary and ensuring it has been finished.
   #
   # If there is an active tool, returns it; otherwise, returns the highest
   # priority tool that has been defined. If no tool has been defined with
   # the given name, returns `nil`.
   #
-  # @param words [Array<String>] The tool name
+  # @param words [Array<String>] The tool name. It must be in the form of
+  #     an array of strings; it cannot be a single string with delimiters.
   # @return [Toys::ToolDefinition] if the tool was found
   # @return [nil] if no such tool exists
+  # @raise [Toys::ToolSourceError] if a root tool source failed to load
+  # @raise [Toys::ContextualError] for errors in tool loading or definition
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:321
+  # pkg:gem/toys-core#lib/toys/loader.rb:149
   def lookup_specific(words); end
+
+  # Ensures all root sources get resolved eagerly.
+  # Does not actually load any tools.
+  #
+  # Can be called pre-emptively prior to other methods to prevent them from
+  # raising {Toys::ToolSourceError} directly. (It is still possible for them
+  # to raise {Toys::ToolSourceError} wrapped in a {Toys::ContextualError} if
+  # a tool invokes another source via one of the `load` directives.)
+  #
+  # @return [self]
+  # @raise [Toys::ToolSourceError] if a root source failed to resolve or load
+  #
+  # pkg:gem/toys-core#lib/toys/loader.rb:227
+  def resolve_sources; end
 
   # Attempt to get a well-known mixin module for the given symbolic name.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:485
+  # pkg:gem/toys-core#lib/toys/loader.rb:332
   def resolve_standard_mixin(name); end
 
   # Attempt to get a well-known template class for the given symbolic name.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:494
+  # pkg:gem/toys-core#lib/toys/loader.rb:341
   def resolve_standard_template(name); end
-
-  # Splits the given path using the delimiters configured in this Loader.
-  # You may pass in either an array of strings, or a single string possibly
-  # delimited by path separators. Always returns an array of strings.
-  #
-  # @param str [String,Symbol,Array<String,Symbol>] The path to split.
-  # @return [Array<String>]
-  #
-  # pkg:gem/toys-core#lib/toys/loader.rb:387
-  def split_path(str); end
 
   # Stop search at the given priority. Returns true if successful.
   # Called only from the DSL.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:449
+  # @param priority [Integer] The priority to stop at
+  # @return [boolean] Whether the search could be stopped there.
+  #
+  # pkg:gem/toys-core#lib/toys/loader.rb:294
   def stop_loading_at_priority(priority); end
 
-  # Returns true if the given tool name currently exists in the loader.
-  # Does not load the tool if not found.
+  # Determines whether any tool has been defined so far with the given name.
+  #
+  # Called from the Runner to ensure that a delegation target exists.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:426
+  # @param words [Array<String>] The tool name
+  # @return [boolean]
+  #
+  # pkg:gem/toys-core#lib/toys/loader.rb:243
   def tool_defined?(words); end
 
-  private
-
-  # Return a snapshot of all the current tool definitions that have been
-  # loaded. No additional loading is done. The returned array is not in any
-  # particular order.
+  # The splitter that interprets delimiters in the tool names handled by this
+  # loader. Use it to convert a delimited name into words.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:763
-  def all_cur_definitions; end
+  # @return [Toys::ToolNameSplitter]
+  #
+  # pkg:gem/toys-core#lib/toys/loader.rb:102
+  def tool_name_splitter; end
+
+  private
 
   # This checks if words1 (a target prefix we're looking for) matches words2
   # (a source we could load).
@@ -5918,192 +6228,576 @@ class Toys::Loader
   # sources. This could be the empty array if we've exhausted the entire
   # desired target, and thus we should load everything from this point down.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:919
+  # pkg:gem/toys-core#lib/toys/loader.rb:587
   def calc_remaining_words(words1, words2); end
 
-  # Look for and require any preloads.
+  # Iterate over all current (activated or highest priority) tool definitions
+  # under a particular tool name.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:882
-  def do_preload(path); end
+  # Caller should normally ensure that loading is complete prior to iteration,
+  # e.g. by calling load_for_prefix. Yielded tools may not be finished.
+  #
+  # @param words [Array<String>] The tool name to start from
+  # @param recursive [boolean] Whether to include tools below the immediate
+  #     children
+  #
+  # pkg:gem/toys-core#lib/toys/loader.rb:420
+  def each_definition_in_subtree(words, recursive: T.unsafe(nil)); end
 
   # Given a sorted list of tools, filter out non-runnable tools, subject to
   # the given settings.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:933
+  # pkg:gem/toys-core#lib/toys/loader.rb:601
   def filter_non_runnable_tools(tools, include_namespaces, include_non_runnable); end
 
-  # Finishes all tool definitions under the given path. This generally means
-  # installing middleware.
+  # Determine the longest prefix of the given command line arguments that
+  # could name a tool, along with the arguments to search it in.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:786
-  def finish_definitions_in_tree(words); end
+  # If the first argument spells a multi-word name using delimiters, that
+  # name is the prefix, and its words replace that argument in the returned
+  # arguments. Otherwise the prefix is the leading arguments that do not look
+  # like flags, and the arguments are returned unchanged.
+  #
+  # pkg:gem/toys-core#lib/toys/loader.rb:442
+  def find_orig_prefix(args); end
 
-  # Get or create the ToolData for the given name.
+  # Handle a resolved SourceInfo from the worklist.
+  #
   # Caller must own the mutex.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:778
-  def get_tool_data(words, create); end
+  # pkg:gem/toys-core#lib/toys/loader.rb:474
+  def handle_resolved_worklist_item(prefix, source_info, words); end
+
+  # Resolve a root SourceSpec from the worklist, and handle the resulting
+  # source or sources.
+  #
+  # Caller must own the mutex.
+  #
+  # pkg:gem/toys-core#lib/toys/loader.rb:458
+  def handle_unresolved_worklist_item(prefix, source_spec, priority); end
 
   # Load non-index file in a directory source.
   # Caller must own the mutex.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:859
-  def load_child_in(source, child, words, remaining_words, priority); end
+  # pkg:gem/toys-core#lib/toys/loader.rb:558
+  def load_child_in(source, child, words, remaining_words); end
 
   # Load an index file in a directory source.
   # Caller must own the mutex.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:849
-  def load_index_in(source, words, remaining_words, priority); end
+  # pkg:gem/toys-core#lib/toys/loader.rb:549
+  def load_index_in(source, words, remaining_words); end
 
   # Loads from a proc source.
   # Caller must own the mutex.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:800
-  def load_proc(source, words, remaining_words, priority); end
+  # pkg:gem/toys-core#lib/toys/loader.rb:492
+  def load_proc(source, words, remaining_words); end
 
   # Load from a file path source that is known to exist and is known to be
   # relevant to the current load request.
   # Caller must own the mutex.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:831
-  def load_relevant_path(source, words, remaining_words, priority); end
+  # pkg:gem/toys-core#lib/toys/loader.rb:528
+  def load_relevant_path(source, words, remaining_words); end
 
   # Load from a file path source that is known to exist.
   # Caller must own the mutex.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:818
-  def load_validated_path(source, words, remaining_words, priority); end
-
-  # Require the contents of the given directory.
-  #
-  # pkg:gem/toys-core#lib/toys/loader.rb:900
-  def require_dir_contents(preload_dir); end
-
-  # Resolve information for a gem source.
-  #
-  # pkg:gem/toys-core#lib/toys/loader.rb:747
-  def resolve_gem_info(gem_name, gem_version, gem_toys_dir, gem_path); end
-
-  # Resolve the file system path to the given object in the git cache
-  #
-  # pkg:gem/toys-core#lib/toys/loader.rb:739
-  def resolve_git_path(git_remote, git_path, git_commit, update); end
+  # pkg:gem/toys-core#lib/toys/loader.rb:515
+  def load_validated_path(source, words, remaining_words); end
 
   # Update min_loaded_priority to the given value.
   # Caller must own the mutex.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:875
+  # pkg:gem/toys-core#lib/toys/loader.rb:573
   def update_min_loaded_priority(priority); end
+end
+
+# The priority of the always-present fallback root tool.
+# This is the priority of the root tool that will be returned from lookups
+# if no sources have been added. If any source is added, it will have a
+# higher priority than this, and its tools will supersede this fallback.
+#
+# @return [Integer]
+#
+# pkg:gem/toys-core#lib/toys/loader.rb:17
+Toys::Loader::FALLBACK_ROOT_PRIORITY = T.let(T.unsafe(nil), Integer)
+
+# Starting point for `@min_loaded_priority`. Should be higher than any
+# actual priority.
+#
+# @return [Integer]
+#
+# pkg:gem/toys-core#lib/toys/loader.rb:25
+Toys::Loader::HIGHEST_PRIORITY = T.let(T.unsafe(nil), Integer)
+
+# A LoadState holds loading state applicable while defining a tool class.
+# It is created by the Loader and read by the DSL. Each tool class holds a
+# LoadState (in an ivar), which is created the first time the DSL runs for
+# that tool, and is updated in place each subsequent time.
+#
+# The internal state comprises four values: `loader`, `words`,
+# `remaining_words`, `source`. The first two are always consistent (i.e. a
+# tool class is always built by a single loader for a single tool name),
+# and are set in the constructor and never modified. The latter two could
+# be different due to evaluating different sources at different points
+# during loading, and are thus updated during the `enter` block.
+#
+# Note this class is not thread-safe by itself, so access should be
+# protected by an external lock. (In practice every mutation happens under
+# the Loader's mutex.)
+#
+# @private This interface is internal and subject to change without warning.
+#
+# pkg:gem/toys-core#lib/toys/loader/load_state.rb:24
+class Toys::Loader::LoadState
+  # Create a LoadState. Use {LoadState.prepare} or
+  # {LoadState.prepare_subclass} rather than calling this directly.
+  #
+  # @private This interface is internal and subject to change without warning.
+  #
+  # @param loader [Toys::Loader] The loader
+  # @param words [Array<String>] The tool name
+  # @param remaining_words [Array<String>,nil] Remaining name segments still
+  #     outstanding in the current lookup, or nil if this name is not on the
+  #     path to the name being looked up.
+  # @param source [Toys::SourceInfo] The current source
+  # @param cur_tool [Toys::ToolDefinition,nil] The current tool, seeded if
+  #     available.
+  #
+  # pkg:gem/toys-core#lib/toys/loader/load_state.rb:208
+  def initialize(loader, words, remaining_words, source, cur_tool: T.unsafe(nil)); end
+
+  # Canonicalizes a given tool name, which could be an array or a single
+  # string with delimiters.
+  #
+  # @param input_name [String,Array<String>] any allowed tool name format
+  # @return [Array<String>] canonical format as array of strings
+  #
+  # pkg:gem/toys-core#lib/toys/loader/load_state.rb:271
+  def canonical_absolute_tool_name(input_name); end
+
+  # Canonicalizes a given relative tool name, which could be an array or a
+  # single string with delimiters, and returns the full absolute name
+  # relative to the current tool name (words).
+  #
+  # @param input_name [String,Array<String>] any allowed tool name format
+  # @return [Array<String>] canonical format as array of strings
+  #
+  # pkg:gem/toys-core#lib/toys/loader/load_state.rb:283
+  def canonical_relative_tool_name(input_name); end
+
+  # Get, and optionally activate, the tool definition being defined. The
+  # result is memoized, separately for the activating and non-activating
+  # cases.
+  #
+  # @param activate [boolean] Whether to activate the tool
+  # @return [Toys::ToolDefinition] The tool definition
+  # @return [nil] if activation failed because a higher-priority definition
+  #     is already active.
+  #
+  # pkg:gem/toys-core#lib/toys/loader/load_state.rb:297
+  def current_tool(activate); end
+
+  # Descend the given name segments from this state's current name.
+  # See {LoadState.descend_name}.
+  #
+  # @param new_words [Array<String>] Name segments to descend
+  # @return [Array(Array<String>,(Array<String>|nil))]
+  #
+  # pkg:gem/toys-core#lib/toys/loader/load_state.rb:260
+  def descend_name(new_words); end
+
+  # Adopt the given load parameters, evaluate the given block, and then
+  # restore the old parameters.
+  # Called only from {LoadState.prepare}.
+  #
+  # @private This interface is internal and subject to change without warning.
+  #
+  # @param remaining_words [Array<String>,nil] Remaining name segments still
+  #     outstanding in the current lookup, or nil if this name is not on the
+  #     path to the name being looked up.
+  # @param source [Toys::SourceInfo] The current source
+  #
+  # @return [Object] The value of the block
+  #
+  # pkg:gem/toys-core#lib/toys/loader/load_state.rb:230
+  def enter(remaining_words, source); end
+
+  # Evaluate the given tool block with the given name under the current
+  # load context, inheriting the current SourceInfo's fields.
+  #
+  # @param block [::Proc] the block to evaluate
+  # @param subtool_name [String,Array<String>] the tool name
+  # @param if_defined [:combine,:reset,:ignore] what to do if a definition
+  #     is already present for the tool.
+  # @return [self]
+  #
+  # pkg:gem/toys-core#lib/toys/loader/load_state.rb:381
+  def eval_tool_block(block, subtool_name, if_defined); end
+
+  # A terse description of this state. Deliberately does not include the
+  # source itself, whose inspection prints its entire parent chain.
+  #
+  # @return [String]
+  #
+  # pkg:gem/toys-core#lib/toys/loader/load_state.rb:411
+  def inspect; end
+
+  # Load the given source spec under the current load context, but without
+  # inheriting SourceInfo fields (i.e. a separate source than the context.)
+  #
+  # @param spec [Toys::SourceSpec] The source to load
+  # @return [self]
+  #
+  # pkg:gem/toys-core#lib/toys/loader/load_state.rb:366
+  def load_source(spec); end
+
+  # The loader.
+  #
+  # @private This interface is internal and subject to change without warning.
+  #
+  # pkg:gem/toys-core#lib/toys/loader/load_state.rb:424
+  def loader; end
+
+  # Resolve a mixin spec, which could be a mixin name defined in a tool
+  # (i.e. a string), a well-known mixin name (i.e. a symbol) or a module.
+  #
+  # @param mixin [String,Symbol,Module] The mixin spec
+  # @return [Module] The resolved mixin module
+  # @raise [Toys::ToolDefinitionError] if the mixin name was not found
+  #
+  # pkg:gem/toys-core#lib/toys/loader/load_state.rb:309
+  def resolve_mixin(mixin); end
+
+  # Resolve a template spec, which could be a template name defined in a
+  # tool (i.e. a string), a well-known template name (i.e. a symbol) or a
+  # class.
+  #
+  # @param template [String,Symbol,Class] The template spec
+  # @return [Class] The resolved template class
+  # @raise [Toys::ToolDefinitionError] if the template name was not found
+  #
+  # pkg:gem/toys-core#lib/toys/loader/load_state.rb:332
+  def resolve_template(template); end
+
+  # The current source.
+  #
+  # @return [Toys::SourceInfo]
+  #
+  # pkg:gem/toys-core#lib/toys/loader/load_state.rb:251
+  def source; end
+
+  # Set the loader to stop loading at the current priority, if possible.
+  #
+  # @raise [Toys::ToolDefinitionError] if lower-priority tools have already
+  #     been loaded.
+  #
+  # pkg:gem/toys-core#lib/toys/loader/load_state.rb:352
+  def stop_loading_at_current_priority; end
+
+  # Return a displayable name for the tool being evaluated
+  #
+  # @return [String]
+  #
+  # pkg:gem/toys-core#lib/toys/loader/load_state.rb:401
+  def tool_display_name; end
+
+  private
+
+  # An activating fetch returns nil when a higher-priority definition is
+  # already active, which ToolRegistry#get_tool checks before it does
+  # anything else. That nil is a stable answer, not a transient one:
+  # Entry#ensure_tool assigns the active priority only on a request that
+  # got past that check, so the active priority never decreases. Hence the
+  # negative result is cached rather than retried.
+  #
+  # pkg:gem/toys-core#lib/toys/loader/load_state.rb:440
+  def active_tool; end
+
+  # A non-activating fetch never returns nil, because ToolRegistry#get_tool
+  # refuses only activation requests, so a plain memo suffices here.
+  #
+  # pkg:gem/toys-core#lib/toys/loader/load_state.rb:430
+  def cur_tool; end
 
   class << self
-    # Get a global default Gems utility.
+    # Given a tool name, the name segments still outstanding in the current
+    # lookup, and a set of new name segments to descend, return the
+    # resulting tool name along with the resulting remaining words, which
+    # are nil if the resulting name is not on the path to the name being
+    # looked up.
+    #
+    # This computation is pure. No argument is modified, and callers must
+    # treat the results as read-only because they may alias the arguments.
+    # {LoadState} freezes them when it adopts them.
     #
     # @private This interface is internal and subject to change without warning.
     #
-    # pkg:gem/toys-core#lib/toys/loader.rb:579
-    def default_gems_util; end
+    # @param words [Array<String>] The current tool name
+    # @param remaining_words [Array<String>,nil] Remaining name segments
+    #     still outstanding in the current lookup
+    # @param new_words [Array<String>] Name segments to descend
+    # @return [Array(Array<String>,(Array<String>|nil))] The tool name with
+    #     the new segments appended, and either the remaining name segments
+    #     in the lookup if the descent followed it, or nil if the descent
+    #     strayed from the lookup.
+    #
+    # pkg:gem/toys-core#lib/toys/loader/load_state.rb:119
+    def descend_name(words, remaining_words, new_words); end
 
-    # Get a global default GitCache.
+    # The load state of the given tool class, or nil if the class has not
+    # been prepared for loading.
     #
     # @private This interface is internal and subject to change without warning.
     #
-    # pkg:gem/toys-core#lib/toys/loader.rb:565
-    def default_git_cache; end
+    # @param tool_class [Class] The tool class
+    # @return [Toys::Loader::LoadState,nil]
+    #
+    # pkg:gem/toys-core#lib/toys/loader/load_state.rb:93
+    def get(tool_class); end
 
-    # Determine the next setting for remaining_words, given a word.
+    # Prepare a tool class in a block or at the top level of a tool file,
+    # by setting up the class's LoadState and evaluating the given block
+    # with this state active.
     #
     # @private This interface is internal and subject to change without warning.
     #
-    # pkg:gem/toys-core#lib/toys/loader.rb:593
-    def next_remaining_words(remaining_words, word); end
+    # @param tool_class [Class] The tool class being loaded
+    # @param loader [Toys::Loader] The loader
+    # @param words [Array<String>] The tool name
+    # @param remaining_words [Array<String>,nil] Remaining name segments
+    # @param source [Toys::SourceInfo] The source being loaded
+    # @return [Object] The value of the block
+    #
+    # pkg:gem/toys-core#lib/toys/loader/load_state.rb:52
+    def prepare(tool_class, loader, words, remaining_words, source, &block); end
+
+    # Prepare a tool class that was created by subclassing Toys::Tool,
+    # by setting up the class's LoadState.
+    #
+    # @private This interface is internal and subject to change without warning.
+    #
+    # @param tool_class [Class] The tool class being loaded
+    # @param given_name [String,nil] Any explicitly-provided tool name, or
+    #     nil (the default) to infer one from the class name
+    #
+    # pkg:gem/toys-core#lib/toys/loader/load_state.rb:68
+    def prepare_subclass(tool_class, given_name: T.unsafe(nil)); end
+
+    private
+
+    # Infer a tool name from the class name
+    #
+    # pkg:gem/toys-core#lib/toys/loader/load_state.rb:141
+    def class_name_to_tool_name(class_name); end
+
+    # Given the fully qualified module name for a Toys::Tool subclass's
+    # namespace parent, return the LoadState for that parent.
+    #
+    # pkg:gem/toys-core#lib/toys/loader/load_state.rb:149
+    def parent_state_from_mod_name_segments(mod_names); end
+
+    # Record the given state in the tool class's ivar.
+    #
+    # pkg:gem/toys-core#lib/toys/loader/load_state.rb:136
+    def set(tool_class, state); end
+
+    # Raises if not currently evaluating a tool file or if in the middle of
+    # evaluating a block in the DSL. Subclassing Toys::Tool is illegal in
+    # both cases. This does not depend on having access to a LoadState,
+    # because it might be called from the inherited callback for Toys::Tool
+    # where there is no context to get the parent LoadState. Instead, it
+    # uses the fiber-local variable set up in LoadState.prepare.
+    #
+    # pkg:gem/toys-core#lib/toys/loader/load_state.rb:175
+    def validate_parent_source; end
   end
 end
 
-# An object that handles name delimiting.
+# The fiber-local slot holding a flag indicating whether the loader is
+# currently evaluating a block. This is used to determine whether it is
+# legal to subclass Toys::Tool.
 #
-# @private
+# pkg:gem/toys-core#lib/toys/loader/load_state.rb:34
+Toys::Loader::LoadState::FIBER_LOCAL_KEY = T.let(T.unsafe(nil), Symbol)
+
+# The tool class instance variable in which the load state is stored.
+# This name is reserved: tool class bodies are user-facing and can set
+# class instance variables of their own.
 #
-# pkg:gem/toys-core#lib/toys/loader.rb:701
-class Toys::Loader::DelimiterHandler
-  # @private
-  #
-  # pkg:gem/toys-core#lib/toys/loader.rb:705
-  def initialize(extra_delimiters); end
+# pkg:gem/toys-core#lib/toys/loader/load_state.rb:28
+Toys::Loader::LoadState::IVAR_NAME = T.let(T.unsafe(nil), Symbol)
 
-  # @private
+# A ToolRegistry is the collection of tool definitions from a Loader,
+# indexed by tool name. For each name it holds one definition per priority,
+# tracks which is the highest, and tracks which, if any, has been activated.
+# It is also the factory for {Toys::ToolDefinition} objects.
+#
+# Note this class is not thread-safe by itself, so access should be
+# protected by an external lock.
+#
+# @private This interface is internal and subject to change without warning.
+#
+# pkg:gem/toys-core#lib/toys/loader/tool_registry.rb:16
+class Toys::Loader::ToolRegistry
+  # Create an empty ToolRegistry.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:723
-  def find_orig_prefix(args); end
+  # @private This interface is internal and subject to change without warning.
+  #
+  # @param middleware_stack [Array<Toys::Middleware::Spec>] An array of
+  #     middleware that will be used by default for all tools built by this
+  #     registry.
+  # @param middleware_lookup [Toys::ModuleLookup] A lookup for well-known
+  #     middleware classes. Defaults to an empty lookup.
+  #
+  # pkg:gem/toys-core#lib/toys/loader/tool_registry.rb:28
+  def initialize(middleware_stack: T.unsafe(nil), middleware_lookup: T.unsafe(nil)); end
 
-  # @private
+  # Returns the current "best" definition for the given name, which is
+  # either the active definition, or, if none, the current highest-priority
+  # definition. Returns nil if the name has no definitions.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:716
-  def split_path(str); end
+  # @private This interface is internal and subject to change without warning.
+  #
+  # pkg:gem/toys-core#lib/toys/loader/tool_registry.rb:84
+  def cur_definition(words); end
+
+  # Iterates over the current definitions (i.e. the activated or highest
+  # priority, if one exists) for every name in this registry, in no
+  # particular order. The iteration occurs over a snapshot, so any tools
+  # added mid-iteration will not be included.
+  #
+  # @private This interface is internal and subject to change without warning.
+  #
+  # pkg:gem/toys-core#lib/toys/loader/tool_registry.rb:96
+  def each_cur_definition; end
+
+  # Get a specific tool definition with the given name and priority.
+  #
+  # If a `tool_class` argument is provided, it is an assertion of the tool's
+  # class. If the tool needs to be newly constructed, the given class will
+  # be used. If the tool exists, and its class is not the same as the given
+  # class, an error will be raised. (This could happen if the tool is being
+  # defined using a Toys::Tool subclass, where it had already previously been
+  # defined through some other means.)
+  #
+  # If `activate` is set to true, it is an assertion that the returned tool
+  # is the active one, of the given priority or higher. Thus, if there is no
+  # currently active tool, or the active tool has a lower priority than given,
+  # the current priority tool is activated and returned. If the currently
+  # active tool has a higher priority than given, *nil is returned*, i.e. you
+  # cannot activate a lower-priority tool than what is already active.
+  #
+  # @private This interface is internal and subject to change without warning.
+  #
+  # pkg:gem/toys-core#lib/toys/loader/tool_registry.rb:54
+  def get_tool(words, priority, activate: T.unsafe(nil), tool_class: T.unsafe(nil)); end
+
+  # Record the source root for the given priority.
+  #
+  # @private This interface is internal and subject to change without warning.
+  #
+  # @param priority [Integer] The priority level.
+  # @param source [Toys::SourceInfo] The root source for that priority. If
+  #     not provided, defaults to an empty source.
+  # @return [self]
+  # @raise [Toys::ToolDefinitionError] if that priority already has a root.
+  #
+  # pkg:gem/toys-core#lib/toys/loader/tool_registry.rb:117
+  def record_root(priority, source = T.unsafe(nil)); end
+
+  # Returns true if the given tool name currently has an entry in this
+  # registry. Does not create one if not found.
+  #
+  # @private This interface is internal and subject to change without warning.
+  #
+  # pkg:gem/toys-core#lib/toys/loader/tool_registry.rb:73
+  def tool_defined?(words); end
+
+  private
+
+  # Build a new tool definition.
+  #
+  # pkg:gem/toys-core#lib/toys/loader/tool_registry.rb:130
+  def build_tool(words, priority, tool_class); end
+
+  # Get the entry for the given name, creating it if requested.
+  #
+  # The creating and non-creating forms are both explicit at every call site
+  # on purpose. Toys::Loader#lookup walks shortening prefixes of whatever
+  # the user typed, so a creating read would validate names that were never
+  # meant to define anything, and raise on any argument carrying a shell
+  # metacharacter that reached the process unexpanded.
+  #
+  # Caller must own the mutex.
+  #
+  # pkg:gem/toys-core#lib/toys/loader/tool_registry.rb:148
+  def entry_for(words, create); end
 end
 
-# An internal object managing the various definitions for a specific tool
-# tool name and their priorities, and tracking which, if any, has been
-# activated.
+# The definitions of a single tool name, by priority, along with which of
+# them is the highest and which, if any, has been activated.
 #
-# This class is not thread-safe by itself. The caller must protect access
-# with a mutex.
+# This class is not thread-safe by itself. Its caller, the registry, holds
+# its own lock around every access.
 #
-# @private
+# @private This interface is internal and subject to change without warning.
 #
-# pkg:gem/toys-core#lib/toys/loader.rb:613
-class Toys::Loader::ToolData
-  # Create an empty tool data with no definitions.
+# pkg:gem/toys-core#lib/toys/loader/tool_registry.rb:174
+class Toys::Loader::ToolRegistry::Entry
+  # Create an empty entry with no definitions.
   #
-  # @private
+  # @private This interface is internal and subject to change without warning.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:619
-  def initialize(words); end
+  # pkg:gem/toys-core#lib/toys/loader/tool_registry.rb:180
+  def initialize; end
 
-  # Attempt to activate the tool with the given priority, and return it.
-  # If the given priority tool is already active, returns it.
-  # If a lower priority tool is already active, activates the given higher
-  # priority tool and returns it.
-  # If a higher priority tool is already active, does nothing and returns
-  # nil.
+  # Return the current definition at the given priority without building
+  # a new one, or nil if there is none.
   #
-  # @private
+  # @private This interface is internal and subject to change without warning.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:669
-  def activate_tool(priority, loader); end
+  # pkg:gem/toys-core#lib/toys/loader/tool_registry.rb:198
+  def [](priority); end
+
+  # The priority of the activated definition, or nil if none is active.
+  #
+  # @private This interface is internal and subject to change without warning.
+  #
+  # pkg:gem/toys-core#lib/toys/loader/tool_registry.rb:190
+  def active_priority; end
 
   # Return the current "best" definition, which is either the active
   # definition, or, if none, the current highest-priority definition.
   #
-  # @private
+  # @private This interface is internal and subject to change without warning.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:631
+  # pkg:gem/toys-core#lib/toys/loader/tool_registry.rb:208
   def cur_definition; end
 
-  # @private
+  # Ensure a tool definition is created at the given priority. Returns
+  # the existing tool at that priority, or the one created by the given
+  # block. Also activates the tool if requested. This is the only
+  # mutating method on Entry.
   #
-  # pkg:gem/toys-core#lib/toys/loader.rb:638
-  def empty?; end
-
-  # Ensure there is a tool definition of the given priority, creating it if
-  # needed, and return it. A tool class may be provided, but only if the
-  # tool definition has not yet been created.
+  # @private This interface is internal and subject to change without warning.
   #
-  # @private
-  #
-  # pkg:gem/toys-core#lib/toys/loader.rb:649
-  def get_tool(priority, loader, tool_class = T.unsafe(nil)); end
+  # pkg:gem/toys-core#lib/toys/loader/tool_registry.rb:220
+  def ensure_tool(priority, should_activate); end
 
   private
 
-  # pkg:gem/toys-core#lib/toys/loader.rb:691
+  # Return the activated definition, or nil if none is active.
+  #
+  # pkg:gem/toys-core#lib/toys/loader/tool_registry.rb:242
   def active_definition; end
 
-  # pkg:gem/toys-core#lib/toys/loader.rb:687
+  # Return the highest-priority definition, or nil if there is none.
+  #
+  # pkg:gem/toys-core#lib/toys/loader/tool_registry.rb:235
   def top_definition; end
-
-  # pkg:gem/toys-core#lib/toys/loader.rb:678
-  def validate_words(words); end
 end
 
 # A middleware is an object that has the opportunity to alter the
@@ -6114,7 +6808,7 @@ end
 # Specifically, a middleware can perform two functions.
 #
 # First, it can modify the configuration of a tool. After tools are defined
-# from configuration, the middleware stack can make modifications to each
+# from their sources, the middleware stack can make modifications to each
 # tool. A middleware can add flags and arguments to the tool, modify the
 # description, or make any other changes to how the tool is set up.
 #
@@ -6506,8 +7200,6 @@ end
 #
 # pkg:gem/toys-core#lib/toys/mixin.rb:98
 module Toys::Mixin::ModuleMethods
-  # @private
-  #
   # The inclusion proc for this mixin. This block is evaluated in the tool
   # class immediately after the mixin is included, and is passed any
   # arguments provided to the `include` directive.
@@ -6515,12 +7207,12 @@ module Toys::Mixin::ModuleMethods
   # You can also set the inclusion proc by passing a block to {#on_include}.
   #
   # @return [Proc] The inclusion procedure for this mixin.
+  #
+  # @private
   #
   # pkg:gem/toys-core#lib/toys/mixin.rb:154
   def inclusion; end
 
-  # @private
-  #
   # The inclusion proc for this mixin. This block is evaluated in the tool
   # class immediately after the mixin is included, and is passed any
   # arguments provided to the `include` directive.
@@ -6529,11 +7221,11 @@ module Toys::Mixin::ModuleMethods
   #
   # @return [Proc] The inclusion procedure for this mixin.
   #
+  # @private
+  #
   # pkg:gem/toys-core#lib/toys/mixin.rb:148
   def inclusion=(_arg0); end
 
-  # @private
-  #
   # The initializer proc for this mixin. This proc is evaluated in the
   # runtime context before execution, and is passed any arguments provided
   # to the `include` directive. It can perform any runtime initialization
@@ -6543,12 +7235,12 @@ module Toys::Mixin::ModuleMethods
   # {#on_initialize}.
   #
   # @return [Proc] The initializer for this mixin.
+  #
+  # @private
   #
   # pkg:gem/toys-core#lib/toys/mixin.rb:151
   def initializer; end
 
-  # @private
-  #
   # The initializer proc for this mixin. This proc is evaluated in the
   # runtime context before execution, and is passed any arguments provided
   # to the `include` directive. It can perform any runtime initialization
@@ -6558,6 +7250,8 @@ module Toys::Mixin::ModuleMethods
   # {#on_initialize}.
   #
   # @return [Proc] The initializer for this mixin.
+  #
+  # @private
   #
   # pkg:gem/toys-core#lib/toys/mixin.rb:124
   def initializer=(_arg0); end
@@ -6644,9 +7338,10 @@ class Toys::ModuleLookup
   end
 end
 
-# An exception indicating that a tool has no run method.
+# An exception indicating an attempt to run a tool that has no run method or
+# otherwise cannot be run.
 #
-# pkg:gem/toys-core#lib/toys/errors.rb:13
+# pkg:gem/toys-core#lib/toys/errors.rb:24
 class Toys::NotRunnableError < ::StandardError; end
 
 # Representation of a formal positional argument
@@ -6795,6 +7490,348 @@ class Toys::PositionalArg
   end
 end
 
+# An object that runs tools.
+#
+# A Runner holds the environment in which tools run. This includes the
+# {Toys::Loader} that resolves a tool name to a tool definition, along with
+# run policy such as how to obtain a logger for a tool and what to do with an
+# error the tool did not handle. This environment is fixed when the Runner is
+# constructed.
+#
+# Everything specific to a single invocation, such as which tool to run and
+# the arguments to pass to it, is passed to {#run}. A Runner is thus itself
+# immutable and holds no per-run state, so one Runner can run any number of
+# tools and is safe to share. This says nothing about the tools it runs,
+# however; running two tools at the same time is safe only if the tools
+# themselves are, since a tool can modify global state such as the load path
+# or a shared logger. See the `logger` parameter of {Toys::CLI#initialize}
+# for one such caveat.
+#
+# The Runner that is running a tool is available to that tool as
+# {Toys::Context#runner}, so a tool can use it to run a sibling tool in the
+# same process. For example:
+#
+#     # My .toys.rb
+#     tool "foo" do
+#       def run
+#         puts "in foo"
+#       end
+#     end
+#     tool "bar" do
+#       def run
+#         puts "in bar"
+#         runner.run(["foo"])
+#       end
+#     end
+#
+# pkg:gem/toys-core#lib/toys/runner.rb:41
+class Toys::Runner
+  # Create a Runner.
+  #
+  # This performs no I/O and raises nothing. Tools are looked up, loaded, and
+  # run only when {#run} is called.
+  #
+  # @param loader [Toys::Loader] The loader used to look up tools.
+  # @param logger_factory [Proc,nil] A proc that takes a
+  #     {Toys::ToolDefinition} as an argument, and returns a logger to use
+  #     when running that tool. If not given,
+  #     {Toys::Runner::DEFAULT_LOGGER_FACTORY} is used.
+  # @param base_level [Integer,nil] The logger level that corresponds to zero
+  #     verbosity. If not provided, the level the logger has before a run
+  #     adjusts it is used (typically Logger::WARN). A run nested inside
+  #     another run that shares the same logger uses the base level already
+  #     in effect for that logger, so that verbosity does not compound.
+  # @param error_handler [Proc,nil] A proc that is called when an unhandled
+  #     exception is detected during a run that has error handling enabled.
+  #     The proc takes the error as its sole argument, and should report it.
+  #     It could simply reraise the exception, or it could display an error
+  #     message and/or return an exit code (normally nonzero) appropriate to
+  #     the error. The error is one of the following:
+  #
+  #     *  a {Toys::ContextualError}, wrapping a `StandardError`, a
+  #        `ScriptError`, or a nested {Toys::ContextualError}
+  #     *  a bare `StandardError` or `ScriptError`, if the run disabled error
+  #        wrapping
+  #     *  a bare `SignalException`, which is never wrapped
+  #
+  #     Optional. If not given, {Toys::Runner::DEFAULT_ERROR_HANDLER} is
+  #     used.
+  # @param executable_name [String,nil] The executable name displayed in help
+  #     text. Optional. Defaults to the ruby program name.
+  # @param external_data [Hash] Additional context data provided by the
+  #     caller. It is merged underneath the data the Runner provides itself,
+  #     so it cannot override runtime-owned keys.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:104
+  def initialize(loader, logger_factory: T.unsafe(nil), base_level: T.unsafe(nil), error_handler: T.unsafe(nil), executable_name: T.unsafe(nil), external_data: T.unsafe(nil)); end
+
+  # The logger level corresponding to zero verbosity, or nil to use the level
+  # already in effect.
+  #
+  # @private This interface is internal and subject to change without warning.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:195
+  def base_level; end
+
+  # The proc that reports an unhandled error.
+  #
+  # @private This interface is internal and subject to change without warning.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:202
+  def error_handler; end
+
+  # The executable name displayed in help text.
+  #
+  # @private This interface is internal and subject to change without warning.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:209
+  def executable_name; end
+
+  # Additional context data provided by the caller.
+  #
+  # @private This interface is internal and subject to change without warning.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:216
+  def external_data; end
+
+  # The loader used to look up tools.
+  #
+  # @private This interface is internal and subject to change without warning.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:180
+  def loader; end
+
+  # The proc that provides a logger for a tool.
+  #
+  # @private This interface is internal and subject to change without warning.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:187
+  def logger_factory; end
+
+  # Run a tool.
+  #
+  # The tool is looked up by matching a tool name at the beginning of the
+  # given arguments. The remaining arguments are then parsed into a
+  # {Toys::Context}, the tool's middleware is applied, and the tool is run.
+  #
+  # If a block is passed, the runtime context is simply yielded to it in
+  # place of the tool's run handler, with the tool's middleware still
+  # applied. This is useful for testing parts of the tool runtime in
+  # isolation.
+  #
+  # If the tool raises a `SignalException` that it does not handle itself,
+  # that exception propagates unwrapped, even when `wrap_errors` is enabled.
+  # This lets each tool in a nested execution dispatch it to its own
+  # `on_interrupt` or `on_signal` handler, and lets the error handler, and
+  # ultimately the Ruby VM, recognize it as a signal.
+  #
+  # @param args [Array<String>] The command line arguments, including the
+  #     name of the tool to look up. This must be an array of strings; it is
+  #     an error to pass anything else.
+  # @param verbosity [Integer] Initial verbosity. Default is 0.
+  # @param wrap_errors [boolean] If true (the default), wrap errors in
+  #     {Toys::ContextualError}, including errors during the tool lookup,
+  #     argument parsing, and tool execution. If false, propagate errors
+  #     as-is and do not wrap them. A `SignalException` is never wrapped
+  #     regardless of this setting; see above.
+  # @param handle_errors [boolean] If true (the default), pass any error
+  #     that reaches the end of the run to this Runner's error handler, and
+  #     return the exit code it produces. If false, let the error propagate
+  #     out of this method. A `SystemExit` is never passed to the error
+  #     handler regardless of this setting, so `Kernel.exit` in a tool still
+  #     exits the process.
+  #
+  # @yieldparam context [Toys::Context] If a block is given, it is invoked in
+  #     place of the tool's run handler, with the tool's middleware still
+  #     applied. This is intended for testing tools.
+  #
+  # @return [Integer] The resulting process status code (i.e. 0 for success).
+  # @raise [ArgumentError] if `args` is not an array. Note that
+  #     {Toys::CLI#run}, unlike this method, takes its arguments as a splat.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:160
+  def run(args, verbosity: T.unsafe(nil), wrap_errors: T.unsafe(nil), handle_errors: T.unsafe(nil), &block); end
+end
+
+# The singleton default error_handler Proc, which simply reraises the error
+# it is given. A {Toys::ContextualError} is reraised as itself, so that a
+# rescue block has access to the context information. An unhandled
+# `SignalException` (or a subclass such as `Interrupt`) is also reraised as
+# itself, so that the Ruby VM has a chance to handle it normally.
+#
+# @return [Proc]
+#
+# pkg:gem/toys-core#lib/toys/runner.rb:63
+Toys::Runner::DEFAULT_ERROR_HANDLER = T.let(T.unsafe(nil), Proc)
+
+# The singleton default logger_factory Proc, which simply returns a new
+# logger writing to the current stderr.
+#
+# @return [Proc]
+#
+# pkg:gem/toys-core#lib/toys/runner.rb:48
+Toys::Runner::DEFAULT_LOGGER_FACTORY = T.let(T.unsafe(nil), Proc)
+
+# A single invocation of a tool by a {Toys::Runner}. It holds the values
+# that are specific to one run, alongside the environment copied from the
+# Runner, and carries out the run. An Invocation is used once and
+# discarded.
+#
+# @private
+#
+# pkg:gem/toys-core#lib/toys/runner.rb:226
+class Toys::Runner::Invocation
+  # Create an invocation. The environment is copied from the given Runner,
+  # and the remaining arguments are specific to this one run. Copying the
+  # environment here, rather than at each call site, keeps a delegated
+  # invocation from silently diverging from the Runner that produced it.
+  #
+  # @private
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:235
+  def initialize(runner:, args:, verbosity:, wrap_errors:, handle_errors:, delegated_from:, block:); end
+
+  # Perform the invocation, and return the resulting process status code.
+  # This looks up the tool, builds its context, and invokes it within its
+  # middleware stack, wrapping errors from each phase and dispatching any
+  # error that reaches the end to the error handler, if requested.
+  #
+  # @private
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:265
+  def run; end
+
+  private
+
+  # The base levels currently in effect on this thread, keyed by logger
+  # identity. A run that adjusts a logger's level records the base
+  # level it used, for the extent of that run, because a nested run cannot
+  # recover it from a shared logger: the level it would find there is the
+  # enclosing run's already adjusted level, which would make verbosity
+  # compound. The record is per-thread because it describes the loggers this
+  # thread is actively adjusting.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:453
+  def base_levels; end
+
+  # Parses the command line arguments against the tool's flag and positional
+  # definitions, and builds the tool's runtime context from the result. Any
+  # argument errors are recorded in the context as usage errors, to be
+  # handled later during execution.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:325
+  def build_context; end
+
+  # Builds the callable that runs the tool. The innermost proc checks for
+  # usage errors and for a missing implementation before invoking the given
+  # block, and catches any signal raised by the tool. That proc is then
+  # wrapped in the tool's middleware in reverse order, so that the first
+  # middleware in the list ends up outermost.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:478
+  def build_executor(context); end
+
+  # Calls a usage error or signal handler against the context. The handler
+  # may be a method name or a proc, and receives the errors or the signal
+  # exception as its argument unless it takes no arguments.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:522
+  def call_handler(context, handler, argument); end
+
+  # Builds the invocation that runs a delegate target. It takes its
+  # environment from the same Runner, and copies this invocation's
+  # settings. Error handling is always disabled for the delegate, so that
+  # the error handler fires once, at the outermost run only.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:396
+  def delegated_invocation(args, context); end
+
+  # Builds the context and runs the tool within it, wrapping any error in a
+  # finalized ContextualError tagged with the tool's identity.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:299
+  def execute; end
+
+  # Builds the context and runs the tool within it, without any error
+  # wrapping. See {#execute}.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:315
+  def execute_internal; end
+
+  # Prepares the runtime environment for the tool, applying lib paths and
+  # initializers, and then calls the tool within its middleware stack and
+  # within the logger level implied by the verbosity, returning the
+  # resulting exit code.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:410
+  def execute_tool(context, &block); end
+
+  # Dispatches a signal raised by the tool to the tool's handler for that
+  # signal, if any, or reraises it otherwise. A different signal raised by
+  # the handler itself is dispatched in turn, but the same signal reraised by
+  # its own handler is passed through.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:510
+  def handle_signal_by_tool(context, exception); end
+
+  # Dispatches the usage errors recorded during argument parsing to the
+  # tool's usage error handler. If the tool has no handler, the errors are
+  # raised instead.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:499
+  def handle_usage_errors(context); end
+
+  # Looks up the tool named at the beginning of the arguments, and records
+  # it along with the arguments remaining after the name was consumed.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:284
+  def lookup_tool; end
+
+  # Wraps the given executor in a single middleware, returning the executor
+  # unchanged if the middleware does not implement the run interface.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:533
+  def make_executor(middleware, context, next_executor); end
+
+  # Returns a proc that invokes the tool's run handler on a context. The
+  # handler may be a method name, the name of a delegate target, or a proc to
+  # execute against the context.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:349
+  def make_run_handler; end
+
+  # Runs the delegate target of a delegating tool. The tool's run handler is
+  # the full name of the target, and the current context is passed along as
+  # the delegating context. The delegated run inherits this invocation's
+  # environment and settings, but never the block.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:371
+  def run_delegation(context, target); end
+
+  # Looks up the tool and runs it, without any error handling.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:277
+  def run_tool; end
+
+  # Records the base level in effect for the given logger, or clears it if
+  # the level is nil, and returns the level previously in effect. The caller
+  # must restore that previous level when its run finishes.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:462
+  def set_base_level(logger, level); end
+
+  # Sets the logger level implied by the verbosity for the duration of the
+  # block, and restores it, along with the base level in effect for it,
+  # afterward. The restoration must cover the level assignment itself,
+  # because a base level that cannot be combined with the verbosity fails
+  # there, and a base level left recorded behind a failed run would be
+  # picked up by later runs sharing the logger. Yields directly if the tool
+  # has no logger.
+  #
+  # pkg:gem/toys-core#lib/toys/runner.rb:431
+  def with_logger_level(context); end
+end
+
 # Information about the source of a tool, such as the file, git repository,
 # or block that defined it.
 #
@@ -6805,8 +7842,9 @@ end
 # * A single toys file
 # * A file or directory loaded from git
 # * A file or directory loaded from a gem
-# * A config block passed directly to the CLI
+# * A block passed directly to the CLI
 # * A tool block within a toys file
+# * A subclass of Toys::Tool
 #
 # The SourceInfo provides information such as the tool's context directory,
 # and locates data and lib directories appropriate to the tool. It also
@@ -6827,10 +7865,10 @@ end
 #
 # SourceInfo objects can be obtained in the DSL from
 # {Toys::DSL::Tool#source_info} or at runtime by getting the
-# {Toys::Context::Key::TOOL_SOURCE} key. However, they are created internally
-# by the Loader and should not be created manually.
+# {Toys::Context::Key::TOOL_SOURCE} key. They are created internally during
+# CLI configuration and during loading.
 #
-# pkg:gem/toys-core#lib/toys/source_info.rb:40
+# pkg:gem/toys-core#lib/toys/source_info.rb:41
 class Toys::SourceInfo
   # Create a SourceInfo.
   # This lower-level interface should be called only from within the class.
@@ -6839,33 +7877,21 @@ class Toys::SourceInfo
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # pkg:gem/toys-core#lib/toys/source_info.rb:224
-  def initialize(parent, priority, context_directory, source_type, source_path, source_proc, git_remote, git_path, git_commit, gem_name, gem_version, gem_path, source_name, data_dir_name, lib_dir_name); end
+  # pkg:gem/toys-core#lib/toys/source_info.rb:425
+  def initialize(parent, priority, context_directory, source_type, origin, relative_path, source_proc, source_subclass, source_name); end
 
-  # Create a child SourceInfo with an absolute path.
-  #
-  # @private This interface is internal and subject to change without warning.
-  #
-  # pkg:gem/toys-core#lib/toys/source_info.rb:270
-  def absolute_child(child_path, source_name: T.unsafe(nil)); end
-
-  # Apply all lib paths in order from high to low priority
-  #
-  # @return [self]
-  #
-  # pkg:gem/toys-core#lib/toys/source_info.rb:210
-  def apply_lib_paths; end
-
-  # The context directory path (normally the directory containing the
-  # toplevel toys file or directory).
+  # The context directory path set by this source or inherited from its
+  # parent. Sometimes this is the directory containing the toplevel toys
+  # file/directory, for example for the `toys` gem directory search that uses
+  # the CLI `add_search*` methods. But other source types typically leave
+  # this unset (nil).
   #
   # This is not affected by setting a custom context directory for a tool.
   #
   # @return [String] The context directory path.
-  # @return [nil] if there is no context directory (perhaps because the root
-  #     source was a block)
+  # @return [nil] if there is no context directory
   #
-  # pkg:gem/toys-core#lib/toys/source_info.rb:75
+  # pkg:gem/toys-core#lib/toys/source_info.rb:95
   def context_directory; end
 
   # Locate the given data file or directory and return an absolute path.
@@ -6876,82 +7902,56 @@ class Toys::SourceInfo
   # @return [String] Absolute path of the resulting data.
   # @return [nil] if the data was not found.
   #
-  # pkg:gem/toys-core#lib/toys/source_info.rb:190
+  # pkg:gem/toys-core#lib/toys/source_info.rb:187
   def find_data(path, type: T.unsafe(nil)); end
 
-  # Create a child SourceInfo with a gem source.
+  # Find lib paths in this source and all ancestors, in order from most to
+  # least significant.
+  #
+  # @return [Array<String>] Directory paths in order
+  #
+  # pkg:gem/toys-core#lib/toys/source_info.rb:211
+  def find_lib_paths; end
+
+  # Find all files to preload in this source only, not including ancestors.
+  #
+  # @return [Array<String>] File paths in order
+  #
+  # pkg:gem/toys-core#lib/toys/source_info.rb:226
+  def find_preload_files; end
+
+  # Create a child SourceInfo for an index tool file, or nil if not found or
+  # not applicable.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # pkg:gem/toys-core#lib/toys/source_info.rb:294
-  def gem_child(child_gem_name, child_gem_version, child_gem_path, child_path, source_name: T.unsafe(nil)); end
+  # pkg:gem/toys-core#lib/toys/source_info.rb:384
+  def index_child(source_name: T.unsafe(nil)); end
 
-  # The gem name. This is set if the source, or one of its ancestors, comes
-  # from a gem.
+  # The origin of this source, describing where its content came from: the
+  # local file system, a git repository, a Ruby gem, or a block of code.
   #
-  # @return [String] The gem name.
-  # @return [nil] if this source is not from a gem.
+  # An origin is fixed when a source spec is resolved. A source created by
+  # descending from another, whether by walking a directory or by entering a
+  # block or a subclass, shares its parent origin object.
   #
-  # pkg:gem/toys-core#lib/toys/source_info.rb:154
-  def gem_name; end
-
-  # The path within the gem, including the toys root directory in the gem.
+  # Origins are one of the following types:
+  # * {Toys::SourceInfo::Origin::Local} for a local file or directory
+  # * {Toys::SourceInfo::Origin::Git} for a git repository
+  # * {Toys::SourceInfo::Origin::Gem} for a RubyGem
+  # * {Toys::SourceInfo::Origin::Block} for a bare Ruby code block
   #
-  # @return [String] The path.
-  # @return [nil] if this source is not from a gem.
+  # @return [Toys::SourceInfo::Origin::Base]
   #
-  # pkg:gem/toys-core#lib/toys/source_info.rb:171
-  def gem_path; end
-
-  # The gem version. This is set if the source, or one of its ancestors,
-  # comes from a gem.
-  #
-  # @return [Gem::Version] The gem version.
-  # @return [nil] if this source is not from a gem.
-  #
-  # pkg:gem/toys-core#lib/toys/source_info.rb:163
-  def gem_version; end
-
-  # Create a child SourceInfo with a git source.
-  #
-  # @private This interface is internal and subject to change without warning.
-  #
-  # pkg:gem/toys-core#lib/toys/source_info.rb:282
-  def git_child(child_git_remote, child_git_path, child_git_commit, child_path, source_name: T.unsafe(nil)); end
-
-  # The git commit. This is set if the source, or one of its ancestors, comes
-  # from git.
-  #
-  # @return [String] The git commit.
-  # @return [nil] if this source is not from git.
-  #
-  # pkg:gem/toys-core#lib/toys/source_info.rb:145
-  def git_commit; end
-
-  # The git path. This is set if the source, or one of its ancestors, comes
-  # from git.
-  #
-  # @return [String] The git path. This could be the empty string.
-  # @return [nil] if this source is not from git.
-  #
-  # pkg:gem/toys-core#lib/toys/source_info.rb:136
-  def git_path; end
-
-  # The git remote. This is set if the source, or one of its ancestors, comes
-  # from git.
-  #
-  # @return [String] The git remote
-  # @return [nil] if this source is not from git.
-  #
-  # pkg:gem/toys-core#lib/toys/source_info.rb:127
-  def git_remote; end
+  # pkg:gem/toys-core#lib/toys/source_info.rb:168
+  def origin; end
 
   # The parent of this SourceInfo.
   #
   # @return [Toys::SourceInfo] The parent.
   # @return [nil] if this SourceInfo is a root.
   #
-  # pkg:gem/toys-core#lib/toys/source_info.rb:47
+  # pkg:gem/toys-core#lib/toys/source_info.rb:65
   def parent; end
 
   # The priority of tools defined by this source. Higher values indicate a
@@ -6959,44 +7959,46 @@ class Toys::SourceInfo
   #
   # @return [Integer] The priority.
   #
-  # pkg:gem/toys-core#lib/toys/source_info.rb:63
+  # pkg:gem/toys-core#lib/toys/source_info.rb:81
   def priority; end
 
   # Create a proc child SourceInfo
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # pkg:gem/toys-core#lib/toys/source_info.rb:306
+  # pkg:gem/toys-core#lib/toys/source_info.rb:394
   def proc_child(child_proc, source_name: T.unsafe(nil)); end
 
   # Create a child SourceInfo relative to the parent path.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # pkg:gem/toys-core#lib/toys/source_info.rb:254
-  def relative_child(filename, source_name: T.unsafe(nil)); end
+  # pkg:gem/toys-core#lib/toys/source_info.rb:368
+  def relative_child(filename, source_name: T.unsafe(nil), lenient: T.unsafe(nil)); end
 
   # The root ancestor of this SourceInfo. This generally represents a source
   # that was added directly to a CLI in code.
   #
   # @return [Toys::SourceInfo] The root ancestor.
   #
-  # pkg:gem/toys-core#lib/toys/source_info.rb:55
+  # pkg:gem/toys-core#lib/toys/source_info.rb:73
   def root; end
 
-  # The source, which may be a path or a proc depending on the {#source_type}.
+  # The source, which may be a path, a proc, or a class, depending on the
+  # {#source_type}.
   #
   # @return [String] Path to the source file or directory.
   # @return [Proc] The block serving as the source.
+  # @return [Class] The {Toys::Tool} subclass serving as the source.
   #
-  # pkg:gem/toys-core#lib/toys/source_info.rb:83
+  # pkg:gem/toys-core#lib/toys/source_info.rb:105
   def source; end
 
   # A user-visible name of this source.
   #
   # @return [String]
   #
-  # pkg:gem/toys-core#lib/toys/source_info.rb:178
+  # pkg:gem/toys-core#lib/toys/source_info.rb:175
   def source_name; end
 
   # The path of the current source file or directory.
@@ -7008,7 +8010,7 @@ class Toys::SourceInfo
   # @return [String] The source path
   # @return [nil] if this source has no file system path.
   #
-  # pkg:gem/toys-core#lib/toys/source_info.rb:110
+  # pkg:gem/toys-core#lib/toys/source_info.rb:134
   def source_path; end
 
   # The source proc. This is set if {#source_type} is `:proc`.
@@ -7016,8 +8018,16 @@ class Toys::SourceInfo
   # @return [Proc] The source proc
   # @return [nil] if this source has no proc.
   #
-  # pkg:gem/toys-core#lib/toys/source_info.rb:118
+  # pkg:gem/toys-core#lib/toys/source_info.rb:142
   def source_proc; end
+
+  # The source subclass. This is set if {#source_type} is `:subclass`.
+  #
+  # @return [Class] The source subclass
+  # @return [nil] if this source is not a subclass.
+  #
+  # pkg:gem/toys-core#lib/toys/source_info.rb:150
+  def source_subclass; end
 
   # The type of source. This could be:
   #
@@ -7028,59 +8038,800 @@ class Toys::SourceInfo
   # * `:proc`, representing a proc, which could be a toplevel block added
   #   directly to a CLI, a `tool` block within a toys file, or a block within
   #   another block. The {#source} will be the proc itself.
+  # * `:subclass`, representing a subclass of {Toys::Tool}. The {#source}
+  #   will be the class object.
   #
-  # @return [:file,:directory,:proc]
+  # @return [:file,:directory,:proc,:subclass]
   #
-  # pkg:gem/toys-core#lib/toys/source_info.rb:98
+  # pkg:gem/toys-core#lib/toys/source_info.rb:122
   def source_type; end
 
-  # pkg:gem/toys-core#lib/toys/source_info.rb:179
+  # Create a subclass child SourceInfo
+  #
+  # @private This interface is internal and subject to change without warning.
+  #
+  # pkg:gem/toys-core#lib/toys/source_info.rb:406
+  def subclass_child(subclass, source_name: T.unsafe(nil)); end
+
+  # pkg:gem/toys-core#lib/toys/source_info.rb:176
   def to_s; end
 
   private
 
-  # pkg:gem/toys-core#lib/toys/source_info.rb:409
+  # pkg:gem/toys-core#lib/toys/source_info.rb:542
   def default_source_name; end
 
-  # pkg:gem/toys-core#lib/toys/source_info.rb:421
-  def find_special_dir(dir_name); end
+  # pkg:gem/toys-core#lib/toys/source_info.rb:553
+  def default_subclass_source_name; end
 
   class << self
     # Check a path and determine the canonical path and type.
     #
     # @private This interface is internal and subject to change without warning.
     #
-    # pkg:gem/toys-core#lib/toys/source_info.rb:387
+    # pkg:gem/toys-core#lib/toys/source_info.rb:461
     def check_path(path, lenient); end
 
-    # Create a root source info for a loaded gem.
+    # Returns an empty source with the given priority.
     #
     # @private This interface is internal and subject to change without warning.
     #
+    # pkg:gem/toys-core#lib/toys/source_info.rb:290
+    def create_empty_root(priority); end
+
+    # Resolve a child source spec into a SourceInfo. The child inherits the
+    # parent's priority, and the parent's context directory if the spec
+    # itself doesn't provide one.
+    #
+    # Performs the file system access, git fetch, or gem activation that the
+    # spec describes, and raises if the resolution process fails.
+    #
+    # @private This interface is internal and subject to change without warning.
+    #
+    # pkg:gem/toys-core#lib/toys/source_info.rb:281
+    def resolve_child(spec, parent, git_cache: T.unsafe(nil), gems_util: T.unsafe(nil)); end
+
+    # Resolve a gem and version constraints and get the install directory.
+    #
+    # @private This interface is internal and subject to change without warning.
+    #
+    # pkg:gem/toys-core#lib/toys/source_info.rb:486
+    def resolve_gem_info(gems_util, gem_name, gem_versions, gem_path, gem_toys_dir); end
+
+    # Resolve contents from the git cache and get the directory.
+    #
+    # @private This interface is internal and subject to change without warning.
+    #
+    # pkg:gem/toys-core#lib/toys/source_info.rb:506
+    def resolve_git_info(git_cache, git_remote, git_path, git_commit, update); end
+
+    # Resolve a root source spec into a root SourceInfo and an array of
+    # starting points for loading. This is called from a loader to resolve
+    # a root source and populate its initial worklist.
+    #
+    # Performs the file system access, git fetch, or gem activation that the
+    # spec describes, and raises if the resolution process fails.
+    #
+    # @private This interface is internal and subject to change without warning.
+    #
+    # pkg:gem/toys-core#lib/toys/source_info.rb:256
+    def resolve_loading_root(spec, priority, git_cache: T.unsafe(nil), gems_util: T.unsafe(nil)); end
+
+    private
+
+    # pkg:gem/toys-core#lib/toys/source_info.rb:530
+    def default_gems_util; end
+
+    # pkg:gem/toys-core#lib/toys/source_info.rb:521
+    def default_git_cache; end
+
     # pkg:gem/toys-core#lib/toys/source_info.rb:356
-    def create_gem_root(gem_name, gem_version, gem_path, source_path, priority, context_directory: T.unsafe(nil), data_dir_name: T.unsafe(nil), lib_dir_name: T.unsafe(nil), source_name: T.unsafe(nil)); end
+    def resolve_block_spec(spec, priority); end
 
-    # Create a root source info for a cached git repo.
-    #
-    # @private This interface is internal and subject to change without warning.
-    #
-    # pkg:gem/toys-core#lib/toys/source_info.rb:340
-    def create_git_root(git_remote, git_path, git_commit, source_path, priority, context_directory: T.unsafe(nil), data_dir_name: T.unsafe(nil), lib_dir_name: T.unsafe(nil), source_name: T.unsafe(nil)); end
+    # pkg:gem/toys-core#lib/toys/source_info.rb:347
+    def resolve_gem_spec(spec, parent, priority, gems_util); end
 
-    # Create a root source info for a file path.
-    #
-    # @private This interface is internal and subject to change without warning.
-    #
-    # pkg:gem/toys-core#lib/toys/source_info.rb:318
-    def create_path_root(source_path, priority, context_directory: T.unsafe(nil), data_dir_name: T.unsafe(nil), lib_dir_name: T.unsafe(nil), source_name: T.unsafe(nil)); end
+    # pkg:gem/toys-core#lib/toys/source_info.rb:330
+    def resolve_git_spec(spec, parent, priority, git_cache); end
 
-    # Create a root source info for a proc.
-    #
-    # @private This interface is internal and subject to change without warning.
-    #
-    # pkg:gem/toys-core#lib/toys/source_info.rb:372
-    def create_proc_root(source_proc, priority, context_directory: T.unsafe(nil), data_dir_name: T.unsafe(nil), lib_dir_name: T.unsafe(nil), source_name: T.unsafe(nil)); end
+    # pkg:gem/toys-core#lib/toys/source_info.rb:312
+    def resolve_path_spec(spec, parent, priority); end
+
+    # pkg:gem/toys-core#lib/toys/source_info.rb:296
+    def resolve_spec(spec, parent, priority, git_cache, gems_util); end
   end
+end
+
+# @private
+#
+# pkg:gem/toys-core#lib/toys/source_info.rb:43
+Toys::SourceInfo::DATA_DIR_NAME = T.let(T.unsafe(nil), String)
+
+# @private
+#
+# pkg:gem/toys-core#lib/toys/source_info.rb:55
+Toys::SourceInfo::INDEX_FILE_NAME = T.let(T.unsafe(nil), String)
+
+# @private
+#
+# pkg:gem/toys-core#lib/toys/source_info.rb:46
+Toys::SourceInfo::LIB_DIR_NAME = T.let(T.unsafe(nil), String)
+
+# An origin describes where a source's content came from: the local file
+# system, a git repository, a Ruby gem, or a block of code.
+#
+# An origin is determined when a source spec is resolved, and it does not
+# change as a loader descends into child sources. Every {Toys::SourceInfo}
+# created by descending from another, whether by walking a directory or by
+# entering a block or a subclass, shares its parent's origin object. A
+# child created by resolving a new source spec gets its own origin instead.
+#
+# An origin is thus fixed information about a resolution: which git remote
+# and commit, or which gem and version, the content came from. Where a
+# particular source sits *within* that content is tracked by the
+# {Toys::SourceInfo} rather than by the origin, and is what makes
+# {Toys::SourceInfo#source_path} differ from one source to the next while
+# the origin stays the same.
+#
+# This is distinct from {Toys::SourceInfo#source_type}, which says what a
+# source *is* — a file, a directory, a block, or a subclass — rather than
+# where it came from. The two vary independently: a git origin can yield
+# either a file or a directory, and a block within a file loaded from git
+# keeps that git origin.
+#
+# pkg:gem/toys-core#lib/toys/source_info/origin.rb:28
+module Toys::SourceInfo::Origin
+  class << self
+    # Combine a relative base path, which may be empty, with a relative
+    # path, and return the result as a relative path.
+    #
+    # @private This interface is internal and subject to change without warning.
+    #
+    # pkg:gem/toys-core#lib/toys/source_info/origin.rb:36
+    def join_relative(base, relative); end
+  end
+end
+
+# The base class of an origin, holding the path that the source spec
+# resolved to.
+#
+# Do not instantiate this class directly. A {Toys::SourceInfo} creates
+# the appropriate subclass when it resolves a source spec.
+#
+# pkg:gem/toys-core#lib/toys/source_info/origin.rb:54
+class Toys::SourceInfo::Origin::Base
+  # Create an origin.
+  #
+  # @private This interface is internal and subject to change without warning.
+  #
+  # pkg:gem/toys-core#lib/toys/source_info/origin.rb:60
+  def initialize(initial_path); end
+
+  # Describe a source at the given path relative to {#initial_path}, for
+  # use as a default source name.
+  #
+  # @private This interface is internal and subject to change without warning.
+  #
+  # pkg:gem/toys-core#lib/toys/source_info/origin.rb:89
+  def describe(relative_path); end
+
+  # The file system path that the source spec resolved to. A source's
+  # own path is this path, plus its position below it.
+  #
+  # @private This interface is internal and subject to change without warning.
+  #
+  # pkg:gem/toys-core#lib/toys/source_info/origin.rb:70
+  def initial_path; end
+
+  # Return the given relative path joined atop the initial path.
+  #
+  # @private This interface is internal and subject to change without warning.
+  #
+  # pkg:gem/toys-core#lib/toys/source_info/origin.rb:77
+  def joined_path(relative_path); end
+end
+
+# The origin of a source that is a block of code passed directly to a
+# CLI, and so came from nowhere on the file system.
+#
+# A block origin never describes a source, because a source with this
+# origin always has a {Toys::SourceInfo#source_type} of `:proc`, which
+# takes its name from the block itself.
+#
+# pkg:gem/toys-core#lib/toys/source_info/origin.rb:216
+class Toys::SourceInfo::Origin::Block < ::Toys::SourceInfo::Origin::Base
+  # Create a block origin.
+  #
+  # @private This interface is internal and subject to change without warning.
+  #
+  # pkg:gem/toys-core#lib/toys/source_info/origin.rb:222
+  def initialize; end
+end
+
+# The origin of a source read from a Ruby gem.
+#
+# Note that within the {Toys::SourceInfo::Origin} module, the name `Gem`
+# resolves to this class rather than to Ruby's `::Gem`. Prefix references
+# to the latter with `::`.
+#
+# pkg:gem/toys-core#lib/toys/source_info/origin.rb:163
+class Toys::SourceInfo::Origin::Gem < ::Toys::SourceInfo::Origin::Base
+  # Create a gem origin.
+  #
+  # @private This interface is internal and subject to change without warning.
+  #
+  # pkg:gem/toys-core#lib/toys/source_info/origin.rb:169
+  def initialize(initial_path, name, version, path); end
+
+  # @private This interface is internal and subject to change without warning.
+  #
+  # pkg:gem/toys-core#lib/toys/source_info/origin.rb:202
+  def describe(relative_path); end
+
+  # The name of the gem that the content was read from.
+  #
+  # @return [String]
+  #
+  # pkg:gem/toys-core#lib/toys/source_info/origin.rb:181
+  def name; end
+
+  # The path within the gem that was read, including the gem's toys root
+  # directory. This is the path of the resolved source itself, and does
+  # not descend with child sources.
+  #
+  # @return [String]
+  #
+  # pkg:gem/toys-core#lib/toys/source_info/origin.rb:197
+  def path; end
+
+  # The version of the gem that was activated.
+  #
+  # @return [::Gem::Version]
+  #
+  # pkg:gem/toys-core#lib/toys/source_info/origin.rb:188
+  def version; end
+end
+
+# The origin of a source read from a git repository.
+#
+# pkg:gem/toys-core#lib/toys/source_info/origin.rb:110
+class Toys::SourceInfo::Origin::Git < ::Toys::SourceInfo::Origin::Base
+  # Create a git origin.
+  #
+  # @private This interface is internal and subject to change without warning.
+  #
+  # pkg:gem/toys-core#lib/toys/source_info/origin.rb:116
+  def initialize(initial_path, remote, commit, path); end
+
+  # The git commit that the content was read at. This is the ref that was
+  # requested, which could be a SHA, a tag, or a branch name.
+  #
+  # @return [String]
+  #
+  # pkg:gem/toys-core#lib/toys/source_info/origin.rb:136
+  def commit; end
+
+  # @private This interface is internal and subject to change without warning.
+  #
+  # pkg:gem/toys-core#lib/toys/source_info/origin.rb:150
+  def describe(relative_path); end
+
+  # The path within the repository that was read. This is the path of the
+  # resolved source itself, and does not descend with child sources. It
+  # could be the empty string, meaning the root of the repository.
+  #
+  # @return [String]
+  #
+  # pkg:gem/toys-core#lib/toys/source_info/origin.rb:145
+  def path; end
+
+  # The git remote that the content was fetched from.
+  #
+  # @return [String]
+  #
+  # pkg:gem/toys-core#lib/toys/source_info/origin.rb:128
+  def remote; end
+end
+
+# The origin of a source read from the local file system.
+#
+# pkg:gem/toys-core#lib/toys/source_info/origin.rb:98
+class Toys::SourceInfo::Origin::Local < ::Toys::SourceInfo::Origin::Base
+  # @private This interface is internal and subject to change without warning.
+  #
+  # pkg:gem/toys-core#lib/toys/source_info/origin.rb:102
+  def describe(relative_path); end
+end
+
+# @private
+#
+# pkg:gem/toys-core#lib/toys/source_info.rb:49
+Toys::SourceInfo::PRELOAD_DIR_NAME = T.let(T.unsafe(nil), String)
+
+# @private
+#
+# pkg:gem/toys-core#lib/toys/source_info.rb:52
+Toys::SourceInfo::PRELOAD_FILE_NAME = T.let(T.unsafe(nil), String)
+
+# An ordered collection of root sources for the Loader, held as unresolved
+# {Toys::SourceSpec} objects. Use this class to build a list of sources, and
+# then pass it to the Loader constructor.
+#
+# Each spec added to the list occupies its own priority level, and resolves
+# to a single root source. This is an invariant the Loader relies on.
+#
+# A source list resolves nothing. The specs it holds describe sources; the
+# Loader turns them into {Toys::SourceInfo} objects when it first needs
+# them.
+#
+# Not thread-safe. Callers should ensure that access is single-threaded or
+# synchronized.
+#
+# pkg:gem/toys-core#lib/toys/source_list.rb:19
+class Toys::SourceList
+  # Create an empty source list.
+  #
+  # pkg:gem/toys-core#lib/toys/source_list.rb:23
+  def initialize; end
+
+  # Add a source spec to the list, assigning it the next priority.
+  #
+  # @param spec [Toys::SourceSpec::Base] The source spec to add.
+  # @param high_priority [boolean] If true, add this source at the top of the
+  #     priority list. Defaults to false, indicating the new source should be
+  #     at the bottom of the priority list.
+  #
+  # @return [self]
+  # @raise [ArgumentError] if the given object is not a source spec.
+  #
+  # pkg:gem/toys-core#lib/toys/source_list.rb:80
+  def add(spec, high_priority: T.unsafe(nil)); end
+
+  # Iterate over the source specs and their assigned priorities, in the
+  # order in which they were added.
+  #
+  # @yield [Toys::SourceSpec::Base, Integer]
+  # @return [self] if a block is given.
+  # @return [Enumerator] if no block is given.
+  #
+  # pkg:gem/toys-core#lib/toys/source_list.rb:63
+  def each_with_priority; end
+
+  # Determines whether the list is empty.
+  #
+  # @return [boolean]
+  #
+  # pkg:gem/toys-core#lib/toys/source_list.rb:42
+  def empty?; end
+
+  # Returns the size of the list.
+  #
+  # @return [Integer]
+  #
+  # pkg:gem/toys-core#lib/toys/source_list.rb:51
+  def size; end
+
+  private
+
+  # Initialize a duplicate
+  # @private
+  #
+  # pkg:gem/toys-core#lib/toys/source_list.rb:32
+  def initialize_copy(original); end
+end
+
+# An exception indicating that a source was added to a {Toys::CLI} after its
+# source list was already finalized. The source list is finalized the first
+# time the CLI's loader is needed, i.e. when {Toys::CLI#loader} or
+# {Toys::CLI#runner} is called, or when a tool is run.
+#
+# pkg:gem/toys-core#lib/toys/errors.rb:33
+class Toys::SourceListFinalizedError < ::StandardError; end
+
+# A source spec is an unresolved description of a source: its kind, and the
+# information needed to locate it.
+#
+# Source specs cover the sources added to a {Toys::SourceList}, and the
+# sources declared from within a toys file using the `load`, `load_git`, and
+# `load_gem` directives. (A source that a {Toys::Loader} finds by walking a
+# directory has no source spec.)
+#
+# A source spec says only what to load; it performs no filesystem access, no
+# git fetch, and no gem activation. Those happen later, when a loader
+# resolves the spec into a {Toys::SourceInfo}. A spec does, however, check
+# the types of its arguments when it is created, so a malformed description
+# is reported at that point rather than at resolution time. Create specs
+# using the factory methods {Toys::SourceSpec.path}, {Toys::SourceSpec.git},
+# {Toys::SourceSpec.gem}, and {Toys::SourceSpec.block}, each of which
+# returns an instance of the corresponding subclass of
+# {Toys::SourceSpec::Base}.
+#
+# Source specs are immutable and compare by value, so two specs describing
+# the same source are equal and hash alike. (A block spec's proc compares by
+# identity.)
+#
+# pkg:gem/toys-core#lib/toys/source_spec.rb:27
+module Toys::SourceSpec
+  class << self
+    # Create a spec for a block of DSL code.
+    #
+    # @param context_directory [String,Pathname,nil] The context directory
+    #     path for tools loaded from this source. Optional. Defaults to nil
+    #     if not provided. Context directory paths should generally be
+    #     absolute. Relative paths will be converted to absolute, using the
+    #     current working directory at the time of construction.
+    # @param source_name [String,nil] The source name that will be shown in
+    #     documentation for tools loaded from this source. If omitted, a
+    #     default is generated at resolution time.
+    # @param block [Proc] The source block, executed in the context of the
+    #     tool DSL {Toys::DSL::Tool}.
+    # @return [Toys::SourceSpec::Block]
+    # @raise [ArgumentError] if an argument is not a legal value.
+    #
+    # pkg:gem/toys-core#lib/toys/source_spec.rb:131
+    def block(context_directory: T.unsafe(nil), source_name: T.unsafe(nil), &block); end
+
+    # @private
+    #
+    # Checks the type of a path argument value, and normalizes to an absolute
+    # path string.
+    #
+    # @param path [String,Pathname] The input path.
+    # @param allow_relative [boolean] If true, do not expand relative paths.
+    #     Defaults to false.
+    # @param allow_nil [boolean] If true, allow nil values. Defaults to false.
+    # @param name [String] What kind of thing is being normalized, used in
+    #     error messages. Defaults to "path".
+    # @return [String] Normalized output path.
+    # @raise [ArgumentError] if an argument is not a legal path string or
+    #     Pathname object.
+    #
+    # pkg:gem/toys-core#lib/toys/source_spec.rb:151
+    def check_and_normalize_path(path, name: T.unsafe(nil), allow_relative: T.unsafe(nil), allow_nil: T.unsafe(nil)); end
+
+    # Create a spec for a gem.
+    #
+    # @param name [String] The name of the gem.
+    # @param version [String,Array<String>,nil] Version requirements for the
+    #     gem. Optional. If not provided, any version is allowed.
+    # @param path [String,nil] The path from the gem's toys directory to the
+    #     relevant file or directory. Optional. If not provided, the entire
+    #     toys directory is used.
+    # @param toys_dir [String,nil] The name of the gem's toys directory.
+    #     Optional. Defaults to the directory specified in the gem's
+    #     metadata, or the value `"toys"`.
+    # @param context_directory [String,Pathname,nil] The context directory
+    #     path for tools loaded from this source. Optional. Defaults to nil
+    #     if not provided. Context directory paths should generally be
+    #     absolute. Relative paths will be converted to absolute, using the
+    #     current working directory at the time of construction.
+    # @param source_name [String,nil] The source name that will be shown in
+    #     documentation for tools loaded from this source. If omitted, a
+    #     default is generated at resolution time.
+    # @return [Toys::SourceSpec::Gem]
+    # @raise [ArgumentError] if an argument is not a legal value.
+    #
+    # pkg:gem/toys-core#lib/toys/source_spec.rb:111
+    def gem(name, version: T.unsafe(nil), path: T.unsafe(nil), toys_dir: T.unsafe(nil), context_directory: T.unsafe(nil), source_name: T.unsafe(nil)); end
+
+    # Create a spec for a git repository.
+    #
+    # @param remote [String,nil] The git repo URL, or `nil` to inherit the
+    #     remote from the source doing the loading. (A `nil` remote with no
+    #     such source fails at resolution time, not here.)
+    # @param path [String,nil] The path within the repo to the file or
+    #     directory to load. Optional. Defaults to the root of the repo.
+    # @param commit [String,nil] The git ref (i.e. SHA, tag, or branch name).
+    #     Optional. Defaults to the commit of the source doing the loading,
+    #     or to `"HEAD"`.
+    # @param update [boolean,Integer] Whether to update non-SHA commit
+    #     references if they were previously loaded. Pass `true` or `false`
+    #     to specify whether to update, or an integer to update if the last
+    #     update was done at least that many seconds ago. Default is `false`.
+    # @param context_directory [String,Pathname,nil] The context directory
+    #     path for tools loaded from this source. Optional. Defaults to nil
+    #     if not provided. Context directory paths should generally be
+    #     absolute. Relative paths will be converted to absolute, using the
+    #     current working directory at the time of construction.
+    # @param source_name [String,nil] The source name that will be shown in
+    #     documentation for tools loaded from this source. If omitted, a
+    #     default is generated at resolution time.
+    # @return [Toys::SourceSpec::Git]
+    # @raise [ArgumentError] if an argument is not a legal value.
+    #
+    # pkg:gem/toys-core#lib/toys/source_spec.rb:84
+    def git(remote, path: T.unsafe(nil), commit: T.unsafe(nil), update: T.unsafe(nil), context_directory: T.unsafe(nil), source_name: T.unsafe(nil)); end
+
+    # Create a spec for a file system path.
+    #
+    # @param path [String,Pathname] Path to a tool file or directory. Must be
+    #     a String or a Pathname. Paths should generally be absolute.
+    #     Relative paths will be converted to absolute, using the current
+    #     working directory at the time of construction.
+    # @param relative_paths [String,Array<String>,nil] If provided, the given
+    #     path is treated as a root directory, and these paths, relative to
+    #     it, are the sources actually loaded. Pass `nil` (the default) to
+    #     load the path itself. Note that `nil` and the empty array mean
+    #     different things: the empty array indicates no paths under the
+    #     given root path, effectively a noop, while `nil` indicates a single
+    #     path equal to the given root path.
+    # @param context_directory [String,Pathname,nil] The context directory
+    #     path for tools loaded from this source. Optional. Defaults to nil
+    #     if not provided. Context directory paths should generally be
+    #     absolute. Relative paths will be converted to absolute, using the
+    #     current working directory at the time of construction.
+    # @param source_name [String,nil] The source name that will be shown in
+    #     documentation for tools loaded from this source. If omitted, a
+    #     default is generated at resolution time.
+    # @return [Toys::SourceSpec::Path]
+    # @raise [ArgumentError] if an argument is not a legal value.
+    #
+    # pkg:gem/toys-core#lib/toys/source_spec.rb:54
+    def path(path, relative_paths: T.unsafe(nil), context_directory: T.unsafe(nil), source_name: T.unsafe(nil)); end
+  end
+end
+
+# The base class of a source spec, holding the attributes common to every
+# kind, and implementing equality.
+#
+# Do not instantiate this class directly. Use one of the factory methods
+# such as {Toys::SourceSpec.path}.
+#
+# pkg:gem/toys-core#lib/toys/source_spec.rb:172
+class Toys::SourceSpec::Base
+  # Create a source spec base.
+  # This argument list is subject to change. Use the factory methods such
+  # as {Toys::SourceSpec.path} instead.
+  #
+  # @private
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:180
+  def initialize(context_directory, source_name); end
+
+  # Source specs compare by value. Specs of different kinds are never
+  # equal, even if their common attributes match.
+  #
+  # @param other [Object]
+  # @return [boolean]
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:211
+  def ==(other); end
+
+  # The context directory for tools loaded from this source, or nil if the
+  # source does not dictate a context directory.
+  #
+  # @return [String,nil]
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:194
+  def context_directory; end
+
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:214
+  def eql?(other); end
+
+  # @return [Integer]
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:219
+  def hash; end
+
+  # The user-visible name for tools loaded from this source, or `nil` to
+  # generate a default at resolution time.
+  #
+  # @return [String,nil]
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:202
+  def source_name; end
+
+  protected
+
+  # The fields that determine equality, in a fixed order. Subclasses
+  # append their own fields to this list.
+  #
+  # @private
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:231
+  def equality_fields; end
+
+  private
+
+  # Same as {#check_string} but also allows nil.
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:249
+  def check_optional_string(value, name); end
+
+  # Return the given value if it is a string, otherwise raise. The name is
+  # used only to describe the offending field in the error message.
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:241
+  def check_string(value, name); end
+end
+
+# A spec for a source given as a block of DSL code.
+#
+# pkg:gem/toys-core#lib/toys/source_spec.rb:439
+class Toys::SourceSpec::Block < ::Toys::SourceSpec::Base
+  # Create a block spec.
+  # This argument list is subject to change. Use
+  # {Toys::SourceSpec.block} instead.
+  #
+  # @private
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:447
+  def initialize(block, context_directory, source_name); end
+
+  # The source block, to be executed in the context of the tool DSL
+  # {Toys::DSL::Tool}.
+  #
+  # @return [Proc]
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:459
+  def block; end
+
+  protected
+
+  # @private
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:466
+  def equality_fields; end
+end
+
+# An empty SourceSpec. Used as a synthetic root SourceSpec for tools
+# without a true source (such as the default root tool, and synthetic
+# tools used for testing.)
+#
+# @return [Toys::SourceSpec::Base]
+#
+# pkg:gem/toys-core#lib/toys/source_spec.rb:478
+Toys::SourceSpec::EMPTY = T.let(T.unsafe(nil), Toys::SourceSpec::Block)
+
+# A spec for a source located in a gem.
+#
+# Beware that within the {Toys::SourceSpec} namespace, the name `Gem`
+# resolves to this class rather than to Ruby's `::Gem`. Prefix references
+# to the latter with `::`, as the project's style rules already require.
+#
+# pkg:gem/toys-core#lib/toys/source_spec.rb:380
+class Toys::SourceSpec::Gem < ::Toys::SourceSpec::Base
+  # Create a gem spec.
+  # This argument list is subject to change. Use
+  # {Toys::SourceSpec.gem} instead.
+  #
+  # @private
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:388
+  def initialize(name, version, path, toys_dir, context_directory, source_name); end
+
+  # The gem name.
+  #
+  # @return [String]
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:401
+  def name; end
+
+  # The path from the gem's toys directory, or `nil` for the entire toys
+  # directory.
+  #
+  # @return [String,nil]
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:417
+  def path; end
+
+  # The name of the gem's toys directory, or `nil` to use the default.
+  #
+  # @return [String,nil]
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:424
+  def toys_dir; end
+
+  # The version requirements. Always an array, which is empty if any
+  # version is allowed.
+  #
+  # @return [Array<String>]
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:409
+  def version; end
+
+  protected
+
+  # @private
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:431
+  def equality_fields; end
+end
+
+# A spec for a source located in a git repository.
+#
+# pkg:gem/toys-core#lib/toys/source_spec.rb:306
+class Toys::SourceSpec::Git < ::Toys::SourceSpec::Base
+  # Create a git spec.
+  # This argument list is subject to change. Use
+  # {Toys::SourceSpec.git} instead.
+  #
+  # @private
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:314
+  def initialize(remote, path, commit, update, context_directory, source_name); end
+
+  # The git ref, or `nil` to inherit it from the source doing the loading
+  # or fall back to `"HEAD"`.
+  #
+  # @return [String,nil]
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:343
+  def commit; end
+
+  # The path within the repo, or `nil` for the root of the repo.
+  #
+  # @return [String,nil]
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:335
+  def path; end
+
+  # The git repo URL, or `nil` to inherit it from the source doing the
+  # loading.
+  #
+  # @return [String,nil]
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:328
+  def remote; end
+
+  # Whether, and when, to force-fetch from the remote.
+  #
+  # @return [boolean,Integer]
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:350
+  def update; end
+
+  protected
+
+  # @private
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:357
+  def equality_fields; end
+
+  private
+
+  # Return the given update setting if it is a boolean or an integer
+  # number of seconds, otherwise raise.
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:367
+  def check_update(update); end
+end
+
+# A spec for a source located by file system path.
+#
+# pkg:gem/toys-core#lib/toys/source_spec.rb:257
+class Toys::SourceSpec::Path < ::Toys::SourceSpec::Base
+  # Create a path spec.
+  # This argument list is subject to change. Use
+  # {Toys::SourceSpec.path} instead.
+  #
+  # @private
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:265
+  def initialize(path, relative_paths, context_directory, source_name); end
+
+  # The file system path. If {#relative_paths} is non-nil, this is the root
+  # directory those paths are relative to.
+  #
+  # @return [String]
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:283
+  def path; end
+
+  # The paths to load, relative to {#path}, or `nil` to load {#path}
+  # itself. The empty array means load nothing from the root.
+  #
+  # @return [Array<String>,nil]
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:291
+  def relative_paths; end
+
+  protected
+
+  # @private
+  #
+  # pkg:gem/toys-core#lib/toys/source_spec.rb:298
+  def equality_fields; end
 end
 
 # Namespace for standard middleware classes.
@@ -7088,19 +8839,19 @@ end
 # These middleware are provided by Toys-Core and can be referenced by name
 # when creating a {Toys::CLI}.
 #
-# pkg:gem/toys-core#lib/toys-core.rb:69
+# pkg:gem/toys-core#lib/toys-core.rb:104
 module Toys::StandardMiddleware
   class << self
     # @private
     #
-    # pkg:gem/toys-core#lib/toys-core.rb:78
+    # pkg:gem/toys-core#lib/toys-core.rb:113
     def append_common_flag_group(tool); end
   end
 end
 
 # @private
 #
-# pkg:gem/toys-core#lib/toys-core.rb:73
+# pkg:gem/toys-core#lib/toys-core.rb:108
 Toys::StandardMiddleware::COMMON_FLAG_GROUP = T.let(T.unsafe(nil), Symbol)
 
 # Namespace for standard mixin classes.
@@ -7108,16 +8859,16 @@ Toys::StandardMiddleware::COMMON_FLAG_GROUP = T.let(T.unsafe(nil), Symbol)
 # These mixins are provided by Toys-Core and can be included by name by
 # passing a symbol to {Toys::DSL::Tool#include}.
 #
-# pkg:gem/toys-core#lib/toys-core.rb:91
+# pkg:gem/toys-core#lib/toys-core.rb:126
 module Toys::StandardMixins; end
 
 # A template definition. Template classes should include this module.
 #
-# A template is a configurable set of DSL code that can be run in a toys
-# configuration to automate tool defintion. For example, toys provides a
-# "minitest" template that generates a "test" tool that invokes minitest.
-# Templates will often support configuration; for example the minitest
-# template lets you configure the paths to the test files.
+# A template is a configurable set of DSL code that can be invoked to
+# automate tool definition. For example, Toys provides a "minitest" template
+# that generates a "test" tool that invokes minitest. Templates will often
+# support configuration; for example the minitest template lets you configure
+# the paths to the test files.
 #
 # ### Usage
 #
@@ -7129,10 +8880,11 @@ module Toys::StandardMixins; end
 # template object is passed to any block given to {Toys::DSL::Tool#expand}.
 #
 # Next, in your template class, call the `on_expand` method, which is defined
-# in {Toys::Template::ClassMethods#on_expand}. Pass this a block which
+# in {Toys::Template::ClassMethods#on_expand}, and pass in a block which
 # defines the implementation of the template. Effectively, the contents of
-# this block are "inserted" into the user's configuration. The template
-# object is passed to the block so you have access to the template options.
+# this block are "inserted" into the tool definition wherever the template is
+# invoked. The template object is passed to the block so you have access to
+# the template options.
 #
 # Note that a template performs two functions: a public interface for the
 # user of the template to _write_ configuration data, and code generation
@@ -7145,8 +8897,7 @@ module Toys::StandardMixins; end
 #
 # This is a simple template that generates a "hello" tool. The tool simply
 # prints a `"Hello, #{name}!"` greeting. The name is set as a template
-# option; it is defined when the template is expanded in a toys
-# configuration.
+# option; it is defined when the template is expanded in a tool definition.
 #
 #     # Define a template by creating a class that includes Toys::Template.
 #     class MyHelloTemplate
@@ -7214,24 +8965,24 @@ end
 #
 # pkg:gem/toys-core#lib/toys/template.rb:102
 module Toys::Template::ClassMethods
-  # @private
-  #
   # The template expansion proc. This proc is passed the template object,
   # and is evaluted in the tool class. It should invoke directives to
   # create tools and other objects.
   #
   # @return [Proc] The expansion of this template.
+  #
+  # @private
   #
   # pkg:gem/toys-core#lib/toys/template.rb:127
   def expansion; end
 
-  # @private
-  #
   # The template expansion proc. This proc is passed the template object,
   # and is evaluted in the tool class. It should invoke directives to
   # create tools and other objects.
   #
   # @return [Proc] The expansion of this template.
+  #
+  # @private
   #
   # pkg:gem/toys-core#lib/toys/template.rb:124
   def expansion=(_arg0); end
@@ -7255,10 +9006,10 @@ end
 # This base class provides an alternative to the {Toys::DSL::Tool#tool}
 # directive for defining tools in the Toys DSL. Creating a subclass of
 # `Toys::Tool` will create a tool whose name is the "kebab-case" of the class
-# name. Subclasses can be created only in the context of a tool configuration
-# DSL. Furthermore, a class-defined tool can be created only at the top level
-# of a configuration file, or within another class-defined tool. It cannot
-# be a subtool of a tool block.
+# name. Subclasses can be created only in the context of a tool DSL.
+# Furthermore, a class-defined tool can be created only at the top level of a
+# tool source, or within another class-defined tool. It cannot be a subtool
+# of a tool block.
 #
 # ### Example
 #
@@ -7270,12 +9021,12 @@ end
 #       end
 #     end
 #
-# pkg:gem/toys-core#lib/toys/dsl/base.rb:77
+# pkg:gem/toys-core#lib/toys/dsl/base.rb:84
 class Toys::Tool < ::Toys::Context
   class << self
     # @private
     #
-    # pkg:gem/toys-core#lib/toys/dsl/base.rb:81
+    # pkg:gem/toys-core#lib/toys/dsl/base.rb:88
     def inherited(tool_class); end
   end
 end
@@ -7286,15 +9037,29 @@ end
 # command line arguments supported, and a block that gets run when the
 # tool is executed.
 #
-# pkg:gem/toys-core#lib/toys/tool_definition.rb:11
+# This object has a two stage lifecycle:
+# * During the loading process, it is editable and its mutation methods are
+#   available.
+# * After loading is done, which is triggered by the internal
+#   `finish_definition` method, the mutation methods will raise exceptions.
+#   At that point, the object is immutable and only getter methods will
+#   function.
+#
+# As a result, the method list is fairly long, comprising both mutation
+# methods and immutable getters. Note that in Aug 2026, we studied the
+# possibility of splitting this class into an immutable definition and a
+# mutable builder. This plan was rejected mostly because the full interface
+# is useful to {Middleware#config}.
+#
+# pkg:gem/toys-core#lib/toys/tool_definition.rb:25
 class Toys::ToolDefinition
   # Create a new tool.
   # Should be created only from the DSL via the Loader.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:263
-  def initialize(parent, full_name, priority, source_root, middleware_stack, middleware_lookup, tool_class = T.unsafe(nil)); end
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:282
+  def initialize(parent, full_name, source_root, middleware_stack, middleware_lookup, tool_class = T.unsafe(nil)); end
 
   # Add a named acceptor to the tool. This acceptor may be refereneced by
   # name when adding a flag or an arg. See {Toys::Acceptor.create} for
@@ -7310,7 +9075,7 @@ class Toys::ToolDefinition
   #     {Toys::Acceptor.create}.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:875
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:918
   def add_acceptor(name, acceptor = T.unsafe(nil), type_desc: T.unsafe(nil), &block); end
 
   # Add a named completion proc to this tool. The completion may be
@@ -7327,12 +9092,14 @@ class Toys::ToolDefinition
   #     {Toys::Completion.create}.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:922
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:965
   def add_completion(name, completion = T.unsafe(nil), **options, &block); end
 
   # Add a flag to the current tool. Each flag must specify a key which
   # the script may use to obtain the flag value from the context.
-  # You may then provide the flags themselves in `OptionParser` form.
+  # You may then provide the flags themselves in `OptionParser` form. If a
+  # flag is not present in the command line, the value is set to the given
+  # default, unless it was already set separately.
   #
   # @param key [String,Symbol] The key to use to retrieve the value from
   #     the execution context.
@@ -7381,7 +9148,7 @@ class Toys::ToolDefinition
   #     text and error messages.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1101
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1165
   def add_flag(key, flags = T.unsafe(nil), accept: T.unsafe(nil), default: T.unsafe(nil), handler: T.unsafe(nil), complete_flags: T.unsafe(nil), complete_values: T.unsafe(nil), report_collisions: T.unsafe(nil), group: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), display_name: T.unsafe(nil)); end
 
   # Add a flag group to the group list.
@@ -7410,7 +9177,7 @@ class Toys::ToolDefinition
   #     group to the list. Default is `false`.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1033
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1094
   def add_flag_group(type: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil), name: T.unsafe(nil), report_collisions: T.unsafe(nil), prepend: T.unsafe(nil)); end
 
   # Add an initializer.
@@ -7420,7 +9187,7 @@ class Toys::ToolDefinition
   # @param kwargs [keywords] Keyword arguments to pass to the initializer
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1340
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1411
   def add_initializer(proc, *args, **kwargs); end
 
   # Add a named mixin module to this tool.
@@ -7432,13 +9199,13 @@ class Toys::ToolDefinition
   #     not provided directly.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:896
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:939
   def add_mixin(name, mixin_module = T.unsafe(nil), &block); end
 
   # Add an optional positional argument to the current tool. You must specify
   # a key which the script may use to obtain the argument value from the
-  # context. If an optional argument is not given on the command line, the
-  # value is set to the given default.
+  # context. If an optional argument is not present in the command line, the
+  # value is set to the given default, unless it was already set separately.
   #
   # In general, arguments are parsed in the order they are added to the tool
   # definition. However, all required arguments are always parsed before
@@ -7465,7 +9232,7 @@ class Toys::ToolDefinition
   #     for a description of allowed formats. Defaults to the empty array.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1212
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1276
   def add_optional_arg(key, default: T.unsafe(nil), accept: T.unsafe(nil), complete: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil)); end
 
   # Add a required positional argument to the current tool. You must specify
@@ -7494,7 +9261,7 @@ class Toys::ToolDefinition
   #     for a description of allowed formats. Defaults to the empty array.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1170
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1234
   def add_required_arg(key, accept: T.unsafe(nil), complete: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil)); end
 
   # Add a named template class to this tool.
@@ -7506,7 +9273,7 @@ class Toys::ToolDefinition
   #     is not provided directly.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:943
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:986
   def add_template(name, template_class = T.unsafe(nil), &block); end
 
   # Append long description strings.
@@ -7517,20 +9284,20 @@ class Toys::ToolDefinition
   # @param long_desc [Array<Toys::WrappableString,String,Array<String>>]
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:854
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:897
   def append_long_desc(long_desc); end
 
   # Returns true if this tool has disabled argument parsing.
   # @return [true,false]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:672
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:707
   def argument_parsing_disabled?; end
 
   # The stack of built middleware specs for this tool.
   #
   # @return [Array<Toys::Middleware>]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:455
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:480
   def built_middleware; end
 
   # Check that the tool can still be defined. Should be called internally
@@ -7538,8 +9305,8 @@ class Toys::ToolDefinition
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1503
-  def check_definition_state(is_arg: T.unsafe(nil), is_method: T.unsafe(nil)); end
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1594
+  def check_definition_state(is_arg: T.unsafe(nil), is_method: T.unsafe(nil), is_descending: T.unsafe(nil)); end
 
   # The completion strategy for this tool.
   #
@@ -7557,7 +9324,7 @@ class Toys::ToolDefinition
   #
   # @return [Toys::Completion::Base,Proc]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:490
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:515
   def completion; end
 
   # Set the completion strategy for this ToolDefinition.
@@ -7566,20 +9333,20 @@ class Toys::ToolDefinition
   #
   # @param spec [Object]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1365
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1439
   def completion=(spec); end
 
-  # Return the effective context directory.
+  # Return the tool's context directory.
+  #
   # If there is a custom context directory, uses that. Otherwise, looks for
   # a custom context directory up the tool ancestor chain. If none is
-  # found, uses the default context directory from the source info. It is
-  # possible for there to be no context directory at all, in which case,
-  # returns nil.
+  # found, uses the default context directory from the source info. If the
+  # source info has no context directory either, returns nil.
   #
-  # @return [String] The effective context directory path.
-  # @return [nil] if there is no effective context directory.
+  # @return [String] The context directory path.
+  # @return [nil] if the tool has no context directory.
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1414
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1489
   def context_directory; end
 
   # The custom context directory set for this tool.
@@ -7587,45 +9354,56 @@ class Toys::ToolDefinition
   # @return [String] The directory path
   # @return [nil] if no custom context directory is set.
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:471
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:496
   def custom_context_directory; end
 
   # Set the custom context directory.
   #
   # See {#custom_context_directory} for details.
   #
-  # @param dir [String]
+  # @param dir [String,Pathname,nil] The context directory path, which should
+  #     generally be absolute. Relative paths will be converted to absolute,
+  #     using the current working directory at the time of the method call.
+  #     If you pass nil, unsets the value.
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1353
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1427
   def custom_context_directory=(dir); end
 
   # The default context data set by arguments.
   #
   # @return [Hash]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:439
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:464
   def default_data; end
 
   # Returns true if this tool's definition has been finished and is locked.
   # @return [true,false]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:664
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:699
   def definition_finished?; end
 
   # The full name of the delegate target, if any.
+  # This array may not be modified.
   #
   # @return [Array<String>] if this tool delegates
   # @return [nil] if this tool does not delegate
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:530
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:565
   def delegate_target; end
 
   # Causes this tool to delegate to another tool.
   #
-  # @param target [Array<String>] The full path to the delegate tool.
+  # This sets {#run_handler} to the name of the target, disables argument
+  # parsing, and replaces {#completion} with one that defers to the target.
+  # It is the only supported way to configure delegation; {#run_handler=}
+  # does not accept a target name.
+  #
+  # @param target [Array<String>] The full path to the delegate tool. The
+  #     elements are converted to strings, and a frozen copy of the array is
+  #     retained.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1424
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1506
   def delegate_to(target); end
 
   # The short description string.
@@ -7642,7 +9420,7 @@ class Toys::ToolDefinition
   #
   # @return [Toys::WrappableString]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:370
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:395
   def desc; end
 
   # Set the short description string.
@@ -7651,14 +9429,14 @@ class Toys::ToolDefinition
   #
   # @param desc [Toys::WrappableString,String,Array<String>]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:828
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:871
   def desc=(desc); end
 
   # Disable argument parsing for this tool.
   #
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:959
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1002
   def disable_argument_parsing; end
 
   # Mark one or more flags as disabled, preventing their use by any
@@ -7668,7 +9446,7 @@ class Toys::ToolDefinition
   # @param flags [String...] The flags to disable
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1132
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1196
   def disable_flag(*flags); end
 
   # A displayable name of this tool, generally the full name delimited by
@@ -7676,50 +9454,54 @@ class Toys::ToolDefinition
   #
   # @return [String]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:547
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:582
   def display_name; end
 
   # Enforce that flags must come before args for this tool.
-  # You may disable enforcement by passoing `false` for the state.
+  # You may disable enforcement by passing `false` for the state.
   #
   # @param state [true,false]
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:977
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1020
   def enforce_flags_before_args(state = T.unsafe(nil)); end
 
   # Returns true if this tool requires exact flag matches.
   # @return [true,false]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:688
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:723
   def exact_flag_match_required?; end
 
   # Complete definition and run middleware configs. Should be called from
   # the Loader only.
   #
+  # Note that if an error occurs during finishing (e.g. a middleware raises),
+  # the tool will be left an inconsistent state, and cannot be used unless it
+  # is reset.
+  #
   # @private This interface is internal and subject to change without warning.
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1469
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1556
   def finish_definition(loader); end
 
   # A list of all defined flag groups, in order.
   #
   # @return [Array<Toys::FlagGroup>]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:396
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:421
   def flag_groups; end
 
   # A list of all defined flags.
   #
   # @return [Array<Toys::Flag>]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:403
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:428
   def flags; end
 
   # Returns true if this tool enforces flags before args.
   # @return [true,false]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:680
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:715
   def flags_before_args_enforced?; end
 
   # The name of the tool as an array of strings.
@@ -7727,7 +9509,7 @@ class Toys::ToolDefinition
   #
   # @return [Array<String>]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:332
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:355
   def full_name; end
 
   # Returns true if this tool handles interrupts. This is equivalent to
@@ -7735,7 +9517,7 @@ class Toys::ToolDefinition
   #
   # @return [true,false]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:602
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:637
   def handles_interrupts?; end
 
   # Returns true if this tool handles the given signal.
@@ -7743,13 +9525,13 @@ class Toys::ToolDefinition
   # @param signal [Integer,String,Symbol] The signal number or name
   # @return [true,false]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:612
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:647
   def handles_signal?(signal); end
 
   # Returns true if this tool handles usage errors.
   # @return [true,false]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:621
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:656
   def handles_usage_errors?; end
 
   # Include the given mixin in the tool class.
@@ -7760,32 +9542,32 @@ class Toys::ToolDefinition
   # @param mod [Module] The mixin module
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:786
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:829
   def include_mixin(mod, *args, **kwargs); end
 
   # Returns true if at least one flag or positional argument is defined
   # for this tool.
   # @return [true,false]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:646
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:681
   def includes_arguments?; end
 
   # Returns true if this tool has any definition information.
   # @return [true,false]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:655
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:690
   def includes_definition?; end
 
   # Returns true if there is a specific description set for this tool.
   # @return [true,false]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:637
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:672
   def includes_description?; end
 
   # Returns true if this tool has at least one included module.
   # @return [true,false]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:629
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:664
   def includes_modules?; end
 
   # Set whether helper methods defined in this tool are inherited by subtools.
@@ -7794,14 +9576,14 @@ class Toys::ToolDefinition
   #     unsets the value, causing it to revert to the setting of the parent
   #     tool if any, or false for the root tool.
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1390
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1465
   def inheritable_helper_methods=(val); end
 
   # Returns true if helper methods defined in this class are inherited by
   # subtools.
   # @return [true,false]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:697
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:740
   def inheritable_helper_methods?; end
 
   # Return the interrupt handler. This is equivalent to `signal_handler(2)`.
@@ -7810,7 +9592,7 @@ class Toys::ToolDefinition
   # @return [Symbol] if the interrupt signal handler is defined as a method
   # @return [nil] if there is no handler for the interrupt signals
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:575
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:610
   def interrupt_handler; end
 
   # Set the interrupt handler. This is equivalent to calling
@@ -7818,7 +9600,7 @@ class Toys::ToolDefinition
   #
   # @param handler [Proc,Symbol] The interrupt signal handler
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1289
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1360
   def interrupt_handler=(handler); end
 
   # Sets the path to the file that defines this tool.
@@ -7828,7 +9610,7 @@ class Toys::ToolDefinition
   # @param source [Toys::SourceInfo] Source info
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:816
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:859
   def lock_source(source); end
 
   # The long description strings.
@@ -7847,7 +9629,7 @@ class Toys::ToolDefinition
   #
   # @return [Array<Toys::WrappableString>]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:389
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:414
   def long_desc; end
 
   # Set the long description strings.
@@ -7856,7 +9638,7 @@ class Toys::ToolDefinition
   #
   # @param long_desc [Array<Toys::WrappableString,String,Array<String>>]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:840
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:883
   def long_desc=(long_desc); end
 
   # Get the named acceptor from this tool or its ancestors.
@@ -7865,7 +9647,7 @@ class Toys::ToolDefinition
   # @return [Toys::Acceptor::Base] The acceptor.
   # @return [nil] if no acceptor of the given name is found.
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:740
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:783
   def lookup_acceptor(name); end
 
   # Get the named completion from this tool or its ancestors.
@@ -7874,14 +9656,14 @@ class Toys::ToolDefinition
   # @return [Toys::Completion::Base,Proc] The completion proc.
   # @return [nil] if no completion of the given name is found.
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:773
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:816
   def lookup_completion(name); end
 
   # Lookup the custom context directory in this tool and its ancestors.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1448
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1531
   def lookup_custom_context_directory; end
 
   # Get the named mixin from this tool or its ancestors.
@@ -7890,7 +9672,7 @@ class Toys::ToolDefinition
   # @return [Module] The mixin module.
   # @return [nil] if no mixin of the given name is found.
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:762
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:805
   def lookup_mixin(name); end
 
   # Get the named template from this tool or its ancestors.
@@ -7899,35 +9681,35 @@ class Toys::ToolDefinition
   # @return [Class,nil] The template class.
   # @return [nil] if no template of the given name is found.
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:751
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:794
   def lookup_template(name); end
 
   # Mark this tool as having at least one module included.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1457
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1540
   def mark_includes_modules; end
 
   # A list of all defined optional positional arguments.
   #
   # @return [Array<Toys::PositionalArg>]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:417
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:442
   def optional_args; end
 
   # All arg definitions in order: required, optional, remaining.
   #
   # @return [Array<Toys::PositionalArg>]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:710
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:753
   def positional_args; end
 
   # The priority of this tool definition.
   #
   # @return [Integer]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:339
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:362
   def priority; end
 
   # The remaining arguments specification.
@@ -7935,7 +9717,7 @@ class Toys::ToolDefinition
   # @return [Toys::PositionalArg] The argument definition
   # @return [nil] if remaining arguments are not supported by this tool.
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:425
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:450
   def remaining_arg; end
 
   # Require that flags must match exactly. (If false, flags can match an
@@ -7944,23 +9726,23 @@ class Toys::ToolDefinition
   # @param state [true,false]
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:995
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1038
   def require_exact_flag_match(state = T.unsafe(nil)); end
 
   # A list of all defined required positional arguments.
   #
   # @return [Array<Toys::PositionalArg>]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:410
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:435
   def required_args; end
 
   # Reset the definition of this tool, deleting all definition data but
-  # leaving named acceptors, mixins, and templates intact.
+  # leaving named acceptors, mixins, templates, and completions intact.
   # Should be called only from the DSL.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:289
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:308
   def reset_definition; end
 
   # Resolve the given flag given the flag string. Returns an object that
@@ -7971,13 +9753,13 @@ class Toys::ToolDefinition
   # @param str [String] Flag string
   # @return [Toys::Flag::Resolution]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:725
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:768
   def resolve_flag(str); end
 
   # Returns true if this tool is a root tool.
   # @return [true,false]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:583
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:618
   def root?; end
 
   # The run handler.
@@ -7990,11 +9772,20 @@ class Toys::ToolDefinition
   # however, typically a tool is made non-runnable simply by leaving the run
   # handler set to `:run` and not defining the method.
   #
+  # Additionally, if this tool delegates to another tool, the run handler is
+  # the full name of the delegate target, as an array of strings. This array
+  # may not be modified. Note also that this value cannot be assigned through
+  # {#run_handler=}, which accepts only a proc, symbol, or nil. Delegation is
+  # configured by calling {#delegate_to}, which sets this attribute along
+  # with the rest of the delegation state. The getter and setter are thus not
+  # symmetrical: the getter can return an array that the setter would reject.
+  #
   # @return [Proc] if the run handler is defined as a Proc
   # @return [Symbol] if the run handler is defined as a method
+  # @return [Array<String>] if this tool delegates to another tool
   # @return [nil] if the tool is explicitly made non-runnable
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:507
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:541
   def run_handler; end
 
   # Set the run handler.
@@ -8007,27 +9798,34 @@ class Toys::ToolDefinition
   # however, typically a tool is made non-runnable simply by leaving the run
   # handler set to `:run` and not defining the method.
   #
+  # This setter does not accept an array, even though {#run_handler} may
+  # return one for a delegating tool. Delegation involves more state than
+  # just the run handler, so it must be configured by calling
+  # {#delegate_to}.
+  #
   # @param handler [Proc,Symbol,nil] the run handler
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1275
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1346
   def run_handler=(handler); end
 
   # Run all initializers against a context. Called from the Runner.
   #
   # @private This interface is internal and subject to change without warning.
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1491
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1582
   def run_initializers(context); end
 
   # Returns true if this tool is marked as runnable.
   # @return [true,false]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:591
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:626
   def runnable?; end
 
   # Specify what should be done with unmatched positional arguments. You must
   # specify a key which the script may use to obtain the remaining args
-  # from the context.
+  # from the context. If no remaining arguments were present in the command
+  # line, the value is set to the given default (normally the empty array),
+  # unless it was already set separately.
   #
   # @param key [String,Symbol] The key to use to retrieve the value from
   #     the execution context.
@@ -8050,7 +9848,7 @@ class Toys::ToolDefinition
   #     for a description of allowed formats. Defaults to the empty array.
   # @return [self]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1250
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1316
   def set_remaining_args(key, default: T.unsafe(nil), accept: T.unsafe(nil), complete: T.unsafe(nil), display_name: T.unsafe(nil), desc: T.unsafe(nil), long_desc: T.unsafe(nil)); end
 
   # Set the handler for the given signal.
@@ -8063,7 +9861,7 @@ class Toys::ToolDefinition
   # @param signal [Integer,String,Symbol] The signal number or name
   # @param handler [Proc,Symbol] The signal handler
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1304
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1375
   def set_signal_handler(signal, handler); end
 
   # Return the signal handler for the given signal.
@@ -8078,14 +9876,14 @@ class Toys::ToolDefinition
   # @return [Symbol] if the signal handler is defined as a method
   # @return [nil] if there is no handler for the given signal
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:564
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:599
   def signal_handler(signal); end
 
   # The local name of this tool, i.e. the last element of the full name.
   #
   # @return [String]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:537
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:572
   def simple_name; end
 
   # Info on the source of this tool.
@@ -8093,14 +9891,14 @@ class Toys::ToolDefinition
   # @return [Toys::SourceInfo] The source info
   # @return [nil] if the source is not defined.
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:463
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:488
   def source_info; end
 
-  # The root source info defining this tool, or nil if there is no source.
+  # The root source info defining this tool.
   #
-  # @return [Toys::SourceInfo,nil]
+  # @return [Toys::SourceInfo]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:346
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:371
   def source_root; end
 
   # The stack of middleware specs used for subtools.
@@ -8109,15 +9907,30 @@ class Toys::ToolDefinition
   #
   # @return [Array<Toys::Middleware::Spec>]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:448
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:473
   def subtool_middleware_stack; end
 
   # The tool class.
   #
   # @return [Class]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:353
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:378
   def tool_class; end
+
+  # Treat unknown flags as positional arguments rather than reporting them
+  # as usage errors.
+  #
+  # @param state [true,false]
+  # @return [self]
+  #
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1056
+  def treat_unknown_flags_as_args(state = T.unsafe(nil)); end
+
+  # Returns true if this tool treats unknown flags as positional arguments.
+  # @return [true,false]
+  #
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:731
+  def unknown_flags_are_args?; end
 
   # The usage error handler.
   #
@@ -8131,7 +9944,7 @@ class Toys::ToolDefinition
   # @return [Symbol] if the user error handler is defined as a method
   # @return [nil] if there is no usage error handler
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:522
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:556
   def usage_error_handler; end
 
   # Set the usage error handler.
@@ -8144,40 +9957,42 @@ class Toys::ToolDefinition
   #
   # @param handler [Proc,Symbol] The usage error handler
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1324
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1395
   def usage_error_handler=(handler); end
 
   # A list of flags that have been used in the flag definitions.
   #
   # @return [Array<String>]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:432
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:457
   def used_flags; end
 
   private
 
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1568
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1648
   def canonicalize_signal(signal); end
 
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1521
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1622
   def create_class; end
 
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1525
+  # The heart of finish_definition, without the definition_state logic
+  #
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1662
+  def finish_definition_internal(loader); end
+
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1626
   def make_config_proc(middleware, loader, next_config); end
 
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1533
-  def make_delegation_run_handler(target); end
-
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1554
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1634
   def resolve_acceptor_name(name); end
 
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1561
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:1641
   def resolve_completion_name(name); end
 end
 
 # A Completion that implements the default algorithm for a tool.
 #
-# pkg:gem/toys-core#lib/toys/tool_definition.rb:15
+# pkg:gem/toys-core#lib/toys/tool_definition.rb:29
 class Toys::ToolDefinition::DefaultCompletion < ::Toys::Completion::Base
   # Create a completion given configuration options.
   #
@@ -8190,7 +10005,7 @@ class Toys::ToolDefinition::DefaultCompletion < ::Toys::Completion::Base
   # @param delegation_target [Array<String>,nil] Delegation target, or
   #     `nil` if none.
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:28
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:42
   def initialize(complete_subtools: T.unsafe(nil), include_hidden_subtools: T.unsafe(nil), complete_args: T.unsafe(nil), complete_flags: T.unsafe(nil), complete_flag_values: T.unsafe(nil), delegation_target: T.unsafe(nil)); end
 
   # Returns candidates for the current completion.
@@ -8199,79 +10014,93 @@ class Toys::ToolDefinition::DefaultCompletion < ::Toys::Completion::Base
   #     context including the string fragment.
   # @return [Array<Toys::Completion::Candidate>] an array of candidates
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:93
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:107
   def call(context); end
 
   # Whether to complete positional args
   # @return [true,false]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:68
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:82
   def complete_args?; end
 
   # Whether to complete flag values
   # @return [true,false]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:76
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:90
   def complete_flag_values?; end
 
   # Whether to complete flags
   # @return [true,false]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:60
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:74
   def complete_flags?; end
 
   # Whether to complete subtool names
   # @return [true,false]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:44
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:58
   def complete_subtools?; end
 
   # Delegation target, or nil for none.
   # @return [Array<String>,nil]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:84
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:98
   def delegation_target; end
 
   # Whether to include hidden subtools
   # @return [true,false]
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:52
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:66
   def include_hidden_subtools?; end
 
   private
 
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:164
+  # Works out which namespace's subtools should be offered as candidates
+  # for the word currently being completed.
+  #
+  # Returns a three-element array `[tool_name, prefix, fragment]`, in which
+  # `tool_name` is the full name of the namespace whose subtools should be
+  # listed, `fragment` is the partial subtool name that candidates must
+  # start with, and `prefix` is a string to prepend to each candidate.
+  #
+  # The current word is the whole word being completed, so a tool path in
+  # it arrives with its delimiters intact. The loader's splitter decides
+  # where that path ends, per {Toys::ToolNameSplitter#split_partial}, and
+  # the path is echoed back in `prefix` so that each candidate remains a
+  # replacement for the whole word.
+  #
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:199
   def analyze_subtool_fragment(context); end
 
   # Returns a list of completion candidates that are non-flag arguments.
   # Does not return nil.
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:190
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:209
   def arg_candidates(context); end
 
   # Returns a list of completion candidates that are flag values.
   # Does not return nil.
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:217
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:236
   def flag_value_candidates(context); end
 
   # Returns a list of completion candidates that are flags.
   # Does not return nil.
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:201
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:220
   def plain_flag_candidates(context); end
 
   # Returns a list of completion candidates that are subtools. Returns nil
   # if subtool completion is disabled or the context demands that we are
   # no longer parsing subtools.
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:147
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:168
   def subtool_candidates(context); end
 
   # Returns a list of completion candidates that are not flags or their
   # values (i.e. are subtools or normal args)
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:136
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:157
   def subtool_or_arg_candidates(context); end
 
   # Return a list of completion candidates of the form "--flag=val".
@@ -8279,37 +10108,147 @@ class Toys::ToolDefinition::DefaultCompletion < ::Toys::Completion::Base
   # are no suitable completions. Returns nil if the context demands a
   # different form.
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:117
+  # The flag name and equals sign are not part of what the flag's value
+  # completion knows how to complete, so they are stripped from the
+  # fragment and restored to each candidate.
+  #
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:135
   def valued_flag_candidates(context); end
 end
 
 # @private
 # A spec for a completion or acceptor, as a single object
 #
-# pkg:gem/toys-core#lib/toys/tool_definition.rb:232
+# pkg:gem/toys-core#lib/toys/tool_definition.rb:251
 class Toys::ToolDefinition::ScalarSpec
   # @private
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:245
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:264
   def initialize(spec, options, block); end
 
   # @private
   #
-  # pkg:gem/toys-core#lib/toys/tool_definition.rb:252
+  # pkg:gem/toys-core#lib/toys/tool_definition.rb:271
   def expand; end
 
   class << self
     # @private
     #
-    # pkg:gem/toys-core#lib/toys/tool_definition.rb:234
+    # pkg:gem/toys-core#lib/toys/tool_definition.rb:253
     def from(spec, options, block); end
   end
 end
 
-# An exception indicating an error in a tool definition.
+# An exception indicating a semantic error in a tool definition.
+# This could include issues such as illegal names, or contradictory or
+# nonsensical argument configurations.
 #
-# pkg:gem/toys-core#lib/toys/errors.rb:7
+# pkg:gem/toys-core#lib/toys/errors.rb:9
 class Toys::ToolDefinitionError < ::StandardError; end
+
+# Splits tool names into words, according to a set of delimiter characters.
+#
+# A tool name is a series of words. On the command line, and in various
+# places in the DSL, a name can be written as a single string with its words
+# separated by delimiters. Whitespace is always a delimiter; additional
+# characters can be configured when a splitter is created.
+#
+# A splitter is immutable, and can be shared by any number of objects that
+# need to interpret tool names the same way.
+#
+# pkg:gem/toys-core#lib/toys/tool_name_splitter.rb:15
+class Toys::ToolNameSplitter
+  # Create a splitter.
+  #
+  # @param extra_delimiters [String] A string containing characters that can
+  #     function as delimiters in a tool name, in addition to whitespace.
+  #     Defaults to empty. Allowed characters are period, colon, and slash.
+  #
+  # pkg:gem/toys-core#lib/toys/tool_name_splitter.rb:23
+  def initialize(extra_delimiters = T.unsafe(nil)); end
+
+  # The extra delimiters this splitter was created with, as given. Whitespace
+  # is a delimiter whether or not it appears here.
+  #
+  # @return [String]
+  #
+  # pkg:gem/toys-core#lib/toys/tool_name_splitter.rb:43
+  def extra_delimiters; end
+
+  # @return [String] a description of this splitter's delimiters
+  #
+  # pkg:gem/toys-core#lib/toys/tool_name_splitter.rb:82
+  def inspect; end
+
+  # Splits the given tool name into words. You may pass either an array,
+  # whose elements are copied as strings without being split further, or a
+  # single string or symbol possibly delimited by this splitter's delimiters.
+  # Always returns a new array of strings.
+  #
+  # @param name [String,Symbol,Array<String,Symbol>] The name to split.
+  # @return [Array<String>]
+  #
+  # pkg:gem/toys-core#lib/toys/tool_name_splitter.rb:54
+  def split(name); end
+
+  # Splits a partially typed name, such as a fragment being completed, into
+  # the portion that names a path and the trailing partial word.
+  #
+  # Returns a two-element array. The first element is the leading portion of
+  # the string through its final delimiter, or the empty string if there is
+  # none; pass it to {#split} to get the path words. The second element is
+  # the text following that delimiter.
+  #
+  # A delimiter is recognized as a separator only if at least one character
+  # precedes it, so a string that begins with a delimiter is not split.
+  #
+  # @param str [String] The partial name to split.
+  # @return [Array(String,String)]
+  #
+  # pkg:gem/toys-core#lib/toys/tool_name_splitter.rb:74
+  def split_partial(str); end
+end
+
+# A splitter that recognizes only whitespace as a delimiter. This is the
+# splitter used when no other is configured.
+#
+# @return [Toys::ToolNameSplitter]
+#
+# pkg:gem/toys-core#lib/toys/tool_name_splitter.rb:92
+Toys::ToolNameSplitter::DEFAULT = T.let(T.unsafe(nil), Toys::ToolNameSplitter)
+
+# An exception indicating a problem with a tool source, e.g. a path that
+# cannot be read, a git repo that cannot be accessed, a gem that cannot be
+# activated, etc.
+#
+# pkg:gem/toys-core#lib/toys/errors.rb:17
+class Toys::ToolSourceError < ::StandardError; end
+
+# A named unique key, useful for {Toys::Context} keys or sentinels.
+#
+# Each individual instance of this class is unique and not equal to any other
+# instance, even if they have the same user-visible name.
+#
+# pkg:gem/toys-core#lib/toys/unique_key.rb:10
+class Toys::UniqueKey
+  # Create a new UniqueKey.
+  #
+  # @param name [String,nil] Optional name. If not passed, a default is
+  #     constructed using the object ID.
+  #
+  # pkg:gem/toys-core#lib/toys/unique_key.rb:17
+  def initialize(name = T.unsafe(nil)); end
+
+  # @return [String] a user-visible name of this key
+  #
+  # pkg:gem/toys-core#lib/toys/unique_key.rb:34
+  def inspect; end
+
+  # @return [String] a user-visible name of this key
+  #
+  # pkg:gem/toys-core#lib/toys/unique_key.rb:27
+  def to_s; end
+end
 
 # Namespace for common utility classes.
 #
@@ -8318,7 +10257,7 @@ class Toys::ToolDefinitionError < ::StandardError; end
 #
 #     require "toys/utils/exec"
 #
-# pkg:gem/toys-core#lib/toys-core.rb:102
+# pkg:gem/toys-core#lib/toys-core.rb:137
 module Toys::Utils; end
 
 # A string intended for word-wrapped display.

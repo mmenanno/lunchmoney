@@ -5,7 +5,7 @@
 # Please instead update this file by running `bin/tapioca gem toys`.
 
 
-# Toys is a configurable command line tool. Write commands in config files
+# Toys is a configurable command line tool. Write commands in source files
 # using a simple DSL, and Toys will provide the command line executable and
 # take care of all the details such as argument parsing, online help, and error
 # reporting. Toys is designed for software developers, IT professionals, and
@@ -71,17 +71,23 @@ class Toys::StandardCLI < ::Toys::CLI
   #     the CLI uses only the given paths. If not, the CLI will search for
   #     paths from the current directory and global paths.
   # @param include_builtins [boolean] Add the builtin tools. Default is true.
-  # @param cur_dir [String,nil] Starting search directory for configs.
+  # @param cur_dir [String,nil] Starting search directory for sources.
   #     Defaults to the current working directory.
+  # @param git_cache [Toys::Utils::GitCache,nil] A custom GitCache instance
+  #     to use when resolving git sources. Optional. If nil or not
+  #     specified, uses a process-wide default GitCache.
+  # @param gems_util [Toys::Utils::Gems,nil] A custom Gems utility instance
+  #     to use when resolving gem sources. Optional. If nil or not
+  #     specified, uses a process-wide default Gems utility.
   #
-  # pkg:gem/toys#lib/toys/standard_cli.rb:115
-  def initialize(custom_paths: T.unsafe(nil), include_builtins: T.unsafe(nil), cur_dir: T.unsafe(nil)); end
+  # pkg:gem/toys#lib/toys/standard_cli.rb:91
+  def initialize(custom_paths: T.unsafe(nil), include_builtins: T.unsafe(nil), cur_dir: T.unsafe(nil), git_cache: T.unsafe(nil), gems_util: T.unsafe(nil)); end
 
   private
 
   # Add paths for builtin tools
   #
-  # pkg:gem/toys#lib/toys/standard_cli.rb:147
+  # pkg:gem/toys#lib/toys/standard_cli.rb:125
   def add_builtins; end
 
   # Add paths for the given current directory and its ancestors, plus the
@@ -91,28 +97,28 @@ class Toys::StandardCLI < ::Toys::CLI
   #     current directory
   # @return [self]
   #
-  # pkg:gem/toys#lib/toys/standard_cli.rb:161
+  # pkg:gem/toys#lib/toys/standard_cli.rb:140
   def add_current_directory_paths(cur_dir); end
 
-  # Returns the default set of global config directories.
+  # Returns the default set of global source directories.
   #
   # @return [Array<String>]
   #
-  # pkg:gem/toys#lib/toys/standard_cli.rb:194
+  # pkg:gem/toys#lib/toys/standard_cli.rb:173
   def default_global_dirs; end
 
   # Returns the middleware for the standard Toys CLI.
   #
   # @return [Array]
   #
-  # pkg:gem/toys#lib/toys/standard_cli.rb:209
+  # pkg:gem/toys#lib/toys/standard_cli.rb:188
   def default_middleware_stack; end
 
   # Returns a ModuleLookup for the default templates.
   #
   # @return [Toys::ModuleLookup]
   #
-  # pkg:gem/toys#lib/toys/standard_cli.rb:240
+  # pkg:gem/toys#lib/toys/standard_cli.rb:219
   def default_template_lookup; end
 
   # Step out of any toys dir.
@@ -121,86 +127,56 @@ class Toys::StandardCLI < ::Toys::CLI
   # @param toys_dir_name [String] The name of the toys directory to look for
   # @return [String] The final directory path
   #
-  # pkg:gem/toys#lib/toys/standard_cli.rb:176
+  # pkg:gem/toys#lib/toys/standard_cli.rb:155
   def skip_toys_dir(dir, toys_dir_name); end
 end
-
-# Standard toys configuration directory name.
-# @return [String]
-#
-# pkg:gem/toys#lib/toys/standard_cli.rb:25
-Toys::StandardCLI::CONFIG_DIR_NAME = T.let(T.unsafe(nil), String)
-
-# Standard toys configuration file name.
-# @return [String]
-#
-# pkg:gem/toys#lib/toys/standard_cli.rb:31
-Toys::StandardCLI::CONFIG_FILE_NAME = T.let(T.unsafe(nil), String)
-
-# Standard data directory name in a toys configuration.
-# @return [String]
-#
-# pkg:gem/toys#lib/toys/standard_cli.rb:55
-Toys::StandardCLI::DATA_DIR_NAME = T.let(T.unsafe(nil), String)
 
 # Short description for the standard root tool.
 # @return [String]
 #
-# pkg:gem/toys#lib/toys/standard_cli.rb:79
+# pkg:gem/toys#lib/toys/standard_cli.rb:49
 Toys::StandardCLI::DEFAULT_ROOT_DESC = T.let(T.unsafe(nil), String)
 
 # Help text for the standard root tool.
 # @return [String]
 #
-# pkg:gem/toys#lib/toys/standard_cli.rb:85
+# pkg:gem/toys#lib/toys/standard_cli.rb:55
 Toys::StandardCLI::DEFAULT_ROOT_LONG_DESC = T.let(T.unsafe(nil), String)
 
 # Short description for the version flag.
 # @return [String]
 #
-# pkg:gem/toys#lib/toys/standard_cli.rb:96
+# pkg:gem/toys#lib/toys/standard_cli.rb:66
 Toys::StandardCLI::DEFAULT_VERSION_FLAG_DESC = T.let(T.unsafe(nil), String)
 
 # Name of the standard toys executable.
 # @return [String]
 #
-# pkg:gem/toys#lib/toys/standard_cli.rb:67
+# pkg:gem/toys#lib/toys/standard_cli.rb:37
 Toys::StandardCLI::EXECUTABLE_NAME = T.let(T.unsafe(nil), String)
 
 # Delimiter characters recognized.
 # @return [String]
 #
-# pkg:gem/toys#lib/toys/standard_cli.rb:73
+# pkg:gem/toys#lib/toys/standard_cli.rb:43
 Toys::StandardCLI::EXTRA_DELIMITERS = T.let(T.unsafe(nil), String)
 
-# Standard index file name in a toys configuration.
+# Standard toys tool directory name.
 # @return [String]
 #
-# pkg:gem/toys#lib/toys/standard_cli.rb:37
-Toys::StandardCLI::INDEX_FILE_NAME = T.let(T.unsafe(nil), String)
+# pkg:gem/toys#lib/toys/standard_cli.rb:25
+Toys::StandardCLI::TOPLEVEL_TOOL_DIR_NAME = T.let(T.unsafe(nil), String)
 
-# Standard lib directory name in a toys configuration.
+# Standard toys tool file name.
 # @return [String]
 #
-# pkg:gem/toys#lib/toys/standard_cli.rb:61
-Toys::StandardCLI::LIB_DIR_NAME = T.let(T.unsafe(nil), String)
-
-# Standard preload directory name in a toys configuration.
-# @return [String]
-#
-# pkg:gem/toys#lib/toys/standard_cli.rb:43
-Toys::StandardCLI::PRELOAD_DIR_NAME = T.let(T.unsafe(nil), String)
-
-# Standard preload file name in a toys configuration.
-# @return [String]
-#
-# pkg:gem/toys#lib/toys/standard_cli.rb:49
-Toys::StandardCLI::PRELOAD_FILE_NAME = T.let(T.unsafe(nil), String)
+# pkg:gem/toys#lib/toys/standard_cli.rb:31
+Toys::StandardCLI::TOPLEVEL_TOOL_FILE_NAME = T.let(T.unsafe(nil), String)
 
 # Name of the toys path environment variable.
 # @return [String]
 #
-# pkg:gem/toys#lib/toys/standard_cli.rb:102
+# pkg:gem/toys#lib/toys/standard_cli.rb:72
 Toys::StandardCLI::TOYS_PATH_ENV = T.let(T.unsafe(nil), String)
 
 # Namespace for standard template classes.
